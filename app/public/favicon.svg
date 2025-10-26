@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none">
+    <style>
+        .shape {
+            fill: #fff;
+            stroke: #fff;
+        }
+
+        .dark .shape {
+            fill: #fff;
+            stroke: #fff;
+        }
+
+        .background {
+            fill: black;
+        }
+
+        .dark .background {
+            fill: #18D1B8;
+        }
+    </style>
+    <rect width="32" height="32" class="background" rx="16" />
+    <path class="shape" stroke-width="2" d="m16.03 9-4.82 7 4.82 7h3.07l-4.42-6.43-.4-.57.4-.57L19.1 9h-3.07Z" />
+</svg>
