@@ -41,22 +41,15 @@
 ### Database Architecture
 
 **1. User Upload**
-- User uploads audio file
+- User uploads audio file -> .webm codecs/opus
 
 **2. Storage Layer**
-- **Action:** Store FLAC in S3
+- **Action:** Store .wav files in S3 -> 16bit 16kHz mono -> ~1.8MB per second
 - **Purpose:** Long-term storage (S3/filesystem)
 
 **3. Database Layer**
 - **Action:** Store path + metadata in database
 - **Purpose:** Metadata only
-
-**4. Processing Layer**
-- **Action:** Convert to WAV (16kHz mono)
-- **Purpose:** Temporary, can be cached
-
-**5. ML Pipeline**
-- Process the converted audio through ML models
 
 ### Audio Quality Metrics
 
@@ -120,3 +113,19 @@
 
 ### Alignment Tools
 - Align Voice recording with IPA transcription → [MFA](https://montreal-forced-aligner.readthedocs.io/en/latest/index.html)
+
+---
+
+## Codebase Architecture
+
+### Database Layer Pattern
+- **DB functions** (`src/db/*.ts`): Pure database operations, no server/client logic
+- **Server functions** (`src/lib/*.ts`): Use `createServerFn` for RPC, call DB functions
+- **Loaders**: Call server functions (not DB directly) - loaders are isomorphic
+- **Components**: Use `useServerFn` hook with TanStack Query for data fetching
+
+### TanStack Start Best Practices
+- Loaders run on both server and client → use server functions for DB access
+- Server functions execute server-only → safe for `process.env`, DB connections
+- Query invalidation: Use `queryClient.invalidateQueries()` after mutations
+- Initial data: Loader data → `initialData` in `useQuery` for SSR hydration

@@ -1,4 +1,10 @@
-import { Pool } from "pg";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+
+// Configure WebSocket for Neon serverless (required for Node.js v21 and earlier)
+if (typeof WebSocket === "undefined") {
+  neonConfig.webSocketConstructor = ws;
+}
 
 const waitForPostgres = async (
   connectionString: string,
@@ -10,17 +16,17 @@ const waitForPostgres = async (
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       await pool.query("SELECT 1");
-      console.log("✅ PostgreSQL is ready!");
+      console.log("✅ Database is ready!");
       await pool.end();
       return;
     } catch (error) {
       console.log(
-        `⏳ Waiting for PostgreSQL... (attempt ${attempt}/${maxAttempts})`
+        `⏳ Waiting for database... (attempt ${attempt}/${maxAttempts})`
       );
       if (attempt === maxAttempts) {
         await pool.end();
         throw new Error(
-          `PostgreSQL is not available after ${maxAttempts} attempts`
+          `Database is not available after ${maxAttempts} attempts`
         );
       }
       await new Promise((resolve) => setTimeout(resolve, delayMs));

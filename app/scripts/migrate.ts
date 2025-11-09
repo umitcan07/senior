@@ -1,10 +1,16 @@
 import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { Pool } from "pg";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import * as schema from "../src/db/schema.ts";
 
 config();
+
+// Configure WebSocket for Neon serverless (required for Node.js v21 and earlier)
+if (typeof WebSocket === "undefined") {
+  neonConfig.webSocketConstructor = ws;
+}
 
 const runMigrations = async () => {
   if (!process.env.DATABASE_URL) {

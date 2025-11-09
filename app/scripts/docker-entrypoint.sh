@@ -3,7 +3,7 @@ set -e
 
 echo "🚀 Starting application initialization..."
 
-echo "⏳ Waiting for PostgreSQL..."
+echo "⏳ Waiting for database connection..."
 pnpm exec tsx scripts/wait-for-postgres.ts
 
 echo "📦 Running database migrations..."

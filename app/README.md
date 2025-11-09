@@ -25,11 +25,12 @@ pnpm start
 
 ## Docker Deployment
 
-This application is configured with Docker and Docker Compose for easy deployment with PostgreSQL.
+This application is configured with Docker and Docker Compose for deployment. The application uses **Neon serverless PostgreSQL** as the database (no local PostgreSQL container needed).
 
 ### Prerequisites
 
 - Docker and Docker Compose installed on your system
+- Neon database account and connection string
 
 ### Quick Start
 
@@ -38,19 +39,27 @@ This application is configured with Docker and Docker Compose for easy deploymen
    cp .env.example .env
    ```
 
-2. **Update environment variables** in `.env` file as needed.
+2. **Set up Neon database**:
+   - Sign up at [neon.tech](https://neon.tech)
+   - Create a new project
+   - Copy your connection string (it will look like: `postgresql://user:password@host.neon.tech/dbname?sslmode=require`)
 
-3. **Build and start all services** (app + PostgreSQL):
+3. **Update environment variables** in `.env` file:
+   ```bash
+   DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
+   ```
+
+4. **Build and start the application**:
    ```bash
    docker-compose up -d --build
    ```
 
-4. **View logs**:
+5. **View logs**:
    ```bash
    docker-compose logs -f
    ```
 
-5. **Stop services**:
+6. **Stop services**:
    ```bash
    docker-compose down
    ```
@@ -62,51 +71,63 @@ This application is configured with Docker and Docker Compose for easy deploymen
   docker build -t tanstack-app .
   ```
 
-- **Run only PostgreSQL** (useful for local development):
-  ```bash
-  docker-compose up -d postgres
-  ```
-
-- **Run database migrations** (when PostgreSQL is running):
+- **Run database migrations**:
   ```bash
   pnpm db:push
   # or
   pnpm db:migrate
   ```
 
-- **Access PostgreSQL directly**:
-  ```bash
-  docker-compose exec postgres psql -U postgres -d tanstack_db
-  ```
-
 ### Environment Variables
 
 The following environment variables can be configured in your `.env` file:
 
-- `DATABASE_URL` - PostgreSQL connection string
-- `POSTGRES_USER` - PostgreSQL username (default: postgres)
-- `POSTGRES_PASSWORD` - PostgreSQL password (default: postgres)
-- `POSTGRES_DB` - PostgreSQL database name (default: tanstack_db)
-- `POSTGRES_PORT` - PostgreSQL port (default: 5432)
+- `DATABASE_URL` - **Required** - Neon PostgreSQL connection string (get from [neon.tech](https://neon.tech))
+  - Format: `postgresql://user:password@host.neon.tech/dbname?sslmode=require`
 - `APP_PORT` - Application port (default: 3000)
 - `NODE_ENV` - Environment mode (development/production)
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk authentication publishable key (for frontend)
 
 ### Production Considerations
 
 For production deployments:
 
-1. **Change default passwords** in `.env` file
-2. **Use Docker secrets** or environment variable management for sensitive data
-3. **Configure proper networking** and firewall rules
-4. **Set up database backups** for the PostgreSQL volume
-5. **Use a reverse proxy** (nginx, Traefik, etc.) in front of the application
-6. **Enable SSL/TLS** for secure connections
+1. **Use environment variable management** for sensitive data (Fly.io secrets, etc.)
+2. **Configure proper networking** and firewall rules
+3. **Neon handles database backups automatically** - no manual backup setup needed
+4. **Use a reverse proxy** (nginx, Traefik, etc.) in front of the application
+5. **Enable SSL/TLS** for secure connections
+6. **Neon connection strings include SSL** - ensure `sslmode=require` is in your connection string
 
 The application uses Nitro v2 for server-side rendering and deployment flexibility. It's an abstraction layer over Vite/Tanstack Start.
 
 ## Database Setup
 
-This application uses **Drizzle ORM** with PostgreSQL for a fully typesafe database experience.
+This application uses **Drizzle ORM** with **Neon serverless PostgreSQL** for a fully typesafe database experience.
+
+### Neon Serverless PostgreSQL
+
+Neon is a serverless PostgreSQL platform that offers:
+- **Automatic scaling** - No need to manage database instances
+- **Automatic backups** - Point-in-time recovery included
+- **Branching** - Create database branches for testing (similar to Git)
+- **Free tier** - 0.5GB storage, perfect for development
+- **Low latency** - Global edge network
+
+### Getting Started with Neon
+
+1. **Sign up** at [neon.tech](https://neon.tech)
+2. **Create a project** - Choose a region close to your deployment
+3. **Copy your connection string** - It will look like:
+   ```
+   postgresql://user:password@ep-xxx-xxx.region.aws.neon.tech/dbname?sslmode=require
+   ```
+4. **Set it in your `.env` file**:
+   ```bash
+   DATABASE_URL=postgresql://user:password@ep-xxx-xxx.region.aws.neon.tech/dbname?sslmode=require
+   ```
+
+The application automatically configures Neon's serverless driver with WebSocket support for optimal performance.
 
 ### Features
 
@@ -131,20 +152,43 @@ export const todos = pgTable("todos", {
 
 ### Using the Database
 
-Import the database instance and use it with full type safety:
+**Three-layer architecture:**
 
+1. **DB functions** (`src/db/*.ts`): Pure database operations
 ```typescript
-import { db } from "@/db";
-import { todos } from "@/db/schema";
-import type { Todo, NewTodo } from "@/db/types";
-
-// Query with full type safety
-const allTodos: Todo[] = await db.query.todos.findMany();
-
-// Insert with type checking
-const newTodo: NewTodo = { title: "My new todo" };
-await db.insert(todos).values(newTodo);
+// src/db/text.ts
+export async function getTexts(): Promise<Text[]> {
+  return await db.select().from(texts);
+}
 ```
+
+2. **Server functions** (`src/lib/*.ts`): RPC layer with validation
+```typescript
+// src/lib/text.ts
+export const serverGetTexts = createServerFn({ method: 'GET' })
+  .handler(async () => {
+    const result = await getTexts();
+    return { success: true, data: result };
+  });
+```
+
+3. **Loaders/Components**: Use server functions (never DB directly)
+```typescript
+// Route loader
+loader: async () => {
+  const result = await serverGetTexts();
+  return { texts: result.data };
+}
+
+// Component with TanStack Query
+const { data } = useQuery({
+  queryKey: ['texts'],
+  queryFn: () => getTextsFn(),
+  initialData: loaderData.texts,
+});
+```
+
+**Key principle**: Loaders are isomorphic → always use server functions for DB access.
 
 ### Database Scripts
 
@@ -157,15 +201,17 @@ await db.insert(todos).values(newTodo);
 
 ### Docker Integration
 
-When using Docker Compose, the database is automatically:
-1. **Initialized** - PostgreSQL container starts with the configured database
+When using Docker Compose with Neon:
+1. **Connection** - App connects to Neon serverless PostgreSQL via the connection string
 2. **Migrated** - Migrations run automatically on app container startup
-3. **Connected** - App connects to PostgreSQL via Docker network
+3. **Ready** - Application starts after successful database connection
 
 The migration process:
-- Waits for PostgreSQL to be healthy
+- Waits for Neon database to be accessible
 - Runs all pending migrations
 - Starts the application
+
+**Note**: No local PostgreSQL container is needed - the app connects directly to Neon's cloud database.
 
 ### Type Safety
 
@@ -214,6 +260,14 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 ```bash
 pnpx shadcn@latest add button
 ```
+
+## Text Management Feature
+
+CRUD operations example (`/admin/text`):
+- **DB layer**: `getTexts()`, `insertText()`, `updateText()`, `deleteText()` in `src/db/text.ts`
+- **Server layer**: `serverGetTexts`, `serverInsertText`, `serverUpdateText`, `serverDeleteText` in `src/lib/text.ts`
+- **UI**: TanStack Form + Query with mutation invalidation
+- **Pattern**: Loader → server function → DB function. Components use `useServerFn` + `useQuery`/`useMutation`
 
 ## Routing
 This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.

@@ -30,7 +30,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --prod --frozen-lockfile && \
-    pnpm add -D tsx drizzle-orm pg dotenv
+    pnpm add -D tsx dotenv
 
 # Copy built application
 COPY --from=builder /app/.output ./.output

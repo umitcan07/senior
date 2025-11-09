@@ -1,8 +1,5 @@
-import type { Database, Schema } from "./index.ts";
-import { todos } from "./schema.ts";
+import type { Database, Schema } from './index.ts';
 
 export type { Database, Schema };
 
-export type { Todo, NewTodo } from "./schema.ts";
-
-export type TodosTable = typeof todos;
+export type { Text, NewText } from './text.ts';
