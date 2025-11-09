@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tanstack-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-tanstack_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tanstack-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Build-time args (for Vite env vars that need to be in the bundle)
+        # Priority: .env.local > .env > default empty
+        VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY:-}
+    container_name: tanstack-app
+    restart: unless-stopped
+    env_file:
+      - .env.local # Load .env.local first (higher priority)
+      - .env # Then load .env as fallback
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-tanstack_db}
+      PORT: 3000
+      VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tanstack-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  tanstack-network:
+    driver: bridge

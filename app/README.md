@@ -17,12 +17,172 @@ To build this application for production:
 pnpm build
 ```
 
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+After building, you can start the production server:
 
 ```bash
-pnpm test
+pnpm start
+```
+
+## Docker Deployment
+
+This application is configured with Docker and Docker Compose for easy deployment with PostgreSQL.
+
+### Prerequisites
+
+- Docker and Docker Compose installed on your system
+
+### Quick Start
+
+1. **Create environment file** (if not already present):
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Update environment variables** in `.env` file as needed.
+
+3. **Build and start all services** (app + PostgreSQL):
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. **View logs**:
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Stop services**:
+   ```bash
+   docker-compose down
+   ```
+
+### Docker Commands
+
+- **Build only the application image**:
+  ```bash
+  docker build -t tanstack-app .
+  ```
+
+- **Run only PostgreSQL** (useful for local development):
+  ```bash
+  docker-compose up -d postgres
+  ```
+
+- **Run database migrations** (when PostgreSQL is running):
+  ```bash
+  pnpm db:push
+  # or
+  pnpm db:migrate
+  ```
+
+- **Access PostgreSQL directly**:
+  ```bash
+  docker-compose exec postgres psql -U postgres -d tanstack_db
+  ```
+
+### Environment Variables
+
+The following environment variables can be configured in your `.env` file:
+
+- `DATABASE_URL` - PostgreSQL connection string
+- `POSTGRES_USER` - PostgreSQL username (default: postgres)
+- `POSTGRES_PASSWORD` - PostgreSQL password (default: postgres)
+- `POSTGRES_DB` - PostgreSQL database name (default: tanstack_db)
+- `POSTGRES_PORT` - PostgreSQL port (default: 5432)
+- `APP_PORT` - Application port (default: 3000)
+- `NODE_ENV` - Environment mode (development/production)
+
+### Production Considerations
+
+For production deployments:
+
+1. **Change default passwords** in `.env` file
+2. **Use Docker secrets** or environment variable management for sensitive data
+3. **Configure proper networking** and firewall rules
+4. **Set up database backups** for the PostgreSQL volume
+5. **Use a reverse proxy** (nginx, Traefik, etc.) in front of the application
+6. **Enable SSL/TLS** for secure connections
+
+The application uses Nitro v2 for server-side rendering and deployment flexibility. It's an abstraction layer over Vite/Tanstack Start.
+
+## Database Setup
+
+This application uses **Drizzle ORM** with PostgreSQL for a fully typesafe database experience.
+
+### Features
+
+- ✅ **Fully Typesafe** - TypeScript types are automatically inferred from your schema
+- ✅ **Auto Migrations** - Database migrations run automatically on Docker container startup
+- ✅ **Type Inference** - Get autocomplete and type checking for all database operations
+- ✅ **Connection Pooling** - Optimized connection management with error handling
+
+### Database Schema
+
+Define your database schema in `src/db/schema.ts`:
+
+```typescript
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+
+export const todos = pgTable("todos", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+```
+
+### Using the Database
+
+Import the database instance and use it with full type safety:
+
+```typescript
+import { db } from "@/db";
+import { todos } from "@/db/schema";
+import type { Todo, NewTodo } from "@/db/types";
+
+// Query with full type safety
+const allTodos: Todo[] = await db.query.todos.findMany();
+
+// Insert with type checking
+const newTodo: NewTodo = { title: "My new todo" };
+await db.insert(todos).values(newTodo);
+```
+
+### Database Scripts
+
+- `pnpm db:generate` - Generate migration files from schema changes
+- `pnpm db:migrate` - Run migrations using drizzle-kit
+- `pnpm db:migrate:run` - Run migrations using the migration script
+- `pnpm db:push` - Push schema changes directly (dev only)
+- `pnpm db:studio` - Open Drizzle Studio (database GUI)
+- `pnpm db:wait` - Wait for PostgreSQL to be ready
+
+### Docker Integration
+
+When using Docker Compose, the database is automatically:
+1. **Initialized** - PostgreSQL container starts with the configured database
+2. **Migrated** - Migrations run automatically on app container startup
+3. **Connected** - App connects to PostgreSQL via Docker network
+
+The migration process:
+- Waits for PostgreSQL to be healthy
+- Runs all pending migrations
+- Starts the application
+
+### Type Safety
+
+The database exports types for use throughout your application:
+
+```typescript
+import type { Database, Schema, Todo, NewTodo } from "@/db/types";
+
+// Database instance type
+const db: Database = ...;
+
+// Schema type
+const schema: Schema = ...;
+
+// Inferred types from schema
+const todo: Todo = { id: 1, title: "Test", createdAt: new Date() };
+const newTodo: NewTodo = { title: "New todo" };
 ```
 
 ## Styling
@@ -54,8 +214,6 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 ```bash
 pnpx shadcn@latest add button
 ```
-
-
 
 ## Routing
 This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.

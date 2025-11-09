@@ -5,16 +5,22 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
+    "start": "node .output/server/index.mjs",
     "serve": "vite preview",
     "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
+    "env:setup": "node -e \"const fs=require('fs'); const setupEnv = (file) => { if(!fs.existsSync(file)) { const example = file.replace('.local', '.example').replace('.env', '.env.example'); if(fs.existsSync(example)) { fs.copyFileSync(example, file); console.log('✅ Created ' + file + ' from ' + example); } } else { console.log('⚠️  ' + file + ' already exists'); } }; setupEnv('.env'); setupEnv('.env.local');\"",
+    "docker:up": "pnpm env:setup && docker-compose up -d --build",
+    "docker:build": "pnpm env:setup && docker-compose build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:migrate:run": "tsx scripts/migrate.ts",
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:wait": "tsx scripts/wait-for-postgres.ts"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.49.0",
@@ -41,6 +47,7 @@
     "pg": "^8.11.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-voice-visualizer": "^2.0.8",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
     "tw-animate-css": "^1.3.6",
@@ -49,6 +56,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
+    "@tanstack/nitro-v2-vite-plugin": "^1.133.19",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
