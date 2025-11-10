@@ -21,11 +21,18 @@
 **Input:** Audio Input (Turkish speaker)
 
 **Step 1: Phonetic Transcription**
-- **Tool:** Wav2Vec 2.0 / Allosaurus
+- **Tools:** 
+  - Wav2Vec 2.0 (via HuggingFace: `facebook/wav2vec2-large-xlsr-53`)
+  - POWSM (Phonetic Open Whisper-Style Speech Model) - `espnet/owsm_v4_medium_1B`
+  - WavLM - `microsoft/wavlm-large`
+  - Allosaurus
 - **Output:** Phonetic IPA transcription
+- **Approach:** Fine-tune pre-trained models with custom data (Turkish speakers) for better performance
 
 **Step 2: Alignment**
-- **Tool:** Montreal Forced Aligner (MFA)
+- **Tools:** 
+  - Montreal Forced Aligner (MFA) - industry standard, English out-of-the-box
+  - Wav2TextGrid - deep learning-based, trainable forced aligner
 - **Output:** Phone-level timestamps
 
 **Step 3: Mispronunciation Detection**
@@ -106,13 +113,101 @@
 
 ## Resources & References
 
+### Deep Learning Models & Libraries for Phonetic Transcription/Assessment
+
+#### Foundation Models
+- **Wav2Vec 2.0**: Self-supervised model for speech representation learning
+  - HuggingFace: `facebook/wav2vec2-large-xlsr-53`
+  - [Fine-tuning guide](https://huggingface.co/blog/fine-tune-wav2vec2-english)
+  - Can be fine-tuned for phonetic recognition tasks
+  - Available via HuggingFace Transformers library
+
+- **POWSM (Phonetic Open Whisper-Style Speech Model)**: Open-source foundation model specifically engineered for phonetic transcription
+  - HuggingFace: `espnet/owsm_v4_medium_1B`
+  - Direct alternative to Whisper for phonetic tasks
+  - Open-source transparency
+
+- **WavLM**: Microsoft's extension of Wav2Vec with gated relative position bias
+  - HuggingFace: `microsoft/wavlm-large`
+  - State-of-the-art performance on speech understanding tasks
+
+- **Whisper**: OpenAI's general-purpose ASR model
+  - While primarily for text transcription, has potential for phonetic output
+  - Not open-source (training data/code not released)
+
+#### Libraries
+- **HuggingFace Transformers**: Provides access to pre-trained models and facilitates fine-tuning
+  - Convenient API for loading and fine-tuning models
+  - Supports wav2vec 2.0, WavLM, and other speech models
+
+### Architectural Approaches & Concepts
+
+#### Two-Stage Approach
+- First: Speech-to-phoneme transcription using acoustic models
+- Second: Forced alignment for temporal alignment
+- Allows independent optimization of transcription accuracy and alignment precision
+
+#### End-to-End Approach
+- Direct mapping from audio to phonetic sequences or mispronunciation labels
+- Often uses CTC (Connectionist Temporal Classification) for sequence alignment
+- Enables training without explicit frame-level labels
+
+#### CTC (Connectionist Temporal Classification)
+- Useful for fine-tuning models like wav2vec 2.0 for sequence tasks
+- Alignment not explicit in training data
+- Enables training on sequences without frame-level annotations
+
+#### LCS-CTC
+- Two-stage framework combining similarity-aware local alignment with constrained CTC
+- Uses modified Longest Common Subsequence algorithm
+- Improves robustness on both fluent and non-fluent speech
+- Paper: [LCS-CTC: Leveraging Soft Alignments to Enhance Phonetic Transcription Robustness](https://arxiv.org/pdf/2508.03937)
+
+#### IPA (International Phonetic Alphabet)
+- Standard for representing phonetic symbols
+- Crucial for consistent output and comparison
+- Enables accurate diffing between target and actual pronunciations
+
+#### Fine-tuning with Custom Data
+- Critical for adapting models to specific accents/languages
+- Example: Using Turkish user recordings to improve performance for Turkish-native English speakers
+- Can significantly improve accuracy for target population
+
+### Tools for Time Alignment (Phonetic Level)
+
+- **Montreal Forced Aligner (MFA)**: Industry-standard tool for phoneme-level time alignment
+  - [Documentation](https://montreal-forced-aligner.readthedocs.io/en/latest/index.html)
+  - Supports English out-of-the-box
+  - Trainable for other languages
+  - Uses acoustic models trained on phonetically transcribed corpora
+
+- **Wav2TextGrid**: Deep learning-based, trainable forced aligner
+  - End-to-end trainable
+  - Potentially higher accuracy with custom training data
+  - Suitable for non-standard accents or specialized speech domains
+
+### Pronunciation Assessment Metrics
+
+- **Phoneme Error Rate (PER)**: Quantifies discrepancy between target and actual transcriptions
+- **Duration Analysis**: Examines temporal characteristics of phonemes
+- **Articulation Quality Scores**: Assesses acoustic properties using GOP (Goodness of Pronunciation) metrics
+- **Error Classification**: Substitution, deletion, insertion
+
 ### Phonetic Transcription Models
 - [PAST](https://github.com/lizhen18THU/PAST)
-- [Wav2Vec 2.0](https://huggingface.co/blog/fine-tune-wav2vec2-english)
 - [MultIPA](https://github.com/ctaguchi/multipa?tab=readme-ov-file)
 
-### Alignment Tools
-- Align Voice recording with IPA transcription → [MFA](https://montreal-forced-aligner.readthedocs.io/en/latest/index.html)
+### Commercial Applications
+
+- **ELSA Speak**: SaaS application for pronunciation assessment
+  - [Website](https://elsaspeak.com/en/)
+  - Real-time pronunciation feedback for English language learners
+  - Industry-grade reference for pronunciation assessment systems
+
+### Relevant Research Papers
+
+- **LCS-CTC**: [LCS-CTC: Leveraging Soft Alignments to Enhance Phonetic Transcription Robustness](https://arxiv.org/pdf/2508.03937) - Ye et al., 2025
+- Additional papers referenced in the report's Related Work section
 
 ---
 

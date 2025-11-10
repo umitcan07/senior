@@ -1,0 +1,25 @@
+\contentsline {chapter}{\numberline {1}INTRODUCTION}{1}{}%
+\contentsline {section}{\numberline {1.1}Broad Impact}{1}{}%
+\contentsline {section}{\numberline {1.2}Ethical Considerations}{1}{}%
+\contentsline {chapter}{\numberline {2}PROJECT DEFINITION AND PLANNING}{2}{}%
+\contentsline {section}{\numberline {2.1}Project Definition}{2}{}%
+\contentsline {section}{\numberline {2.2}Project Planning}{2}{}%
+\contentsline {subsection}{\numberline {2.2.1}Project Time and Resource Estimation}{2}{}%
+\contentsline {subsection}{\numberline {2.2.2}Success Criteria}{2}{}%
+\contentsline {subsection}{\numberline {2.2.3}Risk Analysis}{2}{}%
+\contentsline {subsection}{\numberline {2.2.4}Team Work (if applicable)}{2}{}%
+\contentsline {chapter}{\numberline {3}RELATED WORK}{3}{}%
+\contentsline {chapter}{\numberline {4}METHODOLOGY}{4}{}%
+\contentsline {chapter}{\numberline {5}REQUIREMENTS SPECIFICATION}{5}{}%
+\contentsline {chapter}{\numberline {6}DESIGN}{6}{}%
+\contentsline {section}{\numberline {6.1}Information Structure}{6}{}%
+\contentsline {section}{\numberline {6.2}Information Flow}{6}{}%
+\contentsline {section}{\numberline {6.3}System Design}{6}{}%
+\contentsline {section}{\numberline {6.4}User Interface Design (if applicable)}{6}{}%
+\contentsline {chapter}{\numberline {7}IMPLEMENTATION AND TESTING}{7}{}%
+\contentsline {section}{\numberline {7.1}Implementation}{7}{}%
+\contentsline {section}{\numberline {7.2}Testing}{7}{}%
+\contentsline {section}{\numberline {7.3}Deployment}{7}{}%
+\contentsline {chapter}{\numberline {8}RESULTS}{8}{}%
+\contentsline {chapter}{\numberline {9}CONCLUSION}{9}{}%
+\contentsline {chapter}{\numberline {A}SAMPLE APPENDIX}{10}{}%
