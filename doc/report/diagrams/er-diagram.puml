@@ -1,0 +1,58 @@
+@startuml
+!theme plain
+skinparam linetype ortho
+
+class User {
+  + userid : INTEGER <<PK>>
+  --
+  username : STRING
+  email : STRING
+  native_language : STRING
+  github : TEXT
+  google : TEXT
+}
+
+class Text {
+  + textid : INTEGER <<PK>>
+  --
+  text : STRING
+  ipa : STRING
+}
+
+class Recording {
+  + recordingid : INTEGER <<PK>>
+  --
+  userid : INTEGER <<FK>>
+  storagekey : STRING
+  original_filename : STRING
+  duration : REAL
+  file_size : INTEGER
+  processing_status : STRING
+}
+
+class Analysis {
+  + analysisid : INTEGER <<PK>>
+  --
+  recordingid : INTEGER <<FK>>
+  textid : INTEGER <<FK>>
+  target_phonemes : STRING
+  recognized_phonemes : STRING
+  error_corrections : JSON
+  score : REAL
+  feedback : TEXT
+  alignmentid : INTEGER <<FK>>
+}
+
+class "Alignment Data" as Alignment {
+  + alignmentid : INTEGER <<PK>>
+  --
+  alignment_data_storage_key : STRING
+}
+
+' Relationships
+User ||--o{ Recording : "has"
+Recording ||--o{ Analysis : "analyzes"
+Text ||--o{ Analysis : "uses"
+Alignment ||--o{ Analysis : "references"
+
+@enduml

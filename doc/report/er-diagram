@@ -1,0 +1,68 @@
+@startchen
+' ER Diagram for Pronunciation Assessment System
+' Based on PlantUML Chen notation: https://plantuml.com/er-diagram
+
+entity "User" as USER {
+  "user ID" as userid : INTEGER <<key>>
+  username : STRING
+  email : STRING
+  "native language" as native_language : STRING
+  "social profile" as social_profile : JSON
+}
+
+entity "Text" as TEXT {
+  "text ID" as textid : INTEGER <<key>>
+  text : STRING
+  "IPA transcription" as ipa : STRING
+}
+
+entity "Recording" as RECORDING {
+  "recording ID" as recordingid : INTEGER <<key>>
+  "user ID" as userid : INTEGER
+  "storage key (URI)" as storagekey : STRING
+  "original file name" as original_filename : STRING
+  duration : REAL
+  "file size" as file_size : INTEGER
+  "processing status" as processing_status : STRING
+}
+
+entity "Analysis" as ANALYSIS {
+  "analysis ID" as analysisid : INTEGER <<key>>
+  "recording ID" as recordingid : INTEGER
+  "text ID" as textid : INTEGER
+  "target phonemes" as target_phonemes : STRING
+  "recognized phonemes" as recognized_phonemes : STRING
+  "error corrections" as error_corrections : JSON
+  score : REAL
+  feedback : TEXT
+  "alignment ID" as alignmentid : INTEGER
+}
+
+entity "Alignment Data" as ALIGNMENT {
+  "alignment ID" as alignmentid : INTEGER <<key>>
+  "alignment data storage key" as alignment_data_storage_key : STRING
+}
+
+' Relationships
+relationship "has" as HAS_RECORDING {
+}
+USER -1- HAS_RECORDING
+HAS_RECORDING -N- RECORDING
+
+relationship "analyzes" as ANALYZES {
+}
+RECORDING -1- ANALYZES
+ANALYZES -N- ANALYSIS
+
+relationship "uses" as USES_TEXT {
+}
+TEXT -1- USES_TEXT
+USES_TEXT -N- ANALYSIS
+
+relationship "references" as REFERENCES_ALIGNMENT {
+}
+ALIGNMENT -1- REFERENCES_ALIGNMENT
+REFERENCES_ALIGNMENT -N- ANALYSIS
+
+@endchen
+

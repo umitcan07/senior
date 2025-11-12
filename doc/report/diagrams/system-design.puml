@@ -1,0 +1,35 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+
+package "Nonce Application" {
+  component "Web Client\n(React Frontend\nTanStack Start)" as Client
+  
+  component "Application Server\n(API Endpoints\nBusiness Logic\nTanStack Start Server)" as Server
+  
+  component "ML Processing\n(Phonetic Transcription\nForced Alignment\nPronunciation Assessment)" as GPU
+  
+  component "Database\n(PostgreSQL\nUser Data\nRecordings Metadata\nAnalysis Results)" as DB
+  
+  component "Object Storage\n(Cloudflare R2\nAudio Files\nAlignment Data)" as Storage
+}
+
+' Connections
+Client --> Server : HTTP/HTTPS
+Server --> DB : SQL Queries
+Server --> Storage : File Operations
+Server --> GPU : ML Job Queue
+GPU --> Storage : Read/Write Audio
+GPU --> DB : Store Results
+
+note right of GPU
+  Processes audio asynchronously
+  via job queue system
+end note
+
+note right of Storage
+  Stores processed audio files
+  (16-bit, 16kHz, mono WAV)
+end note
+
+@enduml

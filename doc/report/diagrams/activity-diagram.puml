@@ -1,0 +1,62 @@
+@startuml
+!theme plain
+skinparam dpi 300
+skinparam activity {
+    BackgroundColor #E1F5FF
+    BorderColor #4A90E2
+    FontColor #000000
+    FontSize 10
+}
+skinparam defaultFontSize 10
+skinparam activityDiamond {
+    BackgroundColor #FFF4E1
+    BorderColor #E67E22
+}
+skinparam partition {
+    BackgroundColor #F8F9FA
+    BorderColor #95A5A6
+}
+
+start
+
+:User initiates recording;
+
+:Record audio via browser;
+
+:Audio quality assessment;
+
+if (Quality acceptable?) then (yes)
+  :Convert to WAV format\n(16-bit, 16kHz, mono);
+  :Store audio in object storage;
+  :Create recording record in database;
+  
+  :Queue ML processing job;
+  
+  partition "ML Processing" {
+    :Load audio file;
+    :Phonetic transcription\n(POWSM/Wav2Vec);
+    :Forced alignment\n(MFA);
+    :Compare with target IPA;
+    :Calculate pronunciation score;
+    :Generate error corrections;
+    :Store alignment data;
+  }
+  
+  :Store analysis results in database;
+  :Update processing status;
+  
+  :Display feedback to user;
+  :Show pronunciation score;
+  :Highlight errors;
+  :Provide educational guidance;
+  
+else (no)
+  :Reject recording;
+  :Display quality error message;
+  :Suggest improvements;
+endif
+
+stop
+
+@enduml
+
