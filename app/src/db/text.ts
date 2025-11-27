@@ -10,6 +10,11 @@ export async function getTexts(): Promise<Text[]> {
 	return await db.select().from(texts);
 }
 
+export async function getTextById(id: number): Promise<Text | null> {
+	const [result] = await db.select().from(texts).where(eq(texts.id, id)).limit(1);
+	return result || null;
+}
+
 export async function insertText(data: { text: string }): Promise<Text> {
 	const [result] = await db.insert(texts).values({ text: data.text }).returning();
 	return result;

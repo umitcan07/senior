@@ -5,7 +5,9 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import ClerkProvider from "../integrations/clerk/provider";
+import { Toaster } from "@/components/ui/toaster";
 import appCss from "../styles.css?url";
+import "remixicon/fonts/remixicon.css";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -118,7 +120,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<ClerkProvider>
-					{children}	
+					{children}
+					<Toaster />
 				</ClerkProvider>
 				<Scripts />
 			</body>

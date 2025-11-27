@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import type { AnyFieldApi } from '@tanstack/react-form';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -8,13 +8,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { serverInsertText, serverGetTexts, serverUpdateText, serverDeleteText } from '@/lib/text';
 import { useState, useEffect } from 'react';
+import { RiMicLine } from '@remixicon/react';
+import HeaderUser from '@/integrations/clerk/header-user';
 
 export const Route = createFileRoute('/admin/text')({
 	component: RouteComponent,
 	loader: async () => {
 		const result = await serverGetTexts();
 		if (!result.success) {
-			throw new Error(result.error);
+			throw new Error(result.error.message);
 		}
 		return { texts: result.data };
 	},
@@ -127,6 +129,22 @@ function TextItem({ text }: { text: { id: number; text: string } }) {
 		<li className="group flex flex-col gap-2 p-4 border rounded-lg bg-card hover:border-ring/50 transition-colors">
 			<p className="text-sm whitespace-pre-wrap wrap-break-word flex-1">{text.text}</p>
 			<div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+				<Link
+					to="/record/$textId"
+					params={{ textId: String(text.id) }}
+					className="inline-block"
+				>
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						disabled={isDeleting}
+						className="text-teal-600 hover:text-teal-700"
+					>
+						<RiMicLine className="mr-2" />
+						Record
+					</Button>
+				</Link>
 				<Button
 					type="button"
 					variant="ghost"
@@ -155,17 +173,17 @@ function TextList() {
 	const getTextsFn = useServerFn(serverGetTexts);
 	const loaderData = Route.useLoaderData();
 
-	const { data, isLoading, isError, error } = useQuery({
-		queryKey: ['texts'],
-		queryFn: async () => {
-			const result = await getTextsFn();
-			if (!result.success) {
-				throw new Error(result.error);
-			}
-			return result.data;
-		},
-		initialData: loaderData.texts,
-	});
+		const { data, isLoading, isError, error } = useQuery({
+			queryKey: ['texts'],
+			queryFn: async () => {
+				const result = await getTextsFn();
+				if (!result.success) {
+					throw new Error(result.error.message);
+				}
+				return result.data;
+			},
+			initialData: loaderData.texts,
+		});
 
 	if (isLoading) return <div className="text-muted-foreground">Loading...</div>;
 	if (isError) return <div className="text-destructive">Error: {error?.message}</div>;
@@ -278,15 +296,18 @@ function TextForm() {
 
 function RouteComponent() {
 	return (
-		<div className="container max-w-7xl md:px-10 px-6 mx-auto py-8 flex flex-col gap-12">
-			<div className="space-y-2">
-				<h1 className="text-2xl font-bold">Text Management</h1>
-				<p className="text-muted-foreground">Create, edit, and manage your texts</p>
-			</div>
-			<div className="flex flex-col gap-10">
-				<TextList />
-				<div className="space-y-4">
-					<TextForm />
+		<div className="min-h-screen bg-background">
+			<HeaderUser />
+			<div className="container max-w-7xl md:px-10 px-6 mx-auto py-8 flex flex-col gap-12">
+				<div className="space-y-2">
+					<h1 className="text-2xl font-bold">Text Management</h1>
+					<p className="text-muted-foreground">Create, edit, and manage your texts</p>
+				</div>
+				<div className="flex flex-col gap-10">
+					<TextList />
+					<div className="space-y-4">
+						<TextForm />
+					</div>
 				</div>
 			</div>
 		</div>

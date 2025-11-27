@@ -9,17 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RecordRouteImport } from './routes/record'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as RecordTextIdRouteImport } from './routes/record.$textId'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
 
-const RecordRoute = RecordRouteImport.update({
-  id: '/record',
-  path: '/record',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -35,6 +30,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecordTextIdRoute = RecordTextIdRouteImport.update({
+  id: '/record/$textId',
+  path: '/record/$textId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTextRoute = AdminTextRouteImport.update({
   id: '/admin/text',
   path: '/admin/text',
@@ -44,50 +44,49 @@ const AdminTextRoute = AdminTextRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/record': typeof RecordRoute
   '/admin/text': typeof AdminTextRoute
+  '/record/$textId': typeof RecordTextIdRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/record': typeof RecordRoute
   '/admin/text': typeof AdminTextRoute
+  '/record/$textId': typeof RecordTextIdRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/record': typeof RecordRoute
   '/admin/text': typeof AdminTextRoute
+  '/record/$textId': typeof RecordTextIdRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/record' | '/admin/text' | '/admin'
+  fullPaths: '/' | '/login' | '/admin/text' | '/record/$textId' | '/admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/record' | '/admin/text' | '/admin'
-  id: '__root__' | '/' | '/login' | '/record' | '/admin/text' | '/admin/'
+  to: '/' | '/login' | '/admin/text' | '/record/$textId' | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/admin/text'
+    | '/record/$textId'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
-  RecordRoute: typeof RecordRoute
   AdminTextRoute: typeof AdminTextRoute
+  RecordTextIdRoute: typeof RecordTextIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/record': {
-      id: '/record'
-      path: '/record'
-      fullPath: '/record'
-      preLoaderRoute: typeof RecordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -109,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/record/$textId': {
+      id: '/record/$textId'
+      path: '/record/$textId'
+      fullPath: '/record/$textId'
+      preLoaderRoute: typeof RecordTextIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/text': {
       id: '/admin/text'
       path: '/admin/text'
@@ -122,8 +128,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
-  RecordRoute: RecordRoute,
   AdminTextRoute: AdminTextRoute,
+  RecordTextIdRoute: RecordTextIdRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
