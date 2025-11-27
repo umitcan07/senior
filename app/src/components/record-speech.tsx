@@ -20,6 +20,8 @@ export const RecordSpeech = () => {
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isUploadComplete, setIsUploadComplete] = useState(false);
 	const processedBlobRef = useRef<string | null>(null);
+	const isUploadingRef = useRef(false);
+	const isProcessingRef = useRef(false);
 
 	const uploadRecordingFn = useServerFn(serverUploadRecording);
 
@@ -32,6 +34,11 @@ export const RecordSpeech = () => {
 			return;
 		}
 
+		// Prevent multiple simultaneous uploads using refs to avoid stale closures
+		if (isUploadingRef.current || isProcessingRef.current) {
+			return;
+		}
+
 		const blobId = `${blob.size}-${blob.type}`;
 		if (processedBlobRef.current === blobId) {
 			return;
@@ -41,12 +48,15 @@ export const RecordSpeech = () => {
 
 		try {
 			setIsProcessing(true);
+			isProcessingRef.current = true;
 			showInfoToast("Processing audio...", "Converting to 16kHz mono WAV");
 
 			const processedBlob = await convertTo16kHzMonoWav(blob);
 
 			setIsProcessing(false);
+			isProcessingRef.current = false;
 			setIsUploading(true);
+			isUploadingRef.current = true;
 			showInfoToast("Uploading recording...", "Please wait while we upload your recording");
 
 			const base64data = await new Promise<string>((resolve, reject) => {
@@ -75,6 +85,7 @@ export const RecordSpeech = () => {
 				}) as { success: true; data: unknown } | { success: false; error: unknown };
 
 			setIsUploading(false);
+			isUploadingRef.current = false;
 
 				if (result.success) {
 					setIsUploadComplete(true);
@@ -88,13 +99,16 @@ export const RecordSpeech = () => {
 				}
 			} catch (error) {
 				setIsUploading(false);
+				isUploadingRef.current = false;
 				setIsUploadComplete(false);
 				processedBlobRef.current = null;
 				handleError(error);
 			}
 		} catch (error) {
 			setIsProcessing(false);
+			isProcessingRef.current = false;
 			setIsUploading(false);
+			isUploadingRef.current = false;
 			setIsUploadComplete(false);
 			processedBlobRef.current = null;
 
@@ -123,6 +137,7 @@ export const RecordSpeech = () => {
 		onStopRecording: () => {
 			// Recording stopped - user can now upload and analyze
 			setIsUploadComplete(false);
+			processedBlobRef.current = null;
 		},
 	});
 
