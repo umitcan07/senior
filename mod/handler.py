@@ -1,5 +1,5 @@
 import runpod
-from alignment.edit_distance import edit_operations
+from assessment.edit_distance import edit_operations
 
 
 def assess(audio_uri: str, target_ipa: str) -> dict:

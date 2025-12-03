@@ -1,10 +1,39 @@
-# Pronunciation Assessment - RunPod GPU Worker
+# Pronunciation Assessment & IPA Generation - RunPod Monorepo
 
-Simple Python application for GPU-based pronunciation assessment deployed on RunPod serverless endpoints.
+Monorepo containing two separate RunPod serverless endpoints for pronunciation assessment and IPA generation.
 
 ## Overview
 
-Takes an audio file URI and target IPA pronunciation, returns pronunciation assessment with error detection and scoring.
+This monorepo contains:
+1. **Assessment Endpoint**: Evaluates pronunciation by comparing audio to target IPA
+2. **IPA Generation Endpoint**: Generates IPA transcription from English text (with optional audio)
+
+Both endpoints are deployed as separate Docker containers from this single repository.
+
+## Structure
+
+```
+mod/
+├── assessment/          # Pronunciation assessment endpoint
+│   ├── handler.py      # RunPod handler
+│   ├── assess.py       # Core assessment logic
+│   ├── edit_distance.py # Edit distance for phoneme comparison
+│   ├── Dockerfile      # Assessment Docker image
+│   └── requirements.txt
+├── ipa_generation/      # IPA generation endpoint
+│   ├── handler.py      # RunPod handler
+│   ├── generate.py     # Core IPA generation logic
+│   ├── Dockerfile      # IPA generation Docker image
+│   └── requirements.txt
+├── shared/             # Shared utilities
+│   └── audio.py        # Audio loading/preprocessing
+├── tests/              # Unit tests
+└── .dockerignore
+```
+
+## Endpoints
+
+### Assessment Endpoint
 
 **Input:**
 ```json
@@ -17,35 +46,68 @@ Takes an audio file URI and target IPA pronunciation, returns pronunciation asse
 **Output:**
 ```json
 {
-  "actual_ipa": "...",
+  "actual_ipa": "/h//ɛ//l//o//ʊ/",
   "target_ipa": "hɛloʊ wɜrld",
-  "operations": [...],
   "score": 0.85,
-  "errors": [...]
+  "errors": [
+    {
+      "type": "substitute",
+      "position": 2,
+      "expected": "ə",
+      "actual": "o",
+      "timestamp": {"start": 32000, "end": 40000}
+    }
+  ]
 }
 ```
 
-## Structure
+### IPA Generation Endpoint
 
+**Input:**
+```json
+{
+  "text": "hello world",
+  "audio_uri": "https://..."  // optional
+}
 ```
-mod/
-├── handler.py        # RunPod handler function (entry point)
-├── metrics/          # Pronunciation metrics and distance calculations
-├── tests/            # Unit tests
-└── requirements.txt  # Python dependencies
+
+**Output:**
+```json
+{
+  "ipa_phonemes": "/h//ɛ//l//o//ʊ// //w//ɜ//r//l//d/",
+  "phonemes": ["h", "ɛ", "l", "o", "ʊ", " ", "w", "ɜ", "r", "l", "d"]
+}
+```
+
+## Building Docker Images
+
+Both images are built from the `mod/` directory (build context is `mod/`, not the monorepo root):
+
+```bash
+cd mod/
+
+# Build assessment image (build context is mod/ directory)
+docker build -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
+
+# Build IPA generation image (build context is mod/ directory)
+docker build -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
+
+# Push to registry
+docker push ucede/nonce-assessment:latest
+docker push ucede/nonce-generation:latest
 ```
 
 ## Deployment on RunPod
 
-1. Base directory is `/mod` in the container
-2. Entry point: `handler.py` (RunPod will call the handler function)
-3. Install dependencies: `pip install -r requirements.txt`
+See `doc/runpod/deployment_plan.md` for detailed deployment instructions.
 
-### RunPod Configuration
+### Quick Start
 
-- **Handler**: `handler.py`
-- **Container Start Command**: `python handler.py`
-- **GPU**: Recommended L4/A5000 (24GB) or higher for model inference
+1. Build and push Docker images (see above)
+2. Create endpoints in RunPod Console:
+   - **Assessment**: `ucede/nonce-assessment:latest`
+   - **IPA Generation**: `ucede/nonce-generation:latest`
+3. Configure endpoints as described in deployment plan
 
 ## Local Development
 
@@ -54,30 +116,25 @@ mod/
 python -m venv venv
 source venv/bin/activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies for assessment
+pip install -r assessment/requirements.txt
+
+# Or for IPA generation
+pip install -r ipa_generation/requirements.txt
 
 # Test handler locally (requires RUNPOD_API_KEY)
-python handler.py
+python assessment/handler.py
+# or
+python ipa_generation/handler.py
 ```
 
-## Usage
+## Implementation Status
 
-The handler processes jobs with:
-- `audio_uri`: URI to audio file (HTTP/HTTPS or S3-compatible storage)
-- `target_ipa`: Target IPA pronunciation string (space-separated phonemes)
-
-Returns pronunciation assessment with:
-- `actual_ipa`: Detected IPA from audio (from model inference)
-- `operations`: Edit operations comparing actual vs target
-- `score`: Pronunciation accuracy (0.0-1.0)
-- `errors`: List of pronunciation errors
-
-## Future Considerations
-
-- **Separate endpoint for IPA generation**: When admins add new texts, generate target IPA once (not per assessment)
-- **Model loading**: Load POWSM/Wav2Vec models in handler initialization for faster inference
-- **Audio preprocessing**: Handle format conversion, resampling to 16kHz mono
+⚠️ **Current Implementation**: Dummy/placeholder results
+- IPA transcription returns placeholder values
+- Timestamps are evenly distributed (dummy implementation)
+- Replace `extract_ipa_from_audio()` and `generate_ipa_*()` functions with actual POWSM model inference
+- Replace dummy timestamp generation with actual MFA alignment if needed
 
 ## Running Tests
 
