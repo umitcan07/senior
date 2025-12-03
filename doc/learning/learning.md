@@ -21,7 +21,7 @@
 **Input:** Audio Input (Turkish speaker)
 
 **Step 1: Phonetic Transcription**
-- **Tools:** 
+- **Tools:**
   - Wav2Vec 2.0 (via HuggingFace: `facebook/wav2vec2-large-xlsr-53`)
   - POWSM (Phonetic Open Whisper-Style Speech Model) - `espnet/owsm_v4_medium_1B`
   - WavLM - `microsoft/wavlm-large`
@@ -29,8 +29,14 @@
 - **Output:** Phonetic IPA transcription
 - **Approach:** Fine-tune pre-trained models with custom data (Turkish speakers) for better performance
 
+**Example output:**
+
+```
+həloʊ ɛvɹɪwʌn, aɪɐm ɛmɪkænd ænd ðɪs ɪz ðə dɛmənstɹeɪʃən vɪdɪoʊ fɔːɹ pɑːɹʃəl ɪmplɪmənteɪʃən. tuː taɪmz aʊɚ sɪstəm ɪz ɹᵻspɑːnsᵻbəl fɔːɹ piəɹɪɑːdɪkli tʃɛkɪŋ ðə lɪst lɛvəl ʌv beɪbi ænd ɐlɜːɾɪŋ ðə kɛɹɾeɪkɚ ɔːɹ ɐlɜːɾɪŋ ðə pɜːsənəl ɪntɹɛst vaɪə waɪɚləs kəmjuːnɪkeɪʃən ɪn keɪs ʌv ɛni deɪndʒɚ. soʊ wiː ɑːɹ æktʃuːəli ɐbstɹæktᵻd ðə weɪ ðə kælkjʊleɪʃən ʌv lɪst lɛvəl ɪnstɛd wiː juːz tuː swɪtʃᵻz. ðɪs ɪz ɡoʊɪŋ təbi ɹᵻpleɪst baɪ æktʃuːəl ælɡɚɹɪθəm ænd ænəlɑːɡ ɪnpʊt ɪnðə piːaɪ faɪv. soʊ wiː hæv tuː swɪtʃᵻz hɪɹ. aʊɚɹ aʊtpʊt kəmpoʊnənts ɑːɹ ɛliːdiː ænd bʌzɚɹ ænd wiː ɔːlsoʊ hæv ɐnʌðɚ swɪtʃ. ðɪs ɪz dʒʌst wɜːkɪŋ ᵻlɛktɹɪkli tə tɑːɡəl bᵻtwiːn saʊnd ænd saɪlənt moʊd. ænd lɛts tɔːk ɐbaʊt ðə ɹoʊlaʊt taɪmɚɹ ɪn aʊɚ piːaɪ. wiː hæv tuː taɪmɚz fɔːɹ ðɪs piːaɪ. wʌn fɔːɹ piəɹɪɑːdɪkli tʃɛkɪŋ baɪ tʃɛkɪŋ aɪ miːn tʃɛkɪŋ ðɪ ɪnpʊts ʌv aʊɚ swɪtʃᵻz, tʃɛkɪŋ ðə lɪst lɛvəl ænd ɐnʌðɚ taɪmɚɹ ɪz fɔːɹ ɐdʒʌstɪŋ ðə fɹiːkwənsi ʌv aʊtpʊt kəmpoʊnənts iːðɚɹ ɛliːdiː ɔːɹ bʌzɚ. oʊkeɪ, lɛts siː ɛvɹɪθɪŋ ɪn ækʃən. kɜːɹəntli deɪndʒɚ lɛvəl ɪz sɛt tə ziəɹoʊ ænd wiː ɑːɹ ɪn saʊnd moʊd. lɛts siː wʌt hæpənz wɛn ðə deɪndʒɚ lɛvəl ɪz wʌn. deɪndʒɚ lɛvəl tuː. deɪndʒɚ lɛvəl θɹiː. lɛts siː ðə saɪlənt moʊd. wʌn, tuː, θɹiː. aɪ wɔnt tʊ ɛmfɐsaɪz ðæt ðɛɹ ɪz ɐ nɑːks bʌt ðə lɛɡ bᵻtwiːn ðə tʃeɪndʒ ʌv ɪnpʊts ænd tʃeɪndʒ ʌv aʊtpʊts. ðɪs ɪz ɛɡzædʒɚɹeɪɾᵻd ɪn dɛmənstɹeɪʃən ɔn pɜːpəs bɪkʌz wiː wɔntᵻd tʊ ɛmfɐsaɪz ðə ɹoʊlaʊt fɜːst taɪm, ðə ɹoʊlaʊt piəɹɪɑːdɪk tʃɛkɪŋ. ænd æz aɪ sɛd, ɪts ɡoʊɪŋ təbi ɹᵻpleɪst ɪn piːaɪ faɪv wɪð æktʃuːəl ælɡɚɹɪθəm ænd wɪð pɑːsᵻbli mɔːɹ fɹiːkwənt tʃɛkɪŋz. θæŋks fɔːɹ wɑːtʃɪŋ.
+```
+
 **Step 2: Alignment**
-- **Tools:** 
+- **Tools:**
   - Montreal Forced Aligner (MFA) - industry standard, English out-of-the-box
   - Wav2TextGrid - deep learning-based, trainable forced aligner
 - **Output:** Phone-level timestamps
@@ -47,16 +53,16 @@
 
 ### Database Architecture
 
-**1. User Upload**
-- User uploads audio file -> .webm codecs/opus
+1. **User Upload**
+   - User uploads audio file -> .webm codecs/opus
 
-**2. Storage Layer**
-- **Action:** Store .wav files in S3 -> 16bit 16kHz mono -> ~1.8MB per second
-- **Purpose:** Long-term storage (S3/filesystem)
+2. **Storage Layer**
+   - **Action:** Store .wav files in S3 -> 16bit 16kHz mono -> ~1.8MB per second
+   - **Purpose:** Long-term storage (S3/filesystem)
 
-**3. Database Layer**
-- **Action:** Store path + metadata in database
-- **Purpose:** Metadata only
+3. **Database Layer**
+   - **Action:** Store path + metadata in database
+   - **Purpose:** Metadata only
 
 ### Audio Quality Metrics
 
@@ -224,3 +230,10 @@
 - Server functions execute server-only → safe for `process.env`, DB connections
 - Query invalidation: Use `queryClient.invalidateQueries()` after mutations
 - Initial data: Loader data → `initialData` in `useQuery` for SSR hydration
+
+
+## Minimum Edit Distance (Levenstein Distance)
+
+### Alignment w Whisper 
+
+Hatirlatma Maili

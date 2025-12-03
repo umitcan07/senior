@@ -1,0 +1,21 @@
+# RunPod serverless worker
+runpod>=1.0.0
+
+# Core dependencies for acoustic model inference
+# GPU support via CUDA (install appropriate PyTorch version for your CUDA version)
+# For RunPod: PyTorch with CUDA support is typically pre-installed
+torch>=2.0.0
+espnet>=202311
+espnet-model-zoo>=0.1.8
+
+# Audio processing
+librosa>=0.10.0
+soundfile>=0.12.0
+numpy>=1.24.0
+
+# HTTP client for downloading audio files
+requests>=2.31.0
+
+# Forced alignment (Montreal Forced Aligner)
+# montreal-forced-alignment>=3.0.0  # Install separately if needed
+
