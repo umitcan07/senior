@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-11-27T14:32:25.276174",
+  "model": "espnet/powsm",
+  "task": "Audio-guided Grapheme-to-Phoneme (G2P)",
+  "results": [
+    {
+      "sentence_id": "12",
+      "audio_file": "umit12-r.wav",
+      "ground_truth_transcript": "The weather is rather warm this Thursday. I think we should go to the theater together. Thank you for thinking about this thoroughly.",
+      "asr_transcript": "the weather is rather warm this turnsday  ⁇  think we should go to the theatre together think you for thinking about this toroli",
+      "g2p_result": {
+        "with_slashes": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//ð//ɪ//s//tʰ//ɜ˞//n//z//d//e//ɪ//a//ɪ//θ//ɪ̃//ŋ//k//w//i//ʃ//ʊ//d//k//o//ʊ//tʰ//u//ð//ə//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//θ//ɪ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ð//ɪ//s//tʰ//ɔ//ɹ//o//ʊ//l̴//i/",
+        "clean": "ðəwɛðɜ˞ɪzɹəðɜ˞wɔɹmðɪstʰɜ˞nzdeɪaɪθɪ̃ŋkwiʃʊdkoʊtʰuðəθiətɜ˞tʰəɡɛðɜ˞θɪ̃ŋkjufɹɜ˞θɪ̃ŋkɪ̃ŋəbaʊtðɪstʰɔɹoʊl̴i"
+      }
+    },
+    {
+      "sentence_id": "12",
+      "audio_file": "yusuf12-r.wav",
+      "ground_truth_transcript": "The weather is rather warm this Thursday. I think we should go to the theater together. Thank you for thinking about this thoroughly.",
+      "asr_transcript": "the weather is rather warm this Thursday  ⁇  think we she cause it the theater together think you for thinking about is authority",
+      "g2p_result": {
+        "with_slashes": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//ð//ɪ//s//θ//ɜ˞//z//d//e//ɪ//a//ɪ//θ//ɪ̃//ŋ//k//w//i//ʃ//i//kʰ//ɔ//z//ɪ//t//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//θ//ɪ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ɪ//z//ə//θ//ɔ//ɹ//ə//t//i/",
+        "clean": "ðəwɛðɜ˞ɪzɹəðɜ˞wɔɹmðɪsθɜ˞zdeɪaɪθɪ̃ŋkwiʃikʰɔzɪtθiətɜ˞tʰəɡɛðɜ˞θɪ̃ŋkjufɹɜ˞θɪ̃ŋkɪ̃ŋəbaʊtɪzəθɔɹəti"
+      }
+    },
+    {
+      "sentence_id": "14",
+      "audio_file": "umit14-r.wav",
+      "ground_truth_transcript": "The red car arrived early in the morning. The driver parked near the restaurant and ordered breakfast. The fresh bread was really delicious.",
+      "asr_transcript": "the red car arrived early in the morning the driver park near the restaurant and ordered broadfast to fresh bred was really delicious",
+      "g2p_result": {
+        "with_slashes": "/ð//ə//ɹ//ɛ//d//kʰ//ɑ//ɹ//ɜ˞//a//ɪ//v//d//ɜ˞//l̴//i//ɪ̃//n//ð//ə//m//ɔ//ɹ//n//ɪ̃//ŋ//ð//ə//t//ɹ//a//ɪ//v//ɜ˞//pʰ//ɑ//ɹ//k//n//ɪ//ɹ//ð//ə//ɹ//ɛ//s//t//ɜ˞//ɑ̃//n//t//ə//n//d//ɔ//ɹ//d//ɜ˞//d//p//ɹ//ɔ//d//f//æ//s//t//tʰ//u//f//ɹ//ɛ//ʃ//p//ɹ//ɛ//d//w//ɑ//z//ɹ//i//l̴//i//t//ɪ//l̴//ɪ//ʃ//ə//s/",
+        "clean": "ðəɹɛdkʰɑɹɜ˞aɪvdɜ˞l̴iɪ̃nðəmɔɹnɪ̃ŋðətɹaɪvɜ˞pʰɑɹknɪɹðəɹɛstɜ˞ɑ̃ntəndɔɹdɜ˞dpɹɔdfæsttʰufɹɛʃpɹɛdwɑzɹil̴itɪl̴ɪʃəs"
+      }
+    }
+  ]
+}

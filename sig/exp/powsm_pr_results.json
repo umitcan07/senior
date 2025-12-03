@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-11-27T14:31:35.140715",
+  "model": "espnet/powsm",
+  "task": "Phone Recognition (PR)",
+  "results": [
+    {
+      "sentence_id": "12",
+      "audio_file": "umit12-r.wav",
+      "transcript": "The weather is rather warm this Thursday. I think we should go to the theater together. Thank you for thinking about this thoroughly.",
+      "detected_language": "<eng>",
+      "phone_recognition": {
+        "with_slashes": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//d//ð//ɪ//s//θ//ɜ˞//n//z//d//e//ɪ//a//ɪ//θ//ɪ̃//ŋ//k//w//i//ʃ//ʊ//d//k//o//ʊ//tʰ//u//ð//ə//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//θ//æ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ð//ɪ//s//t//ɔ//ɹ//o//ʊ//l̴//i/",
+        "clean": "ðəwɛðɜ˞ɪzɹəðɜ˞wɔɹmdðɪsθɜ˞nzdeɪaɪθɪ̃ŋkwiʃʊdkoʊtʰuðəθiətɜ˞tʰəɡɛðɜ˞θæ̃ŋkjufɹɜ˞θɪ̃ŋkɪ̃ŋəbaʊtðɪstɔɹoʊl̴i"
+      }
+    },
+    {
+      "sentence_id": "12",
+      "audio_file": "yusuf12-r.wav",
+      "transcript": "The weather is rather warm this Thursday. I think we should go to the theater together. Thank you for thinking about this thoroughly.",
+      "detected_language": "<eng>",
+      "phone_recognition": {
+        "with_slashes": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//ð//ɪ//s//θ//ɜ˞//d//z//d//e//ɪ//a//ɪ//θ//ɪ̃//ŋ//k//w//i//ʃ//i//kʰ//ɔ//z//ɪ//t//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//θ//æ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ɪ//z//ə//θ//ɔ//ɹ//o//ʊ//l̴//i/",
+        "clean": "ðəwɛðɜ˞ɪzɹəðɜ˞wɔɹmðɪsθɜ˞dzdeɪaɪθɪ̃ŋkwiʃikʰɔzɪtθiətɜ˞tʰəɡɛðɜ˞θæ̃ŋkjufɹɜ˞θɪ̃ŋkɪ̃ŋəbaʊtɪzəθɔɹoʊl̴i"
+      }
+    },
+    {
+      "sentence_id": "14",
+      "audio_file": "umit14-r.wav",
+      "transcript": "The red car arrived early in the morning. The driver parked near the restaurant and ordered breakfast. The fresh bread was really delicious.",
+      "detected_language": "<eng>",
+      "phone_recognition": {
+        "with_slashes": "/ð//ə//ɹ//ɛ//d//kʰ//ɑ//ɹ//ɜ˞//a//ɪ//v//d//ɜ˞//l̴//i//ɪ̃//n//ð//ə//m//ɔ//ɹ//n//ɪ̃//ŋ//ð//ə//tʰ//ɹ//a//ɪ//v//ɜ˞//pʰ//ɑ//ɹ//k//n//ɪ//ɹ//ð//ə//ɹ//ɛ//s//t//ɜ˞//ɑ̃//n//t//ə//n//d//ɔ//ɹ//d//ɜ˞//d//p//ɹ//ɛ//k//f//ə//s//t//tʰ//u//f//ɹ//ɛ//ʃ//p//ɹ//ɛ//d//w//ɑ//z//ɹ//i//l̴//i//t//ɪ//l̴//ɪ//ʃ//ə//s/",
+        "clean": "ðəɹɛdkʰɑɹɜ˞aɪvdɜ˞l̴iɪ̃nðəmɔɹnɪ̃ŋðətʰɹaɪvɜ˞pʰɑɹknɪɹðəɹɛstɜ˞ɑ̃ntəndɔɹdɜ˞dpɹɛkfəsttʰufɹɛʃpɹɛdwɑzɹil̴itɪl̴ɪʃəs"
+      }
+    }
+  ]
+}
