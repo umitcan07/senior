@@ -5,8 +5,6 @@ runpod>=1.0.0
 # GPU support via CUDA (install appropriate PyTorch version for your CUDA version)
 # For RunPod: PyTorch with CUDA support is typically pre-installed
 torch>=2.0.0
-espnet>=202311
-espnet-model-zoo>=0.1.8
 
 # Audio processing (optional, for audio-guided G2P)
 librosa>=0.10.0
@@ -15,4 +13,3 @@ numpy>=1.24.0
 
 # HTTP client for downloading audio files (if audio_uri provided)
 requests>=2.31.0
-

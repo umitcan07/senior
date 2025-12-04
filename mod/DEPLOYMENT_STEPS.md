@@ -18,10 +18,11 @@ Navigate to the `mod/` directory and build both Docker images.
 cd mod/
 
 # Build assessment image (build context is mod/ directory)
-docker build -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
+# Note: --platform linux/amd64 is required when building on Apple Silicon (M1/M2/M3)
+docker build --platform linux/amd64 -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
 
 # Build IPA generation image (build context is mod/ directory)
-docker build -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
+docker build --platform linux/amd64 -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
 
 # Tag with version (optional but recommended)
 docker tag ucede/nonce-assessment:latest ucede/nonce-assessment:v1.0.0

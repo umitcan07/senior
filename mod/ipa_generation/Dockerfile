@@ -1,5 +1,6 @@
 # IPA Generation endpoint Dockerfile
-# Build from mod/ directory: cd mod/ && docker build -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
+# Build from mod/ directory: cd mod/ && docker build --platform linux/amd64 -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
+# Note: Use --platform linux/amd64 flag when building on Apple Silicon (M1/M2/M3) for RunPod compatibility
 
 FROM runpod/pytorch:2.0.1-py3.10-cuda11.8.0-devel
 
@@ -24,7 +25,7 @@ COPY ipa_generation/ /app/ipa_generation/
 RUN pip install --no-cache-dir -r ipa_generation/requirements.txt
 
 # Set Python path so imports work correctly in container
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app
 
 # Run IPA generation handler
 WORKDIR /app

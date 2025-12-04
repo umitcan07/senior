@@ -148,9 +148,6 @@ docker push ucede/nonce-generation:latest
 **Assessment** (`mod/assessment/requirements.txt`):
 - `runpod>=1.0.0`
 - `torch>=2.0.0` (with CUDA support)
-- `espnet>=202311` (for POWSM model)
-- `espnet-model-zoo>=0.1.8` (for model loading)
-- `montreal-forced-alignment>=3.0.0`
 - Audio processing: `librosa>=0.10.0`, `soundfile>=0.12.0`
 - `numpy>=1.24.0`
 - `requests>=2.31.0`
@@ -158,8 +155,6 @@ docker push ucede/nonce-generation:latest
 **IPA Generation** (`mod/ipa_generation/requirements.txt`):
 - `runpod>=1.0.0`
 - `torch>=2.0.0` (with CUDA support)
-- `espnet>=202311` (for POWSM model)
-- `espnet-model-zoo>=0.1.8` (for model loading)
 - `numpy>=1.24.0`
 - `requests>=2.31.0` (for downloading audio if audio_uri provided)
 - Audio processing (optional, for audio-guided G2P): `librosa>=0.10.0`, `soundfile>=0.12.0`

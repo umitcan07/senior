@@ -1,5 +1,6 @@
 # Assessment endpoint Dockerfile
-# Build from mod/ directory: cd mod/ && docker build -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
+# Build from mod/ directory: cd mod/ && docker build --platform linux/amd64 -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
+# Note: Use --platform linux/amd64 flag when building on Apple Silicon (M1/M2/M3) for RunPod compatibility
 
 FROM runpod/pytorch:2.0.1-py3.10-cuda11.8.0-devel
 
@@ -23,7 +24,7 @@ COPY assessment/ /app/assessment/
 RUN pip install --no-cache-dir -r assessment/requirements.txt
 
 # Set Python path so imports work correctly in container
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app
 
 # Run assessment handler
 WORKDIR /app
