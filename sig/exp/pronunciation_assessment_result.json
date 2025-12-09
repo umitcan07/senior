@@ -1,0 +1,922 @@
+{
+  "target_text": "The weather is rather warm this Thursday. I think we should go to the theater together. Thank you for thinking about this thoroughly.",
+  "actual_text": "the weather is rather warm this turnsday  ⁇  think we should go to the theatre together think you for thinking about this toroli",
+  "actual_ipa_powsm": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//d//ð//ɪ//s//θ//ɜ˞//n//z//d//e//ɪ//a//ɪ//θ//ɪ̃//ŋ//k//w//i//ʃ//ʊ//d//k//o//ʊ//tʰ//u//ð//ə//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//θ//æ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ð//ɪ//s//t//ɔ//ɹ//o//ʊ//l̴//i/",
+  "target_ipa_powsm": {
+    "from_original_transcript": {
+      "powsm_format": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//ð//ɪ//s//θ//ɜ˞//z//d//e//ɪ//a//ɪ//s//ɪ̃//ŋ//k//w//i//ʃ//ʊ//d//k//o//ʊ//tʰ//u//ð//ə//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//a//ɪ//θ//æ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ð//ɪ//s//θ//ɜ˞//o//ʊ//l̴//i/",
+      "clean": "ðəwɛðɜ˞ɪzɹəðɜ˞wɔɹmðɪsθɜ˞zdeɪaɪsɪ̃ŋkwiʃʊdkoʊtʰuðəθiətɜ˞tʰəɡɛðɜ˞aɪθæ̃ŋkjufɹɜ˞θɪ̃ŋkɪ̃ŋəbaʊtðɪsθɜ˞oʊl̴i",
+      "phones": [
+        "ð",
+        "ə",
+        "w",
+        "ɛ",
+        "ð",
+        "ɜ˞",
+        "ɪ",
+        "z",
+        "ɹ",
+        "ə",
+        "ð",
+        "ɜ˞",
+        "w",
+        "ɔ",
+        "ɹ",
+        "m",
+        "ð",
+        "ɪ",
+        "s",
+        "θ",
+        "ɜ˞",
+        "z",
+        "d",
+        "e",
+        "ɪ",
+        "a",
+        "ɪ",
+        "s",
+        "ɪ̃",
+        "ŋ",
+        "k",
+        "w",
+        "i",
+        "ʃ",
+        "ʊ",
+        "d",
+        "k",
+        "o",
+        "ʊ",
+        "tʰ",
+        "u",
+        "ð",
+        "ə",
+        "θ",
+        "i",
+        "ə",
+        "t",
+        "ɜ˞",
+        "tʰ",
+        "ə",
+        "ɡ",
+        "ɛ",
+        "ð",
+        "ɜ˞",
+        "a",
+        "ɪ",
+        "θ",
+        "æ̃",
+        "ŋ",
+        "k",
+        "j",
+        "u",
+        "f",
+        "ɹ",
+        "ɜ˞",
+        "θ",
+        "ɪ̃",
+        "ŋ",
+        "k",
+        "ɪ̃",
+        "ŋ",
+        "ə",
+        "b",
+        "a",
+        "ʊ",
+        "t",
+        "ð",
+        "ɪ",
+        "s",
+        "θ",
+        "ɜ˞",
+        "o",
+        "ʊ",
+        "l̴",
+        "i"
+      ]
+    },
+    "from_asr_transcript": {
+      "powsm_format": "/ð//ə//w//ɛ//ð//ɜ˞//ɪ//z//ɹ//ə//ð//ɜ˞//w//ɔ//ɹ//m//ð//ɪ//s//tʰ//ɜ˞//n//z//d//e//ɪ//a//ɪ//θ//ɪ̃//ŋ//k//w//i//ʃ//ʊ//d//k//o//ʊ//tʰ//u//ð//ə//θ//i//ə//t//ɜ˞//tʰ//ə//ɡ//ɛ//ð//ɜ˞//θ//ɪ̃//ŋ//k//j//u//f//ɹ//ɜ˞//θ//ɪ̃//ŋ//k//ɪ̃//ŋ//ə//b//a//ʊ//t//ð//ɪ//s//tʰ//ɔ//ɹ//o//ʊ//l̴//i/",
+      "clean": "ðəwɛðɜ˞ɪzɹəðɜ˞wɔɹmðɪstʰɜ˞nzdeɪaɪθɪ̃ŋkwiʃʊdkoʊtʰuðəθiətɜ˞tʰəɡɛðɜ˞θɪ̃ŋkjufɹɜ˞θɪ̃ŋkɪ̃ŋəbaʊtðɪstʰɔɹoʊl̴i",
+      "phones": [
+        "ð",
+        "ə",
+        "w",
+        "ɛ",
+        "ð",
+        "ɜ˞",
+        "ɪ",
+        "z",
+        "ɹ",
+        "ə",
+        "ð",
+        "ɜ˞",
+        "w",
+        "ɔ",
+        "ɹ",
+        "m",
+        "ð",
+        "ɪ",
+        "s",
+        "tʰ",
+        "ɜ˞",
+        "n",
+        "z",
+        "d",
+        "e",
+        "ɪ",
+        "a",
+        "ɪ",
+        "θ",
+        "ɪ̃",
+        "ŋ",
+        "k",
+        "w",
+        "i",
+        "ʃ",
+        "ʊ",
+        "d",
+        "k",
+        "o",
+        "ʊ",
+        "tʰ",
+        "u",
+        "ð",
+        "ə",
+        "θ",
+        "i",
+        "ə",
+        "t",
+        "ɜ˞",
+        "tʰ",
+        "ə",
+        "ɡ",
+        "ɛ",
+        "ð",
+        "ɜ˞",
+        "θ",
+        "ɪ̃",
+        "ŋ",
+        "k",
+        "j",
+        "u",
+        "f",
+        "ɹ",
+        "ɜ˞",
+        "θ",
+        "ɪ̃",
+        "ŋ",
+        "k",
+        "ɪ̃",
+        "ŋ",
+        "ə",
+        "b",
+        "a",
+        "ʊ",
+        "t",
+        "ð",
+        "ɪ",
+        "s",
+        "tʰ",
+        "ɔ",
+        "ɹ",
+        "o",
+        "ʊ",
+        "l̴",
+        "i"
+      ]
+    }
+  },
+  "actual_phones": [
+    "ð",
+    "ə",
+    "w",
+    "ɛ",
+    "ð",
+    "ɜ˞",
+    "ɪ",
+    "z",
+    "ɹ",
+    "ə",
+    "ð",
+    "ɜ˞",
+    "w",
+    "ɔ",
+    "ɹ",
+    "m",
+    "d",
+    "ð",
+    "ɪ",
+    "s",
+    "θ",
+    "ɜ˞",
+    "n",
+    "z",
+    "d",
+    "e",
+    "ɪ",
+    "a",
+    "ɪ",
+    "θ",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "w",
+    "i",
+    "ʃ",
+    "ʊ",
+    "d",
+    "k",
+    "o",
+    "ʊ",
+    "tʰ",
+    "u",
+    "ð",
+    "ə",
+    "θ",
+    "i",
+    "ə",
+    "t",
+    "ɜ˞",
+    "tʰ",
+    "ə",
+    "ɡ",
+    "ɛ",
+    "ð",
+    "ɜ˞",
+    "θ",
+    "æ̃",
+    "ŋ",
+    "k",
+    "j",
+    "u",
+    "f",
+    "ɹ",
+    "ɜ˞",
+    "θ",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "ɪ̃",
+    "ŋ",
+    "ə",
+    "b",
+    "a",
+    "ʊ",
+    "t",
+    "ð",
+    "ɪ",
+    "s",
+    "t",
+    "ɔ",
+    "ɹ",
+    "o",
+    "ʊ",
+    "l̴",
+    "i"
+  ],
+  "target_phones": [
+    "ð",
+    "ə",
+    "w",
+    "ɛ",
+    "ð",
+    "ɜ˞",
+    "ɪ",
+    "z",
+    "ɹ",
+    "ə",
+    "ð",
+    "ɜ˞",
+    "w",
+    "ɔ",
+    "ɹ",
+    "m",
+    "ð",
+    "ɪ",
+    "s",
+    "θ",
+    "ɜ˞",
+    "z",
+    "d",
+    "e",
+    "ɪ",
+    "a",
+    "ɪ",
+    "s",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "w",
+    "i",
+    "ʃ",
+    "ʊ",
+    "d",
+    "k",
+    "o",
+    "ʊ",
+    "tʰ",
+    "u",
+    "ð",
+    "ə",
+    "θ",
+    "i",
+    "ə",
+    "t",
+    "ɜ˞",
+    "tʰ",
+    "ə",
+    "ɡ",
+    "ɛ",
+    "ð",
+    "ɜ˞",
+    "a",
+    "ɪ",
+    "θ",
+    "æ̃",
+    "ŋ",
+    "k",
+    "j",
+    "u",
+    "f",
+    "ɹ",
+    "ɜ˞",
+    "θ",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "ɪ̃",
+    "ŋ",
+    "ə",
+    "b",
+    "a",
+    "ʊ",
+    "t",
+    "ð",
+    "ɪ",
+    "s",
+    "θ",
+    "ɜ˞",
+    "o",
+    "ʊ",
+    "l̴",
+    "i"
+  ],
+  "target_phones_asr": [
+    "ð",
+    "ə",
+    "w",
+    "ɛ",
+    "ð",
+    "ɜ˞",
+    "ɪ",
+    "z",
+    "ɹ",
+    "ə",
+    "ð",
+    "ɜ˞",
+    "w",
+    "ɔ",
+    "ɹ",
+    "m",
+    "ð",
+    "ɪ",
+    "s",
+    "tʰ",
+    "ɜ˞",
+    "n",
+    "z",
+    "d",
+    "e",
+    "ɪ",
+    "a",
+    "ɪ",
+    "θ",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "w",
+    "i",
+    "ʃ",
+    "ʊ",
+    "d",
+    "k",
+    "o",
+    "ʊ",
+    "tʰ",
+    "u",
+    "ð",
+    "ə",
+    "θ",
+    "i",
+    "ə",
+    "t",
+    "ɜ˞",
+    "tʰ",
+    "ə",
+    "ɡ",
+    "ɛ",
+    "ð",
+    "ɜ˞",
+    "θ",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "j",
+    "u",
+    "f",
+    "ɹ",
+    "ɜ˞",
+    "θ",
+    "ɪ̃",
+    "ŋ",
+    "k",
+    "ɪ̃",
+    "ŋ",
+    "ə",
+    "b",
+    "a",
+    "ʊ",
+    "t",
+    "ð",
+    "ɪ",
+    "s",
+    "tʰ",
+    "ɔ",
+    "ɹ",
+    "o",
+    "ʊ",
+    "l̴",
+    "i"
+  ],
+  "score": 0.9352941176470588,
+  "errors": [
+    {
+      "type": "delete",
+      "position": 16,
+      "actual": "d",
+      "timestamp_seconds": {
+        "start": 0.7,
+        "end": 0.75
+      },
+      "timestamp_samples": {
+        "start": 11200,
+        "end": 12000
+      }
+    },
+    {
+      "type": "delete",
+      "position": 22,
+      "actual": "n",
+      "timestamp_seconds": {
+        "start": 0.9,
+        "end": 0.93
+      },
+      "timestamp_samples": {
+        "start": 14400,
+        "end": 14880
+      }
+    },
+    {
+      "type": "substitute",
+      "position": 29,
+      "expected": "s",
+      "actual": "θ",
+      "timestamp_seconds": {
+        "start": 8.04,
+        "end": 8.07
+      },
+      "timestamp_samples": {
+        "start": 128639,
+        "end": 129120
+      }
+    },
+    {
+      "type": "insert",
+      "position": 56,
+      "expected": "a",
+      "timestamp_seconds": {
+        "start": 8.719999999999999,
+        "end": 8.82
+      },
+      "timestamp_samples": {
+        "start": 139519,
+        "end": 141120
+      }
+    },
+    {
+      "type": "insert",
+      "position": 56,
+      "expected": "ɪ",
+      "timestamp_seconds": {
+        "start": 8.719999999999999,
+        "end": 8.82
+      },
+      "timestamp_samples": {
+        "start": 139519,
+        "end": 141120
+      }
+    },
+    {
+      "type": "delete",
+      "position": 79,
+      "actual": "t",
+      "timestamp_seconds": {
+        "start": 0.0,
+        "end": 0.1
+      },
+      "timestamp_samples": {
+        "start": 0,
+        "end": 1600
+      }
+    },
+    {
+      "type": "substitute",
+      "position": 80,
+      "expected": "θ",
+      "actual": "ɔ",
+      "timestamp_seconds": {
+        "start": 0.0,
+        "end": 0.1
+      },
+      "timestamp_samples": {
+        "start": 0,
+        "end": 1600
+      }
+    },
+    {
+      "type": "substitute",
+      "position": 81,
+      "expected": "ɜ˞",
+      "actual": "ɹ",
+      "timestamp_seconds": {
+        "start": 0.0,
+        "end": 0.1
+      },
+      "timestamp_samples": {
+        "start": 0,
+        "end": 1600
+      }
+    }
+  ],
+  "mfa_alignments": [
+    {
+      "phoneme": "ð",
+      "start": 0.0,
+      "end": 0.21
+    },
+    {
+      "phoneme": "ə",
+      "start": 0.21,
+      "end": 0.24
+    },
+    {
+      "phoneme": "w",
+      "start": 0.24,
+      "end": 0.27
+    },
+    {
+      "phoneme": "ɛ",
+      "start": 0.27,
+      "end": 0.3
+    },
+    {
+      "phoneme": "ð",
+      "start": 0.3,
+      "end": 0.33
+    },
+    {
+      "phoneme": "ɚ",
+      "start": 0.33,
+      "end": 0.38
+    },
+    {
+      "phoneme": "ɪ",
+      "start": 0.38,
+      "end": 0.41
+    },
+    {
+      "phoneme": "z",
+      "start": 0.41,
+      "end": 0.44
+    },
+    {
+      "phoneme": "ɹ",
+      "start": 0.44,
+      "end": 0.47
+    },
+    {
+      "phoneme": "æ",
+      "start": 0.47,
+      "end": 0.51
+    },
+    {
+      "phoneme": "ð",
+      "start": 0.51,
+      "end": 0.54
+    },
+    {
+      "phoneme": "ɚ",
+      "start": 0.54,
+      "end": 0.58
+    },
+    {
+      "phoneme": "w",
+      "start": 0.58,
+      "end": 0.61
+    },
+    {
+      "phoneme": "ɒ",
+      "start": 0.61,
+      "end": 0.64
+    },
+    {
+      "phoneme": "ɹ",
+      "start": 0.64,
+      "end": 0.67
+    },
+    {
+      "phoneme": "m",
+      "start": 0.67,
+      "end": 0.7
+    },
+    {
+      "phoneme": "ð",
+      "start": 0.7,
+      "end": 0.75
+    },
+    {
+      "phoneme": "ɪ",
+      "start": 0.75,
+      "end": 0.78
+    },
+    {
+      "phoneme": "s",
+      "start": 0.78,
+      "end": 0.81
+    },
+    {
+      "phoneme": "θ",
+      "start": 0.81,
+      "end": 0.84
+    },
+    {
+      "phoneme": "ɝ",
+      "start": 0.84,
+      "end": 0.87
+    },
+    {
+      "phoneme": "z",
+      "start": 0.87,
+      "end": 0.9
+    },
+    {
+      "phoneme": "d",
+      "start": 0.9,
+      "end": 0.93
+    },
+    {
+      "phoneme": "ej",
+      "start": 0.93,
+      "end": 0.96
+    },
+    {
+      "phoneme": "aj",
+      "start": 0.96,
+      "end": 7.96
+    },
+    {
+      "phoneme": "t̪",
+      "start": 7.96,
+      "end": 7.99
+    },
+    {
+      "phoneme": "ɪ",
+      "start": 7.99,
+      "end": 8.02
+    },
+    {
+      "phoneme": "n",
+      "start": 8.02,
+      "end": 8.03
+    },
+    {
+      "phoneme": "w",
+      "start": 8.03,
+      "end": 8.04
+    },
+    {
+      "phoneme": "iː",
+      "start": 8.04,
+      "end": 8.07
+    },
+    {
+      "phoneme": "ʃ",
+      "start": 8.07,
+      "end": 8.1
+    },
+    {
+      "phoneme": "ʊ",
+      "start": 8.1,
+      "end": 8.12
+    },
+    {
+      "phoneme": "ɾ",
+      "start": 8.12,
+      "end": 8.13
+    },
+    {
+      "phoneme": "ɡ",
+      "start": 8.13,
+      "end": 8.16
+    },
+    {
+      "phoneme": "ow",
+      "start": 8.16,
+      "end": 8.19
+    },
+    {
+      "phoneme": "ə",
+      "start": 8.19,
+      "end": 8.22
+    },
+    {
+      "phoneme": "ə",
+      "start": 8.22,
+      "end": 8.25
+    },
+    {
+      "phoneme": "t̪",
+      "start": 8.25,
+      "end": 8.28
+    },
+    {
+      "phoneme": "iː",
+      "start": 8.28,
+      "end": 8.31
+    },
+    {
+      "phoneme": "ɾ",
+      "start": 8.31,
+      "end": 8.32
+    },
+    {
+      "phoneme": "ɚ",
+      "start": 8.32,
+      "end": 8.35
+    },
+    {
+      "phoneme": "tʰ",
+      "start": 8.35,
+      "end": 8.36
+    },
+    {
+      "phoneme": "ʊ",
+      "start": 8.36,
+      "end": 8.38
+    },
+    {
+      "phoneme": "ɡ",
+      "start": 8.38,
+      "end": 8.41
+    },
+    {
+      "phoneme": "ɛ",
+      "start": 8.41,
+      "end": 8.44
+    },
+    {
+      "phoneme": "ð",
+      "start": 8.44,
+      "end": 8.47
+    },
+    {
+      "phoneme": "ɚ",
+      "start": 8.47,
+      "end": 8.5
+    },
+    {
+      "phoneme": "t̪",
+      "start": 8.5,
+      "end": 8.53
+    },
+    {
+      "phoneme": "æ",
+      "start": 8.53,
+      "end": 8.56
+    },
+    {
+      "phoneme": "ŋ",
+      "start": 8.56,
+      "end": 8.59
+    },
+    {
+      "phoneme": "k",
+      "start": 8.59,
+      "end": 8.62
+    },
+    {
+      "phoneme": "j",
+      "start": 8.62,
+      "end": 8.65
+    },
+    {
+      "phoneme": "ʉː",
+      "start": 8.65,
+      "end": 8.68
+    },
+    {
+      "phoneme": "f",
+      "start": 8.68,
+      "end": 8.71
+    },
+    {
+      "phoneme": "ɚ",
+      "start": 8.71,
+      "end": 8.74
+    },
+    {
+      "phoneme": "t̪",
+      "start": 8.74,
+      "end": 8.77
+    },
+    {
+      "phoneme": "ɪ",
+      "start": 8.77,
+      "end": 8.8
+    },
+    {
+      "phoneme": "ɾ̃",
+      "start": 8.8,
+      "end": 8.81
+    },
+    {
+      "phoneme": "ɪ",
+      "start": 8.81,
+      "end": 8.84
+    },
+    {
+      "phoneme": "ŋ",
+      "start": 8.84,
+      "end": 8.87
+    },
+    {
+      "phoneme": "b",
+      "start": 8.87,
+      "end": 8.88
+    },
+    {
+      "phoneme": "aw",
+      "start": 8.88,
+      "end": 8.89
+    },
+    {
+      "phoneme": "d̪",
+      "start": 8.89,
+      "end": 8.92
+    },
+    {
+      "phoneme": "ɪ",
+      "start": 8.92,
+      "end": 8.95
+    },
+    {
+      "phoneme": "s",
+      "start": 8.95,
+      "end": 8.98
+    },
+    {
+      "phoneme": "θ",
+      "start": 8.98,
+      "end": 8.99
+    },
+    {
+      "phoneme": "ɝ",
+      "start": 8.99,
+      "end": 9.02
+    },
+    {
+      "phoneme": "ə",
+      "start": 9.02,
+      "end": 9.05
+    },
+    {
+      "phoneme": "ʎ",
+      "start": 9.05,
+      "end": 9.08
+    },
+    {
+      "phoneme": "i",
+      "start": 9.08,
+      "end": 9.11
+    }
+  ],
+  "statistics": {
+    "total_errors": 8,
+    "substitutions": 3,
+    "insertions": 2,
+    "deletions": 3,
+    "actual_phone_count": 86,
+    "target_phone_count": 85,
+    "target_phone_count_asr": 85
+  }
+}
