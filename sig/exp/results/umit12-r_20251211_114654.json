@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "audio_file": "umit12-r.wav",
+    "audio_path": "audio/powsm/12/umit12-r.wav",
+    "audio_basename": "umit12-r",
+    "audio_duration_seconds": 20.0,
+    "sample_rate": 16000,
+    "timestamp": "20251211_114654",
+    "trim_for_mfa_seconds": {
+      "start": 0.032,
+      "end": 9.184,
+      "duration": 9.152,
+      "applied": 
