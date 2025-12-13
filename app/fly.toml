@@ -1,7 +1,7 @@
 # Fly.io Configuration for Tanstack Start Application
 # Documentation: https://fly.io/docs/reference/configuration/
 
-app = "nonce"
+app = "senior"
 primary_region = "fra"
 
 [build]
