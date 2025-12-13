@@ -41,12 +41,9 @@ COPY --from=builder /app/src/db ./src/db
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 
-# Make entrypoint script executable
-RUN chmod +x scripts/docker-entrypoint.sh
-
 EXPOSE 3000
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
-ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
+CMD ["node", ".output/server/index.mjs"]
