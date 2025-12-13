@@ -12,6 +12,8 @@
 ## MFA
 - [ ] Look at its Dictionary to see whether it matches with POWSM'sm
 - [ ] Using MFA for word boundary detection
+- [ ] Fallback options: Using Graphemes and uniform alignment.
 
 ## POWSM
 - [ ] Analyze the software to see whether the ASR model works with phonetic data under the hood. 
+- [ ] Canonical IPA fallback: CMUDict.

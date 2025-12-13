@@ -1,7 +1,3 @@
-.env
 .DS_Store
 **/.venv
-doc/mfa
-# But keep JSON config files
-!**/package.json
-!**/tsconfig.json
+.llms
