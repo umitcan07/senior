@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import type { Text } from "@/db/text";
+import type { PracticeText } from "@/db/text";
 
 interface TextStore {
-	currentText: Text | null;
-	setCurrentText: (text: Text | null) => void;
+	currentText: PracticeText | null;
+	setCurrentText: (text: PracticeText | null) => void;
 	clearCurrentText: () => void;
 }
 
@@ -12,4 +12,3 @@ export const useTextStore = create<TextStore>((set) => ({
 	setCurrentText: (text) => set({ currentText: text }),
 	clearCurrentText: () => set({ currentText: null }),
 }));
-

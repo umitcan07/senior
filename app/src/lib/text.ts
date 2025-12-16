@@ -1,37 +1,47 @@
-import { createServerFn } from '@tanstack/react-start';
-import { z } from 'zod';
-import { getTexts, getTextById, insertText, updateText, deleteText } from '@/db/text';
-import { ErrorCode, createErrorResponse, createSuccessResponse } from './errors';
-import type { ApiResponse } from './errors';
-import type { Text } from '@/db/text';
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import type { PracticeText } from "@/db/text";
+import {
+	deletePracticeText,
+	getPracticeTextById,
+	getPracticeTexts,
+	insertPracticeText,
+	updatePracticeText,
+} from "@/db/text";
+import type { ApiResponse } from "./errors";
+import {
+	createErrorResponse,
+	createSuccessResponse,
+	ErrorCode,
+} from "./errors";
 
-const TextSchema = z.object({
-	text: z.string().min(1),
+const PracticeTextSchema = z.object({
+	content: z.string().min(1),
 });
 
-const UpdateTextSchema = z.object({
-	id: z.number().int().positive(),
-	text: z.string().min(1),
+const UpdatePracticeTextSchema = z.object({
+	id: z.string().uuid(),
+	content: z.string().min(1),
 });
 
-const DeleteTextSchema = z.object({
-	id: z.number().int().positive(),
+const DeletePracticeTextSchema = z.object({
+	id: z.string().uuid(),
 });
 
-export const serverInsertText = createServerFn({ method: 'POST' })
-	.inputValidator(TextSchema)
-	.handler(async ({ data }): Promise<ApiResponse<Text>> => {
+export const serverInsertPracticeText = createServerFn({ method: "POST" })
+	.inputValidator(PracticeTextSchema)
+	.handler(async ({ data }): Promise<ApiResponse<PracticeText>> => {
 		try {
-			const result = await insertText({ text: data.text });
+			const result = await insertPracticeText({ content: data.content });
 			return createSuccessResponse(result);
 		} catch (error) {
-			console.error('Insert text error:', error);
-			
+			console.error("Insert practice text error:", error);
+
 			if (error instanceof z.ZodError) {
 				return createErrorResponse(
 					ErrorCode.VALIDATION_ERROR,
-					'Invalid input data',
-					{ errors: error.errors },
+					"Invalid input data",
+					{ errors: error.issues },
 					400,
 				);
 			}
@@ -39,7 +49,7 @@ export const serverInsertText = createServerFn({ method: 'POST' })
 			if (error instanceof Error) {
 				return createErrorResponse(
 					ErrorCode.DATABASE_ERROR,
-					'An error occurred while inserting the text',
+					"An error occurred while inserting the practice text",
 					{ originalError: error.message },
 					500,
 				);
@@ -47,56 +57,58 @@ export const serverInsertText = createServerFn({ method: 'POST' })
 
 			return createErrorResponse(
 				ErrorCode.DATABASE_ERROR,
-				'An error occurred while inserting the text',
+				"An error occurred while inserting the practice text",
 				undefined,
 				500,
 			);
 		}
 	});
 
-export const serverGetTexts = createServerFn({ method: 'GET' }).handler(async (): Promise<ApiResponse<Text[]>> => {
-	try {
-		const result = await getTexts();
-		return createSuccessResponse(result);
-	} catch (error) {
-		console.error('Get texts error:', error);
+export const serverGetPracticeTexts = createServerFn({ method: "GET" }).handler(
+	async (): Promise<ApiResponse<PracticeText[]>> => {
+		try {
+			const result = await getPracticeTexts();
+			return createSuccessResponse(result);
+		} catch (error) {
+			console.error("Get practice texts error:", error);
 
-		if (error instanceof Error) {
+			if (error instanceof Error) {
+				return createErrorResponse(
+					ErrorCode.DATABASE_ERROR,
+					"An error occurred while getting the practice texts",
+					{ originalError: error.message },
+					500,
+				);
+			}
+
 			return createErrorResponse(
 				ErrorCode.DATABASE_ERROR,
-				'An error occurred while getting the texts',
-				{ originalError: error.message },
+				"An error occurred while getting the practice texts",
+				undefined,
 				500,
 			);
 		}
+	},
+);
 
-		return createErrorResponse(
-			ErrorCode.DATABASE_ERROR,
-			'An error occurred while getting the texts',
-			undefined,
-			500,
-		);
-	}
+const GetPracticeTextByIdSchema = z.object({
+	id: z.string().uuid(),
 });
 
-const GetTextByIdSchema = z.object({
-	id: z.number().int().positive(),
-});
-
-export const serverGetTextById = createServerFn({ method: 'GET' })
-	.inputValidator(GetTextByIdSchema)
-	.handler(async ({ data }): Promise<ApiResponse<Text | null>> => {
+export const serverGetPracticeTextById = createServerFn({ method: "GET" })
+	.inputValidator(GetPracticeTextByIdSchema)
+	.handler(async ({ data }): Promise<ApiResponse<PracticeText | null>> => {
 		try {
-			const result = await getTextById(data.id);
+			const result = await getPracticeTextById(data.id);
 			return createSuccessResponse(result);
 		} catch (error) {
-			console.error('Get text by id error:', error);
+			console.error("Get practice text by id error:", error);
 
 			if (error instanceof z.ZodError) {
 				return createErrorResponse(
 					ErrorCode.VALIDATION_ERROR,
-					'Invalid input data',
-					{ errors: error.errors },
+					"Invalid input data",
+					{ errors: error.issues },
 					400,
 				);
 			}
@@ -104,7 +116,7 @@ export const serverGetTextById = createServerFn({ method: 'GET' })
 			if (error instanceof Error) {
 				return createErrorResponse(
 					ErrorCode.DATABASE_ERROR,
-					'An error occurred while getting the text',
+					"An error occurred while getting the practice text",
 					{ originalError: error.message },
 					500,
 				);
@@ -112,27 +124,29 @@ export const serverGetTextById = createServerFn({ method: 'GET' })
 
 			return createErrorResponse(
 				ErrorCode.DATABASE_ERROR,
-				'An error occurred while getting the text',
+				"An error occurred while getting the practice text",
 				undefined,
 				500,
 			);
 		}
 	});
 
-export const serverUpdateText = createServerFn({ method: 'POST' })
-	.inputValidator(UpdateTextSchema)
-	.handler(async ({ data }): Promise<ApiResponse<Text>> => {
+export const serverUpdatePracticeText = createServerFn({ method: "POST" })
+	.inputValidator(UpdatePracticeTextSchema)
+	.handler(async ({ data }): Promise<ApiResponse<PracticeText>> => {
 		try {
-			const result = await updateText(data.id, { text: data.text });
+			const result = await updatePracticeText(data.id, {
+				content: data.content,
+			});
 			return createSuccessResponse(result);
 		} catch (error) {
-			console.error('Update text error:', error);
+			console.error("Update practice text error:", error);
 
 			if (error instanceof z.ZodError) {
 				return createErrorResponse(
 					ErrorCode.VALIDATION_ERROR,
-					'Invalid input data',
-					{ errors: error.errors },
+					"Invalid input data",
+					{ errors: error.issues },
 					400,
 				);
 			}
@@ -140,7 +154,7 @@ export const serverUpdateText = createServerFn({ method: 'POST' })
 			if (error instanceof Error) {
 				return createErrorResponse(
 					ErrorCode.DATABASE_ERROR,
-					'An error occurred while updating the text',
+					"An error occurred while updating the practice text",
 					{ originalError: error.message },
 					500,
 				);
@@ -148,27 +162,27 @@ export const serverUpdateText = createServerFn({ method: 'POST' })
 
 			return createErrorResponse(
 				ErrorCode.DATABASE_ERROR,
-				'An error occurred while updating the text',
+				"An error occurred while updating the practice text",
 				undefined,
 				500,
 			);
 		}
 	});
 
-export const serverDeleteText = createServerFn({ method: 'POST' })
-	.inputValidator(DeleteTextSchema)
+export const serverDeletePracticeText = createServerFn({ method: "POST" })
+	.inputValidator(DeletePracticeTextSchema)
 	.handler(async ({ data }): Promise<ApiResponse<void>> => {
 		try {
-			await deleteText(data.id);
+			await deletePracticeText(data.id);
 			return createSuccessResponse(undefined);
 		} catch (error) {
-			console.error('Delete text error:', error);
+			console.error("Delete practice text error:", error);
 
 			if (error instanceof z.ZodError) {
 				return createErrorResponse(
 					ErrorCode.VALIDATION_ERROR,
-					'Invalid input data',
-					{ errors: error.errors },
+					"Invalid input data",
+					{ errors: error.issues },
 					400,
 				);
 			}
@@ -176,7 +190,7 @@ export const serverDeleteText = createServerFn({ method: 'POST' })
 			if (error instanceof Error) {
 				return createErrorResponse(
 					ErrorCode.DATABASE_ERROR,
-					'An error occurred while deleting the text',
+					"An error occurred while deleting the practice text",
 					{ originalError: error.message },
 					500,
 				);
@@ -184,7 +198,7 @@ export const serverDeleteText = createServerFn({ method: 'POST' })
 
 			return createErrorResponse(
 				ErrorCode.DATABASE_ERROR,
-				'An error occurred while deleting the text',
+				"An error occurred while deleting the practice text",
 				undefined,
 				500,
 			);

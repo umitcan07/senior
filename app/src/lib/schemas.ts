@@ -6,7 +6,7 @@ export const ErrorCodeSchema = z.nativeEnum(ErrorCode);
 export const ApiErrorSchema = z.object({
 	code: z.union([ErrorCodeSchema, z.string()]),
 	message: z.string(),
-	details: z.record(z.unknown()).optional(),
+	details: z.record(z.string(), z.unknown()).optional(),
 	statusCode: z.number().optional(),
 });
 
@@ -26,15 +26,12 @@ export function createErrorResponseSchema() {
 	});
 }
 
-export function createApiResponseSchema<T extends z.ZodTypeAny>(
-	dataSchema: T,
-) {
+export function createApiResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
 	return z.union([
 		createSuccessResponseSchema(dataSchema),
 		createErrorResponseSchema(),
 	]);
 }
-
 export const RecordingSchema = z.object({
 	id: z.number(),
 	userId: z.string(),
@@ -48,7 +45,5 @@ export const RecordingUploadInputSchema = z.object({
 	file: z.instanceof(File).or(z.instanceof(Blob)),
 });
 
-export const RecordingUploadResponseSchema = createApiResponseSchema(
-	RecordingSchema,
-);
-
+export const RecordingUploadResponseSchema =
+	createApiResponseSchema(RecordingSchema);

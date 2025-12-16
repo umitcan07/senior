@@ -1,34 +1,50 @@
-import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import type { AnyFieldApi } from '@tanstack/react-form';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useServerFn } from '@tanstack/react-start';
-import { serverInsertText, serverGetTexts, serverUpdateText, serverDeleteText } from '@/lib/text';
-import { useState, useEffect } from 'react';
-import { RiMicLine } from '@remixicon/react';
-import HeaderUser from '@/integrations/clerk/header-user';
+import type { AnyFieldApi } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { Calendar, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+	MainLayout,
+	PageContainer,
+	PageHeader,
+} from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import type { PracticeText } from "@/db/text";
+import {
+	serverDeletePracticeText,
+	serverGetPracticeTexts,
+	serverInsertPracticeText,
+	serverUpdatePracticeText,
+} from "@/lib/text";
 
-export const Route = createFileRoute('/admin/text')({
+export const Route = createFileRoute("/admin/text")({
 	component: RouteComponent,
 	loader: async () => {
-		const result = await serverGetTexts();
+		const result = await serverGetPracticeTexts();
 		if (!result.success) {
 			throw new Error(result.error.message);
 		}
 		return { texts: result.data };
 	},
+	pendingComponent: TextManagementSkeleton,
 });
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
 	if (!field.state.meta.isTouched) return null;
-	
+
 	return (
-		<div className="text-xs text-muted-foreground mt-1">
+		<div className="mt-1 text-muted-foreground text-xs">
 			{!field.state.meta.isValid && field.state.meta.errors.length > 0 ? (
-				<span className="text-destructive">{field.state.meta.errors.join(', ')}</span>
+				<span className="text-destructive">
+					{field.state.meta.errors.join(", ")}
+				</span>
 			) : field.state.meta.isValidating ? (
 				<span>Validating...</span>
 			) : null}
@@ -36,55 +52,65 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 	);
 }
 
-function TextItem({ text }: { text: { id: number; text: string } }) {
+function formatDate(date: Date) {
+	return new Intl.DateTimeFormat("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+		hour: "numeric",
+		minute: "2-digit",
+	}).format(new Date(date));
+}
+
+function TextItem({ text }: { text: PracticeText }) {
 	const [isEditing, setIsEditing] = useState(false);
-	const [editValue, setEditValue] = useState(text.text);
-	const updateTextFn = useServerFn(serverUpdateText);
-	const deleteTextFn = useServerFn(serverDeleteText);
+	const [editValue, setEditValue] = useState(text.content);
+	const updateTextFn = useServerFn(serverUpdatePracticeText);
+	const deleteTextFn = useServerFn(serverDeletePracticeText);
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (!isEditing) {
-			setEditValue(text.text);
+			setEditValue(text.content);
 		}
-	}, [text.text, isEditing]);
+	}, [text.content, isEditing]);
 
 	const { mutate: updateText, isPending: isUpdating } = useMutation({
-		mutationFn: async (data: { id: number; text: string }) => {
+		mutationFn: async (data: { id: string; content: string }) => {
 			return updateTextFn({ data });
 		},
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ['texts'] });
+			await queryClient.invalidateQueries({ queryKey: ["texts"] });
 			setIsEditing(false);
 		},
 	});
 
 	const { mutate: deleteText, isPending: isDeleting } = useMutation({
-		mutationFn: async (id: number) => {
+		mutationFn: async (id: string) => {
 			return deleteTextFn({ data: { id } });
 		},
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ['texts'] });
+			await queryClient.invalidateQueries({ queryKey: ["texts"] });
 		},
 	});
 
 	const handleSave = () => {
-		if (editValue.trim() && editValue !== text.text) {
-			updateText({ id: text.id, text: editValue.trim() });
+		if (editValue.trim() && editValue !== text.content) {
+			updateText({ id: text.id, content: editValue.trim() });
 		} else {
 			setIsEditing(false);
 		}
 	};
 
 	const handleCancel = () => {
-		setEditValue(text.text);
+		setEditValue(text.content);
 		setIsEditing(false);
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if ((e.key === 'Enter' && (e.metaKey || e.ctrlKey)) || e.key === 'Escape') {
+		if ((e.key === "Enter" && (e.metaKey || e.ctrlKey)) || e.key === "Escape") {
 			e.preventDefault();
-			if (e.key === 'Escape') {
+			if (e.key === "Escape") {
 				handleCancel();
 			} else {
 				handleSave();
@@ -94,137 +120,142 @@ function TextItem({ text }: { text: { id: number; text: string } }) {
 
 	if (isEditing) {
 		return (
-			<li className="flex flex-col gap-2 p-4 border rounded-lg bg-card">
-				<Textarea
-					value={editValue}
-					onChange={(e) => setEditValue(e.target.value)}
-					onKeyDown={handleKeyDown}
-					className="min-h-24 resize-none"
-					autoFocus
-				/>
-				<div className="flex gap-2 justify-end">
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={handleCancel}
-						disabled={isUpdating}
-					>
-						Cancel
-					</Button>
-					<Button
-						type="button"
-						size="sm"
-						onClick={handleSave}
-						disabled={isUpdating || !editValue.trim()}
-					>
-						{isUpdating ? 'Saving...' : 'Save'}
-					</Button>
-				</div>
-			</li>
+			<Card className="transition-all duration-200">
+				<CardContent className="flex flex-col gap-4 pt-6">
+					<Textarea
+						value={editValue}
+						onChange={(e) => setEditValue(e.target.value)}
+						onKeyDown={handleKeyDown}
+						className="min-h-32 resize-none"
+						autoFocus
+					/>
+					<div className="flex justify-end gap-2">
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							onClick={handleCancel}
+							disabled={isUpdating}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							size="sm"
+							onClick={handleSave}
+							disabled={isUpdating || !editValue.trim()}
+						>
+							{isUpdating ? "Saving..." : "Save"}
+						</Button>
+					</div>
+				</CardContent>
+			</Card>
 		);
 	}
 
 	return (
-		<li className="group flex flex-col gap-2 p-4 border rounded-lg bg-card hover:border-ring/50 transition-colors">
-			<p className="text-sm whitespace-pre-wrap wrap-break-word flex-1">{text.text}</p>
-			<div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-				<Link
-					to="/record/$textId"
-					params={{ textId: String(text.id) }}
-					className="inline-block"
-				>
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						disabled={isDeleting}
-						className="text-teal-600 hover:text-teal-700"
-					>
-						<RiMicLine className="mr-2" />
-						Record
-					</Button>
-				</Link>
-				<Button
-					type="button"
-					variant="ghost"
-					size="sm"
-					onClick={() => setIsEditing(true)}
-					disabled={isDeleting}
-				>
-					Edit
-				</Button>
-				<Button
-					type="button"
-					variant="ghost"
-					size="sm"
-					onClick={() => deleteText(text.id)}
-					disabled={isDeleting}
-					className="text-destructive hover:text-destructive"
-				>
-					Delete
-				</Button>
-			</div>
-		</li>
+		<Card className="group transition-all duration-200">
+			<CardContent className="flex flex-col gap-4 pt-6">
+				<p className="line-clamp-5 text-foreground text-sm leading-relaxed">
+					{text.content}
+				</p>
+				<div className="flex items-center justify-between border-t pt-4">
+					<div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+						<Calendar size={12} />
+						<span>{formatDate(text.createdAt)}</span>
+						{text.updatedAt > text.createdAt && (
+							<span className="text-muted-foreground/60">
+								(edited {formatDate(text.updatedAt)})
+							</span>
+						)}
+					</div>
+					<div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon-sm"
+							onClick={() => setIsEditing(true)}
+							disabled={isDeleting}
+							aria-label="Edit"
+						>
+							<Pencil size={14} />
+						</Button>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon-sm"
+							onClick={() => deleteText(text.id)}
+							disabled={isDeleting}
+							className="text-destructive hover:text-destructive"
+							aria-label="Delete"
+						>
+							<Trash2 size={14} />
+						</Button>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
 	);
 }
 
 function TextList() {
-	const getTextsFn = useServerFn(serverGetTexts);
+	const getTextsFn = useServerFn(serverGetPracticeTexts);
 	const loaderData = Route.useLoaderData();
 
-		const { data, isLoading, isError, error } = useQuery({
-			queryKey: ['texts'],
-			queryFn: async () => {
-				const result = await getTextsFn();
-				if (!result.success) {
-					throw new Error(result.error.message);
-				}
-				return result.data;
-			},
-			initialData: loaderData.texts,
-		});
+	const { data, isLoading, isError, error } = useQuery({
+		queryKey: ["texts"],
+		queryFn: async () => {
+			const result = await getTextsFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
+		},
+		initialData: loaderData.texts,
+	});
 
 	if (isLoading) return <div className="text-muted-foreground">Loading...</div>;
-	if (isError) return <div className="text-destructive">Error: {error?.message}</div>;
+	if (isError)
+		return <div className="text-destructive">Error: {error?.message}</div>;
+
 	if (data && data.length > 0) {
 		return (
-			<div>
-				<h2 className="text-lg font-semibold mb-4">Texts ({data.length})</h2>
-				<ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{data.map((text) => (
-						<TextItem key={text.id} text={text} />
-					))}
-				</ul>
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				{data.map((text) => (
+					<TextItem key={text.id} text={text} />
+				))}
 			</div>
 		);
 	}
+
 	if (data && data.length === 0) {
 		return (
-			<div className="text-center py-8 text-muted-foreground">
-				<p>No texts yet. Add one below.</p>
-			</div>
+			<EmptyState
+				title="No practice texts yet"
+				description="Create your first practice text using the form below."
+			/>
 		);
 	}
+
 	return null;
 }
 
 function TextForm() {
-	const insertTextFn = useServerFn(serverInsertText);
+	const insertTextFn = useServerFn(serverInsertPracticeText);
 	const queryClient = useQueryClient();
 
 	const { mutate } = useMutation({
-		mutationFn: async (data: { text: string }) => {
+		mutationFn: async (data: { content: string }) => {
 			return insertTextFn({ data });
 		},
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ['texts'] });
+			await queryClient.invalidateQueries({ queryKey: ["texts"] });
 		},
 	});
 
 	const form = useForm({
 		defaultValues: {
-			text: '',
+			content: "",
 		},
 		onSubmit: async ({ value }) => {
 			mutate(value, {
@@ -234,82 +265,96 @@ function TextForm() {
 			});
 		},
 	});
+
 	return (
-		<form
-			onSubmit={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				form.handleSubmit();
-			}}
-			className="space-y-4"
-		>
-			<div className="space-y-2">
-				<Label htmlFor="text">Add New Text</Label>
-				<form.Field
-					name="text"
-					validators={{
-						onChange: ({ value }) =>
-							!value
-								? "Text is required"
-								: value.length < 3
-									? "Text must be at least 3 characters"
-									: undefined,
-						onChangeAsyncDebounceMs: 500,
-						onChangeAsync: async ({ value }) => {
-							await new Promise((resolve) => setTimeout(resolve, 1000));
-							return (
-								value.includes("error") &&
-								'No "error" allowed in text'
-							)
-						},
+		<Card>
+			<CardContent className="pt-6">
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						form.handleSubmit();
 					}}
-					// biome-ignore lint/correctness/noChildrenProp: <explanation>
-					children={(field) => {
-						return (
-							<>
-								<Textarea
-									id={field.name}
-									name={field.name}
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Enter your text here..."
-									className="min-h-24 resize-none"
-								/>
-								<FieldInfo field={field} />
-							</>
-						)
-					}}
-				/>
-			</div>
-			<form.Subscribe
-				selector={(state) => [state.canSubmit, state.isSubmitting]}
-				children={([canSubmit, isSubmitting]) => (
-					<Button type="submit" disabled={!canSubmit}>
-						{isSubmitting ? "Submitting..." : "Add Text"}
-					</Button>
-				)}
-			/>
-		</form>
-	)
+					className="space-y-4"
+				>
+					<div className="space-y-2">
+						<Label htmlFor="content">New Practice Text</Label>
+						<form.Field
+							name="content"
+							validators={{
+								onChange: ({ value }) =>
+									!value
+										? "Text is required"
+										: value.length < 3
+											? "Text must be at least 3 characters"
+											: undefined,
+							}}
+							children={(field) => {
+								return (
+									<>
+										<Textarea
+											id={field.name}
+											name={field.name}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											placeholder="Enter your practice text here..."
+											className="min-h-32 resize-none"
+										/>
+										<FieldInfo field={field} />
+									</>
+								);
+							}}
+						/>
+					</div>
+					<form.Subscribe
+						selector={(state) => [state.canSubmit, state.isSubmitting]}
+						children={([canSubmit, isSubmitting]) => (
+							<Button type="submit" disabled={!canSubmit}>
+								{isSubmitting ? "Adding..." : "Add Text"}
+							</Button>
+						)}
+					/>
+				</form>
+			</CardContent>
+		</Card>
+	);
+}
+
+function TextManagementSkeleton() {
+	return (
+		<MainLayout>
+			<PageContainer>
+				<div className="space-y-8">
+					<div className="space-y-2">
+						<Skeleton className="h-8 w-48" />
+						<Skeleton className="h-4 w-80" />
+					</div>
+					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<Skeleton key={i} className="h-40" />
+						))}
+					</div>
+					<Skeleton className="h-48" />
+				</div>
+			</PageContainer>
+		</MainLayout>
+	);
 }
 
 function RouteComponent() {
 	return (
-		<div className="min-h-screen bg-background">
-			<HeaderUser />
-			<div className="container max-w-7xl md:px-10 px-6 mx-auto py-8 flex flex-col gap-12">
-				<div className="space-y-2">
-					<h1 className="text-2xl font-bold">Text Management</h1>
-					<p className="text-muted-foreground">Create, edit, and manage your texts</p>
-				</div>
-				<div className="flex flex-col gap-10">
+		<MainLayout>
+			<PageContainer>
+				<div className="space-y-8">
+					<PageHeader
+						title="Text Management"
+						description="Create, edit, and manage practice texts for pronunciation exercises"
+					/>
 					<TextList />
-					<div className="space-y-4">
-						<TextForm />
-					</div>
+					<TextForm />
 				</div>
-			</div>
-		</div>
+			</PageContainer>
+		</MainLayout>
 	);
 }

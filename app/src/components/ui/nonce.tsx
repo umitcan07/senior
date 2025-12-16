@@ -1,33 +1,25 @@
 type NonceLogoProps = {
 	className?: string;
-	size?: "sm" | "md" | "lg";
+	height?: number;
 };
 
-const sizeMap = {
-	sm: {
-		height: 16,
-		width: 54,
-	},
-	md: {
-		height: 32,
-		width: 108,
-	},
-	lg: {
-		height: 48,
-		width: 162,
-	},
-};
+const ASPECT_RATIO = 54 / 16;
 
-export const NonceLogo = ({ className, size = "md" }: NonceLogoProps) => {
+export const NonceLogo = ({
+	className,
+	height = 24,
+	...props
+}: NonceLogoProps) => {
 	return (
 		<svg
 			aria-label="Nonce Logo"
-			height={sizeMap[size].height}
-			width={sizeMap[size].width}
+			height={height}
+			width={height * ASPECT_RATIO}
 			viewBox="0 0 54 16"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			className={className}
+			{...props}
 		>
 			<title>Nonce Logo</title>
 			<g fill="currentColor">

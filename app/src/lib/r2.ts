@@ -1,6 +1,10 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { ErrorCode, createErrorResponse, createSuccessResponse } from "./errors";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { ApiResponse } from "./errors";
+import {
+	createErrorResponse,
+	createSuccessResponse,
+	ErrorCode,
+} from "./errors";
 
 if (!process.env.R2_ACCOUNT_ID) {
 	throw new Error("R2_ACCOUNT_ID environment variable is not set");
@@ -54,7 +58,7 @@ export async function uploadToR2(
 		});
 	} catch (error) {
 		console.error("R2 upload error:", error);
-		
+
 		if (error instanceof Error) {
 			return createErrorResponse(
 				ErrorCode.R2_UPLOAD_ERROR,
@@ -72,4 +76,3 @@ export async function uploadToR2(
 		);
 	}
 }
-

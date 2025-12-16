@@ -1,12 +1,21 @@
+import {
+	RiAlertFill,
+	RiCheckboxCircleFill,
+	RiErrorWarningFill,
+	RiInformationFill,
+} from "@remixicon/react";
 import * as React from "react";
-import { useToast } from "@/hooks/use-toast";
 import type { ToastActionElement } from "@/components/ui/toast";
-import { RiCheckboxCircleFill, RiErrorWarningFill, RiAlertFill, RiInformationFill } from "@remixicon/react";
+import { useToast } from "@/hooks/use-toast";
 
 export function useToastHelpers() {
 	const { toast } = useToast();
 
-	const createToastTitle = (Icon: React.ComponentType<{ className?: string }>, message: string, iconClassName?: string) => {
+	const createToastTitle = (
+		Icon: React.ComponentType<{ className?: string }>,
+		message: string,
+		iconClassName?: string,
+	) => {
 		return React.createElement(
 			"div",
 			{ className: "flex items-center gap-2" },

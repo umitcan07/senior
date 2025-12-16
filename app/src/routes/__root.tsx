@@ -4,8 +4,11 @@ import {
 	HeadContent,
 	Scripts,
 } from "@tanstack/react-router";
-import ClerkProvider from "../integrations/clerk/provider";
+import { NotFound } from "@/components/not-found";
+import { ThemeInitializer } from "@/components/theme-initializer";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import ClerkProvider from "../integrations/clerk/provider";
 import appCss from "../styles.css?url";
 import "remixicon/fonts/remixicon.css";
 
@@ -18,7 +21,7 @@ const appDescription =
 	"Nonce is an advanced, free-to-use English pronunciation assessment tool powered by signal processing and machine learning.";
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	notFoundComponent: () => <div>Not Found</div>,
+	notFoundComponent: NotFound,
 	errorComponent: () => <div>Error</div>,
 	head: () => ({
 		meta: [
@@ -106,6 +109,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				rel: "manifest",
 				href: "/manifest.json",
 			},
+			{
+				rel: "preconnect",
+				href: "https://rsms.me/",
+			},
+			{
+				rel: "preconnect",
+				href: "https://rsms.me/inter/inter.css",
+			},
 		],
 	}),
 
@@ -114,15 +125,32 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							(function() {
+								const theme = localStorage.getItem('nonce-theme-preference') || 'system';
+								const isDark = theme === 'dark' || 
+									(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+								if (isDark) {
+									document.documentElement.classList.add('dark');
+								}
+							})();
+						`,
+					}}
+				/>
 			</head>
 			<body>
-				<ClerkProvider>
-					{children}
-					<Toaster />
-				</ClerkProvider>
+				<ThemeInitializer />
+				<ThemeProvider>
+					<ClerkProvider>
+						{children}
+						<Toaster />
+					</ClerkProvider>
+				</ThemeProvider>
 				<Scripts />
 			</body>
 		</html>

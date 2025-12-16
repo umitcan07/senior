@@ -1,19 +1,11 @@
-import { ErrorCode } from "./errors";
-
-export async function convertTo16kHzMonoWav(
-	audioBlob: Blob,
-): Promise<Blob> {
+export async function convertTo16kHzMonoWav(audioBlob: Blob): Promise<Blob> {
 	try {
 		const arrayBuffer = await audioBlob.arrayBuffer();
 		const audioContext = new AudioContext({ sampleRate: 16000 });
 
 		const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-		const monoBuffer = audioContext.createBuffer(
-			1,
-			audioBuffer.length,
-			16000,
-		);
+		const monoBuffer = audioContext.createBuffer(1, audioBuffer.length, 16000);
 
 		const monoData = monoBuffer.getChannelData(0);
 		const numberOfChannels = audioBuffer.numberOfChannels;
@@ -95,4 +87,3 @@ function audioBufferToWav(buffer: AudioBuffer): ArrayBuffer {
 
 	return arrayBuffer;
 }
-

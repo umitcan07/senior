@@ -6,7 +6,6 @@ import ws from "ws";
 import * as schema from "../src/db/schema.ts";
 
 config();
-
 // Configure WebSocket for Neon serverless (required for Node.js v21 and earlier)
 if (typeof WebSocket === "undefined") {
   neonConfig.webSocketConstructor = ws;

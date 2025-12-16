@@ -11,7 +11,7 @@ export enum ErrorCode {
 export interface ApiError {
 	code: ErrorCode | string;
 	message: string;
-	details?: Record<string, unknown>;
+	details?: Record<string, {}>;
 	statusCode?: number;
 }
 
@@ -22,7 +22,7 @@ export type ApiResponse<T> =
 export function createErrorResponse(
 	code: ErrorCode | string,
 	message: string,
-	details?: Record<string, unknown>,
+	details?: Record<string, {}>,
 	statusCode?: number,
 ): { success: false; error: ApiError } {
 	return {
@@ -36,9 +36,7 @@ export function createErrorResponse(
 	};
 }
 
-export function createSuccessResponse<T>(
-	data: T,
-): { success: true; data: T } {
+export function createSuccessResponse<T>(data: T): { success: true; data: T } {
 	return {
 		success: true,
 		data,
@@ -70,4 +68,3 @@ export function getErrorCode(error: unknown): ErrorCode | string {
 	}
 	return ErrorCode.UNKNOWN_ERROR;
 }
-

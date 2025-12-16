@@ -18,7 +18,7 @@
 
 > Lives in Clerk
 
-### `texts`
+### `practice_texts`
 
 | Column       | Type      | Description          |
 | ------------ | --------- | -------------------- |
@@ -46,7 +46,7 @@
 | `id`                | uuid         | Primary key                    |
 | `storage_key`       | varchar(500) | S3/R2 object key               |
 | `author_id`         | uuid         | FK → `authors.id`              |
-| `text_id`           | uuid         | FK → `texts.id`                |
+| `text_id`           | uuid         | FK → `practice_texts.id`       |
 | `generation_method` | varchar(20)  | Enum: "tts", "native"          |
 | `ipa_transcription` | text         | IPA phonetic transcription     |
 | `ipa_method`        | varchar(20)  | Enum: "powsm", "cmudict"       |
@@ -87,7 +87,6 @@
 | `silence_ratio`     | decimal(5,4) | Percentage of silence/quiet segments (0-1) |
 | `clipping_ratio`    | decimal(5,4) | Percentage of clipped samples (0-1)        |
 | `quality_status`    | varchar(20)  | Enum: "accept", "warning", "reject"        |
-| `quality_errors`    | text[]       | Array of error messages                    |
 | `created_at`        | timestamp    | Record creation time                       |
 
 ### `analyses`
@@ -104,12 +103,10 @@
 | `recognized_phonemes`    | text         | Recognized IPA phonemes            |
 | `phoneme_distance`       | integer      | Edit distance for phonemes         |
 | `phoneme_score`          | decimal(5,4) | Phoneme-level score (0-1)          |
-| `phoneme_errors`         | jsonb        | Array of phoneme-level errors      |
 | `target_words`           | text         | Target words                       |
 | `recognized_words`       | text         | Recognized words                   |
 | `word_distance`          | integer      | Edit distance for words            |
 | `word_score`             | decimal(5,4) | Word-level score (0-1)             |
-| `word_errors`            | jsonb        | Array of word-level errors         |
 | `alignment_id`           | uuid         | FK → `alignments.id` (nullable)    |
 | `created_at`             | timestamp    | Record creation time               |
 
@@ -133,63 +130,31 @@
 | `created_at`          | timestamp    | Record creation time         |
 | `updated_at`          | timestamp    | Last update time             |
 
----
+### `phoneme_errors`
 
-## JSON Data Structures
+| Column               | Type        | Description                            |
+| -------------------- | ----------- | -------------------------------------- |
+| `id`                 | uuid        | Primary key                            |
+| `analysis_id`        | uuid        | FK → `analyses.id`                     |
+| `error_type`         | varchar(10) | Enum: "substitute", "insert", "delete" |
+| `position`           | integer     | Position in phoneme sequence           |
+| `expected`           | varchar(10) | Expected phoneme (NULL for inserts)    |
+| `actual`             | varchar(10) | Actual phoneme (NULL for deletes)      |
+| `timestamp_start_ms` | integer     | Start timestamp in milliseconds        |
+| `timestamp_end_ms`   | integer     | End timestamp in milliseconds          |
+| `created_at`         | timestamp   | Record creation time                   |
 
-### `phoneme_errors` (jsonb array)
+### `word_errors`
 
-```json
-[
-  {
-    "type": "substitute",
-    "position": 29,
-    "expected": "s",
-    "actual": "θ",
-    "timestamp_start_ms": 4550,
-    "timestamp_end_ms": 4670
-  },
-  {
-    "type": "insert",
-    "position": 16,
-    "actual": "d",
-    "timestamp_start_ms": 2750,
-    "timestamp_end_ms": 2850
-  },
-  {
-    "type": "delete",
-    "position": 54,
-    "expected": "a",
-    "timestamp_start_ms": 6370,
-    "timestamp_end_ms": 6400
-  }
-]
-```
-
-### `word_errors` (jsonb array)
-
-```json
-[
-  {
-    "type": "substitute",
-    "position": 6,
-    "expected": "thursday",
-    "actual": "turnsday"
-  },
-  {
-    "type": "delete",
-    "position": 7,
-    "expected": "i"
-  }
-]
-```
-
-### `quality_errors` (text array)
-
-```sql
--- PostgreSQL text array
-ARRAY['SNR too low: 8.5 dB (minimum: 12 dB)', 'Silence ratio out of range: 3.2% (acceptable: 5-70%)']
-```
+| Column        | Type         | Description                            |
+| ------------- | ------------ | -------------------------------------- |
+| `id`          | uuid         | Primary key                            |
+| `analysis_id` | uuid         | FK → `analyses.id`                     |
+| `error_type`  | varchar(10)  | Enum: "substitute", "insert", "delete" |
+| `position`    | integer      | Position in word sequence              |
+| `expected`    | varchar(100) | Expected word (NULL for inserts)       |
+| `actual`      | varchar(100) | Actual word (NULL for deletes)         |
+| `created_at`  | timestamp    | Record creation time                   |
 
 ---
 
@@ -205,9 +170,17 @@ CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
 CREATE INDEX idx_analyses_user_recording_id ON analyses(user_recording_id);
 CREATE INDEX idx_audio_quality_metrics_user_recording_id ON audio_quality_metrics(user_recording_id);
 
--- JSONB indexes for error aggregation queries
-CREATE INDEX idx_analyses_phoneme_errors ON analyses USING GIN (phoneme_errors);
-CREATE INDEX idx_analyses_word_errors ON analyses USING GIN (word_errors);
+-- Phoneme errors indexes (for aggregation queries)
+CREATE INDEX idx_phoneme_errors_analysis_id ON phoneme_errors(analysis_id);
+CREATE INDEX idx_phoneme_errors_type ON phoneme_errors(error_type);
+CREATE INDEX idx_phoneme_errors_expected ON phoneme_errors(expected);
+CREATE INDEX idx_phoneme_errors_actual ON phoneme_errors(actual);
+
+-- Word errors indexes (for aggregation queries)
+CREATE INDEX idx_word_errors_analysis_id ON word_errors(analysis_id);
+CREATE INDEX idx_word_errors_type ON word_errors(error_type);
+CREATE INDEX idx_word_errors_expected ON word_errors(expected);
+CREATE INDEX idx_word_errors_actual ON word_errors(actual);
 
 -- Query optimization indexes
 CREATE INDEX idx_user_recordings_created_at ON user_recordings(created_at DESC);
@@ -215,7 +188,11 @@ CREATE INDEX idx_analyses_created_at ON analyses(created_at DESC);
 ```
 ---
 
-## Quality Thresholds
+## Quality Thresholds (Application Layer)
+
+> **Note:** Quality error messages are derived in the application layer by comparing
+> stored metrics (`snr_db`, `silence_ratio`, `clipping_ratio`) against these thresholds.
+> This separation allows threshold changes without data migrations.
 
 | Metric         | Accept | Warning         | Reject      |
 | -------------- | ------ | --------------- | ----------- |
@@ -243,8 +220,8 @@ CREATE TYPE quality_status AS ENUM ('accept', 'warning', 'reject');
 -- Alignment method
 CREATE TYPE alignment_method AS ENUM ('mfa', 'wav2textgrid');
 
--- Error type (used in JSON, not as DB enum)
--- Values: 'substitute', 'insert', 'delete'
+-- Error type for phoneme_errors and word_errors
+CREATE TYPE error_type AS ENUM ('substitute', 'insert', 'delete');
 ```
 
 ---

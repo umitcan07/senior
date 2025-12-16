@@ -15,6 +15,13 @@
       "when": 1762695433918,
       "tag": "0001_dusty_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765833344926,
+      "tag": "0002_greedy_harpoon",
+      "breakpoints": true
     }
   ]
 }

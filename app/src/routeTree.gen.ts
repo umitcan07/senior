@@ -9,15 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LearnRouteImport } from './routes/learn'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PracticeIndexRouteImport } from './routes/practice/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as RecordTextIdRouteImport } from './routes/record.$textId'
+import { Route as PracticeTextIdRouteImport } from './routes/practice/$textId'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
+import { Route as AdminReferencesRouteImport } from './routes/admin/references'
+import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
+import { Route as PracticeTextIdAnalysisAnalysisIdRouteImport } from './routes/practice/$textId.analysis.$analysisId'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PracticeRoute = PracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,73 +59,191 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+const PracticeIndexRoute = PracticeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PracticeRoute,
 } as any)
-const RecordTextIdRoute = RecordTextIdRouteImport.update({
-  id: '/record/$textId',
-  path: '/record/$textId',
-  getParentRoute: () => rootRouteImport,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PracticeTextIdRoute = PracticeTextIdRouteImport.update({
+  id: '/$textId',
+  path: '/$textId',
+  getParentRoute: () => PracticeRoute,
 } as any)
 const AdminTextRoute = AdminTextRouteImport.update({
-  id: '/admin/text',
-  path: '/admin/text',
-  getParentRoute: () => rootRouteImport,
+  id: '/text',
+  path: '/text',
+  getParentRoute: () => AdminRoute,
 } as any)
+const AdminReferencesRoute = AdminReferencesRouteImport.update({
+  id: '/references',
+  path: '/references',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuthorsRoute = AdminAuthorsRouteImport.update({
+  id: '/authors',
+  path: '/authors',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PracticeTextIdAnalysisAnalysisIdRoute =
+  PracticeTextIdAnalysisAnalysisIdRouteImport.update({
+    id: '/analysis/$analysisId',
+    path: '/analysis/$analysisId',
+    getParentRoute: () => PracticeTextIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/feed': typeof FeedRoute
+  '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
+  '/practice': typeof PracticeRouteWithChildren
+  '/settings': typeof SettingsRoute
+  '/admin/authors': typeof AdminAuthorsRoute
+  '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
-  '/record/$textId': typeof RecordTextIdRoute
-  '/admin': typeof AdminIndexRoute
+  '/practice/$textId': typeof PracticeTextIdRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/practice/': typeof PracticeIndexRoute
+  '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/feed': typeof FeedRoute
+  '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
+  '/admin/authors': typeof AdminAuthorsRoute
+  '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
-  '/record/$textId': typeof RecordTextIdRoute
+  '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin': typeof AdminIndexRoute
+  '/practice': typeof PracticeIndexRoute
+  '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/feed': typeof FeedRoute
+  '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
+  '/practice': typeof PracticeRouteWithChildren
+  '/settings': typeof SettingsRoute
+  '/admin/authors': typeof AdminAuthorsRoute
+  '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
-  '/record/$textId': typeof RecordTextIdRoute
+  '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/practice/': typeof PracticeIndexRoute
+  '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin/text' | '/record/$textId' | '/admin'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/feed'
+    | '/learn'
+    | '/login'
+    | '/practice'
+    | '/settings'
+    | '/admin/authors'
+    | '/admin/references'
+    | '/admin/text'
+    | '/practice/$textId'
+    | '/admin/'
+    | '/practice/'
+    | '/practice/$textId/analysis/$analysisId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin/text' | '/record/$textId' | '/admin'
+  to:
+    | '/'
+    | '/feed'
+    | '/learn'
+    | '/login'
+    | '/settings'
+    | '/admin/authors'
+    | '/admin/references'
+    | '/admin/text'
+    | '/practice/$textId'
+    | '/admin'
+    | '/practice'
+    | '/practice/$textId/analysis/$analysisId'
   id:
     | '__root__'
     | '/'
+    | '/admin'
+    | '/feed'
+    | '/learn'
     | '/login'
+    | '/practice'
+    | '/settings'
+    | '/admin/authors'
+    | '/admin/references'
     | '/admin/text'
-    | '/record/$textId'
+    | '/practice/$textId'
     | '/admin/'
+    | '/practice/'
+    | '/practice/$textId/analysis/$analysisId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  FeedRoute: typeof FeedRoute
+  LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
-  AdminTextRoute: typeof AdminTextRoute
-  RecordTextIdRoute: typeof RecordTextIdRoute
-  AdminIndexRoute: typeof AdminIndexRoute
+  PracticeRoute: typeof PracticeRouteWithChildren
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/practice': {
+      id: '/practice'
+      path: '/practice'
+      fullPath: '/practice'
+      preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -101,36 +253,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/practice/': {
+      id: '/practice/'
+      path: '/'
+      fullPath: '/practice/'
+      preLoaderRoute: typeof PracticeIndexRouteImport
+      parentRoute: typeof PracticeRoute
+    }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin'
+      path: '/'
+      fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/record/$textId': {
-      id: '/record/$textId'
-      path: '/record/$textId'
-      fullPath: '/record/$textId'
-      preLoaderRoute: typeof RecordTextIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/practice/$textId': {
+      id: '/practice/$textId'
+      path: '/$textId'
+      fullPath: '/practice/$textId'
+      preLoaderRoute: typeof PracticeTextIdRouteImport
+      parentRoute: typeof PracticeRoute
     }
     '/admin/text': {
       id: '/admin/text'
-      path: '/admin/text'
+      path: '/text'
       fullPath: '/admin/text'
       preLoaderRoute: typeof AdminTextRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/references': {
+      id: '/admin/references'
+      path: '/references'
+      fullPath: '/admin/references'
+      preLoaderRoute: typeof AdminReferencesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/authors': {
+      id: '/admin/authors'
+      path: '/authors'
+      fullPath: '/admin/authors'
+      preLoaderRoute: typeof AdminAuthorsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/practice/$textId/analysis/$analysisId': {
+      id: '/practice/$textId/analysis/$analysisId'
+      path: '/analysis/$analysisId'
+      fullPath: '/practice/$textId/analysis/$analysisId'
+      preLoaderRoute: typeof PracticeTextIdAnalysisAnalysisIdRouteImport
+      parentRoute: typeof PracticeTextIdRoute
     }
   }
 }
 
+interface AdminRouteChildren {
+  AdminAuthorsRoute: typeof AdminAuthorsRoute
+  AdminReferencesRoute: typeof AdminReferencesRoute
+  AdminTextRoute: typeof AdminTextRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuthorsRoute: AdminAuthorsRoute,
+  AdminReferencesRoute: AdminReferencesRoute,
+  AdminTextRoute: AdminTextRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface PracticeTextIdRouteChildren {
+  PracticeTextIdAnalysisAnalysisIdRoute: typeof PracticeTextIdAnalysisAnalysisIdRoute
+}
+
+const PracticeTextIdRouteChildren: PracticeTextIdRouteChildren = {
+  PracticeTextIdAnalysisAnalysisIdRoute: PracticeTextIdAnalysisAnalysisIdRoute,
+}
+
+const PracticeTextIdRouteWithChildren = PracticeTextIdRoute._addFileChildren(
+  PracticeTextIdRouteChildren,
+)
+
+interface PracticeRouteChildren {
+  PracticeTextIdRoute: typeof PracticeTextIdRouteWithChildren
+  PracticeIndexRoute: typeof PracticeIndexRoute
+}
+
+const PracticeRouteChildren: PracticeRouteChildren = {
+  PracticeTextIdRoute: PracticeTextIdRouteWithChildren,
+  PracticeIndexRoute: PracticeIndexRoute,
+}
+
+const PracticeRouteWithChildren = PracticeRoute._addFileChildren(
+  PracticeRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  FeedRoute: FeedRoute,
+  LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
-  AdminTextRoute: AdminTextRoute,
-  RecordTextIdRoute: RecordTextIdRoute,
-  AdminIndexRoute: AdminIndexRoute,
+  PracticeRoute: PracticeRouteWithChildren,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

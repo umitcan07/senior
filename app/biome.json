@@ -1,5 +1,10 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.3.0/schema.json",
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
@@ -7,15 +12,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": [
-			"**/node_modules/**",
-			"**/dist/**",
-			"**/build/**",
-			"**/.output/**",
-			"**/routeTree.gen.ts",
-			"**/drizzle/**",
-			"**/*.lock"
-		]
+		"includes": ["./src/**/*.ts", "./src/**/*.tsx", "!**/routeTree.gen.ts"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -24,9 +21,13 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"recommended": false,
 			"correctness": {
-				"noChildrenProp": "off"
+				"noChildrenProp": "off",
+				"noUnusedImports": "on"
+			},
+			"nursery": {
+				"useSortedClasses": "warn"
 			}
 		}
 	},
