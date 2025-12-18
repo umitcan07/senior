@@ -144,14 +144,14 @@ function SettingsSkeleton() {
 function GuestSettings() {
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="md">
+			<PageContainer maxWidth="full">
 				<div className="space-y-8">
 					<PageHeader title="Settings" description="Manage your preferences" />
 
-					<Card className="border-dashed">
+					<Card className="bg-muted/30">
 						<CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-							<div className="space-y-2">
-								<h2 className="font-semibold text-lg">
+							<div className="flex flex-col gap-2">
+								<h2 className="font-medium text-lg">
 									Sign in to access settings
 								</h2>
 								<p className="max-w-md text-muted-foreground text-sm">

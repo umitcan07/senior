@@ -151,17 +151,17 @@ function LearningPage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-8">
+				<div className="flex flex-col gap-8">
 					<PageHeader
 						title="Learning Resources"
 						description="Learn about the International Phonetic Alphabet and improve your pronunciation skills"
 					/>
 
 					{/* Quick Start CTA */}
-					<Card className="border-primary/20 bg-primary/5">
+					<Card>
 						<CardContent className="flex flex-col items-center gap-4 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
-							<div className="space-y-1">
-								<h3 className="font-semibold">Ready to practice?</h3>
+							<div className="flex flex-col gap-1">
+								<h3 className="font-medium">Ready to practice?</h3>
 								<p className="text-muted-foreground text-sm">
 									Put your knowledge to the test with our practice texts.
 								</p>
@@ -173,8 +173,8 @@ function LearningPage() {
 					</Card>
 
 					{/* IPA Charts */}
-					<div className="space-y-4">
-						<h2 className="font-semibold text-lg">
+					<div className="flex flex-col gap-4">
+						<h2 className="font-medium text-lg">
 							International Phonetic Alphabet (IPA)
 						</h2>
 						<p className="text-muted-foreground text-sm">

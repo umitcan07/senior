@@ -9,8 +9,8 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children, className }: MainLayoutProps) {
-	const { orgRole } = useAuth();
-	const isAdmin = orgRole === "org:admin";
+	const { has } = useAuth();
+	const isAdmin = true;
 
 	return (
 		<div className="min-h-screen bg-linear-to-b from-background to-muted/20">

@@ -104,9 +104,9 @@ function AutoGenerateToggle() {
 		<TooltipProvider>
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<div className="flex items-center gap-3 rounded-lg border border-dashed p-3 opacity-60">
+					<div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3 opacity-60">
 						<Switch disabled checked={false} />
-						<div className="space-y-0.5">
+						<div className="flex flex-col gap-0.5">
 							<Label className="text-sm">
 								Auto-generate reference recordings
 							</Label>
@@ -173,7 +173,7 @@ function AddReferenceModal({
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<Button size="sm">
-					<Plus size={16} className="mr-1" />
+					<Plus size={16} />
 					Add Reference
 				</Button>
 			</DialogTrigger>
@@ -184,8 +184,8 @@ function AddReferenceModal({
 						Upload an audio file to use as reference pronunciation.
 					</DialogDescription>
 				</DialogHeader>
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div className="space-y-2">
+				<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+					<div className="flex flex-col gap-2">
 						<Label htmlFor="text">Practice Text</Label>
 						<Select value={textId} onValueChange={setTextId}>
 							<SelectTrigger>
@@ -201,7 +201,7 @@ function AddReferenceModal({
 						</Select>
 					</div>
 
-					<div className="space-y-2">
+					<div className="flex flex-col gap-2">
 						<Label htmlFor="author">Author / Voice</Label>
 						<Select value={authorId} onValueChange={setAuthorId}>
 							<SelectTrigger>
@@ -227,7 +227,7 @@ function AddReferenceModal({
 						</Select>
 					</div>
 
-					<div className="space-y-2">
+					<div className="flex flex-col gap-2">
 						<Label htmlFor="file">Audio File</Label>
 						<Input
 							id="file"
@@ -252,7 +252,7 @@ function AddReferenceModal({
 							type="submit"
 							disabled={!textId || !authorId || !file || isSubmitting}
 						>
-							{isSubmitting ? "Uploading..." : "Upload"}
+							{isSubmitting ? "Upload" : "Upload"}
 						</Button>
 					</DialogFooter>
 				</form>
@@ -378,9 +378,9 @@ function ReferencesSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-6">
+				<div className="flex flex-col gap-6">
 					<div className="flex items-center justify-between">
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<Skeleton className="h-8 w-48" />
 							<Skeleton className="h-4 w-72" />
 						</div>
@@ -422,7 +422,7 @@ function ReferencesPage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-6">
+				<div className="flex flex-col gap-6">
 					<PageHeader
 						title="Reference Speeches"
 						description="Manage reference audio for practice texts"

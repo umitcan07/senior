@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import {
 	MainLayout,
 	PageContainer,
 	PageHeader,
 } from "@/components/layout/main-layout";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InlineLink } from "@/components/ui/inline-link";
@@ -48,26 +50,24 @@ interface TextCardProps {
 
 function TextCard({ text }: TextCardProps) {
 	return (
-		<Link to="/practice/$textId" params={{ textId: text.id }}>
-			<Card className="group h-full transition-all duration-200 hover:border-primary/30 hover:shadow-md">
-				<CardContent className="flex-1 p-6">
-					<p className="line-clamp-5 text-foreground text-sm leading-relaxed">
-						{text.content}
-					</p>
-				</CardContent>
-				<CardFooter className="flex items-center justify-between border-t px-6 py-3">
-					<span className="text-muted-foreground text-xs">
-						{text.wordCount} words
-					</span>
-					{text.referenceCount > 0 && (
-						<Badge variant="secondary" className="text-xs">
-							{text.referenceCount}{" "}
-							{text.referenceCount === 1 ? "voice" : "voices"}
-						</Badge>
-					)}
-				</CardFooter>
-			</Card>
-		</Link>
+		<Card className="group h-full flex flex-col transition-all duration-200">
+			<CardContent className="flex-1 p-6">
+				<p className="line-clamp-5 text-foreground text-sm leading-relaxed">
+					{text.content}
+				</p>
+			</CardContent>
+			<CardFooter className="flex items-center justify-between border-t px-6 py-3">
+				<Badge variant="secondary" className="text-xs">
+					{text.referenceCount} {text.referenceCount === 1 ? "voice" : "voices"}
+				</Badge>
+				<Button variant="default" size="sm" asChild>
+					<Link to="/practice/$textId" params={{ textId: text.id }}>
+						Practice
+						<ArrowRight size={16} />
+					</Link>
+				</Button>
+			</CardFooter>
+		</Card>
 	);
 }
 
@@ -79,7 +79,7 @@ function TextCardSkeleton() {
 	return (
 		<Card className="h-full">
 			<CardContent className="p-6">
-				<div className="space-y-2">
+				<div className="flex flex-col gap-2">
 					<Skeleton className="h-4 w-full" />
 					<Skeleton className="h-4 w-full" />
 					<Skeleton className="h-4 w-full" />
@@ -98,8 +98,8 @@ function PracticePageSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-8">
-					<div className="space-y-2">
+				<div className="flex flex-col gap-8">
+					<div className="flex flex-col gap-2">
 						<Skeleton className="h-8 w-48" />
 						<Skeleton className="h-4 w-96" />
 					</div>
@@ -124,7 +124,7 @@ function PracticePage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-8">
+				<div className="flex flex-col gap-8">
 					<PageHeader
 						title="Practice Texts"
 						description="Choose a text to practice your pronunciation. Each text comes with reference audio to help guide you."

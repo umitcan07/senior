@@ -22,7 +22,8 @@ import {
 	type Attempt,
 	type CommonError,
 	formatRelativeTime,
-	getScoreColor,
+	getScoreLevel,
+	scoreColorVariants,
 	MOCK_ATTEMPTS,
 	MOCK_COMMON_ERRORS,
 	MOCK_TEXTS,
@@ -31,7 +32,7 @@ import {
 } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/feed")({
+export const Route = createFileRoute("/summary")({
 	component: FeedPage,
 	loader: async () => {
 		// In production, fetch from database
@@ -67,12 +68,12 @@ function StatCard({
 	return (
 		<Card>
 			<CardContent className="p-4 sm:p-6">
-				<div className="space-y-1">
+				<div className="flex flex-col gap-1">
 					<p className="text-muted-foreground text-xs uppercase tracking-wide">
 						{label}
 					</p>
 					<div className="flex items-baseline gap-2">
-						<span className="font-semibold text-2xl tabular-nums sm:text-3xl">
+						<span className="font-medium text-2xl tabular-nums sm:text-3xl">
 							{value}
 							{suffix}
 						</span>
@@ -228,10 +229,13 @@ function AttemptCard({ attempt }: AttemptCardProps) {
 			params={{ textId: attempt.textId, analysisId: attempt.analysisId }}
 			className="block"
 		>
-			<Card className="transition-all duration-150 hover:border-primary/30 hover:shadow-sm">
+			<Card>
 				<CardContent className="flex items-center gap-4 p-4">
 					<div
-						className={`flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted font-semibold text-lg tabular-nums ${getScoreColor(attempt.score)}`}
+						className={cn(
+							"flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted font-medium text-lg tabular-nums",
+							scoreColorVariants({ level: getScoreLevel(attempt.score) }),
+						)}
 					>
 						{attempt.score}%
 					</div>
@@ -281,8 +285,8 @@ function AttemptList({
 	}
 
 	return (
-		<div className="space-y-4">
-			<div className="space-y-3">
+		<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-3">
 				{attempts.map((attempt) => (
 					<AttemptCard key={attempt.id} attempt={attempt} />
 				))}
@@ -291,7 +295,7 @@ function AttemptList({
 			{hasMore && (
 				<div className="flex justify-center pt-4">
 					<Button variant="outline" onClick={onLoadMore} disabled={isLoading}>
-						{isLoading ? "Loading..." : "Load More"}
+						Load More
 					</Button>
 				</div>
 			)}
@@ -307,8 +311,8 @@ function FeedSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-8">
-					<div className="space-y-2">
+				<div className="flex flex-col gap-8">
+					<div className="flex flex-col gap-2">
 						<Skeleton className="h-8 w-32" />
 						<Skeleton className="h-4 w-64" />
 					</div>
@@ -318,7 +322,7 @@ function FeedSkeleton() {
 						))}
 					</div>
 					<Skeleton className="h-32" />
-					<div className="space-y-3">
+					<div className="flex flex-col gap-3">
 						{[1, 2, 3, 4, 5].map((i) => (
 							<Skeleton key={i} className="h-20" />
 						))}
@@ -337,16 +341,16 @@ function GuestFeed() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="space-y-8">
+				<div className="flex flex-col gap-8">
 					<PageHeader
 						title="Your History"
 						description="Track your pronunciation progress over time"
 					/>
 
-					<Card className="border-dashed">
+					<Card className="bg-muted/30">
 						<CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-							<div className="space-y-2">
-								<h2 className="font-semibold text-lg">
+							<div className="flex flex-col gap-2">
+								<h2 className="font-medium text-lg">
 									Sign in to see your progress
 								</h2>
 								<p className="max-w-md text-muted-foreground text-sm">
@@ -392,7 +396,7 @@ function FeedPage() {
 			<SignedIn>
 				<MainLayout>
 					<PageContainer>
-						<div className="space-y-8">
+						<div className="flex flex-col gap-8">
 							<PageHeader
 								title="Your History"
 								description="Track your pronunciation progress over time"

@@ -5,7 +5,7 @@ import {
 	UserButton,
 } from "@clerk/clerk-react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { ChartBarIncreasingIcon, Menu, Settings2Icon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NonceLogo } from "@/components/ui/nonce";
@@ -18,14 +18,12 @@ interface NavLinkItem {
 }
 
 const mainNavLinks: NavLinkItem[] = [
-	{ to: "/practice", label: "Practice" },
-	{ to: "/feed", label: "Feed" },
 	{ to: "/learn", label: "Learn" },
-	{ to: "/settings", label: "Settings" },
+	{ to: "/practice", label: "Practice" },
+	{ to: "/summary", label: "Summary" },
 ];
 
 const adminNavLinks: NavLinkItem[] = [
-	{ to: "/admin", label: "Dashboard" },
 	{ to: "/admin/text", label: "Texts" },
 	{ to: "/admin/references", label: "References" },
 	{ to: "/admin/authors", label: "Authors" },
@@ -157,25 +155,30 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 					</div>
 
 					{/* Right Side Actions */}
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-4">
 						<ThemeToggle />
+						<Button variant="ghost" size="icon" asChild>
+							<Link to="/settings">
+								<Settings2Icon size={20} />
+							</Link>
+						</Button>
+						<div className="flex w-10 items-center justify-end">
+							<SignedIn>
+								<UserButton
+									appearance={{
+										elements: {
+											avatarBox: "size-8",
+										},
+									}}
+								/>
+							</SignedIn>
+							<SignedOut>
+								<Button variant="default" size="sm" asChild>
+									<SignInButton />
+								</Button>
+							</SignedOut>
+						</div>
 
-						<SignedIn>
-							<UserButton
-								appearance={{
-									elements: {
-										avatarBox: "size-8",
-									},
-								}}
-							/>
-						</SignedIn>
-						<SignedOut>
-							<Button variant="default" size="sm" asChild>
-								<SignInButton />
-							</Button>
-						</SignedOut>
-
-						{/* Mobile Menu Button */}
 						<Button
 							variant="ghost"
 							size="icon"
@@ -185,7 +188,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 							aria-controls="mobile-menu"
 							aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
 						>
-							{isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+							{isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
 						</Button>
 					</div>
 				</div>

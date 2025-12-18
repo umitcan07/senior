@@ -1,0 +1,467 @@
+---
+alwaysApply: true
+---
+
+# Style Guide
+
+This document defines the styling conventions and design system used throughout the codebase.
+
+## Color System
+
+### Color Tokens
+The application uses a semantic color system with CSS variables defined in `oklch` color space. Always use semantic tokens instead of raw colors.
+
+**Primary Colors:**
+- `bg-background` / `text-foreground` - Main background and text
+- `bg-card` / `text-card-foreground` - Card backgrounds
+- `bg-primary` / `text-primary-foreground` - Primary actions and accents
+- `bg-secondary` / `text-secondary-foreground` - Secondary elements
+- `bg-muted` / `text-muted-foreground` - Muted/subdued content
+- `bg-accent` / `text-accent-foreground` - Accent highlights
+- `bg-destructive` / `text-destructive-foreground` - Error/destructive actions
+
+**Border & Input:**
+- `border-border` - Standard borders
+- `border-input` - Input field borders
+- `ring-ring` - Focus ring color
+
+**Text Colors:**
+- `text-foreground` - Primary text
+- `text-muted-foreground` - Secondary/subdued text
+- `text-primary` - Primary colored text
+- `text-destructive` - Error text
+
+### Color Usage Rules
+- Never use raw color values (e.g., `bg-blue-500`). Use semantic tokens.
+- For subtle backgrounds, use opacity modifiers: `bg-primary/5`, `bg-primary/10`
+- For hover states, use opacity: `hover:bg-primary/90`
+- Dark mode is handled automatically via CSS variables
+
+## Typography
+
+### Font Families
+- **Sans-serif**: System font stack (Inter/Satoshi fallback)
+- **Mono**: For code, phonemes, technical content: `font-mono`
+- **Display**: For hero headings: `font-display`
+
+### Font Sizes
+Use semantic size classes with responsive scaling:
+
+**Headings:**
+- Hero/Page Title: `text-3xl sm:text-4xl md:text-5xl` with `font-display font-semibold tracking-tight`
+- Section Title: `text-2xl md:text-3xl` with `font-semibold`
+- Card Title: `text-lg` or `text-base` with `font-semibold`
+- Subsection: `text-base` with `font-semibold`
+
+**Body Text:**
+- Default: `text-sm` (14px) on mobile, `text-base` (16px) on desktop
+- Large body: `text-lg` for hero descriptions
+- Small text: `text-xs` for labels, metadata, timestamps
+
+### Typography Utilities
+- `leading-relaxed` - For body text readability
+- `leading-tight` - For headings
+- `tracking-tight` - For display headings
+- `tracking-wide` - For uppercase labels
+- `font-semibold` - Standard weight for headings and emphasis
+- `font-medium` - For navigation and secondary emphasis
+- `tabular-nums` - For numbers in stats (consistent width)
+
+### Text Effects
+- Gradient text: `bg-linear-to-b from-foreground to-foreground/70 bg-clip-text text-transparent`
+- Text balance: `text-balanced` for multi-line text centering
+
+### Icon Usage in Text
+- **Minimize icons in headings and body text** - use icons sparingly and only when they add meaningful context
+- Prefer text-only headings for clarity and readability
+- Icons should serve a functional purpose, not decorative
+- When icons are needed, place them outside the heading/text flow (e.g., in a flex container)
+
+## Spacing
+
+### Base Unit
+The spacing system uses a 4px base unit (Tailwind's default).
+
+### Spacing Philosophy
+**Prioritize Flex with Gaps**: Always prefer flexbox with `gap-*` utilities over margins or `space-y-*`. Use flex containers to control spacing between children.
+
+### Common Spacing Patterns
+
+**Padding:**
+- Cards: `p-6` (24px) standard, `p-8` (32px) for larger cards
+- Card headers: `p-6` with `pb-3` or `pt-0` for content
+- Buttons: `px-4 py-2` (default), `px-3` (small), `px-6` (large)
+- Page container: `px-6 py-8 md:px-10 md:py-10`
+
+**Gaps (Preferred Method):**
+- Between flex items: `gap-2` (8px), `gap-3` (12px), `gap-4` (16px)
+- Grid gaps: `gap-4` (16px) standard, `gap-6` (24px) for larger grids
+- Section spacing: Use `flex flex-col` with `gap-6` or `gap-12` for major sections
+
+**Avoid:**
+- ❌ Don't use `space-y-*` - use `flex flex-col` with `gap-*` instead
+- ❌ Don't use margin utilities (`mb-*`, `mt-*`, `mx-*`, `my-*`) - use flex with gaps
+- ❌ Don't use margin/padding on icons inside buttons - let flexbox handle spacing
+
+### Responsive Spacing
+- Mobile-first: Start with mobile spacing, add larger on desktop
+- Example: `py-8 md:py-12`, `px-6 md:px-10`
+- Section gaps: Use `gap-6 md:gap-8` or `gap-12` with flex containers
+
+## Layout
+
+### Container Patterns
+- Page container: `container mx-auto px-6 py-8 md:px-10 md:py-10`
+- Max widths: `max-w-2xl` (sm), `max-w-3xl` (md), `max-w-5xl` (lg), `max-w-7xl` (xl)
+- Full width: Omit max-width class
+
+### Flexbox Patterns (Preferred Layout Method)
+- Center content: `flex items-center justify-center`
+- Space between: `flex items-center justify-between`
+- Column layout: `flex flex-col` with `gap-*` (preferred over `space-y-*`)
+- Vertical spacing: Always use `flex flex-col gap-*` instead of margins or `space-y-*`
+- Responsive direction: `flex-col sm:flex-row`
+- Icons in buttons: Use `flex items-center gap-2` - never add margin/padding to icons themselves
+
+### Grid Patterns
+- Responsive grids: `grid gap-4 sm:grid-cols-2 lg:grid-cols-3`
+- Equal columns: `grid-cols-3` for stats, `grid-cols-2` for two-column layouts
+
+### Positioning
+- Sticky header: `sticky top-0 z-50`
+- Centered content: `flex min-h-[60vh] flex-col items-center justify-center`
+
+### Layout Philosophy
+**Avoid Box-in-Box Patterns**: Don't nest cards/boxes unnecessarily. Use spacing and dividers to create visual hierarchy instead of wrapping everything in containers.
+
+**When to Use Cards vs. Spacing:**
+- ✅ Use cards for distinct, self-contained content blocks
+- ❌ Don't nest cards inside cards - use spacing and dividers instead
+- ✅ Use `gap-*` and dividers (`border-t`, `border-b`) to separate sections
+- ✅ Prefer background color changes (`bg-muted`, `bg-card`) over nested boxes
+- ✅ Use padding and spacing to create visual separation without boxes
+
+**Example:**
+```tsx
+// ❌ Avoid: Box-in-box
+<Card>
+  <CardContent>
+    <Card> {/* Nested card */}
+      <CardContent>Content</CardContent>
+    </Card>
+  </CardContent>
+</Card>
+
+// ✅ Prefer: Spacing and dividers
+<div className="flex flex-col gap-6">
+  <section>Content 1</section>
+  <div className="border-t" />
+  <section>Content 2</section>
+</div>
+```
+
+## Border Radius
+
+### Standard Radius
+- Cards: `rounded-xl` (12px)
+- Buttons: `rounded-md` (6px)
+- Badges/Pills: `rounded-full`
+- Small elements: `rounded-md` (6px)
+- Icons in containers: `rounded-md` or `rounded-full`
+
+### Custom Radius
+- Base radius: `--radius: 0.625rem` (10px)
+- Use semantic tokens when available
+
+## Shadows
+
+### Shadow Philosophy
+**Minimize Shadow Usage**: Shadows should be used sparingly and only when necessary for visual hierarchy or elevation. Prefer background colors and subtle borders for separation.
+
+### Shadow Tokens (Use Sparingly)
+- `shadow-xs` - Subtle elevation (use only when absolutely needed)
+- `shadow-sm` - Small elevation (rarely needed)
+- `shadow` - Default shadow (avoid)
+- `shadow-md` - Medium elevation (avoid)
+- `shadow-lg` - Large elevation (only for modals/dialogs when necessary)
+
+### Usage Guidelines
+- Cards: **No shadow** - use background colors for separation
+- Buttons: **No shadow** - rely on background colors and borders
+- Modals/Dialogs: Only use `shadow-lg` or `shadow-xl` if absolutely necessary for depth
+- Hover states: **Avoid** adding shadows on hover - use color/opacity changes instead
+- Default: Most components should have no shadow
+
+## Borders
+
+### Border Philosophy
+**Avoid Borders Unless Necessary**: Borders should only be used when absolutely required for visual separation or input field definition. Prefer background colors, spacing, and layout for visual hierarchy.
+
+### When to Use Borders
+- Input fields: Required for form inputs (`border-input`)
+- Cards: Only when necessary for separation (prefer background colors)
+- Dividers: Use sparingly for section separation
+- Focus states: Use `ring-*` utilities instead of borders for focus indicators
+
+### Border Patterns (Use Sparingly)
+- Standard: `border` (1px solid) - only when necessary
+- Dashed: `border-dashed` - **only use when absolutely necessary** (prefer background colors for empty states)
+- Border colors: `border-border`, `border-input` (for inputs only)
+- Avoid colored borders for decoration - use background colors instead
+- **Avoid dashed borders** unless they serve a specific functional purpose (e.g., drag-and-drop zones)
+
+### Border Radius with Borders
+- Always pair `border` with appropriate `rounded-*` class when borders are used
+
+## Backgrounds
+
+### Background Patterns
+- Page background: `bg-linear-to-b from-background to-muted/20`
+- Card backgrounds: `bg-card`
+- Muted backgrounds: `bg-muted`
+- Accent backgrounds: `bg-primary/5`, `bg-primary/10` for subtle highlights
+- Sticky headers: `bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60`
+
+### Gradient Backgrounds
+- Use opacity for subtle gradients: `from-blue-500/10 to-cyan-500/10`
+- Text gradients: `bg-linear-to-b from-foreground to-foreground/70 bg-clip-text text-transparent`
+
+## Transitions & Animations
+
+### Transition Patterns
+- Color changes: `transition-colors`
+- All properties: `transition-all`
+- Duration: Default (150ms) or `duration-200` (200ms)
+- Hover states: Include transitions for interactive elements, but use sparingly
+
+### Hover State Philosophy
+**Minimize Hover Effects**: Hover styles should be used judiciously and primarily for interactive elements. Avoid hover effects on large surface areas like cards, sections, or containers.
+
+### Common Transitions
+- Buttons: `transition-all` (small, interactive elements)
+- Links: `transition-colors` (text links only)
+- Cards: **Avoid hover effects** on entire cards - prefer no hover or subtle text color changes
+- Large containers: **No hover effects** - hover should be limited to buttons, links, and small interactive elements
+- Opacity: `transition-opacity hover:opacity-80` (for small interactive elements only)
+
+### Hover Guidelines
+- ✅ Use hover on: Buttons, links, small interactive elements
+- ❌ Avoid hover on: Cards, large containers, sections, headings
+- ❌ Avoid hover effects that cover large surface areas - they can be distracting
+- When in doubt, skip the hover effect
+
+## Responsive Design
+
+### Breakpoints
+- `sm:` - 640px and up
+- `md:` - 768px and up
+- `lg:` - 1024px and up
+- `xl:` - 1280px and up
+
+### Mobile-First Approach
+- Write base styles for mobile
+- Add desktop enhancements with breakpoint prefixes
+- Example: `text-sm md:text-base`, `flex-col sm:flex-row`
+
+### Common Responsive Patterns
+- Text sizes: `text-3xl sm:text-4xl md:text-5xl`
+- Spacing: `px-6 md:px-10`, `py-8 md:py-12`
+- Grid columns: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
+- Flex direction: `flex-col sm:flex-row`
+- Visibility: `hidden md:flex`, `md:hidden`
+
+## Component-Specific Patterns
+
+### Cards
+```tsx
+<Card className="...">
+  <CardHeader className="pb-3">
+    <CardTitle className="text-base">Title</CardTitle>
+  </CardHeader>
+  <CardContent className="p-6">
+    {/* Content */}
+  </CardContent>
+</Card>
+```
+- **No hover effects** on cards - they are containers, not interactive elements
+- If a card is clickable, make only the link/button inside interactive, not the entire card
+- **Don't nest cards inside cards** - use spacing and dividers instead
+- Prefer a single card level with internal spacing over nested card structures
+
+### Buttons
+- Default: `h-9 px-4 py-2`
+- Small: `h-8 px-3` with `gap-1.5`
+- Large: `h-10 px-6`
+- Icon buttons: `size-9`, `size-8`, `size-10`
+- Buttons with icons: Use `flex items-center gap-2` - **never add margin or padding to icons themselves**
+- Icons inherit spacing from parent flex container
+
+### Badges
+- Standard: `rounded-md bg-muted px-3 py-1.5`
+- With text: `text-xs` or `text-sm`
+- Secondary variant: `variant="secondary"`
+
+### Empty States
+- Centered layout: `flex flex-col items-center justify-center gap-2 py-4 text-center`
+- Icon container: `size-10` or `size-20` with `rounded-full bg-muted`
+- Description: `max-w-lg text-balanced text-muted-foreground text-sm leading-6`
+- Use `flex flex-col gap-*` for vertical spacing, not `space-y-*`
+
+### Navigation Links
+- Active state: `bg-neutral-100 text-foreground dark:bg-neutral-900`
+- Inactive: `text-muted-foreground`
+- Hover: `hover:bg-neutral-50 dark:hover:bg-neutral-950` (acceptable for small nav links)
+- Rounded: `rounded-full px-4 py-1.5`
+- Keep hover effects subtle and limited to the link itself
+
+### Dividers
+- Use `border-t` or `border-b` for horizontal dividers between sections
+- Use `border-l` or `border-r` for vertical dividers (sparingly)
+- Divider color: `border-border`
+- Prefer dividers over nested boxes for separation
+- Use spacing (`gap-*`) in combination with dividers for clear section separation
+
+## Focus States
+
+### Focus Patterns
+- Buttons: `focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]`
+- Inputs: Use component defaults (handled by shadcn/ui)
+- Links: Ensure visible focus indicators
+- Always use `focus-visible:` instead of `focus:` for better UX
+
+## Accessibility
+
+### ARIA & Semantics
+- Use semantic HTML elements
+- Include `aria-label` for icon-only buttons
+- Use `aria-expanded` for collapsible content
+- Navigation: `aria-label="Main navigation"`
+
+### Color Contrast
+- Always use semantic color tokens (they meet WCAG standards)
+- Test with screen readers and keyboard navigation
+- Ensure focus indicators are visible
+
+## Content & UX Patterns
+
+### Don't Overstate the Obvious
+**Minimize Redundant Text**: Don't add text that repeats what visual elements already communicate.
+
+**Examples:**
+- ❌ Don't show "Loading..." text when there's already a spinner visible
+- ❌ Don't add "Click here" when the button/link text is already clear
+- ❌ Don't label icons with text if the icon is universally understood
+- ✅ Let visual elements (spinners, icons, buttons) communicate their purpose
+- ✅ Use `aria-label` for screen readers instead of visible redundant text
+- ✅ Only add text when it provides additional context or clarification
+
+**Loading States:**
+```tsx
+// ❌ Avoid: Redundant text
+<div>
+  <Spinner />
+  <p>Loading...</p>
+</div>
+
+// ✅ Prefer: Visual only
+<Spinner aria-label="Loading" />
+```
+
+### Avoid Information Duplication
+**Single Source of Truth**: Don't show the same information in multiple places on the same page or component.
+
+**Guidelines:**
+- ❌ Don't repeat the same data in headers, sidebars, and main content
+- ❌ Don't show the same status/state in multiple locations
+- ❌ Don't duplicate navigation or action buttons
+- ✅ Show information once in the most appropriate location
+- ✅ Use consistent placement patterns across the app
+- ✅ If information appears in multiple views, ensure it's the same source/state
+
+**Component Information:**
+- Show component/page title once (usually in header or page title)
+- Show status/state indicators once (choose the most prominent location)
+- Show action buttons once (avoid duplicating in header and content area)
+
+## Utility Classes
+
+### Common Utilities
+- `cn()` - Always use for className merging (from `@/lib/utils`)
+- `group` - For group hover effects on parent
+- `group-hover:*` - For child hover effects within group
+- `whitespace-nowrap` - Prevent text wrapping
+- `truncate` - Ellipsis for overflow text
+
+### Size Utilities
+- Icons: `size-4`, `size-8`, `size-10`, `size-20`
+- Containers: Use `size-*` for square elements
+- Width: `w-64` for fixed widths, `max-w-*` for constrained widths
+
+## Code Style & Styling
+
+**Core Rules:**
+- Use **CVA (class-variance-authority)** for component variants
+- Use **`cn()` utility** for all className merging
+- Use **direct calculations** for dynamic values
+- **No string interpolation** in className (e.g., `` `text-${color}-600` or `flex ${props.className}` ``)
+- **No redundant wrapper functions** - use CVA variants directly in components
+
+**Pattern:**
+```typescript
+// Export CVA variants and calculation helpers
+export const scoreColorVariants = cva("", {
+  variants: { level: { high: "...", medium: "...", low: "..." } }
+});
+export function getScoreLevel(score: number): ScoreLevel { ... }
+
+// Use directly in components
+const level = getScoreLevel(score);
+<div className={cn(scoreColorVariants({ level }))} />
+```
+
+**Anti-Patterns:**
+- ❌ `className={`text-${color}-600`}` → ✅ Use CVA variants
+- ❌ `getScoreColor(score)` wrapper function → ✅ Use CVA directly
+- ❌ Template literals for className → ✅ Use `cn()`
+
+## Best Practices
+
+1. **Consistency**: Use the same spacing/sizing patterns across similar components
+2. **Semantic Tokens**: Always prefer semantic color tokens over raw colors
+3. **Mobile-First**: Write mobile styles first, enhance for desktop
+4. **Responsive**: Test at multiple breakpoints
+5. **Transitions**: Add transitions to interactive elements
+6. **Accessibility**: Ensure proper contrast and focus states
+7. **Performance**: Avoid unnecessary custom CSS; use Tailwind utilities
+8. **Readability**: Use `leading-relaxed` for body text, `tracking-tight` for headings
+9. **Flex-First Spacing**: Always use `flex flex-col gap-*` instead of `space-y-*` or margins
+10. **Dark Mode**: Test both light and dark themes; colors adapt automatically
+11. **Minimal Shadows**: Use shadows sparingly - prefer background colors for separation
+12. **Minimal Borders**: Only use borders when absolutely necessary - prefer layout and colors
+13. **Minimal Icons**: Don't overuse icons in headings and text - use sparingly and only when functional
+14. **Minimal Hover**: Don't overuse hover styles - limit to small interactive elements, avoid on large areas
+15. **Avoid Box-in-Box**: Use spacing and dividers instead of nested cards/boxes
+16. **Don't Overstate**: Let visual elements communicate - avoid redundant text like "Loading..." with spinners
+17. **Single Source**: Don't duplicate information - show it once in the most appropriate location
+
+## Anti-Patterns to Avoid
+
+- ❌ Don't use raw color values like `bg-blue-500` or `text-gray-600`
+- ❌ Don't use arbitrary values like `p-[13px]` unless absolutely necessary
+- ❌ **Don't use `space-y-*`** - use `flex flex-col gap-*` instead
+- ❌ **Don't use margin utilities** (`mb-*`, `mt-*`, `mx-*`, `my-*`) - use flex with gaps
+- ❌ **Don't add margin or padding to icons inside buttons** - let flexbox handle spacing
+- ❌ **Don't use shadows** unless absolutely necessary - prefer background colors
+- ❌ **Don't use borders** unless absolutely necessary - prefer layout and colors
+- ❌ **Don't use dashed borders** unless absolutely necessary - prefer background colors
+- ❌ **Don't overuse icons** in headings and text - use sparingly and only when functional
+- ❌ **Don't overuse hover styles** - avoid hover effects on cards, large containers, or sections
+- ❌ **Don't add hover effects to large surface areas** - limit to small interactive elements
+- ❌ **Don't use box-in-box patterns** - use spacing and dividers instead of nested cards
+- ❌ **Don't overstate the obvious** - don't add "Loading..." text when there's already a spinner
+- ❌ **Don't duplicate information** - show the same data/status in multiple places
+- ❌ Don't forget responsive variants for spacing and typography
+- ❌ Don't use `focus:` instead of `focus-visible:`
+- ❌ Don't hardcode z-index values; use semantic z-index utilities
+- ❌ Don't create custom CSS when Tailwind utilities exist
+- 

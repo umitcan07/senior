@@ -9,11 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LearnRouteImport } from './routes/learn'
-import { Route as FeedRouteImport } from './routes/feed'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PracticeIndexRouteImport } from './routes/practice/index'
@@ -24,6 +24,11 @@ import { Route as AdminReferencesRouteImport } from './routes/admin/references'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
 import { Route as PracticeTextIdAnalysisAnalysisIdRouteImport } from './routes/practice/$textId.analysis.$analysisId'
 
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -42,11 +47,6 @@ const LoginRoute = LoginRouteImport.update({
 const LearnRoute = LearnRouteImport.update({
   id: '/learn',
   path: '/learn',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedRoute = FeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -99,11 +99,11 @@ const PracticeTextIdAnalysisAnalysisIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/feed': typeof FeedRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
@@ -114,10 +114,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/feed': typeof FeedRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
@@ -130,11 +130,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/feed': typeof FeedRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/summary': typeof SummaryRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
@@ -148,11 +148,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/feed'
     | '/learn'
     | '/login'
     | '/practice'
     | '/settings'
+    | '/summary'
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
@@ -163,10 +163,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/feed'
     | '/learn'
     | '/login'
     | '/settings'
+    | '/summary'
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
@@ -178,11 +178,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
-    | '/feed'
     | '/learn'
     | '/login'
     | '/practice'
     | '/settings'
+    | '/summary'
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
@@ -195,15 +195,22 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
-  FeedRoute: typeof FeedRoute
   LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
   PracticeRoute: typeof PracticeRouteWithChildren
   SettingsRoute: typeof SettingsRoute
+  SummaryRoute: typeof SummaryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -230,13 +237,6 @@ declare module '@tanstack/react-router' {
       path: '/learn'
       fullPath: '/learn'
       preLoaderRoute: typeof LearnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -350,11 +350,11 @@ const PracticeRouteWithChildren = PracticeRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
-  FeedRoute: FeedRoute,
   LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
   PracticeRoute: PracticeRouteWithChildren,
   SettingsRoute: SettingsRoute,
+  SummaryRoute: SummaryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

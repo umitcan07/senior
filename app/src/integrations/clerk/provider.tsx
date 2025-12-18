@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/clerk-react";
+import { shadcn } from "@clerk/themes";
 
 // Handle both client-side (import.meta.env) and server-side (process.env) contexts
 function getClerkPublishableKey(): string | undefined {
@@ -32,7 +33,13 @@ export default function AppClerkProvider({
 	}
 
 	return (
-		<ClerkProvider publishableKey={publishableKey} afterSignOutUrl="/">
+		<ClerkProvider
+			publishableKey={publishableKey}
+			afterSignOutUrl="/"
+			appearance={{
+				theme: shadcn,
+			}}
+		>
 			{children}
 		</ClerkProvider>
 	);

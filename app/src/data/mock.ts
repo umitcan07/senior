@@ -6,6 +6,7 @@
  * These mocks simulate the expected data shapes from the database schema.
  */
 
+import { cva, type VariantProps } from "class-variance-authority";
 import type {
 	Analysis,
 	Author,
@@ -622,19 +623,38 @@ export function formatRelativeTime(date: Date): string {
 }
 
 /**
- * Get score color based on value
+ * Score color variants using CVA
  */
-export function getScoreColor(score: number): string {
-	if (score >= 75) return "text-green-600 dark:text-green-400";
-	if (score >= 50) return "text-yellow-600 dark:text-yellow-400";
-	return "text-red-600 dark:text-red-400";
-}
+export const scoreColorVariants = cva("", {
+	variants: {
+		level: {
+			high: "text-green-600 dark:text-green-400",
+			medium: "text-yellow-600 dark:text-yellow-400",
+			low: "text-red-600 dark:text-red-400",
+		},
+	},
+});
 
 /**
- * Get score background color based on value
+ * Score background color variants using CVA
  */
-export function getScoreBgColor(score: number): string {
-	if (score >= 75) return "bg-green-100 dark:bg-green-900/30";
-	if (score >= 50) return "bg-yellow-100 dark:bg-yellow-900/30";
-	return "bg-red-100 dark:bg-red-900/30";
+export const scoreBgColorVariants = cva("", {
+	variants: {
+		level: {
+			high: "bg-green-100 dark:bg-green-900/30",
+			medium: "bg-yellow-100 dark:bg-yellow-900/30",
+			low: "bg-red-100 dark:bg-red-900/30",
+		},
+	},
+});
+
+export type ScoreLevel = VariantProps<typeof scoreColorVariants>["level"];
+
+/**
+ * Get score level based on value
+ */
+export function getScoreLevel(score: number): ScoreLevel {
+	if (score >= 75) return "high";
+	if (score >= 50) return "medium";
+	return "low";
 }

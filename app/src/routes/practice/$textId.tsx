@@ -30,9 +30,10 @@ import {
 	formatRelativeTime,
 	getRecentAttemptsForText,
 	getReferencesForText,
-	getScoreColor,
+	getScoreLevel,
 	MOCK_TEXTS,
 	type ReferenceSpeech,
+	scoreColorVariants,
 } from "@/data/mock";
 import { serverGetPracticeTextById } from "@/lib/text";
 import { cn } from "@/lib/utils";
@@ -119,7 +120,7 @@ function ReferenceSelector({
 			<CardHeader className="pb-3">
 				<CardTitle className="text-base">Reference Voice</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-4">
+			<CardContent className="flex flex-col gap-4">
 				<Select value={selectedId ?? undefined} onValueChange={onSelect}>
 					<SelectTrigger>
 						<SelectValue placeholder="Select a voice" />
@@ -188,7 +189,7 @@ function AudioPlayer({ disabled }: AudioPlayerProps) {
 	}, [isPlaying, disabled]);
 
 	return (
-		<div className="space-y-2">
+		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-3">
 				<Button
 					variant="outline"
@@ -299,10 +300,10 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 				<CardHeader className="pb-3">
 					<CardTitle className="text-base">Record Your Voice</CardTitle>
 				</CardHeader>
-				<CardContent className="space-y-4">
+				<CardContent className="flex flex-col gap-4">
 					<div className="flex flex-col items-center gap-4 py-4">
 						<Button size="lg" disabled>
-							<Mic size={18} className="mr-2" />
+							<Mic size={18} />
 							Start Recording
 						</Button>
 						<p className="text-muted-foreground text-xs">
@@ -319,16 +320,16 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 			<CardHeader className="pb-3">
 				<CardTitle className="text-base">Record Your Voice</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-4">
+			<CardContent className="flex flex-col gap-4">
 				{state === "idle" && (
 					<div className="flex flex-col items-center gap-4 py-4 sm:flex-row sm:justify-center">
 						<Button size="lg" onClick={startRecording}>
-							<Mic size={18} className="mr-2" />
+							<Mic size={18} />
 							Start Recording
 						</Button>
 						<span className="text-muted-foreground text-sm">or</span>
 						<Button variant="outline" size="lg" disabled>
-							<Upload size={18} className="mr-2" />
+							<Upload size={18} />
 							Upload Audio
 						</Button>
 					</div>
@@ -346,7 +347,7 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 							</span>
 						</div>
 						<Button variant="destructive" size="lg" onClick={stopRecording}>
-							<Square size={18} className="mr-2" />
+							<Square size={18} />
 							Stop Recording
 						</Button>
 						{recordingTime >= 55 && (
@@ -365,7 +366,7 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 				)}
 
 				{state === "preview" && (
-					<div className="space-y-4 py-4">
+					<div className="flex flex-col gap-4 py-4">
 						<div className="rounded-lg bg-muted p-4">
 							<div className="flex items-center justify-between">
 								<span className="text-sm">Recording ready</span>
@@ -384,10 +385,9 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 				)}
 
 				{state === "uploading" && (
-					<div className="space-y-4 py-4">
-						<div className="space-y-2">
+					<div className="flex flex-col gap-4 py-4">
+						<div className="flex flex-col gap-2">
 							<div className="flex justify-between text-sm">
-								<span>Uploading...</span>
 								<span className="tabular-nums">{uploadProgress}%</span>
 							</div>
 							<Progress value={uploadProgress} />
@@ -428,7 +428,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 				<CardTitle className="text-base">Recent Attempts</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className="space-y-2">
+				<div className="flex flex-col gap-2">
 					{attempts.map((attempt) => (
 						<Link
 							key={attempt.id}
@@ -439,8 +439,8 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 							<div className="flex items-center gap-3">
 								<div
 									className={cn(
-										"font-semibold tabular-nums",
-										getScoreColor(attempt.score),
+										"font-medium tabular-nums",
+										scoreColorVariants({ level: getScoreLevel(attempt.score) }),
 									)}
 								>
 									{attempt.score}%
@@ -468,10 +468,10 @@ function TextDetailSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer maxWidth="lg">
-				<div className="space-y-6">
+				<div className="flex flex-col gap-6">
 					<div className="flex items-center gap-4">
 						<Skeleton className="size-9" />
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<Skeleton className="h-7 w-48" />
 							<Skeleton className="h-4 w-72" />
 						</div>
@@ -535,7 +535,7 @@ function PracticeTextPage() {
 	return (
 		<MainLayout>
 			<PageContainer maxWidth="lg">
-				<div className="space-y-6">
+				<div className="flex flex-col gap-6">
 					{/* Header */}
 					<div className="flex items-center gap-4">
 						<Button variant="ghost" size="icon" asChild>
@@ -543,7 +543,7 @@ function PracticeTextPage() {
 								<ArrowLeft size={18} />
 							</Link>
 						</Button>
-						<div className="space-y-1">
+						<div className="flex flex-col gap-1">
 							<h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-xl text-transparent tracking-tight md:text-2xl">
 								Practice Session
 							</h1>
@@ -582,10 +582,10 @@ function PracticeTextPage() {
 								<CardHeader className="pb-3">
 									<CardTitle className="text-base">Record Your Voice</CardTitle>
 								</CardHeader>
-								<CardContent className="space-y-4">
+								<CardContent className="flex flex-col gap-4">
 									<div className="flex flex-col items-center gap-4 py-4">
 										<Button disabled>
-											<Mic size={18} className="mr-2" />
+											<Mic size={18} />
 											Sign in to record
 										</Button>
 										<Button asChild>

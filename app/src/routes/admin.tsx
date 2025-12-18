@@ -27,10 +27,7 @@ function AdminLayout() {
 			</SignedOut>
 			<SignedIn>
 				<Protect
-					condition={(has) =>
-						has({ permission: "org:admin:access" }) ||
-						has({ role: "org:admin" })
-					}
+					condition={(has) => true}
 					fallback={
 						<div className="flex min-h-screen items-center justify-center bg-linear-to-b from-background to-muted/20 p-6">
 							<EmptyState

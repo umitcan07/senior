@@ -13,9 +13,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	getAnalysisById,
-	getScoreBgColor,
-	getScoreColor,
+	getScoreLevel,
 	type PhonemeError,
+	scoreBgColorVariants,
+	scoreColorVariants,
 	type WordError,
 } from "@/data/mock";
 import { cn } from "@/lib/utils";
@@ -45,10 +46,12 @@ interface ScoreCardProps {
 function ScoreCard({ label, score, size = "md" }: ScoreCardProps) {
 	const percentage = Math.round(score * 100);
 	const sizeClasses = {
-		sm: "size-16",
-		md: "size-20",
-		lg: "size-24",
+		sm: "size-8",
+		md: "size-12",
+		lg: "size-16",
 	};
+
+	const level = getScoreLevel(percentage);
 
 	return (
 		<div className="flex flex-col items-center gap-2">
@@ -56,11 +59,11 @@ function ScoreCard({ label, score, size = "md" }: ScoreCardProps) {
 				className={cn(
 					"relative rounded-full",
 					sizeClasses[size],
-					getScoreBgColor(percentage),
+					scoreBgColorVariants({ level }),
 				)}
 			>
 				<svg
-					className="size-full -rotate-90"
+					className="-rotate-90 size-full"
 					viewBox="0 0 100 100"
 					aria-hidden="true"
 				>
@@ -82,14 +85,14 @@ function ScoreCard({ label, score, size = "md" }: ScoreCardProps) {
 						strokeWidth="8"
 						strokeLinecap="round"
 						strokeDasharray={`${percentage * 2.51} 251`}
-						className={getScoreColor(percentage)}
+						className={scoreColorVariants({ level })}
 					/>
 				</svg>
 				<div className="absolute inset-0 flex items-center justify-center">
 					<span
 						className={cn(
 							"font-semibold tabular-nums",
-							getScoreColor(percentage),
+							scoreColorVariants({ level }),
 						)}
 					>
 						{percentage}%
@@ -385,7 +388,7 @@ function AnalysisPage() {
 							</Link>
 						</Button>
 						<div className="space-y-1">
-							<h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-xl text-transparent tracking-tight md:text-2xl">
+							<h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
 								Analysis Results
 							</h1>
 							<p className="text-muted-foreground text-sm">
@@ -438,7 +441,9 @@ function AnalysisPage() {
 							</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link to="/feed">View All Attempts</Link>
+							<Link to="/summary" params={{ textId, analysisId: analysis.id }}>
+								View All Attempts
+							</Link>
 						</Button>
 					</div>
 				</div>
