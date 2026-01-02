@@ -11,9 +11,7 @@ export const Route = createFileRoute("/learn")({
 	component: LearningPage,
 });
 
-// ============================================================================
 // IPA SECTION
-// ============================================================================
 
 interface IPASymbol {
 	symbol: string;
@@ -84,9 +82,7 @@ function IPAChart({ title, symbols }: { title: string; symbols: IPASymbol[] }) {
 	);
 }
 
-// ============================================================================
 // TIPS SECTION
-// ============================================================================
 
 const tips = [
 	{
@@ -124,11 +120,9 @@ const tips = [
 function TipsSection() {
 	return (
 		<Card>
-			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Pronunciation Tips</CardTitle>
-			</CardHeader>
+			<CardHeader className="pb-0"></CardHeader>
 			<CardContent>
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					{tips.map((tip) => (
 						<div key={tip.title} className="space-y-1">
 							<h4 className="font-medium text-sm">{tip.title}</h4>
@@ -143,9 +137,7 @@ function TipsSection() {
 	);
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function LearningPage() {
 	return (
@@ -156,21 +148,6 @@ function LearningPage() {
 						title="Learning Resources"
 						description="Learn about the International Phonetic Alphabet and improve your pronunciation skills"
 					/>
-
-					{/* Quick Start CTA */}
-					<Card>
-						<CardContent className="flex flex-col items-center gap-4 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
-							<div className="flex flex-col gap-1">
-								<h3 className="font-medium">Ready to practice?</h3>
-								<p className="text-muted-foreground text-sm">
-									Put your knowledge to the test with our practice texts.
-								</p>
-							</div>
-							<Button asChild>
-								<Link to="/practice">Start Practicing</Link>
-							</Button>
-						</CardContent>
-					</Card>
 
 					{/* IPA Charts */}
 					<div className="flex flex-col gap-4">
@@ -190,17 +167,18 @@ function LearningPage() {
 					{/* Tips Section */}
 					<TipsSection />
 
-					{/* Additional Resources */}
+					{/* Quick Start CTA */}
 					<Card>
-						<CardHeader className="pb-3">
-							<CardTitle className="text-base">Additional Resources</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-muted-foreground text-sm">
-								More learning resources and articulation guides are coming soon.
-								In the meantime, practice regularly with our curated texts to
-								improve your pronunciation.
-							</p>
+						<CardContent className="flex flex-col items-center gap-4 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+							<div className="flex flex-col gap-1">
+								<h3 className="font-medium">Ready to practice?</h3>
+								<p className="text-muted-foreground text-sm">
+									Put your knowledge to the test with our practice texts.
+								</p>
+							</div>
+							<Button asChild>
+								<Link to="/practice">Start Practicing</Link>
+							</Button>
 						</CardContent>
 					</Card>
 				</div>

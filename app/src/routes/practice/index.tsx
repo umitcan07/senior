@@ -40,9 +40,7 @@ export const Route = createFileRoute("/practice/")({
 	pendingComponent: PracticePageSkeleton,
 });
 
-// ============================================================================
 // TEXT CARD
-// ============================================================================
 
 interface TextCardProps {
 	text: PracticeText & { referenceCount: number; wordCount: number };
@@ -71,9 +69,7 @@ function TextCard({ text }: TextCardProps) {
 	);
 }
 
-// ============================================================================
 // SKELETON LOADING
-// ============================================================================
 
 function TextCardSkeleton() {
 	return (
@@ -114,9 +110,7 @@ function PracticePageSkeleton() {
 	);
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function PracticePage() {
 	const { texts, source } = Route.useLoaderData();

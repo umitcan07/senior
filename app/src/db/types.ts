@@ -63,3 +63,6 @@ export type QualityStatus =
 export type AlignmentMethod =
 	(typeof schema.alignmentMethodEnum.enumValues)[number];
 export type ErrorType = (typeof schema.errorTypeEnum.enumValues)[number];
+export type TextDifficulty =
+	(typeof schema.textDifficultyEnum.enumValues)[number];
+export type TextType = (typeof schema.textTypeEnum.enumValues)[number];

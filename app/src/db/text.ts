@@ -1,9 +1,24 @@
 import { eq } from "drizzle-orm";
 import { db } from "./index";
 import { practiceTexts } from "./schema";
-import type { NewPracticeText, PracticeText } from "./types";
+import type {
+	NewPracticeText,
+	PracticeText,
+	TextDifficulty,
+	TextType,
+} from "./types";
 
 export type { PracticeText, NewPracticeText };
+
+/**
+ * Calculate word count from text content
+ */
+function calculateWordCount(content: string): number {
+	return content
+		.trim()
+		.split(/\s+/)
+		.filter((word) => word.length > 0).length;
+}
 
 export async function getPracticeTexts(): Promise<PracticeText[]> {
 	return await db.select().from(practiceTexts);
@@ -22,21 +37,65 @@ export async function getPracticeTextById(
 
 export async function insertPracticeText(data: {
 	content: string;
+	difficulty: TextDifficulty;
+	type: TextType;
+	wordCount?: number;
+	note?: string | null;
 }): Promise<PracticeText> {
+	const wordCount = data.wordCount ?? calculateWordCount(data.content);
+
 	const [result] = await db
 		.insert(practiceTexts)
-		.values({ content: data.content })
+		.values({
+			content: data.content,
+			difficulty: data.difficulty,
+			type: data.type,
+			wordCount,
+			note: data.note ?? null,
+		})
 		.returning();
 	return result;
 }
 
 export async function updatePracticeText(
 	id: string,
-	data: { content: string },
+	data: {
+		content?: string;
+		difficulty?: TextDifficulty;
+		type?: TextType;
+		wordCount?: number;
+		note?: string | null;
+	},
 ): Promise<PracticeText> {
+	const updateData: Partial<NewPracticeText> = {
+		updatedAt: new Date(),
+	};
+
+	if (data.content !== undefined) {
+		updateData.content = data.content;
+		const wordCount = data.wordCount ?? calculateWordCount(data.content);
+		updateData.wordCount = wordCount;
+	}
+
+	if (data.difficulty !== undefined) {
+		updateData.difficulty = data.difficulty;
+	}
+
+	if (data.type !== undefined) {
+		updateData.type = data.type;
+	}
+
+	if (data.wordCount !== undefined) {
+		updateData.wordCount = data.wordCount;
+	}
+
+	if (data.note !== undefined) {
+		updateData.note = data.note;
+	}
+
 	const [result] = await db
 		.update(practiceTexts)
-		.set({ content: data.content, updatedAt: new Date() })
+		.set(updateData)
 		.where(eq(practiceTexts.id, id))
 		.returning();
 	return result;

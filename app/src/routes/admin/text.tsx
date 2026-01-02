@@ -1,15 +1,11 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Calendar, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-	MainLayout,
-	PageContainer,
-	PageHeader,
-} from "@/components/layout/main-layout";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -17,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import type { PracticeText } from "@/db/text";
+import { useRequireAdmin } from "@/lib/auth";
 import {
 	serverDeletePracticeText,
 	serverGetPracticeTexts,
@@ -26,13 +23,6 @@ import {
 
 export const Route = createFileRoute("/admin/text")({
 	component: RouteComponent,
-	loader: async () => {
-		const result = await serverGetPracticeTexts();
-		if (!result.success) {
-			throw new Error(result.error.message);
-		}
-		return { texts: result.data };
-	},
 	pendingComponent: TextManagementSkeleton,
 });
 
@@ -200,7 +190,6 @@ function TextItem({ text }: { text: PracticeText }) {
 
 function TextList() {
 	const getTextsFn = useServerFn(serverGetPracticeTexts);
-	const loaderData = Route.useLoaderData();
 
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ["texts"],
@@ -211,7 +200,6 @@ function TextList() {
 			}
 			return result.data;
 		},
-		initialData: loaderData.texts,
 	});
 
 	if (isLoading) {
@@ -229,7 +217,7 @@ function TextList() {
 	if (data && data.length > 0) {
 		return (
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-				{data.map((text) => (
+				{data.map((text: PracticeText) => (
 					<TextItem key={text.id} text={text} />
 				))}
 			</div>
@@ -331,38 +319,42 @@ function TextForm() {
 
 function TextManagementSkeleton() {
 	return (
-		<MainLayout>
-			<PageContainer>
-				<div className="space-y-8">
-					<div className="space-y-2">
-						<Skeleton className="h-8 w-48" />
-						<Skeleton className="h-4 w-80" />
-					</div>
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{Array.from({ length: 6 }).map((_, i) => (
-							<Skeleton key={i} className="h-40" />
-						))}
-					</div>
-					<Skeleton className="h-48" />
+		<AdminLayout
+			title="Text Management"
+			description="Create, edit, and manage practice texts for pronunciation exercises"
+		>
+			<div className="flex flex-col gap-8">
+				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+					{Array.from({ length: 6 }).map((_, i) => (
+						<Skeleton key={i} className="h-40" />
+					))}
 				</div>
-			</PageContainer>
-		</MainLayout>
+				<Skeleton className="h-48" />
+			</div>
+		</AdminLayout>
 	);
 }
 
 function RouteComponent() {
+	const { isAdmin, isAuthenticated, isLoading } = useRequireAdmin();
+
+	if (isLoading) {
+		return null;
+	}
+
+	if (!isAuthenticated || !isAdmin) {
+		return <Navigate to="/login" />;
+	}
+
 	return (
-		<MainLayout>
-			<PageContainer>
-				<div className="space-y-8">
-					<PageHeader
-						title="Text Management"
-						description="Create, edit, and manage practice texts for pronunciation exercises"
-					/>
-					<TextList />
-					<TextForm />
-				</div>
-			</PageContainer>
-		</MainLayout>
+		<AdminLayout
+			title="Text Management"
+			description="Create, edit, and manage practice texts for pronunciation exercises"
+		>
+			<div className="flex flex-col gap-8">
+				<TextList />
+				<TextForm />
+			</div>
+		</AdminLayout>
 	);
 }

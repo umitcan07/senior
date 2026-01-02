@@ -13,12 +13,14 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	getAnalysisById,
-	getScoreLevel,
 	type PhonemeError,
-	scoreBgColorVariants,
-	scoreColorVariants,
 	type WordError,
 } from "@/data/mock";
+import {
+	getScoreLevel,
+	scoreBgColorVariants,
+	scoreColorVariants,
+} from "@/lib/score";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
@@ -33,9 +35,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 	pendingComponent: AnalysisSkeleton,
 });
 
-// ============================================================================
 // SCORE CARD
-// ============================================================================
 
 interface ScoreCardProps {
 	label: string;
@@ -106,9 +106,7 @@ function ScoreCard({ label, score, size = "md" }: ScoreCardProps) {
 	);
 }
 
-// ============================================================================
 // SCORE OVERVIEW
-// ============================================================================
 
 interface ScoreOverviewProps {
 	overallScore: number;
@@ -139,9 +137,7 @@ function ScoreOverview({
 	);
 }
 
-// ============================================================================
 // TEXT COMPARISON
-// ============================================================================
 
 interface TextComparisonProps {
 	target: string;
@@ -196,9 +192,7 @@ function TextComparison({ target, recognized, errors }: TextComparisonProps) {
 	);
 }
 
-// ============================================================================
 // PHONEME COMPARISON
-// ============================================================================
 
 interface PhonemeComparisonProps {
 	target: string;
@@ -233,9 +227,7 @@ function PhonemeComparison({ target, recognized }: PhonemeComparisonProps) {
 	);
 }
 
-// ============================================================================
 // ERROR LIST
-// ============================================================================
 
 interface ErrorListProps {
 	phonemeErrors: PhonemeError[];
@@ -322,9 +314,7 @@ function ErrorList({ phonemeErrors, wordErrors }: ErrorListProps) {
 	);
 }
 
-// ============================================================================
 // SKELETON
-// ============================================================================
 
 function AnalysisSkeleton() {
 	return (
@@ -350,9 +340,7 @@ function AnalysisSkeleton() {
 	);
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function AnalysisPage() {
 	const { analysis, phonemeErrors, wordErrors, textId } = Route.useLoaderData();

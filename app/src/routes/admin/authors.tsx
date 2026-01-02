@@ -1,11 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import {
-	MainLayout,
-	PageContainer,
-	PageHeader,
-} from "@/components/layout/main-layout";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,21 +34,14 @@ import {
 } from "@/components/ui/tooltip";
 import { type Author, getAuthorsWithReferenceCounts } from "@/data/mock";
 import { useToast } from "@/hooks/use-toast";
+import { useRequireAdmin } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/authors")({
 	component: AuthorsPage,
-	loader: async () => {
-		// In production, fetch from database
-		return {
-			authors: getAuthorsWithReferenceCounts(),
-		};
-	},
 	pendingComponent: AuthorsSkeleton,
 });
 
-// ============================================================================
 // CONSTANTS
-// ============================================================================
 
 const ACCENTS = ["US", "UK", "AU", "CA", "IN", "NZ", "SA", "IE"];
 const STYLES = ["Neutral", "Formal", "Casual", "Professional", "Friendly"];
@@ -63,9 +53,7 @@ const LANGUAGES = [
 	{ code: "en-IN", label: "English (IN)" },
 ];
 
-// ============================================================================
 // AUTHOR FORM MODAL
-// ============================================================================
 
 interface AuthorFormData {
 	name: string;
@@ -255,9 +243,7 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 	);
 }
 
-// ============================================================================
 // AUTHOR TABLE
-// ============================================================================
 
 interface AuthorTableProps {
 	authors: (Author & { referenceCount: number })[];
@@ -352,36 +338,72 @@ function AuthorTable({ authors, onDelete }: AuthorTableProps) {
 	);
 }
 
-// ============================================================================
 // SKELETON
-// ============================================================================
 
 function AuthorsSkeleton() {
 	return (
-		<MainLayout>
-			<PageContainer>
-				<div className="space-y-6">
-					<div className="flex items-center justify-between">
-						<div className="space-y-2">
-							<Skeleton className="h-8 w-32" />
-							<Skeleton className="h-4 w-64" />
-						</div>
-						<Skeleton className="h-9 w-28" />
-					</div>
-					<Skeleton className="h-64" />
+		<AdminLayout
+			title="Authors"
+			description="Manage voices for reference speeches"
+		>
+			<div className="flex flex-col gap-6">
+				<div className="flex items-center justify-end">
+					<Skeleton className="h-9 w-28" />
 				</div>
-			</PageContainer>
-		</MainLayout>
+				<Skeleton className="h-64" />
+			</div>
+		</AdminLayout>
 	);
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function AuthorsPage() {
-	const { authors } = Route.useLoaderData();
+	const {
+		isAdmin,
+		isAuthenticated,
+		isLoading: authLoading,
+	} = useRequireAdmin();
 	const { toast } = useToast();
+
+	const {
+		data: authors,
+		isLoading: dataLoading,
+		isError,
+		error,
+	} = useQuery({
+		queryKey: ["authors"],
+		queryFn: async () => {
+			// Simulate async operation
+			await new Promise((resolve) => setTimeout(resolve, 100));
+			return getAuthorsWithReferenceCounts();
+		},
+	});
+
+	if (authLoading || dataLoading) {
+		return null;
+	}
+
+	if (!isAuthenticated || !isAdmin) {
+		return <Navigate to="/login" />;
+	}
+
+	if (isError) {
+		return (
+			<AdminLayout
+				title="Authors"
+				description="Manage voices for reference speeches"
+			>
+				<div className="text-destructive">Error: {error?.message}</div>
+			</AdminLayout>
+		);
+	}
+
+	if (!authors) {
+		return null;
+	}
+
+	const queryClient = useQueryClient();
 
 	const handleDelete = (_id: string) => {
 		// In production, call API to delete
@@ -389,30 +411,26 @@ function AuthorsPage() {
 			title: "Author deleted",
 			description: "The author has been removed.",
 		});
+		// Invalidate and refetch
+		queryClient.invalidateQueries({ queryKey: ["authors"] });
 	};
 
 	const handleAddSuccess = () => {
-		// In production, refetch data
+		// Invalidate and refetch
+		queryClient.invalidateQueries({ queryKey: ["authors"] });
 	};
 
 	return (
-		<MainLayout>
-			<PageContainer>
-				<div className="space-y-6">
-					<PageHeader
-						title="Authors"
-						description="Manage voices for reference speeches"
-					>
-						<AuthorFormModal onSuccess={handleAddSuccess} />
-					</PageHeader>
-
-					<Card>
-						<CardContent className="p-4">
-							<AuthorTable authors={authors} onDelete={handleDelete} />
-						</CardContent>
-					</Card>
-				</div>
-			</PageContainer>
-		</MainLayout>
+		<AdminLayout
+			title="Authors"
+			description="Manage voices for reference speeches"
+			headerActions={<AuthorFormModal onSuccess={handleAddSuccess} />}
+		>
+			<Card>
+				<CardContent className="p-4">
+					<AuthorTable authors={authors} onDelete={handleDelete} />
+				</CardContent>
+			</Card>
+		</AdminLayout>
 	);
 }

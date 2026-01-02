@@ -11,9 +11,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 
-// ============================================================================
 // ENUMS
-// ============================================================================
 
 export const generationMethodEnum = pgEnum("generation_method", [
 	"tts",
@@ -38,20 +36,45 @@ export const errorTypeEnum = pgEnum("error_type", [
 	"insert",
 	"delete",
 ]);
+export const textDifficultyEnum = pgEnum("text_difficulty", [
+	"beginner",
+	"intermediate",
+	"advanced",
+]);
+export const textTypeEnum = pgEnum("text_type", [
+	"daily",
+	"professional",
+	"academic",
+	"phonetic_challenge",
+	"common_phrase",
+]);
 
-// ============================================================================
 // TABLES
-// ============================================================================
 
 /**
  * Texts for pronunciation practice
  */
-export const practiceTexts = pgTable("practice_texts", {
-	id: uuid("id").primaryKey().defaultRandom(),
-	content: text("content").notNull(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const practiceTexts = pgTable(
+	"practice_texts",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		content: text("content").notNull(),
+		difficulty: textDifficultyEnum("difficulty").notNull(),
+		wordCount: integer("word_count").notNull(),
+		type: textTypeEnum("type").notNull(),
+		note: text("note"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	},
+	(table) => [
+		index("idx_practice_texts_difficulty").on(table.difficulty),
+		index("idx_practice_texts_type").on(table.type),
+		index("idx_practice_texts_difficulty_type").on(
+			table.difficulty,
+			table.type,
+		),
+	],
+);
 
 /**
  * Authors/voices for reference speeches (TTS or native speakers)

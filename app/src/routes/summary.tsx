@@ -22,14 +22,13 @@ import {
 	type Attempt,
 	type CommonError,
 	formatRelativeTime,
-	getScoreLevel,
-	scoreColorVariants,
 	MOCK_ATTEMPTS,
 	MOCK_COMMON_ERRORS,
 	MOCK_TEXTS,
 	MOCK_USER_STATS,
 	type UserStats,
 } from "@/data/mock";
+import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/summary")({
@@ -46,9 +45,7 @@ export const Route = createFileRoute("/summary")({
 	pendingComponent: FeedSkeleton,
 });
 
-// ============================================================================
 // STATS SUMMARY
-// ============================================================================
 
 interface StatsSummaryProps {
 	stats: UserStats;
@@ -109,9 +106,7 @@ function StatsSummary({ stats }: StatsSummaryProps) {
 	);
 }
 
-// ============================================================================
 // COMMON ERRORS
-// ============================================================================
 
 interface CommonErrorsProps {
 	errors: CommonError[];
@@ -147,9 +142,7 @@ function CommonErrors({ errors }: CommonErrorsProps) {
 	);
 }
 
-// ============================================================================
 // FILTER BAR
-// ============================================================================
 
 interface FilterBarProps {
 	texts: { id: string; content: string }[];
@@ -214,9 +207,7 @@ function FilterBar({
 	);
 }
 
-// ============================================================================
 // ATTEMPT CARD
-// ============================================================================
 
 interface AttemptCardProps {
 	attempt: Attempt;
@@ -233,7 +224,7 @@ function AttemptCard({ attempt }: AttemptCardProps) {
 				<CardContent className="flex items-center gap-4 p-4">
 					<div
 						className={cn(
-							"flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted font-medium text-lg tabular-nums",
+							"flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted font-semibold text-sm",
 							scoreColorVariants({ level: getScoreLevel(attempt.score) }),
 						)}
 					>
@@ -252,9 +243,7 @@ function AttemptCard({ attempt }: AttemptCardProps) {
 	);
 }
 
-// ============================================================================
 // ATTEMPT LIST
-// ============================================================================
 
 interface AttemptListProps {
 	attempts: Attempt[];
@@ -303,9 +292,7 @@ function AttemptList({
 	);
 }
 
-// ============================================================================
 // SKELETON
-// ============================================================================
 
 function FeedSkeleton() {
 	return (
@@ -333,9 +320,7 @@ function FeedSkeleton() {
 	);
 }
 
-// ============================================================================
 // GUEST VIEW
-// ============================================================================
 
 function GuestFeed() {
 	return (
@@ -369,9 +354,7 @@ function GuestFeed() {
 	);
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function FeedPage() {
 	const { attempts, stats, commonErrors, texts } = Route.useLoaderData();

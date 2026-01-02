@@ -10,7 +10,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ children, className }: MainLayoutProps) {
 	const { has } = useAuth();
-	const isAdmin = true;
+	const isAdmin = has?.({ feature: "admin:admin" }) ?? false;
 
 	return (
 		<div className="min-h-screen bg-linear-to-b from-background to-muted/20">

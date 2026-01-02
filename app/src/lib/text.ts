@@ -17,11 +17,33 @@ import {
 
 const PracticeTextSchema = z.object({
 	content: z.string().min(1),
+	difficulty: z.enum(["beginner", "intermediate", "advanced"]),
+	type: z.enum([
+		"daily",
+		"professional",
+		"academic",
+		"phonetic_challenge",
+		"common_phrase",
+	]),
+	wordCount: z.number().int().positive().optional(),
+	note: z.string().nullable().optional(),
 });
 
 const UpdatePracticeTextSchema = z.object({
 	id: z.string().uuid(),
-	content: z.string().min(1),
+	content: z.string().min(1).optional(),
+	difficulty: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+	type: z
+		.enum([
+			"daily",
+			"professional",
+			"academic",
+			"phonetic_challenge",
+			"common_phrase",
+		])
+		.optional(),
+	wordCount: z.number().int().positive().optional(),
+	note: z.string().nullable().optional(),
 });
 
 const DeletePracticeTextSchema = z.object({
@@ -31,8 +53,18 @@ const DeletePracticeTextSchema = z.object({
 export const serverInsertPracticeText = createServerFn({ method: "POST" })
 	.inputValidator(PracticeTextSchema)
 	.handler(async ({ data }): Promise<ApiResponse<PracticeText>> => {
+		// Note: Server-side auth check requires request access
+		// Currently relying on client-side protection via <Protect> component in admin layout
+		// TODO: Implement proper server-side auth when request context is available
+
 		try {
-			const result = await insertPracticeText({ content: data.content });
+			const result = await insertPracticeText({
+				content: data.content,
+				difficulty: data.difficulty,
+				type: data.type,
+				wordCount: data.wordCount,
+				note: data.note,
+			});
 			return createSuccessResponse(result);
 		} catch (error) {
 			console.error("Insert practice text error:", error);
@@ -66,6 +98,10 @@ export const serverInsertPracticeText = createServerFn({ method: "POST" })
 
 export const serverGetPracticeTexts = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ApiResponse<PracticeText[]>> => {
+		// Note: Server-side auth check requires request access
+		// Currently relying on client-side protection via <Protect> component in admin layout
+		// TODO: Implement proper server-side auth when request context is available
+
 		try {
 			const result = await getPracticeTexts();
 			return createSuccessResponse(result);
@@ -98,6 +134,10 @@ const GetPracticeTextByIdSchema = z.object({
 export const serverGetPracticeTextById = createServerFn({ method: "GET" })
 	.inputValidator(GetPracticeTextByIdSchema)
 	.handler(async ({ data }): Promise<ApiResponse<PracticeText | null>> => {
+		// Note: Server-side auth check requires request access
+		// Currently relying on client-side protection via <Protect> component in admin layout
+		// TODO: Implement proper server-side auth when request context is available
+
 		try {
 			const result = await getPracticeTextById(data.id);
 			return createSuccessResponse(result);
@@ -134,9 +174,17 @@ export const serverGetPracticeTextById = createServerFn({ method: "GET" })
 export const serverUpdatePracticeText = createServerFn({ method: "POST" })
 	.inputValidator(UpdatePracticeTextSchema)
 	.handler(async ({ data }): Promise<ApiResponse<PracticeText>> => {
+		// Note: Server-side auth check requires request access
+		// Currently relying on client-side protection via <Protect> component in admin layout
+		// TODO: Implement proper server-side auth when request context is available
+
 		try {
 			const result = await updatePracticeText(data.id, {
 				content: data.content,
+				difficulty: data.difficulty,
+				type: data.type,
+				wordCount: data.wordCount,
+				note: data.note,
 			});
 			return createSuccessResponse(result);
 		} catch (error) {
@@ -172,6 +220,10 @@ export const serverUpdatePracticeText = createServerFn({ method: "POST" })
 export const serverDeletePracticeText = createServerFn({ method: "POST" })
 	.inputValidator(DeletePracticeTextSchema)
 	.handler(async ({ data }): Promise<ApiResponse<void>> => {
+		// Note: Server-side auth check requires request access
+		// Currently relying on client-side protection via <Protect> component in admin layout
+		// TODO: Implement proper server-side auth when request context is available
+
 		try {
 			await deletePracticeText(data.id);
 			return createSuccessResponse(undefined);

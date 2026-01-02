@@ -14,7 +14,6 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LearnRouteImport } from './routes/learn'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PracticeIndexRouteImport } from './routes/practice/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -49,11 +48,6 @@ const LearnRoute = LearnRouteImport.update({
   path: '/learn',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -65,9 +59,9 @@ const PracticeIndexRoute = PracticeIndexRouteImport.update({
   getParentRoute: () => PracticeRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeTextIdRoute = PracticeTextIdRouteImport.update({
   id: '/$textId',
@@ -75,19 +69,19 @@ const PracticeTextIdRoute = PracticeTextIdRouteImport.update({
   getParentRoute: () => PracticeRoute,
 } as any)
 const AdminTextRoute = AdminTextRouteImport.update({
-  id: '/text',
-  path: '/text',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/text',
+  path: '/admin/text',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminReferencesRoute = AdminReferencesRouteImport.update({
-  id: '/references',
-  path: '/references',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/references',
+  path: '/admin/references',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAuthorsRoute = AdminAuthorsRouteImport.update({
-  id: '/authors',
-  path: '/authors',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/authors',
+  path: '/admin/authors',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeTextIdAnalysisAnalysisIdRoute =
   PracticeTextIdAnalysisAnalysisIdRouteImport.update({
@@ -98,7 +92,6 @@ const PracticeTextIdAnalysisAnalysisIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
@@ -108,7 +101,7 @@ export interface FileRoutesByFullPath {
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
-  '/admin/': typeof AdminIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/practice/': typeof PracticeIndexRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
@@ -129,7 +122,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
@@ -147,7 +139,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/learn'
     | '/login'
     | '/practice'
@@ -157,7 +148,7 @@ export interface FileRouteTypes {
     | '/admin/references'
     | '/admin/text'
     | '/practice/$textId'
-    | '/admin/'
+    | '/admin'
     | '/practice/'
     | '/practice/$textId/analysis/$analysisId'
   fileRoutesByTo: FileRoutesByTo
@@ -177,7 +168,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/learn'
     | '/login'
     | '/practice'
@@ -194,12 +184,15 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
   LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
   PracticeRoute: typeof PracticeRouteWithChildren
   SettingsRoute: typeof SettingsRoute
   SummaryRoute: typeof SummaryRoute
+  AdminAuthorsRoute: typeof AdminAuthorsRoute
+  AdminReferencesRoute: typeof AdminReferencesRoute
+  AdminTextRoute: typeof AdminTextRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -239,13 +232,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -262,10 +248,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
+      path: '/admin'
+      fullPath: '/admin'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/practice/$textId': {
       id: '/practice/$textId'
@@ -276,24 +262,24 @@ declare module '@tanstack/react-router' {
     }
     '/admin/text': {
       id: '/admin/text'
-      path: '/text'
+      path: '/admin/text'
       fullPath: '/admin/text'
       preLoaderRoute: typeof AdminTextRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/references': {
       id: '/admin/references'
-      path: '/references'
+      path: '/admin/references'
       fullPath: '/admin/references'
       preLoaderRoute: typeof AdminReferencesRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/authors': {
       id: '/admin/authors'
-      path: '/authors'
+      path: '/admin/authors'
       fullPath: '/admin/authors'
       preLoaderRoute: typeof AdminAuthorsRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/practice/$textId/analysis/$analysisId': {
       id: '/practice/$textId/analysis/$analysisId'
@@ -304,22 +290,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface AdminRouteChildren {
-  AdminAuthorsRoute: typeof AdminAuthorsRoute
-  AdminReferencesRoute: typeof AdminReferencesRoute
-  AdminTextRoute: typeof AdminTextRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminAuthorsRoute: AdminAuthorsRoute,
-  AdminReferencesRoute: AdminReferencesRoute,
-  AdminTextRoute: AdminTextRoute,
-  AdminIndexRoute: AdminIndexRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PracticeTextIdRouteChildren {
   PracticeTextIdAnalysisAnalysisIdRoute: typeof PracticeTextIdAnalysisAnalysisIdRoute
@@ -349,12 +319,15 @@ const PracticeRouteWithChildren = PracticeRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
   LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
   PracticeRoute: PracticeRouteWithChildren,
   SettingsRoute: SettingsRoute,
   SummaryRoute: SummaryRoute,
+  AdminAuthorsRoute: AdminAuthorsRoute,
+  AdminReferencesRoute: AdminReferencesRoute,
+  AdminTextRoute: AdminTextRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

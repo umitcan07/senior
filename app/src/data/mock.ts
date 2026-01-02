@@ -6,7 +6,6 @@
  * These mocks simulate the expected data shapes from the database schema.
  */
 
-import { cva, type VariantProps } from "class-variance-authority";
 import type {
 	Analysis,
 	Author,
@@ -17,9 +16,7 @@ import type {
 	WordError,
 } from "@/db/types";
 
-// ============================================================================
 // CUSTOM TYPES (UI/derived types not in DB schema)
-// ============================================================================
 
 export interface Attempt {
 	id: string;
@@ -53,9 +50,7 @@ export type {
 	WordError,
 };
 
-// ============================================================================
 // MOCK AUTHORS
-// ============================================================================
 
 export const MOCK_AUTHORS: Author[] = [
 	{
@@ -105,9 +100,7 @@ export const MOCK_AUTHORS: Author[] = [
 	},
 ];
 
-// ============================================================================
 // MOCK PRACTICE TEXTS
-// ============================================================================
 
 export const MOCK_TEXTS: PracticeText[] = [
 	{
@@ -154,9 +147,7 @@ export const MOCK_TEXTS: PracticeText[] = [
 	},
 ];
 
-// ============================================================================
 // MOCK REFERENCE SPEECHES
-// ============================================================================
 
 export const MOCK_REFERENCES: ReferenceSpeech[] = [
 	{
@@ -229,9 +220,7 @@ export const MOCK_REFERENCES: ReferenceSpeech[] = [
 	},
 ];
 
-// ============================================================================
 // MOCK ANALYSES & ATTEMPTS
-// ============================================================================
 
 export const MOCK_ANALYSES: Analysis[] = [
 	{
@@ -398,9 +387,7 @@ export const MOCK_WORD_ERRORS: WordError[] = [
 	},
 ];
 
-// ============================================================================
 // MOCK ATTEMPTS (combines recording, analysis, and text data)
-// ============================================================================
 
 export const MOCK_ATTEMPTS: Attempt[] = [
 	{
@@ -469,9 +456,7 @@ export const MOCK_ATTEMPTS: Attempt[] = [
 	},
 ];
 
-// ============================================================================
 // MOCK USER STATS
-// ============================================================================
 
 export const MOCK_USER_STATS: UserStats = {
 	totalAttempts: 47,
@@ -480,9 +465,7 @@ export const MOCK_USER_STATS: UserStats = {
 	weeklyProgress: 8,
 };
 
-// ============================================================================
 // MOCK COMMON ERRORS
-// ============================================================================
 
 export const MOCK_COMMON_ERRORS: CommonError[] = [
 	{ phoneme: "/θ/", count: 23 },
@@ -492,9 +475,7 @@ export const MOCK_COMMON_ERRORS: CommonError[] = [
 	{ phoneme: "/l/", count: 9 },
 ];
 
-// ============================================================================
 // HELPER FUNCTIONS
-// ============================================================================
 
 /**
  * Get references for a specific text
@@ -620,41 +601,4 @@ export function formatRelativeTime(date: Date): string {
 	if (diffHours > 0) return `${diffHours}h ago`;
 	if (diffMinutes > 0) return `${diffMinutes}m ago`;
 	return "just now";
-}
-
-/**
- * Score color variants using CVA
- */
-export const scoreColorVariants = cva("", {
-	variants: {
-		level: {
-			high: "text-green-600 dark:text-green-400",
-			medium: "text-yellow-600 dark:text-yellow-400",
-			low: "text-red-600 dark:text-red-400",
-		},
-	},
-});
-
-/**
- * Score background color variants using CVA
- */
-export const scoreBgColorVariants = cva("", {
-	variants: {
-		level: {
-			high: "bg-green-100 dark:bg-green-900/30",
-			medium: "bg-yellow-100 dark:bg-yellow-900/30",
-			low: "bg-red-100 dark:bg-red-900/30",
-		},
-	},
-});
-
-export type ScoreLevel = VariantProps<typeof scoreColorVariants>["level"];
-
-/**
- * Get score level based on value
- */
-export function getScoreLevel(score: number): ScoreLevel {
-	if (score >= 75) return "high";
-	if (score >= 50) return "medium";
-	return "low";
 }

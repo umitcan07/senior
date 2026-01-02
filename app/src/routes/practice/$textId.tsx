@@ -30,15 +30,13 @@ import {
 	formatRelativeTime,
 	getRecentAttemptsForText,
 	getReferencesForText,
-	getScoreLevel,
 	MOCK_TEXTS,
 	type ReferenceSpeech,
-	scoreColorVariants,
 } from "@/data/mock";
+import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetPracticeTextById } from "@/lib/text";
 import { cn } from "@/lib/utils";
 
-// UUID regex pattern
 const UUID_REGEX =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -86,10 +84,6 @@ export const Route = createFileRoute("/practice/$textId")({
 	},
 	pendingComponent: TextDetailSkeleton,
 });
-
-// ============================================================================
-// REFERENCE SELECTOR
-// ============================================================================
 
 interface ReferenceSelectorProps {
 	references: (ReferenceSpeech & { author: Author })[];
@@ -156,9 +150,7 @@ function ReferenceSelector({
 	);
 }
 
-// ============================================================================
 // AUDIO PLAYER (placeholder)
-// ============================================================================
 
 interface AudioPlayerProps {
 	audioUrl: string;
@@ -215,10 +207,6 @@ function AudioPlayer({ disabled }: AudioPlayerProps) {
 		</div>
 	);
 }
-
-// ============================================================================
-// RECORDING SECTION
-// ============================================================================
 
 type RecordingState =
 	| "idle"
@@ -408,10 +396,6 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 	);
 }
 
-// ============================================================================
-// RECENT ATTEMPTS
-// ============================================================================
-
 interface RecentAttemptsProps {
 	attempts: Attempt[];
 	textId: string;
@@ -460,9 +444,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 	);
 }
 
-// ============================================================================
 // SKELETON
-// ============================================================================
 
 function TextDetailSkeleton() {
 	return (
@@ -487,9 +469,7 @@ function TextDetailSkeleton() {
 	);
 }
 
-// ============================================================================
 // LAYOUT
-// ============================================================================
 
 function PracticeTextLayout() {
 	const matches = useMatches();
@@ -504,9 +484,7 @@ function PracticeTextLayout() {
 	return <PracticeTextPage />;
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function PracticeTextPage() {
 	const { text, references, recentAttempts } = Route.useLoaderData();

@@ -5,7 +5,7 @@ import {
 	UserButton,
 } from "@clerk/clerk-react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChartBarIncreasingIcon, Menu, Settings2Icon, X } from "lucide-react";
+import { Menu, Settings2Icon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NonceLogo } from "@/components/ui/nonce";
@@ -162,7 +162,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 								<Settings2Icon size={20} />
 							</Link>
 						</Button>
-						<div className="flex w-10 items-center justify-end">
+						<div className="flex min-w-10 items-center justify-end">
 							<SignedIn>
 								<UserButton
 									appearance={{

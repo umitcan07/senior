@@ -1,11 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { Pause, Play, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import {
-	MainLayout,
-	PageContainer,
-	PageHeader,
-} from "@/components/layout/main-layout";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,27 +43,14 @@ import {
 	type ReferenceSpeech,
 } from "@/data/mock";
 import { useToast } from "@/hooks/use-toast";
+import { useRequireAdmin } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/references")({
 	component: ReferencesPage,
-	loader: async () => {
-		// In production, fetch from database
-		return {
-			texts: MOCK_TEXTS,
-			authors: MOCK_AUTHORS,
-			references: MOCK_REFERENCES.map((ref) => ({
-				...ref,
-				author: MOCK_AUTHORS.find((a) => a.id === ref.authorId)!,
-				text: MOCK_TEXTS.find((t) => t.id === ref.textId)!,
-			})),
-		};
-	},
 	pendingComponent: ReferencesSkeleton,
 });
 
-// ============================================================================
 // TEXT SELECTOR
-// ============================================================================
 
 interface TextSelectorProps {
 	texts: PracticeText[];
@@ -95,9 +79,7 @@ function TextSelector({ texts, selectedTextId, onSelect }: TextSelectorProps) {
 	);
 }
 
-// ============================================================================
 // AUTO-GENERATE TOGGLE (Disabled)
-// ============================================================================
 
 function AutoGenerateToggle() {
 	return (
@@ -124,9 +106,7 @@ function AutoGenerateToggle() {
 	);
 }
 
-// ============================================================================
 // ADD REFERENCE MODAL
-// ============================================================================
 
 interface AddReferenceModalProps {
 	texts: PracticeText[];
@@ -261,9 +241,7 @@ function AddReferenceModal({
 	);
 }
 
-// ============================================================================
 // REFERENCE TABLE
-// ============================================================================
 
 interface ReferenceWithRelations extends ReferenceSpeech {
 	author: Author;
@@ -370,42 +348,88 @@ function ReferenceTable({ references, onDelete }: ReferenceTableProps) {
 	);
 }
 
-// ============================================================================
 // SKELETON
-// ============================================================================
 
 function ReferencesSkeleton() {
 	return (
-		<MainLayout>
-			<PageContainer>
-				<div className="flex flex-col gap-6">
-					<div className="flex items-center justify-between">
-						<div className="flex flex-col gap-2">
-							<Skeleton className="h-8 w-48" />
-							<Skeleton className="h-4 w-72" />
-						</div>
-						<Skeleton className="h-9 w-32" />
-					</div>
-					<Skeleton className="h-12" />
-					<Skeleton className="h-64" />
+		<AdminLayout
+			title="Reference Speeches"
+			description="Manage reference audio for practice texts"
+		>
+			<div className="flex flex-col gap-6">
+				<div className="flex items-center justify-end">
+					<Skeleton className="h-9 w-32" />
 				</div>
-			</PageContainer>
-		</MainLayout>
+				<Skeleton className="h-12" />
+				<Skeleton className="h-64" />
+			</div>
+		</AdminLayout>
 	);
 }
 
-// ============================================================================
 // MAIN PAGE
-// ============================================================================
 
 function ReferencesPage() {
-	const { texts, authors, references } = Route.useLoaderData();
+	const {
+		isAdmin,
+		isAuthenticated,
+		isLoading: authLoading,
+	} = useRequireAdmin();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
 	const { toast } = useToast();
+
+	const {
+		data: referencesData,
+		isLoading: dataLoading,
+		isError,
+		error,
+	} = useQuery({
+		queryKey: ["references"],
+		queryFn: async () => {
+			// Simulate async operation
+			await new Promise((resolve) => setTimeout(resolve, 100));
+			return {
+				texts: MOCK_TEXTS,
+				authors: MOCK_AUTHORS,
+				references: MOCK_REFERENCES.map((ref) => ({
+					...ref,
+					author: MOCK_AUTHORS.find((a) => a.id === ref.authorId)!,
+					text: MOCK_TEXTS.find((t) => t.id === ref.textId)!,
+				})),
+			};
+		},
+	});
+
+	if (authLoading || dataLoading) {
+		return null;
+	}
+
+	if (!isAuthenticated || !isAdmin) {
+		return <Navigate to="/login" />;
+	}
+
+	if (isError) {
+		return (
+			<AdminLayout
+				title="Reference Speeches"
+				description="Manage reference audio for practice texts"
+			>
+				<div className="text-destructive">Error: {error?.message}</div>
+			</AdminLayout>
+		);
+	}
+
+	if (!referencesData) {
+		return null;
+	}
+
+	const { texts, authors, references } = referencesData;
 
 	const filteredReferences = selectedTextId
 		? references.filter((r) => r.textId === selectedTextId)
 		: references;
+
+	const queryClient = useQueryClient();
 
 	const handleDelete = (_id: string) => {
 		// In production, call API to delete
@@ -413,56 +437,56 @@ function ReferencesPage() {
 			title: "Reference deleted",
 			description: "The reference speech has been removed.",
 		});
+		// Invalidate and refetch
+		queryClient.invalidateQueries({ queryKey: ["references"] });
 	};
 
 	const handleAddSuccess = () => {
-		// In production, refetch data
+		// Invalidate and refetch
+		queryClient.invalidateQueries({ queryKey: ["references"] });
 	};
 
 	return (
-		<MainLayout>
-			<PageContainer>
-				<div className="flex flex-col gap-6">
-					<PageHeader
-						title="Reference Speeches"
-						description="Manage reference audio for practice texts"
-					>
-						<AddReferenceModal
+		<AdminLayout
+			title="Reference Speeches"
+			description="Manage reference audio for practice texts"
+			headerActions={
+				<AddReferenceModal
+					texts={texts}
+					authors={authors}
+					selectedTextId={selectedTextId}
+					onSuccess={handleAddSuccess}
+				/>
+			}
+		>
+			<div className="flex flex-col gap-6">
+				{/* Auto-generate toggle (disabled) */}
+				<AutoGenerateToggle />
+
+				{/* Filters */}
+				<Card>
+					<CardHeader className="pb-3">
+						<CardTitle className="text-base">Filter References</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<TextSelector
 							texts={texts}
-							authors={authors}
 							selectedTextId={selectedTextId}
-							onSuccess={handleAddSuccess}
+							onSelect={setSelectedTextId}
 						/>
-					</PageHeader>
+					</CardContent>
+				</Card>
 
-					{/* Auto-generate toggle (disabled) */}
-					<AutoGenerateToggle />
-
-					{/* Filters */}
-					<Card>
-						<CardHeader className="pb-3">
-							<CardTitle className="text-base">Filter References</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<TextSelector
-								texts={texts}
-								selectedTextId={selectedTextId}
-								onSelect={setSelectedTextId}
-							/>
-						</CardContent>
-					</Card>
-
-					{/* Reference Table */}
-					<Card>
-						<CardContent className="p-4">
-							<ReferenceTable
-								references={filteredReferences}
-								onDelete={handleDelete}
-							/>
-						</CardContent>
-					</Card>
-				</div>
-			</PageContainer>
-		</MainLayout>
+				{/* Reference Table */}
+				<Card>
+					<CardContent className="p-4">
+						<ReferenceTable
+							references={filteredReferences}
+							onDelete={handleDelete}
+						/>
+					</CardContent>
+				</Card>
+			</div>
+		</AdminLayout>
 	);
 }
