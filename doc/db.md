@@ -20,12 +20,16 @@
 
 ### `practice_texts`
 
-| Column       | Type      | Description          |
-| ------------ | --------- | -------------------- |
-| `id`         | uuid      | Primary key          |
-| `content`    | text      | The text content     |
-| `created_at` | timestamp | Record creation time |
-| `updated_at` | timestamp | Last update time     |
+| Column       | Type      | Description                                                                      |
+| ------------ | --------- | -------------------------------------------------------------------------------- |
+| `id`         | uuid      | Primary key                                                                      |
+| `content`    | text      | The text content                                                                 |
+| `difficulty` | enum      | Enum: "beginner", "intermediate", "advanced"                                     |
+| `word_count` | integer   | Number of words in the text                                                      |
+| `type`       | enum      | Enum: "daily", "professional", "academic", "phonetic_challenge", "common_phrase" |
+| `note`       | text      | Optional note or description about the text (nullable)                           |
+| `created_at` | timestamp | Record creation time                                                             |
+| `updated_at` | timestamp | Last update time                                                                 |
 
 ### `authors`
 
@@ -185,6 +189,11 @@ CREATE INDEX idx_word_errors_actual ON word_errors(actual);
 -- Query optimization indexes
 CREATE INDEX idx_user_recordings_created_at ON user_recordings(created_at DESC);
 CREATE INDEX idx_analyses_created_at ON analyses(created_at DESC);
+
+-- Practice texts categorization indexes
+CREATE INDEX idx_practice_texts_difficulty ON practice_texts(difficulty);
+CREATE INDEX idx_practice_texts_type ON practice_texts(type);
+CREATE INDEX idx_practice_texts_difficulty_type ON practice_texts(difficulty, type);
 ```
 ---
 
@@ -222,6 +231,18 @@ CREATE TYPE alignment_method AS ENUM ('mfa', 'wav2textgrid');
 
 -- Error type for phoneme_errors and word_errors
 CREATE TYPE error_type AS ENUM ('substitute', 'insert', 'delete');
+
+-- Practice text difficulty level
+CREATE TYPE text_difficulty AS ENUM ('beginner', 'intermediate', 'advanced');
+
+-- Practice text type/category
+CREATE TYPE text_type AS ENUM (
+  'daily',
+  'professional',
+  'academic',
+  'phonetic_challenge',
+  'common_phrase'
+);
 ```
 
 ---

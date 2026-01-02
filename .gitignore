@@ -3,3 +3,4 @@
 .llms
 sig/exp/audio/development/**/*.m4a
 sig/exp/audio/development/**/*.wav
+node_modules
