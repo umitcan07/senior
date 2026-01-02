@@ -24,7 +24,10 @@
 			"recommended": false,
 			"correctness": {
 				"noChildrenProp": "off",
-				"noUnusedImports": "on"
+				"noUnusedImports": "off"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "off"
 			},
 			"nursery": {
 				"useSortedClasses": "warn"

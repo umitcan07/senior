@@ -1,998 +1,578 @@
-{
-	"texts": [
-		{
-			"content": "I need milk and bread today.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"neutral"
-			],
-			"target_challenges": [
-				"general"
-			],
-			"word_count": 6,
-			"complexity_notes": "Simple shopping routine with basic vocabulary."
-		},
-		{
-			"content": "The weather looks nice outside.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/θ/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/ð/"
-			],
-			"word_count": 5,
-			"complexity_notes": "Weather discussion with dental fricatives."
-		},
-		{
-			"content": "My family watches movies every weekend together.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/w/",
-				"/v/"
-			],
-			"target_challenges": [
-				"/w/",
-				"/v/"
-			],
-			"word_count": 7,
-			"complexity_notes": "Family activities with /w/ and /v/ sounds."
-		},
-		{
-			"content": "Can you help me find the right bus to the city center?",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/aɪ/"
-			],
-			"target_challenges": [
-				"/r/"
-			],
-			"word_count": 12,
-			"complexity_notes": "Transportation request with /r/ sound practice."
-		},
-		{
-			"content": "During summer vacation, we usually visit my grandmother and spend wonderful time together talking, cooking, and sharing stories about our family history.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/ʌ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʌ/"
-			],
-			"word_count": 22,
-			"complexity_notes": "Family vacation with strut vowel and /r/ sounds."
-		},
-		{
-			"content": "The children were playing happily in the beautiful garden while their loving parents carefully prepared a delicious lunch with fresh vegetables, herbs, and organic ingredients from the local farmer's market.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/ð/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/ð/",
-				"/r/"
-			],
-			"word_count": 30,
-			"complexity_notes": "Family scene with voiced dental fricative."
-		},
-		{
-			"content": "She regularly exercises at the gym, follows a healthy diet, maintains good sleeping habits, and practices meditation consistently to improve her overall well-being and mental health.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/l/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/",
-				"/θ/"
-			],
-			"word_count": 26,
-			"complexity_notes": "Health routine with multiple challenging sounds."
-		},
-		{
-			"content": "The neighborhood community organized a lovely festival with delicious food, live music, various entertainment activities, games for children, and beautiful decorations throughout the entire park area for everyone to enjoy together.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/v/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/v/",
-				"/l/"
-			],
-			"word_count": 31,
-			"complexity_notes": "Community event with fricatives and liquids."
-		},
-		{
-			"content": "Managing household responsibilities effectively requires careful planning, efficient organization, consistent dedication, and maintaining cleanliness throughout every room.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"word_count": 17,
-			"complexity_notes": "Domestic management with complex phonetic patterns."
-		},
-		{
-			"content": "The sophisticated cooking techniques she learned during her extensive culinary school training completely transformed her approach to preparing elaborate meals, creative appetizers, and gourmet desserts for special occasions and dinner parties.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/"
-			],
-			"word_count": 31,
-			"complexity_notes": "Culinary expertise with fricatives."
-		},
-		{
-			"content": "Contemporary lifestyle choices increasingly emphasize sustainable practices, environmental consciousness, and thoughtful consumption patterns across diverse demographics, age groups, and socioeconomic backgrounds in modern society.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 24,
-			"complexity_notes": "Modern living philosophy with dental fricatives."
-		},
-		{
-			"content": "The intricate relationship between personal wellness and social connections demonstrates the profound importance of nurturing meaningful relationships, maintaining strong family bonds, and building supportive community networks throughout life's journey.",
-			"difficulty": "beginner",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/",
-				"/θ/"
-			],
-			"word_count": 29,
-			"complexity_notes": "Wellness philosophy with complex consonant clusters."
-		},
-		{
-			"content": "Please send the report today.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 5,
-			"complexity_notes": "Simple work request with dental fricative."
-		},
-		{
-			"content": "Our team meets every Tuesday morning to discuss projects.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/r/"
-			],
-			"word_count": 9,
-			"complexity_notes": "Team meeting schedule with /r/ sounds."
-		},
-		{
-			"content": "The company values hard work and creativity from employees.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/v/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/v/"
-			],
-			"word_count": 9,
-			"complexity_notes": "Company values with fricatives."
-		},
-		{
-			"content": "We should schedule a meeting with the client to review their specific requirements carefully.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/"
-			],
-			"word_count": 14,
-			"complexity_notes": "Client meeting with liquid and fricative sounds."
-		},
-		{
-			"content": "The marketing department developed several innovative strategies to increase customer engagement and brand loyalty significantly through social media campaigns.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/"
-			],
-			"word_count": 19,
-			"complexity_notes": "Marketing strategy with liquid consonants."
-		},
-		{
-			"content": "Professional development workshops provide valuable opportunities for employees to enhance their skills, advance career prospects, improve communication abilities, and develop leadership qualities essential for success in today's competitive business environment.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/v/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/v/"
-			],
-			"word_count": 30,
-			"complexity_notes": "Career development with fricatives."
-		},
-		{
-			"content": "The quarterly financial results exceeded expectations, demonstrating strong performance across all business divisions and geographical regions worldwide through strategic planning and effective management.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 23,
-			"complexity_notes": "Financial reporting with dental fricatives."
-		},
-		{
-			"content": "Effective leadership requires excellent communication abilities, strategic thinking capabilities, emotional intelligence, and genuine commitment to organizational success, team collaboration, and employee development programs that foster growth and innovation throughout the company culture.",
-			"difficulty": "beginner",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/",
-				"/l/"
-			],
-			"word_count": 32,
-			"complexity_notes": "Leadership qualities with complex consonants."
-		},
-		{
-			"content": "Students need to complete their homework assignments before the next class meeting and bring all necessary materials for the upcoming examination.",
-			"difficulty": "beginner",
-			"type": "academic",
-			"phonetic_focus": [
-				"neutral"
-			],
-			"target_challenges": [
-				"general"
-			],
-			"word_count": 21,
-			"complexity_notes": "Simple academic instruction."
-		},
-		{
-			"content": "The library has thousands of books about history, science, literature, mathematics, philosophy, and other academic subjects for comprehensive research and study purposes in various fields of knowledge.",
-			"difficulty": "beginner",
-			"type": "academic",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 27,
-			"complexity_notes": "Library resources with dental fricatives."
-		},
-		{
-			"content": "Mathematics requires careful thinking.",
-			"difficulty": "beginner",
-			"type": "academic",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 4,
-			"complexity_notes": "Math learning with fricatives."
-		},
-		{
-			"content": "The teacher explains lessons clearly and answers student questions.",
-			"difficulty": "beginner",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/"
-			],
-			"word_count": 9,
-			"complexity_notes": "Classroom instruction with liquid consonants."
-		},
-		{
-			"content": "She sells seashells by the seashore.",
-			"difficulty": "intermediate",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/ʃ/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/ʃ/"
-			],
-			"word_count": 6,
-			"complexity_notes": "Classic tongue twister focusing on fricatives."
-		},
-		{
-			"content": "Three thick things and thirty thin things were thrown through the theater entrance.",
-			"difficulty": "intermediate",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/θ/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/ð/"
-			],
-			"word_count": 13,
-			"complexity_notes": "Dental fricative intensive practice."
-		},
-		{
-			"content": "Red lorries and yellow lorries race rapidly around the rough, rocky roads while carrying heavy loads of lumber and construction materials for building projects throughout the region.",
-			"difficulty": "intermediate",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/"
-			],
-			"word_count": 27,
-			"complexity_notes": "Liquid consonant distinction practice."
-		},
-		{
-			"content": "We were washing white wool while waiting for wonderful weather conditions to improve significantly during the upcoming weekend forecast period according to meteorological predictions.",
-			"difficulty": "intermediate",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/w/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/w/"
-			],
-			"word_count": 24,
-			"complexity_notes": "Fricative and approximant contrast."
-		},
-		{
-			"content": "Better late than never, but better never late.",
-			"difficulty": "intermediate",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/"
-			],
-			"word_count": 8,
-			"complexity_notes": "Traditional saying with liquid consonants."
-		},
-		{
-			"content": "Actions speak louder than words, so show what you really mean always.",
-			"difficulty": "intermediate",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 12,
-			"complexity_notes": "Common idiom with dental fricatives."
-		},
-		{
-			"content": "Time is money, and money talks, so we should use both resources very wisely in our daily lives and business decisions to achieve maximum success.",
-			"difficulty": "intermediate",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/aɪ/",
-				"/ʌ/"
-			],
-			"target_challenges": [
-				"/ʌ/"
-			],
-			"word_count": 25,
-			"complexity_notes": "Business idioms with vowel practice."
-		},
-		{
-			"content": "The early bird catches the worm, while the second mouse gets the cheese from the trap without any danger or consequences whatsoever in this situation.",
-			"difficulty": "intermediate",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"word_count": 25,
-			"complexity_notes": "Mixed proverbs with fricatives."
-		},
-		{
-			"content": "Research methodology courses teach students systematic approaches to gathering information, analyzing data, and drawing valid conclusions from empirical evidence and theoretical frameworks.",
-			"difficulty": "intermediate",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 22,
-			"complexity_notes": "Research methods with dental fricatives."
-		},
-		{
-			"content": "The scholarly article presented compelling evidence.",
-			"difficulty": "intermediate",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 6,
-			"complexity_notes": "Academic writing with fricatives."
-		},
-		{
-			"content": "Laboratory experiments require precise measurements and careful observation procedures.",
-			"difficulty": "intermediate",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 9,
-			"complexity_notes": "Scientific methodology with complex sounds."
-		},
-		{
-			"content": "Critical thinking skills develop through practice, reflection, and exposure to diverse perspectives within academic discourse communities, scholarly debates, and intellectual discussions that challenge assumptions and promote deeper understanding.",
-			"difficulty": "intermediate",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 28,
-			"complexity_notes": "Educational philosophy with fricatives."
-		},
-		{
-			"content": "The marketing department developed several innovative strategies to increase customer engagement and brand loyalty significantly through targeted campaigns and social media outreach programs.",
-			"difficulty": "intermediate",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/"
-			],
-			"word_count": 23,
-			"complexity_notes": "Marketing strategy with liquid consonants."
-		},
-		{
-			"content": "Professional development workshops provide valuable opportunities for employees.",
-			"difficulty": "intermediate",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/v/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/v/"
-			],
-			"word_count": 8,
-			"complexity_notes": "Career development with fricatives."
-		},
-		{
-			"content": "The quarterly financial results exceeded expectations completely.",
-			"difficulty": "intermediate",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 7,
-			"complexity_notes": "Financial reporting with dental fricatives."
-		},
-		{
-			"content": "Effective leadership requires excellent communication abilities, strategic thinking capabilities, and genuine commitment to organizational success, team collaboration, and employee development programs that foster growth and innovation throughout the entire company culture and business operations.",
-			"difficulty": "intermediate",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/",
-				"/l/"
-			],
-			"word_count": 34,
-			"complexity_notes": "Leadership qualities with complex consonants."
-		},
-		{
-			"content": "During summer vacation, we usually visit grandmother.",
-			"difficulty": "intermediate",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/ʌ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʌ/"
-			],
-			"word_count": 7,
-			"complexity_notes": "Family vacation with strut vowel and /r/ sounds."
-		},
-		{
-			"content": "The children were playing in the garden while their parents prepared lunch with fresh vegetables and herbs from their organic garden plot.",
-			"difficulty": "intermediate",
-			"type": "daily",
-			"phonetic_focus": [
-				"/ð/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/ð/",
-				"/r/"
-			],
-			"word_count": 22,
-			"complexity_notes": "Family scene with voiced dental fricative."
-		},
-		{
-			"content": "She regularly exercises at the gym.",
-			"difficulty": "intermediate",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/l/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/",
-				"/θ/"
-			],
-			"word_count": 6,
-			"complexity_notes": "Health routine with multiple challenging sounds."
-		},
-		{
-			"content": "The neighborhood community organized a lovely festival with delicious food, live music, various entertainment activities, games for children, beautiful decorations, and fun activities.",
-			"difficulty": "intermediate",
-			"type": "daily",
-			"phonetic_focus": [
-				"/v/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/v/",
-				"/l/"
-			],
-			"word_count": 23,
-			"complexity_notes": "Community event with fricatives and liquids."
-		},
-		{
-			"content": "When it rains, it pours, meaning problems come together.",
-			"difficulty": "advanced",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/r/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ð/"
-			],
-			"word_count": 9,
-			"complexity_notes": "Weather idiom with explanation."
-		},
-		{
-			"content": "Every cloud has a silver lining, which means something positive can emerge from difficult situations eventually through patience and perseverance during challenging times.",
-			"difficulty": "advanced",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/r/",
-				"/l/",
-				"/v/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/l/",
-				"/v/"
-			],
-			"word_count": 23,
-			"complexity_notes": "Optimistic idiom with liquid consonants."
-		},
-		{
-			"content": "The grass is always greener on the other side, suggesting people often think others have better situations, more opportunities, and fewer problems than they actually experience in reality.",
-			"difficulty": "advanced",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"word_count": 28,
-			"complexity_notes": "Comparison idiom with fricatives."
-		},
-		{
-			"content": "Rome wasn't built in a day, reminding us that worthwhile achievements require patience, persistence, dedication, hard work, and considerable time to reach completion and success.",
-			"difficulty": "advanced",
-			"type": "common_phrase",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/aɪ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 25,
-			"complexity_notes": "Historical idiom with dental fricatives."
-		},
-		{
-			"content": "Theoretical frameworks in contemporary social sciences integrate multidisciplinary perspectives to address complex societal phenomena comprehensively through rigorous analytical methodologies and empirical research approaches.",
-			"difficulty": "advanced",
-			"type": "academic",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 23,
-			"complexity_notes": "Social science theory with dental fricatives."
-		},
-		{
-			"content": "Interdisciplinary research methodologies facilitate comprehensive understanding.",
-			"difficulty": "advanced",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 6,
-			"complexity_notes": "Research methodology with sophisticated vocabulary."
-		},
-		{
-			"content": "The epistemological implications of postmodern theories challenge traditional assumptions about knowledge construction and scientific objectivity fundamentally through critical analysis and philosophical inquiry methods.",
-			"difficulty": "advanced",
-			"type": "academic",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/",
-				"/l/"
-			],
-			"word_count": 23,
-			"complexity_notes": "Philosophical discourse with complex phonetics."
-		},
-		{
-			"content": "Pedagogical innovations incorporating digital technologies transform educational experiences while maintaining rigorous academic standards throughout comprehensive learning processes that promote student engagement, critical thinking, and intellectual development.",
-			"difficulty": "advanced",
-			"type": "academic",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/"
-			],
-			"word_count": 26,
-			"complexity_notes": "Educational technology with fricatives."
-		},
-		{
-			"content": "The corporation's strategic transformation initiative encompasses comprehensive restructuring, technological modernization, and cultural realignment across multiple organizational levels to achieve sustainable competitive advantages.",
-			"difficulty": "advanced",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/",
-				"/θ/"
-			],
-			"word_count": 22,
-			"complexity_notes": "Corporate transformation with sophisticated terminology."
-		},
-		{
-			"content": "International business negotiations require sophisticated understanding of cultural nuances.",
-			"difficulty": "advanced",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/"
-			],
-			"word_count": 9,
-			"complexity_notes": "Global business with complex fricatives."
-		},
-		{
-			"content": "The executive committee thoroughly evaluated the acquisition proposal, considering financial implications, regulatory compliance requirements, and long-term strategic alignment with corporate objectives and shareholder interests.",
-			"difficulty": "advanced",
-			"type": "professional",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/",
-				"/l/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/",
-				"/l/"
-			],
-			"word_count": 24,
-			"complexity_notes": "Corporate governance with dental fricatives."
-		},
-		{
-			"content": "Advanced analytics platforms revolutionize decision-making processes by providing unprecedented insights into consumer behavior patterns, market trends, competitive dynamics, and business performance metrics.",
-			"difficulty": "advanced",
-			"type": "professional",
-			"phonetic_focus": [
-				"/r/",
-				"/v/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/v/",
-				"/ʃ/"
-			],
-			"word_count": 22,
-			"complexity_notes": "Business analytics with technical terminology."
-		},
-		{
-			"content": "The thoughtful author thoroughly researched authentic methods.",
-			"difficulty": "advanced",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/θ/",
-				"/ð/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/ð/",
-				"/r/"
-			],
-			"word_count": 7,
-			"complexity_notes": "Multiple dental fricatives with /r/ sounds."
-		},
-		{
-			"content": "Particularly peculiar purple people persistently pursued precious pearls, probably preferring perfectly polished precious stones.",
-			"difficulty": "advanced",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/p/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/r/"
-			],
-			"word_count": 14,
-			"complexity_notes": "Plosive and liquid consonant combination."
-		},
-		{
-			"content": "Several sailors swiftly sailed southward, skillfully steering their ships through shallow waters and sharp coral reefs while navigating dangerous ocean currents and unpredictable weather conditions.",
-			"difficulty": "advanced",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/s/",
-				"/ʃ/",
-				"/r/"
-			],
-			"target_challenges": [
-				"/ʃ/",
-				"/r/"
-			],
-			"word_count": 25,
-			"complexity_notes": "Fricative intensive with /r/ sounds."
-		},
-		{
-			"content": "Vivacious visitors viewed various valuable vintage vehicles while vendors volunteered valuable information about vehicle verification procedures.",
-			"difficulty": "advanced",
-			"type": "phonetic_challenge",
-			"phonetic_focus": [
-				"/v/",
-				"/w/"
-			],
-			"target_challenges": [
-				"/v/",
-				"/w/"
-			],
-			"word_count": 16,
-			"complexity_notes": "Intensive /v/ practice with /w/ contrast."
-		},
-		{
-			"content": "Managing household responsibilities effectively requires careful planning, efficient organization, and consistent dedication to maintaining cleanliness, order, and functionality.",
-			"difficulty": "advanced",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/θ/",
-				"/ð/"
-			],
-			"word_count": 18,
-			"complexity_notes": "Domestic management with complex phonetic patterns."
-		},
-		{
-			"content": "The sophisticated cooking techniques she learned during culinary school completely transformed her approach.",
-			"difficulty": "advanced",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/"
-			],
-			"word_count": 13,
-			"complexity_notes": "Culinary expertise with fricatives."
-		},
-		{
-			"content": "Contemporary lifestyle choices increasingly emphasize sustainable practices, environmental consciousness, thoughtful consumption patterns, ethical decision-making, and responsible resource management across diverse demographics, age groups, and geographical regions.",
-			"difficulty": "advanced",
-			"type": "daily",
-			"phonetic_focus": [
-				"/θ/",
-				"/r/",
-				"/s/"
-			],
-			"target_challenges": [
-				"/θ/",
-				"/r/"
-			],
-			"word_count": 26,
-			"complexity_notes": "Modern living philosophy with dental fricatives."
-		},
-		{
-			"content": "The intricate relationship between personal wellness and social connections demonstrates the profound importance of nurturing meaningful relationships throughout life's journey.",
-			"difficulty": "advanced",
-			"type": "daily",
-			"phonetic_focus": [
-				"/r/",
-				"/ʃ/",
-				"/θ/"
-			],
-			"target_challenges": [
-				"/r/",
-				"/ʃ/",
-				"/θ/"
-			],
-			"word_count": 20,
-			"complexity_notes": "Wellness philosophy with complex consonant clusters."
-		}
-	]
-}
+[
+	{
+		"content": "I need milk and bread today.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["neutral"],
+		"target_challenges": ["general"],
+		"word_count": 6,
+		"complexity_notes": "Simple shopping routine with basic vocabulary."
+	},
+	{
+		"content": "The weather looks nice outside.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/θ/", "/ð/"],
+		"target_challenges": ["/θ/", "/ð/"],
+		"word_count": 5,
+		"complexity_notes": "Weather discussion with dental fricatives."
+	},
+	{
+		"content": "My family watches movies every weekend together.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/w/", "/v/"],
+		"target_challenges": ["/w/", "/v/"],
+		"word_count": 7,
+		"complexity_notes": "Family activities with /w/ and /v/ sounds."
+	},
+	{
+		"content": "Can you help me find the right bus to the city center?",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/aɪ/"],
+		"target_challenges": ["/r/"],
+		"word_count": 12,
+		"complexity_notes": "Transportation request with /r/ sound practice."
+	},
+	{
+		"content": "During summer vacation, we usually visit my grandmother and spend wonderful time together talking, cooking, and sharing stories about our family history.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/ʌ/"],
+		"target_challenges": ["/r/", "/ʌ/"],
+		"word_count": 22,
+		"complexity_notes": "Family vacation with strut vowel and /r/ sounds."
+	},
+	{
+		"content": "The children were playing happily in the beautiful garden while their loving parents carefully prepared a delicious lunch with fresh vegetables, herbs, and organic ingredients from the local farmer's market.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/ð/", "/r/"],
+		"target_challenges": ["/ð/", "/r/"],
+		"word_count": 30,
+		"complexity_notes": "Family scene with voiced dental fricative."
+	},
+	{
+		"content": "She regularly exercises at the gym, follows a healthy diet, maintains good sleeping habits, and practices meditation consistently to improve her overall well-being and mental health.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/l/", "/θ/"],
+		"target_challenges": ["/r/", "/l/", "/θ/"],
+		"word_count": 26,
+		"complexity_notes": "Health routine with multiple challenging sounds."
+	},
+	{
+		"content": "The neighborhood community organized a lovely festival with delicious food, live music, various entertainment activities, games for children, and beautiful decorations throughout the entire park area for everyone to enjoy together.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/v/", "/l/"],
+		"target_challenges": ["/v/", "/l/"],
+		"word_count": 31,
+		"complexity_notes": "Community event with fricatives and liquids."
+	},
+	{
+		"content": "Managing household responsibilities effectively requires careful planning, efficient organization, consistent dedication, and maintaining cleanliness throughout every room.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/θ/", "/ð/"],
+		"target_challenges": ["/r/", "/θ/", "/ð/"],
+		"word_count": 17,
+		"complexity_notes": "Domestic management with complex phonetic patterns."
+	},
+	{
+		"content": "The sophisticated cooking techniques she learned during her extensive culinary school training completely transformed her approach to preparing elaborate meals, creative appetizers, and gourmet desserts for special occasions and dinner parties.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/ʃ/"],
+		"target_challenges": ["/r/", "/ʃ/"],
+		"word_count": 31,
+		"complexity_notes": "Culinary expertise with fricatives."
+	},
+	{
+		"content": "Contemporary lifestyle choices increasingly emphasize sustainable practices, environmental consciousness, and thoughtful consumption patterns across diverse demographics, age groups, and socioeconomic backgrounds in modern society.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/θ/", "/r/", "/s/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 24,
+		"complexity_notes": "Modern living philosophy with dental fricatives."
+	},
+	{
+		"content": "The intricate relationship between personal wellness and social connections demonstrates the profound importance of nurturing meaningful relationships, maintaining strong family bonds, and building supportive community networks throughout life's journey.",
+		"difficulty": "beginner",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/ʃ/", "/θ/"],
+		"target_challenges": ["/r/", "/ʃ/", "/θ/"],
+		"word_count": 29,
+		"complexity_notes": "Wellness philosophy with complex consonant clusters."
+	},
+	{
+		"content": "Please send the report today.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/θ/", "/r/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 5,
+		"complexity_notes": "Simple work request with dental fricative."
+	},
+	{
+		"content": "Our team meets every Tuesday morning to discuss projects.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/s/"],
+		"target_challenges": ["/r/"],
+		"word_count": 9,
+		"complexity_notes": "Team meeting schedule with /r/ sounds."
+	},
+	{
+		"content": "The company values hard work and creativity from employees.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/v/"],
+		"target_challenges": ["/r/", "/v/"],
+		"word_count": 9,
+		"complexity_notes": "Company values with fricatives."
+	},
+	{
+		"content": "We should schedule a meeting with the client to review their specific requirements carefully.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/ʃ/"],
+		"target_challenges": ["/r/", "/ʃ/"],
+		"word_count": 14,
+		"complexity_notes": "Client meeting with liquid and fricative sounds."
+	},
+	{
+		"content": "The marketing department developed several innovative strategies to increase customer engagement and brand loyalty significantly through social media campaigns.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/l/"],
+		"target_challenges": ["/r/", "/l/"],
+		"word_count": 19,
+		"complexity_notes": "Marketing strategy with liquid consonants."
+	},
+	{
+		"content": "Professional development workshops provide valuable opportunities for employees to enhance their skills, advance career prospects, improve communication abilities, and develop leadership qualities essential for success in today's competitive business environment.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/v/", "/s/"],
+		"target_challenges": ["/r/", "/v/"],
+		"word_count": 30,
+		"complexity_notes": "Career development with fricatives."
+	},
+	{
+		"content": "The quarterly financial results exceeded expectations, demonstrating strong performance across all business divisions and geographical regions worldwide through strategic planning and effective management.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/θ/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 23,
+		"complexity_notes": "Financial reporting with dental fricatives."
+	},
+	{
+		"content": "Effective leadership requires excellent communication abilities, strategic thinking capabilities, emotional intelligence, and genuine commitment to organizational success, team collaboration, and employee development programs that foster growth and innovation throughout the company culture.",
+		"difficulty": "beginner",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/θ/", "/l/"],
+		"target_challenges": ["/r/", "/θ/", "/l/"],
+		"word_count": 32,
+		"complexity_notes": "Leadership qualities with complex consonants."
+	},
+	{
+		"content": "Students need to complete their homework assignments before the next class meeting and bring all necessary materials for the upcoming examination.",
+		"difficulty": "beginner",
+		"type": "academic",
+		"phonetic_focus": ["neutral"],
+		"target_challenges": ["general"],
+		"word_count": 21,
+		"complexity_notes": "Simple academic instruction."
+	},
+	{
+		"content": "The library has thousands of books about history, science, literature, mathematics, philosophy, and other academic subjects for comprehensive research and study purposes in various fields of knowledge.",
+		"difficulty": "beginner",
+		"type": "academic",
+		"phonetic_focus": ["/θ/", "/r/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 27,
+		"complexity_notes": "Library resources with dental fricatives."
+	},
+	{
+		"content": "Mathematics requires careful thinking.",
+		"difficulty": "beginner",
+		"type": "academic",
+		"phonetic_focus": ["/θ/", "/r/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 4,
+		"complexity_notes": "Math learning with fricatives."
+	},
+	{
+		"content": "The teacher explains lessons clearly and answers student questions.",
+		"difficulty": "beginner",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/l/"],
+		"target_challenges": ["/r/", "/l/"],
+		"word_count": 9,
+		"complexity_notes": "Classroom instruction with liquid consonants."
+	},
+	{
+		"content": "She sells seashells by the seashore.",
+		"difficulty": "intermediate",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/ʃ/", "/s/"],
+		"target_challenges": ["/ʃ/"],
+		"word_count": 6,
+		"complexity_notes": "Classic tongue twister focusing on fricatives."
+	},
+	{
+		"content": "Three thick things and thirty thin things were thrown through the theater entrance.",
+		"difficulty": "intermediate",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/θ/", "/ð/"],
+		"target_challenges": ["/θ/", "/ð/"],
+		"word_count": 13,
+		"complexity_notes": "Dental fricative intensive practice."
+	},
+	{
+		"content": "Red lorries and yellow lorries race rapidly around the rough, rocky roads while carrying heavy loads of lumber and construction materials for building projects throughout the region.",
+		"difficulty": "intermediate",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/r/", "/l/"],
+		"target_challenges": ["/r/", "/l/"],
+		"word_count": 27,
+		"complexity_notes": "Liquid consonant distinction practice."
+	},
+	{
+		"content": "We were washing white wool while waiting for wonderful weather conditions to improve significantly during the upcoming weekend forecast period according to meteorological predictions.",
+		"difficulty": "intermediate",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/w/", "/ʃ/"],
+		"target_challenges": ["/w/"],
+		"word_count": 24,
+		"complexity_notes": "Fricative and approximant contrast."
+	},
+	{
+		"content": "Better late than never, but better never late.",
+		"difficulty": "intermediate",
+		"type": "common_phrase",
+		"phonetic_focus": ["/r/", "/l/"],
+		"target_challenges": ["/r/", "/l/"],
+		"word_count": 8,
+		"complexity_notes": "Traditional saying with liquid consonants."
+	},
+	{
+		"content": "Actions speak louder than words, so show what you really mean always.",
+		"difficulty": "intermediate",
+		"type": "common_phrase",
+		"phonetic_focus": ["/θ/", "/r/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 12,
+		"complexity_notes": "Common idiom with dental fricatives."
+	},
+	{
+		"content": "Time is money, and money talks, so we should use both resources very wisely in our daily lives and business decisions to achieve maximum success.",
+		"difficulty": "intermediate",
+		"type": "common_phrase",
+		"phonetic_focus": ["/aɪ/", "/ʌ/"],
+		"target_challenges": ["/ʌ/"],
+		"word_count": 25,
+		"complexity_notes": "Business idioms with vowel practice."
+	},
+	{
+		"content": "The early bird catches the worm, while the second mouse gets the cheese from the trap without any danger or consequences whatsoever in this situation.",
+		"difficulty": "intermediate",
+		"type": "common_phrase",
+		"phonetic_focus": ["/r/", "/θ/", "/ð/"],
+		"target_challenges": ["/r/", "/θ/", "/ð/"],
+		"word_count": 25,
+		"complexity_notes": "Mixed proverbs with fricatives."
+	},
+	{
+		"content": "Research methodology courses teach students systematic approaches to gathering information, analyzing data, and drawing valid conclusions from empirical evidence and theoretical frameworks.",
+		"difficulty": "intermediate",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/θ/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 22,
+		"complexity_notes": "Research methods with dental fricatives."
+	},
+	{
+		"content": "The scholarly article presented compelling evidence.",
+		"difficulty": "intermediate",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/θ/", "/s/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 6,
+		"complexity_notes": "Academic writing with fricatives."
+	},
+	{
+		"content": "Laboratory experiments require precise measurements and careful observation procedures.",
+		"difficulty": "intermediate",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/θ/", "/ʃ/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 9,
+		"complexity_notes": "Scientific methodology with complex sounds."
+	},
+	{
+		"content": "Critical thinking skills develop through practice, reflection, and exposure to diverse perspectives within academic discourse communities, scholarly debates, and intellectual discussions that challenge assumptions and promote deeper understanding.",
+		"difficulty": "intermediate",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/θ/", "/s/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 28,
+		"complexity_notes": "Educational philosophy with fricatives."
+	},
+	{
+		"content": "The marketing department developed several innovative strategies to increase customer engagement and brand loyalty significantly through targeted campaigns and social media outreach programs.",
+		"difficulty": "intermediate",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/l/"],
+		"target_challenges": ["/r/", "/l/"],
+		"word_count": 23,
+		"complexity_notes": "Marketing strategy with liquid consonants."
+	},
+	{
+		"content": "Professional development workshops provide valuable opportunities for employees.",
+		"difficulty": "intermediate",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/v/", "/s/"],
+		"target_challenges": ["/r/", "/v/"],
+		"word_count": 8,
+		"complexity_notes": "Career development with fricatives."
+	},
+	{
+		"content": "The quarterly financial results exceeded expectations completely.",
+		"difficulty": "intermediate",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/θ/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 7,
+		"complexity_notes": "Financial reporting with dental fricatives."
+	},
+	{
+		"content": "Effective leadership requires excellent communication abilities, strategic thinking capabilities, and genuine commitment to organizational success, team collaboration, and employee development programs that foster growth and innovation throughout the entire company culture and business operations.",
+		"difficulty": "intermediate",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/θ/", "/l/"],
+		"target_challenges": ["/r/", "/θ/", "/l/"],
+		"word_count": 34,
+		"complexity_notes": "Leadership qualities with complex consonants."
+	},
+	{
+		"content": "During summer vacation, we usually visit grandmother.",
+		"difficulty": "intermediate",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/ʌ/"],
+		"target_challenges": ["/r/", "/ʌ/"],
+		"word_count": 7,
+		"complexity_notes": "Family vacation with strut vowel and /r/ sounds."
+	},
+	{
+		"content": "The children were playing in the garden while their parents prepared lunch with fresh vegetables and herbs from their organic garden plot.",
+		"difficulty": "intermediate",
+		"type": "daily",
+		"phonetic_focus": ["/ð/", "/r/"],
+		"target_challenges": ["/ð/", "/r/"],
+		"word_count": 22,
+		"complexity_notes": "Family scene with voiced dental fricative."
+	},
+	{
+		"content": "She regularly exercises at the gym.",
+		"difficulty": "intermediate",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/l/", "/θ/"],
+		"target_challenges": ["/r/", "/l/", "/θ/"],
+		"word_count": 6,
+		"complexity_notes": "Health routine with multiple challenging sounds."
+	},
+	{
+		"content": "The neighborhood community organized a lovely festival with delicious food, live music, various entertainment activities, games for children, beautiful decorations, and fun activities.",
+		"difficulty": "intermediate",
+		"type": "daily",
+		"phonetic_focus": ["/v/", "/l/"],
+		"target_challenges": ["/v/", "/l/"],
+		"word_count": 23,
+		"complexity_notes": "Community event with fricatives and liquids."
+	},
+	{
+		"content": "When it rains, it pours, meaning problems come together.",
+		"difficulty": "advanced",
+		"type": "common_phrase",
+		"phonetic_focus": ["/r/", "/ð/"],
+		"target_challenges": ["/r/", "/ð/"],
+		"word_count": 9,
+		"complexity_notes": "Weather idiom with explanation."
+	},
+	{
+		"content": "Every cloud has a silver lining, which means something positive can emerge from difficult situations eventually through patience and perseverance during challenging times.",
+		"difficulty": "advanced",
+		"type": "common_phrase",
+		"phonetic_focus": ["/r/", "/l/", "/v/"],
+		"target_challenges": ["/r/", "/l/", "/v/"],
+		"word_count": 23,
+		"complexity_notes": "Optimistic idiom with liquid consonants."
+	},
+	{
+		"content": "The grass is always greener on the other side, suggesting people often think others have better situations, more opportunities, and fewer problems than they actually experience in reality.",
+		"difficulty": "advanced",
+		"type": "common_phrase",
+		"phonetic_focus": ["/r/", "/θ/", "/ð/"],
+		"target_challenges": ["/r/", "/θ/", "/ð/"],
+		"word_count": 28,
+		"complexity_notes": "Comparison idiom with fricatives."
+	},
+	{
+		"content": "Rome wasn't built in a day, reminding us that worthwhile achievements require patience, persistence, dedication, hard work, and considerable time to reach completion and success.",
+		"difficulty": "advanced",
+		"type": "common_phrase",
+		"phonetic_focus": ["/r/", "/θ/", "/aɪ/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 25,
+		"complexity_notes": "Historical idiom with dental fricatives."
+	},
+	{
+		"content": "Theoretical frameworks in contemporary social sciences integrate multidisciplinary perspectives to address complex societal phenomena comprehensively through rigorous analytical methodologies and empirical research approaches.",
+		"difficulty": "advanced",
+		"type": "academic",
+		"phonetic_focus": ["/θ/", "/r/", "/s/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 23,
+		"complexity_notes": "Social science theory with dental fricatives."
+	},
+	{
+		"content": "Interdisciplinary research methodologies facilitate comprehensive understanding.",
+		"difficulty": "advanced",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/θ/", "/s/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 6,
+		"complexity_notes": "Research methodology with sophisticated vocabulary."
+	},
+	{
+		"content": "The epistemological implications of postmodern theories challenge traditional assumptions about knowledge construction and scientific objectivity fundamentally through critical analysis and philosophical inquiry methods.",
+		"difficulty": "advanced",
+		"type": "academic",
+		"phonetic_focus": ["/θ/", "/r/", "/l/"],
+		"target_challenges": ["/θ/", "/r/", "/l/"],
+		"word_count": 23,
+		"complexity_notes": "Philosophical discourse with complex phonetics."
+	},
+	{
+		"content": "Pedagogical innovations incorporating digital technologies transform educational experiences while maintaining rigorous academic standards throughout comprehensive learning processes that promote student engagement, critical thinking, and intellectual development.",
+		"difficulty": "advanced",
+		"type": "academic",
+		"phonetic_focus": ["/r/", "/θ/", "/ʃ/"],
+		"target_challenges": ["/r/", "/θ/"],
+		"word_count": 26,
+		"complexity_notes": "Educational technology with fricatives."
+	},
+	{
+		"content": "The corporation's strategic transformation initiative encompasses comprehensive restructuring, technological modernization, and cultural realignment across multiple organizational levels to achieve sustainable competitive advantages.",
+		"difficulty": "advanced",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/ʃ/", "/θ/"],
+		"target_challenges": ["/r/", "/ʃ/", "/θ/"],
+		"word_count": 22,
+		"complexity_notes": "Corporate transformation with sophisticated terminology."
+	},
+	{
+		"content": "International business negotiations require sophisticated understanding of cultural nuances.",
+		"difficulty": "advanced",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/ʃ/"],
+		"target_challenges": ["/r/", "/ʃ/"],
+		"word_count": 9,
+		"complexity_notes": "Global business with complex fricatives."
+	},
+	{
+		"content": "The executive committee thoroughly evaluated the acquisition proposal, considering financial implications, regulatory compliance requirements, and long-term strategic alignment with corporate objectives and shareholder interests.",
+		"difficulty": "advanced",
+		"type": "professional",
+		"phonetic_focus": ["/θ/", "/r/", "/l/"],
+		"target_challenges": ["/θ/", "/r/", "/l/"],
+		"word_count": 24,
+		"complexity_notes": "Corporate governance with dental fricatives."
+	},
+	{
+		"content": "Advanced analytics platforms revolutionize decision-making processes by providing unprecedented insights into consumer behavior patterns, market trends, competitive dynamics, and business performance metrics.",
+		"difficulty": "advanced",
+		"type": "professional",
+		"phonetic_focus": ["/r/", "/v/", "/ʃ/"],
+		"target_challenges": ["/r/", "/v/", "/ʃ/"],
+		"word_count": 22,
+		"complexity_notes": "Business analytics with technical terminology."
+	},
+	{
+		"content": "The thoughtful author thoroughly researched authentic methods.",
+		"difficulty": "advanced",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/θ/", "/ð/", "/r/"],
+		"target_challenges": ["/θ/", "/ð/", "/r/"],
+		"word_count": 7,
+		"complexity_notes": "Multiple dental fricatives with /r/ sounds."
+	},
+	{
+		"content": "Particularly peculiar purple people persistently pursued precious pearls, probably preferring perfectly polished precious stones.",
+		"difficulty": "advanced",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/p/", "/r/"],
+		"target_challenges": ["/r/"],
+		"word_count": 14,
+		"complexity_notes": "Plosive and liquid consonant combination."
+	},
+	{
+		"content": "Several sailors swiftly sailed southward, skillfully steering their ships through shallow waters and sharp coral reefs while navigating dangerous ocean currents and unpredictable weather conditions.",
+		"difficulty": "advanced",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/s/", "/ʃ/", "/r/"],
+		"target_challenges": ["/ʃ/", "/r/"],
+		"word_count": 25,
+		"complexity_notes": "Fricative intensive with /r/ sounds."
+	},
+	{
+		"content": "Vivacious visitors viewed various valuable vintage vehicles while vendors volunteered valuable information about vehicle verification procedures.",
+		"difficulty": "advanced",
+		"type": "phonetic_challenge",
+		"phonetic_focus": ["/v/", "/w/"],
+		"target_challenges": ["/v/", "/w/"],
+		"word_count": 16,
+		"complexity_notes": "Intensive /v/ practice with /w/ contrast."
+	},
+	{
+		"content": "Managing household responsibilities effectively requires careful planning, efficient organization, and consistent dedication to maintaining cleanliness, order, and functionality.",
+		"difficulty": "advanced",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/θ/", "/ð/"],
+		"target_challenges": ["/r/", "/θ/", "/ð/"],
+		"word_count": 18,
+		"complexity_notes": "Domestic management with complex phonetic patterns."
+	},
+	{
+		"content": "The sophisticated cooking techniques she learned during culinary school completely transformed her approach.",
+		"difficulty": "advanced",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/ʃ/"],
+		"target_challenges": ["/r/", "/ʃ/"],
+		"word_count": 13,
+		"complexity_notes": "Culinary expertise with fricatives."
+	},
+	{
+		"content": "Contemporary lifestyle choices increasingly emphasize sustainable practices, environmental consciousness, thoughtful consumption patterns, ethical decision-making, and responsible resource management across diverse demographics, age groups, and geographical regions.",
+		"difficulty": "advanced",
+		"type": "daily",
+		"phonetic_focus": ["/θ/", "/r/", "/s/"],
+		"target_challenges": ["/θ/", "/r/"],
+		"word_count": 26,
+		"complexity_notes": "Modern living philosophy with dental fricatives."
+	},
+	{
+		"content": "The intricate relationship between personal wellness and social connections demonstrates the profound importance of nurturing meaningful relationships throughout life's journey.",
+		"difficulty": "advanced",
+		"type": "daily",
+		"phonetic_focus": ["/r/", "/ʃ/", "/θ/"],
+		"target_challenges": ["/r/", "/ʃ/", "/θ/"],
+		"word_count": 20,
+		"complexity_notes": "Wellness philosophy with complex consonant clusters."
+	}
+]
