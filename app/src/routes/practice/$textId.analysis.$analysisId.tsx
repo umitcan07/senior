@@ -10,12 +10,15 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-	getAnalysisById,
-	type PhonemeError,
-	type WordError,
-} from "@/data/mock";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
+import type {
+	Analysis,
+	Author,
+	PhonemeError,
+	PracticeText,
+	ReferenceSpeech,
+	WordError,
+} from "@/db/types";
 import {
 	getScoreLevel,
 	scoreBgColorVariants,
@@ -23,12 +26,28 @@ import {
 } from "@/lib/score";
 import { cn } from "@/lib/utils";
 
+type AnalysisLoaderData = {
+	analysis: Analysis | null;
+	reference: ReferenceSpeech | null;
+	text: PracticeText | null;
+	author: Author | null;
+	phonemeErrors: PhonemeError[];
+	wordErrors: WordError[];
+	textId: string;
+};
+
 export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 	component: AnalysisPage,
-	loader: async ({ params }) => {
-		const data = getAnalysisById(params.analysisId);
+	loader: async ({ params }): Promise<AnalysisLoaderData> => {
+		// TODO: Implement database query for analysis
+		// For now, return null to show empty state
 		return {
-			...data,
+			analysis: null,
+			reference: null,
+			text: null,
+			author: null,
+			phonemeErrors: [],
+			wordErrors: [],
 			textId: params.textId,
 		};
 	},
@@ -172,10 +191,13 @@ function TextComparison({ target, recognized, errors }: TextComparisonProps) {
 					<p className="rounded-lg bg-muted/50 p-3 text-sm leading-relaxed">
 						{recognizedWords.map((word, i) => {
 							const error = getErrorForPosition(i);
+							const uniqueKey = error
+								? `error-${error.id}-${i}`
+								: `word-${word}-${i}`;
 							if (error) {
 								return (
 									<span
-										key={i}
+										key={uniqueKey}
 										className="mx-0.5 rounded bg-destructive/20 px-1 text-destructive"
 										title={`Expected: ${error.expected}`}
 									>
@@ -183,7 +205,7 @@ function TextComparison({ target, recognized, errors }: TextComparisonProps) {
 									</span>
 								);
 							}
-							return <span key={i}>{word} </span>;
+							return <span key={uniqueKey}>{word} </span>;
 						})}
 					</p>
 				</div>
@@ -234,10 +256,14 @@ interface ErrorListProps {
 	wordErrors: WordError[];
 }
 
+type ErrorWithType =
+	| (WordError & { type: "word" })
+	| (PhonemeError & { type: "phoneme" });
+
 function ErrorList({ phonemeErrors, wordErrors }: ErrorListProps) {
-	const allErrors = [
-		...wordErrors.map((e) => ({ ...e, type: "word" as const })),
-		...phonemeErrors.map((e) => ({ ...e, type: "phoneme" as const })),
+	const allErrors: ErrorWithType[] = [
+		...wordErrors.map((e): ErrorWithType => ({ ...e, type: "word" })),
+		...phonemeErrors.map((e): ErrorWithType => ({ ...e, type: "phoneme" })),
 	];
 
 	if (allErrors.length === 0) {
@@ -314,26 +340,18 @@ function ErrorList({ phonemeErrors, wordErrors }: ErrorListProps) {
 	);
 }
 
-// SKELETON
+// Loading state
 
 function AnalysisSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer maxWidth="lg">
-				<div className="space-y-6">
-					<div className="flex items-center gap-4">
-						<Skeleton className="size-9" />
-						<div className="space-y-2">
-							<Skeleton className="h-7 w-48" />
-							<Skeleton className="h-4 w-72" />
-						</div>
-					</div>
-					<Skeleton className="h-40" />
-					<div className="grid gap-6 lg:grid-cols-2">
-						<Skeleton className="h-48" />
-						<Skeleton className="h-48" />
-					</div>
-					<Skeleton className="h-32" />
+				<div className="flex min-h-64 flex-col items-center justify-center">
+					<ShimmeringText
+						text="Loading analysis..."
+						className="text-lg"
+						duration={1.5}
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>

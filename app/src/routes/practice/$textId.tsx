@@ -6,208 +6,75 @@ import {
 	useMatches,
 	useNavigate,
 } from "@tanstack/react-router";
-import { ArrowLeft, Mic, Pause, Play, Square, Upload } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import {
+	ArrowLeft,
+	Check,
+	ChevronDown,
+	Mic,
+	RotateCcw,
+	Square,
+	Volume2,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import {
+	AudioPlayerButton,
+	AudioPlayerDuration,
+	AudioPlayerProgress,
+	AudioPlayerProvider,
+	AudioPlayerSpeed,
+	AudioPlayerTime,
+} from "@/components/ui/audio-player";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LiveWaveform } from "@/components/ui/live-waveform";
 import { Progress } from "@/components/ui/progress";
-import { Pulse } from "@/components/ui/pulse";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-	type Attempt,
-	type Author,
-	formatDuration,
-	formatRelativeTime,
-	getRecentAttemptsForText,
-	getReferencesForText,
-	MOCK_TEXTS,
-	type ReferenceSpeech,
-} from "@/data/mock";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
+import type { Author, ReferenceSpeech } from "@/db/types";
+import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetPracticeTextById } from "@/lib/text";
-import { cn } from "@/lib/utils";
-
-const UUID_REGEX =
-	/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+import { cn, formatRelativeTime } from "@/lib/utils";
 
 export const Route = createFileRoute("/practice/$textId")({
 	component: PracticeTextLayout,
 	loader: async ({ params }) => {
-		// Only try database if the ID looks like a valid UUID
-		if (UUID_REGEX.test(params.textId)) {
-			try {
-				const result = await serverGetPracticeTextById({
-					data: { id: params.textId },
-				});
+		const textResult = await serverGetPracticeTextById({
+			data: { id: params.textId },
+		});
 
-				if (result.success && result.data) {
-					// Use real data with mock references
-					return {
-						text: result.data,
-						references: getReferencesForText(params.textId),
-						recentAttempts: getRecentAttemptsForText(params.textId),
-						source: "database" as const,
-					};
-				}
-			} catch {
-				// Database lookup failed, fall through to mock
-			}
-		}
-
-		// Fall back to mock
-		const mockText = MOCK_TEXTS.find((t) => t.id === params.textId);
-		if (!mockText) {
+		if (!textResult.success || !textResult.data) {
 			return {
 				text: null,
 				references: [],
 				recentAttempts: [],
-				source: "mock" as const,
 			};
 		}
 
+		const referencesResult = await serverGetReferencesForText({
+			data: { textId: params.textId },
+		});
+
+		const references =
+			referencesResult.success && referencesResult.data
+				? referencesResult.data.map((ref) => ({
+						...ref,
+						author: ref.author,
+					}))
+				: [];
+
 		return {
-			text: mockText,
-			references: getReferencesForText(params.textId),
-			recentAttempts: getRecentAttemptsForText(params.textId),
-			source: "mock" as const,
+			text: textResult.data,
+			references,
+			recentAttempts: [], // TODO: Implement when user recordings/analyses are available
 		};
 	},
 	pendingComponent: TextDetailSkeleton,
 });
 
-interface ReferenceSelectorProps {
-	references: (ReferenceSpeech & { author: Author })[];
-	selectedId: string | null;
-	onSelect: (id: string) => void;
-}
-
-function ReferenceSelector({
-	references,
-	selectedId,
-	onSelect,
-}: ReferenceSelectorProps) {
-	if (references.length === 0) {
-		return (
-			<Card>
-				<CardContent className="py-6">
-					<EmptyState
-						title="No reference audio available"
-						description="Reference audio for this text is not yet available. Check back soon."
-					/>
-				</CardContent>
-			</Card>
-		);
-	}
-
-	return (
-		<Card>
-			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Reference Voice</CardTitle>
-			</CardHeader>
-			<CardContent className="flex flex-col gap-4">
-				<Select value={selectedId ?? undefined} onValueChange={onSelect}>
-					<SelectTrigger>
-						<SelectValue placeholder="Select a voice" />
-					</SelectTrigger>
-					<SelectContent>
-						{references.map((ref) => (
-							<SelectItem key={ref.id} value={ref.id}>
-								<div className="flex items-center gap-2">
-									<span>{ref.author.name}</span>
-									<Badge variant="secondary" className="text-xs">
-										{ref.author.accent}
-									</Badge>
-									{ref.durationMs && (
-										<span className="text-muted-foreground text-xs">
-											{formatDuration(ref.durationMs)}
-										</span>
-									)}
-								</div>
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-
-				{selectedId && (
-					<AudioPlayer
-						// In production, this would be the actual audio URL
-						audioUrl={`/api/audio/${selectedId}`}
-						disabled
-					/>
-				)}
-			</CardContent>
-		</Card>
-	);
-}
-
-// AUDIO PLAYER (placeholder)
-
-interface AudioPlayerProps {
-	audioUrl: string;
-	disabled?: boolean;
-}
-
-function AudioPlayer({ disabled }: AudioPlayerProps) {
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [progress, setProgress] = useState(0);
-
-	// Simulated playback for demo
-	const togglePlay = useCallback(() => {
-		if (disabled) return;
-		setIsPlaying(!isPlaying);
-		if (!isPlaying) {
-			// Simulate progress
-			const interval = setInterval(() => {
-				setProgress((p) => {
-					if (p >= 100) {
-						clearInterval(interval);
-						setIsPlaying(false);
-						return 0;
-					}
-					return p + 2;
-				});
-			}, 100);
-		}
-	}, [isPlaying, disabled]);
-
-	return (
-		<div className="flex flex-col gap-2">
-			<div className="flex items-center gap-3">
-				<Button
-					variant="outline"
-					size="icon"
-					onClick={togglePlay}
-					disabled={disabled}
-					aria-label={isPlaying ? "Pause" : "Play"}
-				>
-					{isPlaying ? <Pause size={16} /> : <Play size={16} />}
-				</Button>
-				<div className="flex-1">
-					<Progress value={progress} className="h-2" />
-				</div>
-				<span className="text-muted-foreground text-xs tabular-nums">
-					0:00 / --:--
-				</span>
-			</div>
-			{disabled && (
-				<p className="text-muted-foreground text-xs">
-					Audio playback requires backend integration
-				</p>
-			)}
-		</div>
-	);
-}
-
+// Recording state and logic
 type RecordingState =
 	| "idle"
 	| "recording"
@@ -216,48 +83,100 @@ type RecordingState =
 	| "uploading"
 	| "analyzing";
 
-interface RecordingSectionProps {
-	textId: string;
-	referenceId: string | null;
-	disabled?: boolean;
-}
-
-function RecordingSection({ textId, disabled }: RecordingSectionProps) {
+function useRecording(textId: string) {
 	const [state, setState] = useState<RecordingState>("idle");
 	const [recordingTime, setRecordingTime] = useState(0);
 	const [uploadProgress, setUploadProgress] = useState(0);
+	const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+	const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+	const chunksRef = useRef<Blob[]>([]);
 	const navigate = useNavigate();
 
+	const audioPreviewUrl = useMemo(() => {
+		if (!audioBlob) return null;
+		return URL.createObjectURL(audioBlob);
+	}, [audioBlob]);
+
+	useEffect(() => {
+		return () => {
+			if (audioPreviewUrl) {
+				URL.revokeObjectURL(audioPreviewUrl);
+			}
+		};
+	}, [audioPreviewUrl]);
+
 	const startRecording = useCallback(() => {
+		chunksRef.current = [];
+		setAudioBlob(null);
 		setState("recording");
 		setRecordingTime(0);
+
 		timerRef.current = setInterval(() => {
-			setRecordingTime((t) => t + 1);
+			setRecordingTime((t) => {
+				if (t >= 59) {
+					return 60;
+				}
+				return t + 1;
+			});
 		}, 1000);
 	}, []);
 
 	const stopRecording = useCallback(() => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
+			timerRef.current = null;
 		}
+
+		if (
+			mediaRecorderRef.current &&
+			mediaRecorderRef.current.state !== "inactive"
+		) {
+			mediaRecorderRef.current.stop();
+		}
+
+		if (mediaStream) {
+			mediaStream.getTracks().forEach((track) => track.stop());
+			setMediaStream(null);
+		}
+
 		setState("processing");
-		// Simulate processing
-		setTimeout(() => setState("preview"), 1000);
+
+		setTimeout(() => {
+			if (chunksRef.current.length > 0) {
+				const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+				setAudioBlob(blob);
+			}
+			setState("preview");
+		}, 500);
+	}, [mediaStream]);
+
+	const handleStreamReady = useCallback((stream: MediaStream) => {
+		setMediaStream(stream);
+		const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+		mediaRecorder.ondataavailable = (event) => {
+			if (event.data.size > 0) {
+				chunksRef.current.push(event.data);
+			}
+		};
+		mediaRecorderRef.current = mediaRecorder;
+		mediaRecorder.start(100);
+	}, []);
+
+	const handleStreamEnd = useCallback(() => {
+		setMediaStream(null);
 	}, []);
 
 	const submitRecording = useCallback(() => {
 		setState("uploading");
 		setUploadProgress(0);
-		// Simulate upload
 		const interval = setInterval(() => {
 			setUploadProgress((p) => {
 				if (p >= 100) {
 					clearInterval(interval);
 					setState("analyzing");
-					// Simulate analysis
 					setTimeout(() => {
-						// Navigate to analysis page (mock)
 						navigate({
 							to: "/practice/$textId/analysis/$analysisId",
 							params: { textId, analysisId: "analysis-1" },
@@ -274,203 +193,227 @@ function RecordingSection({ textId, disabled }: RecordingSectionProps) {
 		setState("idle");
 		setRecordingTime(0);
 		setUploadProgress(0);
+		setAudioBlob(null);
+		chunksRef.current = [];
 	}, []);
 
-	const formatTime = (seconds: number) => {
-		const mins = Math.floor(seconds / 60);
-		const secs = seconds % 60;
-		return `${mins}:${secs.toString().padStart(2, "0")}`;
+	return {
+		state,
+		recordingTime,
+		uploadProgress,
+		audioPreviewUrl,
+		startRecording,
+		stopRecording,
+		submitRecording,
+		resetRecording,
+		handleStreamReady,
+		handleStreamEnd,
 	};
-
-	if (disabled) {
-		return (
-			<Card>
-				<CardHeader className="pb-3">
-					<CardTitle className="text-base">Record Your Voice</CardTitle>
-				</CardHeader>
-				<CardContent className="flex flex-col gap-4">
-					<div className="flex flex-col items-center gap-4 py-4">
-						<Button size="lg" disabled>
-							<Mic size={18} />
-							Start Recording
-						</Button>
-						<p className="text-muted-foreground text-xs">
-							Select a reference voice to start recording
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-		);
-	}
-
-	return (
-		<Card>
-			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Record Your Voice</CardTitle>
-			</CardHeader>
-			<CardContent className="flex flex-col gap-4">
-				{state === "idle" && (
-					<div className="flex flex-col items-center gap-4 py-4 sm:flex-row sm:justify-center">
-						<Button size="lg" onClick={startRecording}>
-							<Mic size={18} />
-							Start Recording
-						</Button>
-						<span className="text-muted-foreground text-sm">or</span>
-						<Button variant="outline" size="lg" disabled>
-							<Upload size={18} />
-							Upload Audio
-						</Button>
-					</div>
-				)}
-
-				{state === "recording" && (
-					<div className="flex flex-col items-center gap-4 py-4">
-						<div className="flex items-center gap-3">
-							<span className="relative flex size-3">
-								<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
-								<span className="relative inline-flex size-3 rounded-full bg-destructive" />
-							</span>
-							<span className="font-mono text-lg tabular-nums">
-								{formatTime(recordingTime)}
-							</span>
-						</div>
-						<Button variant="destructive" size="lg" onClick={stopRecording}>
-							<Square size={18} />
-							Stop Recording
-						</Button>
-						{recordingTime >= 55 && (
-							<p className="text-destructive text-xs">
-								Max recording time: 60 seconds
-							</p>
-						)}
-					</div>
-				)}
-
-				{state === "processing" && (
-					<div className="flex flex-col items-center gap-4 py-8">
-						<div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-						<p className="text-muted-foreground text-sm">Processing audio...</p>
-					</div>
-				)}
-
-				{state === "preview" && (
-					<div className="flex flex-col gap-4 py-4">
-						<div className="rounded-lg bg-muted p-4">
-							<div className="flex items-center justify-between">
-								<span className="text-sm">Recording ready</span>
-								<span className="font-mono text-muted-foreground text-sm">
-									{formatTime(recordingTime)}
-								</span>
-							</div>
-						</div>
-						<div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-							<Button variant="outline" onClick={resetRecording}>
-								Re-record
-							</Button>
-							<Button onClick={submitRecording}>Submit for Analysis</Button>
-						</div>
-					</div>
-				)}
-
-				{state === "uploading" && (
-					<div className="flex flex-col gap-4 py-4">
-						<div className="flex flex-col gap-2">
-							<div className="flex justify-between text-sm">
-								<span className="tabular-nums">{uploadProgress}%</span>
-							</div>
-							<Progress value={uploadProgress} />
-						</div>
-					</div>
-				)}
-
-				{state === "analyzing" && (
-					<div className="flex flex-col items-center gap-4 py-8">
-						<Pulse className="w-10" />
-						<p className="text-muted-foreground text-sm">
-							Analyzing pronunciation...
-						</p>
-					</div>
-				)}
-			</CardContent>
-		</Card>
-	);
 }
 
-interface RecentAttemptsProps {
-	attempts: Attempt[];
-	textId: string;
+function formatTime(seconds: number) {
+	const mins = Math.floor(seconds / 60);
+	const secs = seconds % 60;
+	return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
-	if (attempts.length === 0) {
+// Reference Voice Section (collapsible, secondary)
+interface ReferenceVoiceProps {
+	references: (ReferenceSpeech & { author: Author })[];
+	selectedId: string | null;
+	onSelect: (id: string) => void;
+}
+
+function ReferenceVoice({
+	references,
+	selectedId,
+	onSelect,
+}: ReferenceVoiceProps) {
+	const [isOpen, setIsOpen] = useState(false);
+	const selectedReference = references.find((ref) => ref.id === selectedId);
+
+	if (references.length === 0) {
 		return null;
 	}
 
 	return (
-		<Card>
-			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Recent Attempts</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<div className="flex flex-col gap-2">
-					{attempts.map((attempt) => (
-						<Link
-							key={attempt.id}
-							to="/practice/$textId/analysis/$analysisId"
-							params={{ textId, analysisId: attempt.analysisId }}
-							className="flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-muted"
+		<div className="flex flex-col gap-3">
+			{/* Always visible: voice selector row */}
+			<div className="flex h-10 items-center justify-between">
+				<Collapsible open={isOpen} onOpenChange={setIsOpen} className="flex-1">
+					<CollapsibleTrigger asChild>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="gap-2 text-muted-foreground"
 						>
-							<div className="flex items-center gap-3">
-								<div
+							<Volume2 size={16} />
+							<span>
+								{selectedReference
+									? `${selectedReference.author.name} · ${selectedReference.author.accent}`
+									: "Select reference voice"}
+							</span>
+							<ChevronDown
+								size={14}
+								className={cn("transition-transform", isOpen && "rotate-180")}
+							/>
+						</Button>
+					</CollapsibleTrigger>
+				</Collapsible>
+
+				{/* Inline player - always rendered, visibility controlled */}
+				{selectedReference && (
+					<AudioPlayerProvider>
+						<div
+							className={cn(
+								"flex items-center gap-2 transition-opacity",
+								isOpen ? "pointer-events-none opacity-0" : "opacity-100",
+							)}
+						>
+							<AudioPlayerButton
+								item={{
+									id: selectedReference.id,
+									src: `/api/audio/${selectedReference.id}`,
+								}}
+								variant="ghost"
+								size="sm"
+								className="size-8"
+							/>
+							<AudioPlayerProgress className="hidden w-24 sm:flex" />
+						</div>
+					</AudioPlayerProvider>
+				)}
+			</div>
+
+			{/* Expandable content */}
+			{isOpen && (
+				<div className="flex flex-col gap-3 border-t pt-3">
+					{/* Voice options */}
+					<div className="flex flex-wrap gap-2">
+						{references.map((ref) => {
+							const isSelected = selectedId === ref.id;
+							return (
+								<button
+									key={ref.id}
+									type="button"
+									onClick={() => {
+										onSelect(ref.id);
+										setIsOpen(false);
+									}}
 									className={cn(
-										"font-medium tabular-nums",
-										scoreColorVariants({ level: getScoreLevel(attempt.score) }),
+										"flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
+										isSelected
+											? "border-primary bg-primary/10 text-primary"
+											: "border-border hover:border-primary/50",
 									)}
 								>
-									{attempt.score}%
+									<span className="font-medium">{ref.author.name}</span>
+									<Badge variant="secondary" className="text-xs">
+										{ref.author.accent}
+									</Badge>
+									{ref.durationMs && (
+										<span className="text-muted-foreground text-xs">
+											{formatDuration(ref.durationMs)}
+										</span>
+									)}
+								</button>
+							);
+						})}
+					</div>
+
+					{/* Full player for selected voice */}
+					{selectedReference && (
+						<AudioPlayerProvider>
+							<div className="flex items-center gap-3">
+								<AudioPlayerButton
+									item={{
+										id: selectedReference.id,
+										src: `/api/audio/${selectedReference.id}`,
+									}}
+									variant="outline"
+									size="icon"
+								/>
+								<AudioPlayerProgress className="flex-1" />
+								<div className="flex items-center gap-2 text-muted-foreground text-xs">
+									<AudioPlayerTime />
+									<span>/</span>
+									<AudioPlayerDuration />
 								</div>
-								<span className="text-muted-foreground text-sm">
-									{formatRelativeTime(attempt.date)}
-								</span>
+								<AudioPlayerSpeed />
 							</div>
-							<span className="text-muted-foreground text-xs">
-								View analysis →
-							</span>
-						</Link>
-					))}
+						</AudioPlayerProvider>
+					)}
 				</div>
-			</CardContent>
-		</Card>
+			)}
+		</div>
 	);
 }
 
-// SKELETON
+// Recent Attempts (minimal)
+interface RecentAttemptsProps {
+	attempts: Array<{
+		id: string;
+		textId: string;
+		textPreview: string;
+		score: number;
+		date: Date;
+		analysisId: string;
+	}>;
+	textId: string;
+}
 
+function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
+	if (attempts.length === 0) return null;
+
+	return (
+		<div className="flex flex-col gap-2">
+			<h3 className="font-medium text-muted-foreground text-sm">
+				Recent Attempts
+			</h3>
+			<div className="flex flex-wrap gap-2">
+				{attempts.map((attempt) => (
+					<Link
+						key={attempt.id}
+						to="/practice/$textId/analysis/$analysisId"
+						params={{ textId, analysisId: attempt.analysisId }}
+						className="flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors hover:border-primary/50 hover:bg-muted/50"
+					>
+						<span
+							className={cn(
+								"font-medium tabular-nums",
+								scoreColorVariants({ level: getScoreLevel(attempt.score) }),
+							)}
+						>
+							{attempt.score}%
+						</span>
+						<span className="text-muted-foreground">
+							{formatRelativeTime(attempt.date)}
+						</span>
+					</Link>
+				))}
+			</div>
+		</div>
+	);
+}
+
+// Loading state
 function TextDetailSkeleton() {
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="lg">
-				<div className="flex flex-col gap-6">
-					<div className="flex items-center gap-4">
-						<Skeleton className="size-9" />
-						<div className="flex flex-col gap-2">
-							<Skeleton className="h-7 w-48" />
-							<Skeleton className="h-4 w-72" />
-						</div>
-					</div>
-					<Skeleton className="h-40 w-full" />
-					<div className="grid gap-6 lg:grid-cols-2">
-						<Skeleton className="h-48" />
-						<Skeleton className="h-48" />
-					</div>
+			<PageContainer maxWidth="md">
+				<div className="flex min-h-64 flex-col items-center justify-center">
+					<ShimmeringText
+						text="Loading practice text..."
+						className="text-lg"
+						duration={1.5}
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>
 	);
 }
 
-// LAYOUT
-
+// Layout
 function PracticeTextLayout() {
 	const matches = useMatches();
 	const hasChildRoute = matches.some(
@@ -484,19 +427,19 @@ function PracticeTextLayout() {
 	return <PracticeTextPage />;
 }
 
-// MAIN PAGE
-
+// Main Page
 function PracticeTextPage() {
 	const { text, references, recentAttempts } = Route.useLoaderData();
 	const [selectedReferenceId, setSelectedReferenceId] = useState<string | null>(
 		references[0]?.id ?? null,
 	);
 	const navigate = useNavigate();
+	const recording = useRecording(text?.id ?? "");
 
 	if (!text) {
 		return (
 			<MainLayout>
-				<PageContainer maxWidth="lg">
+				<PageContainer maxWidth="md">
 					<EmptyState
 						title="Text not found"
 						description="This practice text may have been removed or doesn't exist."
@@ -510,74 +453,203 @@ function PracticeTextPage() {
 		);
 	}
 
+	const isRecording = recording.state === "recording";
+	const isProcessing = recording.state === "processing";
+	const isUploading = recording.state === "uploading";
+	const isAnalyzing = recording.state === "analyzing";
+	const hasPreview = recording.state === "preview" && recording.audioPreviewUrl;
+	const isIdle = recording.state === "idle";
+
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="lg">
-				<div className="flex flex-col gap-6">
-					{/* Header */}
-					<div className="flex items-center gap-4">
-						<Button variant="ghost" size="icon" asChild>
-							<Link to="/practice">
-								<ArrowLeft size={18} />
+			<PageContainer maxWidth="md">
+				<div className="flex flex-col gap-8">
+					{/* Back button */}
+					<div className="flex items-center gap-3">
+						<Button variant="ghost" size="sm" asChild>
+							<Link to="/practice" className="gap-2">
+								<ArrowLeft size={16} />
+								Back
 							</Link>
 						</Button>
-						<div className="flex flex-col gap-1">
-							<h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-xl text-transparent tracking-tight md:text-2xl">
-								Practice Session
-							</h1>
-							<p className="text-muted-foreground text-sm">
-								Read the text aloud and get feedback on your pronunciation
-							</p>
-						</div>
 					</div>
 
-					{/* Text Content */}
-					<Card>
-						<CardContent className="p-6">
-							<p className="text-foreground text-lg leading-relaxed">
-								{text.content}
-							</p>
-						</CardContent>
-					</Card>
-
-					{/* Reference Selector & Recording Section */}
-					<div className="grid gap-6 lg:grid-cols-2">
-						<ReferenceSelector
+					{/* Main content area */}
+					<div className="flex flex-col gap-6">
+						{/* Reference voice selector (secondary, collapsible) */}
+						<ReferenceVoice
 							references={references}
 							selectedId={selectedReferenceId}
 							onSelect={setSelectedReferenceId}
 						/>
 
-						<SignedIn>
-							<RecordingSection
-								textId={text.id}
-								referenceId={selectedReferenceId}
-								disabled={!selectedReferenceId}
-							/>
-						</SignedIn>
-						<SignedOut>
-							<Card>
-								<CardHeader className="pb-3">
-									<CardTitle className="text-base">Record Your Voice</CardTitle>
-								</CardHeader>
-								<CardContent className="flex flex-col gap-4">
-									<div className="flex flex-col items-center gap-4 py-4">
-										<Button disabled>
+						{/* THE TEXT - Main focus */}
+						<div
+							className={cn(
+								"rounded-2xl border-2 p-6 transition-colors md:p-8",
+								isRecording
+									? "border-destructive/50 bg-destructive/5"
+									: "border-border bg-card",
+							)}
+						>
+							<p className="font-serif text-xl leading-relaxed md:text-2xl md:leading-relaxed">
+								{text.content}
+							</p>
+						</div>
+
+						{/* Recording controls - fixed height container to prevent shifts */}
+						<div className="flex flex-col items-center">
+							{/* Waveform visualization - fixed height */}
+							<div className="h-20 w-full">
+								<LiveWaveform
+									active={isRecording}
+									processing={isProcessing}
+									height={80}
+									barWidth={3}
+									barGap={2}
+									mode="static"
+									fadeEdges
+									sensitivity={1.5}
+									onStreamReady={recording.handleStreamReady}
+									onStreamEnd={recording.handleStreamEnd}
+								/>
+							</div>
+
+							{/* Controls container - fixed min-height */}
+							<div className="flex min-h-32 w-full flex-col items-center justify-center gap-4 pt-4">
+								<SignedIn>
+									{/* Idle state */}
+									{isIdle && (
+										<Button
+											size="lg"
+											onClick={recording.startRecording}
+											disabled={!selectedReferenceId}
+											className="gap-2"
+										>
 											<Mic size={18} />
-											Sign in to record
+											{selectedReferenceId
+												? "Start Recording"
+												: "Select a voice first"}
 										</Button>
-										<Button asChild>
-											<SignInButton mode="modal">
-												Sign in to start practicing
-											</SignInButton>
-										</Button>
-									</div>
-								</CardContent>
-							</Card>
-						</SignedOut>
+									)}
+
+									{/* Recording state */}
+									{isRecording && (
+										<>
+											<div className="flex items-center gap-3">
+												<span className="relative flex size-3">
+													<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+													<span className="relative inline-flex size-3 rounded-full bg-destructive" />
+												</span>
+												<span className="font-mono text-2xl tabular-nums">
+													{formatTime(recording.recordingTime)}
+												</span>
+												<span className="text-muted-foreground">/ 1:00</span>
+											</div>
+											<Button
+												variant="destructive"
+												size="lg"
+												onClick={recording.stopRecording}
+												className="gap-2"
+											>
+												<Square size={16} className="fill-current" />
+												Stop
+											</Button>
+											{recording.recordingTime >= 50 && (
+												<p className="text-destructive text-xs">
+													Auto-stop at 60s
+												</p>
+											)}
+										</>
+									)}
+
+									{/* Processing state */}
+									{isProcessing && (
+										<p className="text-muted-foreground text-sm">
+											Processing...
+										</p>
+									)}
+
+									{/* Preview state */}
+									{hasPreview && (
+										<>
+											<AudioPlayerProvider>
+												<div className="flex w-full max-w-md items-center gap-3">
+													<AudioPlayerButton
+														item={{
+															id: "preview",
+															src: recording.audioPreviewUrl!,
+														}}
+														variant="outline"
+														size="icon"
+													/>
+													<AudioPlayerProgress className="flex-1" />
+													<span className="font-mono text-muted-foreground text-sm tabular-nums">
+														{formatTime(recording.recordingTime)}
+													</span>
+												</div>
+											</AudioPlayerProvider>
+											<div className="flex gap-3">
+												<Button
+													variant="outline"
+													onClick={recording.resetRecording}
+													className="gap-2"
+												>
+													<RotateCcw size={16} />
+													Re-record
+												</Button>
+												<Button
+													onClick={recording.submitRecording}
+													className="gap-2"
+												>
+													<Check size={16} />
+													Submit
+												</Button>
+											</div>
+										</>
+									)}
+
+									{/* Uploading state */}
+									{isUploading && (
+										<div className="flex w-full max-w-xs flex-col gap-2">
+											<Progress
+												value={recording.uploadProgress}
+												className="h-2"
+											/>
+											<ShimmeringText
+												text={`Uploading ${recording.uploadProgress}%`}
+												className="text-center text-muted-foreground text-sm"
+												duration={1.5}
+											/>
+										</div>
+									)}
+
+									{/* Analyzing state */}
+									{isAnalyzing && (
+										<ShimmeringText
+											text="Analyzing pronunciation..."
+											className="text-muted-foreground text-sm"
+											duration={1.5}
+										/>
+									)}
+								</SignedIn>
+
+								<SignedOut>
+									<Button disabled className="gap-2">
+										<Mic size={18} />
+										Sign in to record
+									</Button>
+									<Button variant="outline" asChild>
+										<SignInButton mode="modal">
+											Sign in to start practicing
+										</SignInButton>
+									</Button>
+								</SignedOut>
+							</div>
+						</div>
 					</div>
 
-					{/* Recent Attempts */}
+					{/* Recent attempts (minimal) */}
 					<SignedIn>
 						<RecentAttempts attempts={recentAttempts} textId={text.id} />
 					</SignedIn>

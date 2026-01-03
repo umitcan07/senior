@@ -16,18 +16,22 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
-import { type Author, MOCK_AUTHORS } from "@/data/mock";
+import type { Author } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
+import { serverGetAuthors } from "@/lib/author";
 
 export const Route = createFileRoute("/settings")({
 	component: SettingsPage,
 	loader: async () => {
-		// In production, fetch user preferences and available authors from database
+		const authorsResult = await serverGetAuthors();
+		const authors = authorsResult.success ? authorsResult.data : [];
+
+		// TODO: Fetch user preferences from database
 		return {
-			authors: MOCK_AUTHORS,
-			currentPreferredAuthorId: MOCK_AUTHORS[0]?.id ?? null,
+			authors,
+			currentPreferredAuthorId: authors[0]?.id ?? null,
 		};
 	},
 	pendingComponent: SettingsSkeleton,
@@ -114,18 +118,18 @@ function AuthorSelector({
 	);
 }
 
-// SKELETON
+// Loading state
 
 function SettingsSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer maxWidth="md">
-				<div className="flex flex-col gap-8">
-					<div className="flex flex-col gap-2">
-						<Skeleton className="h-8 w-32" />
-						<Skeleton className="h-4 w-64" />
-					</div>
-					<Skeleton className="h-40" />
+				<div className="flex min-h-64 flex-col items-center justify-center">
+					<ShimmeringText
+						text="Loading settings..."
+						className="text-lg"
+						duration={1.5}
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>

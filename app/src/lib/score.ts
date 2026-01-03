@@ -36,4 +36,3 @@ export function getScoreLevel(score: number): ScoreLevel {
 	if (score >= 50) return "medium";
 	return "low";
 }
-

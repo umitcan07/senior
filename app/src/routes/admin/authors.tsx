@@ -1,11 +1,29 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+	type ColumnFiltersState,
+	flexRender,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	getSortedRowModel,
+	type SortingState,
+	useReactTable,
+} from "@tanstack/react-table";
+import {
+	ArrowUpDown,
+	MoreHorizontal,
+	Pencil,
+	Plus,
+	Trash2,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/admin-layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogContent,
@@ -13,8 +31,15 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,24 +50,31 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { type Author, getAuthorsWithReferenceCounts } from "@/data/mock";
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import type { Author } from "@/db/author";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
+import {
+	serverDeleteAuthor,
+	serverGetAuthors,
+	serverInsertAuthor,
+	serverUpdateAuthor,
+} from "@/lib/author";
 
 export const Route = createFileRoute("/admin/authors")({
 	component: AuthorsPage,
 	pendingComponent: AuthorsSkeleton,
 });
 
-// CONSTANTS
-
+// Constants
 const ACCENTS = ["US", "UK", "AU", "CA", "IN", "NZ", "SA", "IE"];
 const STYLES = ["Neutral", "Formal", "Casual", "Professional", "Friendly"];
 const LANGUAGES = [
@@ -53,82 +85,241 @@ const LANGUAGES = [
 	{ code: "en-IN", label: "English (IN)" },
 ];
 
-// AUTHOR FORM MODAL
+type AuthorWithCount = Author & { referenceCount: number };
 
-interface AuthorFormData {
-	name: string;
-	accent: string;
-	style: string;
-	languageCode: string;
+// Columns
+function createColumns(
+	onEdit: (author: AuthorWithCount) => void,
+	onDelete: (author: AuthorWithCount) => void,
+): ColumnDef<AuthorWithCount>[] {
+	return [
+		{
+			id: "select",
+			size: 40,
+			header: ({ table }) => (
+				<Checkbox
+					checked={table.getIsAllPageRowsSelected()}
+					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+					aria-label="Select all"
+				/>
+			),
+			cell: ({ row }) => (
+				<Checkbox
+					checked={row.getIsSelected()}
+					onCheckedChange={(value) => row.toggleSelected(!!value)}
+					aria-label="Select row"
+				/>
+			),
+			enableSorting: false,
+			enableHiding: false,
+		},
+		{
+			accessorKey: "name",
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					Name
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => (
+				<span className="font-medium">{row.getValue("name")}</span>
+			),
+		},
+		{
+			accessorKey: "accent",
+			size: 100,
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					Accent
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const accent = row.getValue("accent") as string | null;
+				return (
+					<span className="text-muted-foreground text-sm">{accent || "—"}</span>
+				);
+			},
+		},
+		{
+			accessorKey: "style",
+			size: 120,
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					Style
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const style = row.getValue("style") as string | null;
+				return (
+					<span className="text-muted-foreground text-sm">{style || "—"}</span>
+				);
+			},
+		},
+		{
+			accessorKey: "languageCode",
+			size: 120,
+			header: "Language",
+			cell: ({ row }) => {
+				const code = row.getValue("languageCode") as string | null;
+				const lang = LANGUAGES.find((l) => l.code === code);
+				return (
+					<span className="text-muted-foreground text-sm">
+						{lang?.label || code || "—"}
+					</span>
+				);
+			},
+		},
+		{
+			accessorKey: "referenceCount",
+			size: 100,
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					References
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => (
+				<span className="tabular-nums">{row.getValue("referenceCount")}</span>
+			),
+		},
+		{
+			id: "actions",
+			size: 50,
+			cell: ({ row }) => {
+				const author = row.original;
+				return (
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" className="h-8 w-8 p-0">
+								<span className="sr-only">Open menu</span>
+								<MoreHorizontal className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuLabel>Actions</DropdownMenuLabel>
+							<DropdownMenuItem onClick={() => onEdit(author)}>
+								<Pencil className="mr-2 h-4 w-4" />
+								Edit
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onClick={() => onDelete(author)}
+								className="text-destructive"
+								disabled={author.referenceCount > 0}
+							>
+								<Trash2 className="mr-2 h-4 w-4" />
+								Delete
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				);
+			},
+		},
+	];
 }
 
-interface AuthorFormModalProps {
-	author?: Author & { referenceCount: number };
-	onSuccess: () => void;
-	trigger?: React.ReactNode;
+// Author Form Dialog
+interface AuthorFormDialogProps {
+	author?: AuthorWithCount | null;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
 }
 
-function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
-	const [open, setOpen] = useState(false);
-	const [formData, setFormData] = useState<AuthorFormData>({
-		name: author?.name ?? "",
-		accent: author?.accent ?? "",
-		style: author?.style ?? "",
-		languageCode: author?.languageCode ?? "en-US",
-	});
-	const [isSubmitting, setIsSubmitting] = useState(false);
+function AuthorFormDialog({
+	author,
+	open,
+	onOpenChange,
+}: AuthorFormDialogProps) {
+	const [name, setName] = useState("");
+	const [accent, setAccent] = useState("");
+	const [style, setStyle] = useState("");
+	const [languageCode, setLanguageCode] = useState("en-US");
+	const [elevenlabsVoiceId, setElevenlabsVoiceId] = useState("");
+	const queryClient = useQueryClient();
+	const insertAuthorFn = useServerFn(serverInsertAuthor);
+	const updateAuthorFn = useServerFn(serverUpdateAuthor);
 	const { toast } = useToast();
 
 	const isEdit = !!author;
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	useEffect(() => {
+		if (open) {
+			setName(author?.name ?? "");
+			setAccent(author?.accent ?? "");
+			setStyle(author?.style ?? "");
+			setLanguageCode(author?.languageCode ?? "en-US");
+			setElevenlabsVoiceId(author?.elevenlabsVoiceId ?? "");
+		}
+	}, [open, author]);
+
+	const { mutate: saveAuthor, isPending } = useMutation({
+		mutationFn: async () => {
+			if (isEdit && author) {
+				return updateAuthorFn({
+					data: {
+						id: author.id,
+						name,
+						accent: accent || null,
+						style: style || null,
+						languageCode: languageCode || null,
+						elevenlabsVoiceId: elevenlabsVoiceId || null,
+					},
+				});
+			}
+			return insertAuthorFn({
+				data: {
+					name,
+					accent: accent || null,
+					style: style || null,
+					languageCode: languageCode || null,
+					elevenlabsVoiceId: elevenlabsVoiceId || null,
+				},
+			});
+		},
+		onSuccess: async (result) => {
+			if (result.success) {
+				await queryClient.invalidateQueries({ queryKey: ["authors"] });
+				onOpenChange(false);
+				toast({
+					title: isEdit ? "Author updated" : "Author created",
+					description: `${name} has been ${isEdit ? "updated" : "added"}.`,
+				});
+			} else {
+				toast({
+					title: "Error",
+					description: result.error.message,
+					variant: "destructive",
+				});
+			}
+		},
+	});
+
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!formData.name || !formData.accent || !formData.style) return;
-
-		setIsSubmitting(true);
-		// Simulate API call
-		await new Promise((resolve) => setTimeout(resolve, 500));
-
-		toast({
-			title: isEdit ? "Author updated" : "Author created",
-			description: `${formData.name} has been ${isEdit ? "updated" : "added"}.`,
-		});
-
-		setIsSubmitting(false);
-		setOpen(false);
-		if (!isEdit) {
-			setFormData({
-				name: "",
-				accent: "",
-				style: "",
-				languageCode: "en-US",
-			});
-		}
-		onSuccess();
-	};
-
-	const handleOpenChange = (newOpen: boolean) => {
-		setOpen(newOpen);
-		if (newOpen && author) {
-			setFormData({
-				name: author.name,
-				accent: author.accent ?? "",
-				style: author.style ?? "",
-				languageCode: author.languageCode ?? "en-US",
-			});
-		}
+		if (!name.trim()) return;
+		saveAuthor();
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogTrigger asChild>
-				{trigger ?? (
-					<Button size="sm">
-						<Plus size={16} className="mr-1" />
-						Add Author
-					</Button>
-				)}
-			</DialogTrigger>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>{isEdit ? "Edit Author" : "Add Author"}</DialogTitle>
@@ -143,10 +334,8 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 						<Label htmlFor="name">Name</Label>
 						<Input
 							id="name"
-							value={formData.name}
-							onChange={(e) =>
-								setFormData({ ...formData, name: e.target.value })
-							}
+							value={name}
+							onChange={(e) => setName(e.target.value)}
 							placeholder="e.g., Amy, John"
 							required
 						/>
@@ -155,17 +344,14 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 					<div className="grid grid-cols-2 gap-4">
 						<div className="space-y-2">
 							<Label htmlFor="accent">Accent</Label>
-							<Select
-								value={formData.accent}
-								onValueChange={(v) => setFormData({ ...formData, accent: v })}
-							>
+							<Select value={accent} onValueChange={setAccent}>
 								<SelectTrigger>
 									<SelectValue placeholder="Select accent" />
 								</SelectTrigger>
 								<SelectContent>
-									{ACCENTS.map((accent) => (
-										<SelectItem key={accent} value={accent}>
-											{accent}
+									{ACCENTS.map((a) => (
+										<SelectItem key={a} value={a}>
+											{a}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -174,17 +360,14 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 
 						<div className="space-y-2">
 							<Label htmlFor="style">Style</Label>
-							<Select
-								value={formData.style}
-								onValueChange={(v) => setFormData({ ...formData, style: v })}
-							>
+							<Select value={style} onValueChange={setStyle}>
 								<SelectTrigger>
 									<SelectValue placeholder="Select style" />
 								</SelectTrigger>
 								<SelectContent>
-									{STYLES.map((style) => (
-										<SelectItem key={style} value={style}>
-											{style}
+									{STYLES.map((s) => (
+										<SelectItem key={s} value={s}>
+											{s}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -194,12 +377,7 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 
 					<div className="space-y-2">
 						<Label htmlFor="language">Language</Label>
-						<Select
-							value={formData.languageCode}
-							onValueChange={(v) =>
-								setFormData({ ...formData, languageCode: v })
-							}
-						>
+						<Select value={languageCode} onValueChange={setLanguageCode}>
 							<SelectTrigger>
 								<SelectValue placeholder="Select language" />
 							</SelectTrigger>
@@ -213,24 +391,29 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 						</Select>
 					</div>
 
+					<div className="space-y-2">
+						<Label htmlFor="elevenlabsVoiceId">ElevenLabs Voice ID</Label>
+						<Input
+							id="elevenlabsVoiceId"
+							value={elevenlabsVoiceId}
+							onChange={(e) => setElevenlabsVoiceId(e.target.value)}
+							placeholder="e.g., JBFqnCBsd6RMkjVDRZzb"
+						/>
+						<p className="text-muted-foreground text-xs">
+							Optional. Voice ID from ElevenLabs for TTS generation.
+						</p>
+					</div>
+
 					<DialogFooter>
 						<Button
 							type="button"
 							variant="outline"
-							onClick={() => setOpen(false)}
+							onClick={() => onOpenChange(false)}
 						>
 							Cancel
 						</Button>
-						<Button
-							type="submit"
-							disabled={
-								!formData.name ||
-								!formData.accent ||
-								!formData.style ||
-								isSubmitting
-							}
-						>
-							{isSubmitting
+						<Button type="submit" disabled={!name.trim() || isPending}>
+							{isPending
 								? "Saving..."
 								: isEdit
 									? "Save Changes"
@@ -243,149 +426,257 @@ function AuthorFormModal({ author, onSuccess, trigger }: AuthorFormModalProps) {
 	);
 }
 
-// AUTHOR TABLE
-
-interface AuthorTableProps {
-	authors: (Author & { referenceCount: number })[];
-	onDelete: (id: string) => void;
+// Data Table
+interface AuthorsDataTableProps {
+	data: AuthorWithCount[];
+	onEdit: (author: AuthorWithCount) => void;
+	onDelete: (author: AuthorWithCount) => void;
+	onDeleteSelected: (rows: AuthorWithCount[]) => void;
 }
 
-function AuthorTable({ authors, onDelete }: AuthorTableProps) {
-	const { toast } = useToast();
+function AuthorsDataTable({
+	data,
+	onEdit,
+	onDelete,
+	onDeleteSelected,
+}: AuthorsDataTableProps) {
+	const [sorting, setSorting] = useState<SortingState>([]);
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [rowSelection, setRowSelection] = useState({});
 
-	if (authors.length === 0) {
-		return (
-			<EmptyState
-				title="No authors found"
-				description="Add authors to manage reference voices."
-			/>
-		);
-	}
+	const columns = createColumns(onEdit, onDelete);
 
-	const handleDelete = (author: Author & { referenceCount: number }) => {
-		if (author.referenceCount > 0) {
-			toast({
-				title: "Cannot delete author",
-				description: "Remove all references using this author first.",
-				variant: "destructive",
-			});
-			return;
+	const table = useReactTable({
+		data,
+		columns,
+		onSortingChange: setSorting,
+		onColumnFiltersChange: setColumnFilters,
+		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		onRowSelectionChange: setRowSelection,
+		state: {
+			sorting,
+			columnFilters,
+			rowSelection,
+		},
+	});
+
+	const selectedRows = table.getFilteredSelectedRowModel().rows;
+	const hasSelection = selectedRows.length > 0;
+
+	const handleDeleteSelected = () => {
+		if (hasSelection) {
+			const deletableRows = selectedRows
+				.map((row) => row.original)
+				.filter((author) => author.referenceCount === 0);
+			if (deletableRows.length > 0) {
+				onDeleteSelected(deletableRows);
+				setRowSelection({});
+			}
 		}
-		onDelete(author.id);
 	};
 
 	return (
-		<div className="overflow-x-auto">
-			<table className="w-full text-sm">
-				<thead>
-					<tr className="border-b text-left">
-						<th className="pb-3 font-medium">Name</th>
-						<th className="pb-3 font-medium">Accent</th>
-						<th className="pb-3 font-medium">Style</th>
-						<th className="pb-3 font-medium">References</th>
-						<th className="pb-3 text-right font-medium">Actions</th>
-					</tr>
-				</thead>
-				<tbody className="divide-y">
-					{authors.map((author) => (
-						<tr key={author.id} className="group">
-							<td className="py-3 font-medium">{author.name}</td>
-							<td className="py-3">
-								<Badge variant="secondary">{author.accent}</Badge>
-							</td>
-							<td className="py-3 text-muted-foreground">{author.style}</td>
-							<td className="py-3 tabular-nums">{author.referenceCount}</td>
-							<td className="py-3">
-								<div className="flex justify-end gap-1">
-									<AuthorFormModal
-										author={author}
-										onSuccess={() => {}}
-										trigger={
-											<Button variant="ghost" size="icon-sm">
-												<Pencil size={14} />
-											</Button>
-										}
-									/>
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<span>
-													<Button
-														variant="ghost"
-														size="icon-sm"
-														className="text-destructive hover:text-destructive"
-														onClick={() => handleDelete(author)}
-														disabled={author.referenceCount > 0}
-													>
-														<Trash2 size={14} />
-													</Button>
-												</span>
-											</TooltipTrigger>
-											{author.referenceCount > 0 && (
-												<TooltipContent>
-													<p>Cannot delete author with references</p>
-												</TooltipContent>
+		<div className="flex flex-col gap-4">
+			<div className="flex items-center justify-between gap-4">
+				<Input
+					placeholder="Filter by name..."
+					value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+					onChange={(event) =>
+						table.getColumn("name")?.setFilterValue(event.target.value)
+					}
+					className="max-w-sm"
+				/>
+				<div className="flex items-center gap-2">
+					{hasSelection && (
+						<Button
+							variant="destructive"
+							size="sm"
+							onClick={handleDeleteSelected}
+						>
+							<Trash2 size={16} />
+							Delete{" "}
+							{
+								selectedRows.filter((r) => r.original.referenceCount === 0)
+									.length
+							}
+						</Button>
+					)}
+				</div>
+			</div>
+			<div className="overflow-hidden rounded-md border">
+				<Table className="table-fixed">
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => (
+									<TableHead
+										key={header.id}
+										style={{
+											width:
+												header.getSize() !== 150 ? header.getSize() : undefined,
+										}}
+									>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
+									</TableHead>
+								))}
+							</TableRow>
+						))}
+					</TableHeader>
+					<TableBody>
+						{table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => (
+								<TableRow
+									key={row.id}
+									data-state={row.getIsSelected() && "selected"}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
 											)}
-										</Tooltip>
-									</TooltipProvider>
-								</div>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+										</TableCell>
+									))}
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="h-24 text-center"
+								>
+									No results.
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			</div>
+			<div className="flex items-center justify-between">
+				<div className="flex-1 text-muted-foreground text-sm">
+					{selectedRows.length} of {table.getFilteredRowModel().rows.length}{" "}
+					row(s) selected.
+				</div>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+					>
+						Previous
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+					>
+						Next
+					</Button>
+				</div>
+			</div>
 		</div>
 	);
 }
 
-// SKELETON
-
+// Loading state
 function AuthorsSkeleton() {
 	return (
 		<AdminLayout
 			title="Authors"
 			description="Manage voices for reference speeches"
 		>
-			<div className="flex flex-col gap-6">
-				<div className="flex items-center justify-end">
-					<Skeleton className="h-9 w-28" />
-				</div>
-				<Skeleton className="h-64" />
+			<div className="flex min-h-64 flex-col items-center justify-center">
+				<ShimmeringText
+					text="Loading authors..."
+					className="text-lg"
+					duration={1.5}
+				/>
 			</div>
 		</AdminLayout>
 	);
 }
 
-// MAIN PAGE
-
+// Main Page
 function AuthorsPage() {
 	const {
 		isAdmin,
 		isAuthenticated,
 		isLoading: authLoading,
 	} = useRequireAdmin();
+	const [editingAuthor, setEditingAuthor] = useState<AuthorWithCount | null>(
+		null,
+	);
+	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+	const queryClient = useQueryClient();
+	const getAuthorsFn = useServerFn(serverGetAuthors);
+	const deleteAuthorFn = useServerFn(serverDeleteAuthor);
 	const { toast } = useToast();
 
-	const {
-		data: authors,
-		isLoading: dataLoading,
-		isError,
-		error,
-	} = useQuery({
+	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ["authors"],
 		queryFn: async () => {
-			// Simulate async operation
-			await new Promise((resolve) => setTimeout(resolve, 100));
-			return getAuthorsWithReferenceCounts();
+			const result = await getAuthorsFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
 		},
 	});
 
-	if (authLoading || dataLoading) {
+	const { mutate: deleteAuthor } = useMutation({
+		mutationFn: async (id: string) => {
+			return deleteAuthorFn({ data: { id } });
+		},
+		onSuccess: async (result) => {
+			if (result.success) {
+				await queryClient.invalidateQueries({ queryKey: ["authors"] });
+				toast({
+					title: "Author deleted",
+					description: "The author has been removed.",
+				});
+			} else {
+				toast({
+					title: "Error",
+					description: result.error.message,
+					variant: "destructive",
+				});
+			}
+		},
+	});
+
+	const { mutate: deleteMultiple } = useMutation({
+		mutationFn: async (ids: string[]) => {
+			return Promise.all(ids.map((id) => deleteAuthorFn({ data: { id } })));
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["authors"] });
+			toast({
+				title: "Authors deleted",
+				description: "Selected authors have been removed.",
+			});
+		},
+	});
+
+	if (authLoading) {
 		return null;
 	}
 
 	if (!isAuthenticated || !isAdmin) {
 		return <Navigate to="/login" />;
+	}
+
+	if (isLoading) {
+		return <AuthorsSkeleton />;
 	}
 
 	if (isError) {
@@ -399,38 +690,64 @@ function AuthorsPage() {
 		);
 	}
 
-	if (!authors) {
-		return null;
-	}
-
-	const queryClient = useQueryClient();
-
-	const handleDelete = (_id: string) => {
-		// In production, call API to delete
-		toast({
-			title: "Author deleted",
-			description: "The author has been removed.",
-		});
-		// Invalidate and refetch
-		queryClient.invalidateQueries({ queryKey: ["authors"] });
+	const handleDelete = (author: AuthorWithCount) => {
+		if (author.referenceCount > 0) {
+			toast({
+				title: "Cannot delete author",
+				description: "Remove all references using this author first.",
+				variant: "destructive",
+			});
+			return;
+		}
+		deleteAuthor(author.id);
 	};
 
-	const handleAddSuccess = () => {
-		// Invalidate and refetch
-		queryClient.invalidateQueries({ queryKey: ["authors"] });
+	const handleDeleteSelected = (authors: AuthorWithCount[]) => {
+		deleteMultiple(authors.map((a) => a.id));
 	};
 
 	return (
 		<AdminLayout
 			title="Authors"
 			description="Manage voices for reference speeches"
-			headerActions={<AuthorFormModal onSuccess={handleAddSuccess} />}
+			headerActions={
+				<Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
+					<Plus size={16} />
+					Add Author
+				</Button>
+			}
 		>
 			<Card>
 				<CardContent className="p-4">
-					<AuthorTable authors={authors} onDelete={handleDelete} />
+					{!data || data.length === 0 ? (
+						<EmptyState
+							title="No authors yet"
+							description="Add authors to manage reference voices for pronunciation practice."
+						/>
+					) : (
+						<AuthorsDataTable
+							data={data}
+							onEdit={setEditingAuthor}
+							onDelete={handleDelete}
+							onDeleteSelected={handleDeleteSelected}
+						/>
+					)}
 				</CardContent>
 			</Card>
+
+			<AuthorFormDialog
+				author={null}
+				open={isAddDialogOpen}
+				onOpenChange={setIsAddDialogOpen}
+			/>
+
+			<AuthorFormDialog
+				author={editingAuthor}
+				open={!!editingAuthor}
+				onOpenChange={(open) => {
+					if (!open) setEditingAuthor(null);
+				}}
+			/>
 		</AdminLayout>
 	);
 }

@@ -10,17 +10,15 @@ import {
 	categoryGradientVariants,
 	categoryLabels,
 	PracticeTextTable,
-	PracticeTextTableSkeleton,
 } from "@/components/practice-text-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InlineLink } from "@/components/ui/inline-link";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import { getTextsWithReferenceCounts } from "@/data/mock";
 import type { TextDifficulty, TextType } from "@/db/types";
-import { serverGetPracticeTexts } from "@/lib/text";
+import { serverGetPracticeTextsWithReferences } from "@/lib/text";
+import { cn } from "@/lib/utils";
 import { getWordCountCategory, useTextFilterStore } from "@/stores/text-store";
 
 const ITEMS_PER_PAGE = 10;
@@ -75,7 +73,7 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 		>
 			{/* Placeholder icon area */}
 			<svg
-				className="absolute right-1.5 top-1.5 size-5 text-white/30 sm:right-2 sm:top-2 sm:size-6"
+				className="absolute top-1.5 right-1.5 size-5 text-white/30 sm:top-2 sm:right-2 sm:size-6"
 				viewBox="0 0 24 24"
 				fill="currentColor"
 				aria-hidden="true"
@@ -95,10 +93,25 @@ interface DifficultySwitcherProps {
 }
 
 function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
+	const validValues = [
+		"all",
+		"beginner",
+		"intermediate",
+		"advanced",
+	] as const satisfies ReadonlyArray<TextDifficulty | "all">;
+
+	const isValidValue = (v: string): v is TextDifficulty | "all" => {
+		return (validValues as ReadonlyArray<string>).includes(v);
+	};
+
 	return (
 		<Tabs
 			value={value}
-			onValueChange={(v) => onChange(v as TextDifficulty | "all")}
+			onValueChange={(v) => {
+				if (isValidValue(v)) {
+					onChange(v);
+				}
+			}}
 			className="w-full"
 		>
 			<TabsList className="w-full">
@@ -124,25 +137,19 @@ function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
 export const Route = createFileRoute("/practice/")({
 	component: PracticePage,
 	loader: async () => {
-		// Try to load from database first
-		const result = await serverGetPracticeTexts();
-		if (result.success && result.data.length > 0) {
-			// Add mock reference counts since we don't have that data yet
+		const result = await serverGetPracticeTextsWithReferences();
+		if (result.success) {
 			return {
 				texts: result.data.map((text) => ({
 					...text,
-					referenceCount: Math.floor(Math.random() * 3) + 1,
-					// Use wordCount from database if available, otherwise calculate
+					referenceCount: text.referenceCount ?? 0,
 					wordCount: text.wordCount ?? text.content.split(/\s+/).length,
 				})),
-				source: "database" as const,
 			};
 		}
 
-		// Fall back to mock data
 		return {
-			texts: getTextsWithReferenceCounts(),
-			source: "mock" as const,
+			texts: [],
 		};
 	},
 	pendingComponent: PracticePageSkeleton,
@@ -152,25 +159,12 @@ function PracticePageSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-4 sm:gap-6">
-					{/* Header skeleton */}
-					<div className="flex flex-col gap-2">
-						<Skeleton className="h-8 w-48" />
-						<Skeleton className="h-4 w-full max-w-96" />
-					</div>
-					{/* Category cards skeleton */}
-					<div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6 sm:gap-3">
-						{categoryTypes.map((type) => (
-							<Skeleton
-								key={type}
-								className="aspect-4/3 min-h-14 rounded-xl sm:min-h-16"
-							/>
-						))}
-					</div>
-					{/* Difficulty switcher skeleton */}
-					<Skeleton className="h-10 w-full rounded-md" />
-					{/* Table skeleton */}
-					<PracticeTextTableSkeleton />
+				<div className="flex min-h-64 flex-col items-center justify-center">
+					<ShimmeringText
+						text="Loading practice texts..."
+						className="text-lg"
+						duration={1.5}
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>
@@ -180,7 +174,7 @@ function PracticePageSkeleton() {
 // MAIN PAGE
 
 function PracticePage() {
-	const { texts: allTexts, source } = Route.useLoaderData();
+	const { texts: allTexts } = Route.useLoaderData();
 	const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 	const {
 		difficultyFilter,
@@ -300,12 +294,6 @@ function PracticePage() {
 								</>
 							}
 						/>
-					)}
-
-					{source === "mock" && allTexts.length > 0 && (
-						<p className="pb-4 text-center text-muted-foreground text-xs">
-							Showing demo content. Connect to database for real data.
-						</p>
 					)}
 				</div>
 			</PageContainer>

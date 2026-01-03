@@ -1,374 +1,465 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { Pause, Play, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+	type ColumnFiltersState,
+	type ExpandedState,
+	flexRender,
+	getCoreRowModel,
+	getExpandedRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	getSortedRowModel,
+	type SortingState,
+	useReactTable,
+} from "@tanstack/react-table";
+import {
+	ArrowUpDown,
+	ChevronDown,
+	ChevronRight,
+	MoreHorizontal,
+	Plus,
+	Trash2,
+} from "lucide-react";
+import { Fragment, useState } from "react";
+import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
 import { AdminLayout } from "@/components/layout/admin-layout";
-import { Badge } from "@/components/ui/badge";
+import {
+	AudioPlayerButton,
+	AudioPlayerDuration,
+	AudioPlayerProgress,
+	AudioPlayerProvider,
+	AudioPlayerTime,
+} from "@/components/ui/audio-player";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-	type Author,
-	formatDuration,
-	MOCK_AUTHORS,
-	MOCK_REFERENCES,
-	MOCK_TEXTS,
-	type PracticeText,
-	type ReferenceSpeech,
-} from "@/data/mock";
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import { TextCombobox } from "@/components/ui/text-combobox";
+import type { ReferenceSpeechWithRelations } from "@/db/reference";
+import type { PracticeText } from "@/db/text";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
+import { serverGetAuthors } from "@/lib/author";
+import {
+	formatDuration,
+	serverDeleteReference,
+	serverGetReferences,
+} from "@/lib/reference";
+import { serverGetPracticeTexts } from "@/lib/text";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/references")({
 	component: ReferencesPage,
 	pendingComponent: ReferencesSkeleton,
 });
 
-// TEXT SELECTOR
-
-interface TextSelectorProps {
-	texts: PracticeText[];
-	selectedTextId: string | null;
-	onSelect: (textId: string | null) => void;
+// Helper
+function getMethodColor(method: string) {
+	switch (method) {
+		case "native":
+			return "text-green-600 dark:text-green-500";
+		case "tts":
+			return "text-blue-600 dark:text-blue-500";
+		default:
+			return "text-muted-foreground";
+	}
 }
 
-function TextSelector({ texts, selectedTextId, onSelect }: TextSelectorProps) {
-	return (
-		<Select
-			value={selectedTextId ?? "all"}
-			onValueChange={(v) => onSelect(v === "all" ? null : v)}
-		>
-			<SelectTrigger className="w-64">
-				<SelectValue placeholder="Filter by text" />
-			</SelectTrigger>
-			<SelectContent>
-				<SelectItem value="all">All texts</SelectItem>
-				{texts.map((text) => (
-					<SelectItem key={text.id} value={text.id}>
-						{text.content.slice(0, 40)}...
-					</SelectItem>
-				))}
-			</SelectContent>
-		</Select>
-	);
-}
-
-// AUTO-GENERATE TOGGLE (Disabled)
-
-function AutoGenerateToggle() {
-	return (
-		<TooltipProvider>
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3 opacity-60">
-						<Switch disabled checked={false} />
-						<div className="flex flex-col gap-0.5">
-							<Label className="text-sm">
-								Auto-generate reference recordings
-							</Label>
-							<p className="text-muted-foreground text-xs">
-								Future feature – currently disabled
-							</p>
-						</div>
-					</div>
-				</TooltipTrigger>
-				<TooltipContent>
-					<p>TTS generation will be available in a future update</p>
-				</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
-	);
-}
-
-// ADD REFERENCE MODAL
-
-interface AddReferenceModalProps {
-	texts: PracticeText[];
-	authors: Author[];
-	selectedTextId: string | null;
-	onSuccess: () => void;
-}
-
-function AddReferenceModal({
-	texts,
-	authors,
-	selectedTextId,
-	onSuccess,
-}: AddReferenceModalProps) {
-	const [open, setOpen] = useState(false);
-	const [textId, setTextId] = useState(selectedTextId ?? "");
-	const [authorId, setAuthorId] = useState("");
-	const [file, setFile] = useState<File | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const { toast } = useToast();
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!textId || !authorId || !file) return;
-
-		setIsSubmitting(true);
-		// Simulate upload
-		await new Promise((resolve) => setTimeout(resolve, 1500));
-
-		toast({
-			title: "Reference added",
-			description: "The reference speech has been uploaded successfully.",
-		});
-
-		setIsSubmitting(false);
-		setOpen(false);
-		setTextId(selectedTextId ?? "");
-		setAuthorId("");
-		setFile(null);
-		onSuccess();
-	};
-
-	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button size="sm">
-					<Plus size={16} />
-					Add Reference
+// Columns
+function createColumns(
+	onDelete: (ref: ReferenceSpeechWithRelations) => void,
+): ColumnDef<ReferenceSpeechWithRelations>[] {
+	return [
+		{
+			id: "expand",
+			size: 40,
+			header: () => null,
+			cell: ({ row }) => (
+				<Button
+					variant="ghost"
+					size="sm"
+					className="size-8 p-0"
+					onClick={() => row.toggleExpanded()}
+					aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
+				>
+					{row.getIsExpanded() ? (
+						<ChevronDown size={14} />
+					) : (
+						<ChevronRight size={14} />
+					)}
 				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>Add Reference Speech</DialogTitle>
-					<DialogDescription>
-						Upload an audio file to use as reference pronunciation.
-					</DialogDescription>
-				</DialogHeader>
-				<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-					<div className="flex flex-col gap-2">
-						<Label htmlFor="text">Practice Text</Label>
-						<Select value={textId} onValueChange={setTextId}>
-							<SelectTrigger>
-								<SelectValue placeholder="Select a text" />
-							</SelectTrigger>
-							<SelectContent>
-								{texts.map((text) => (
-									<SelectItem key={text.id} value={text.id}>
-										{text.content.slice(0, 50)}...
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+			),
+			enableSorting: false,
+			enableHiding: false,
+		},
+		{
+			id: "select",
+			size: 40,
+			header: ({ table }) => (
+				<Checkbox
+					checked={table.getIsAllPageRowsSelected()}
+					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+					aria-label="Select all"
+				/>
+			),
+			cell: ({ row }) => (
+				<Checkbox
+					checked={row.getIsSelected()}
+					onCheckedChange={(value) => row.toggleSelected(!!value)}
+					aria-label="Select row"
+				/>
+			),
+			enableSorting: false,
+			enableHiding: false,
+		},
+		{
+			id: "author",
+			accessorFn: (row) => row.author.name,
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					Author
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const author = row.original.author;
+				return (
+					<div className="flex flex-col">
+						<span className="font-medium">{author.name}</span>
+						{author.accent && (
+							<span className="text-muted-foreground text-xs">
+								{author.accent}
+							</span>
+						)}
 					</div>
-
-					<div className="flex flex-col gap-2">
-						<Label htmlFor="author">Author / Voice</Label>
-						<Select value={authorId} onValueChange={setAuthorId}>
-							<SelectTrigger>
-								<SelectValue placeholder="Select an author" />
-							</SelectTrigger>
-							<SelectContent>
-								{authors.map((author) => (
-									<SelectItem key={author.id} value={author.id}>
-										{author.name} ({author.accent})
-									</SelectItem>
-								))}
-								<div className="border-t p-2">
-									<Button
-										variant="ghost"
-										size="sm"
-										className="w-full justify-start"
-										asChild
-									>
-										<Link to="/admin/authors">Add New Author</Link>
-									</Button>
-								</div>
-							</SelectContent>
-						</Select>
-					</div>
-
-					<div className="flex flex-col gap-2">
-						<Label htmlFor="file">Audio File</Label>
-						<Input
-							id="file"
-							type="file"
-							accept=".wav,.mp3,.m4a,.ogg"
-							onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-						/>
-						<p className="text-muted-foreground text-xs">
-							Supported formats: WAV, MP3, M4A, OGG (max 10MB)
+				);
+			},
+		},
+		{
+			id: "text",
+			accessorFn: (row) => row.text.content,
+			header: "Text",
+			cell: ({ row }) => {
+				const text = row.original.text;
+				return (
+					<div className="max-w-xs">
+						<p className="line-clamp-2 text-muted-foreground text-sm">
+							{text.content.slice(0, 60)}...
 						</p>
 					</div>
-
-					<DialogFooter>
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setOpen(false)}
-						>
-							Cancel
-						</Button>
-						<Button
-							type="submit"
-							disabled={!textId || !authorId || !file || isSubmitting}
-						>
-							{isSubmitting ? "Upload" : "Upload"}
-						</Button>
-					</DialogFooter>
-				</form>
-			</DialogContent>
-		</Dialog>
-	);
+				);
+			},
+		},
+		{
+			accessorKey: "generationMethod",
+			size: 100,
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					Method
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const method = row.getValue("generationMethod") as string;
+				return (
+					<span
+						className={cn(
+							"font-medium text-sm capitalize",
+							getMethodColor(method),
+						)}
+					>
+						{method}
+					</span>
+				);
+			},
+		},
+		{
+			accessorKey: "durationMs",
+			size: 100,
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					Duration
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			cell: ({ row }) => (
+				<span className="text-muted-foreground text-sm tabular-nums">
+					{formatDuration(row.getValue("durationMs"))}
+				</span>
+			),
+		},
+		{
+			id: "actions",
+			size: 80,
+			cell: ({ row }) => {
+				const ref = row.original;
+				return (
+					<div className="flex items-center gap-1">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" className="h-8 w-8 p-0">
+									<span className="sr-only">Open menu</span>
+									<MoreHorizontal className="h-4 w-4" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuLabel>Actions</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									onClick={() => onDelete(ref)}
+									className="text-destructive"
+								>
+									<Trash2 className="mr-2 h-4 w-4" />
+									Delete
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				);
+			},
+		},
+	];
 }
 
-// REFERENCE TABLE
-
-interface ReferenceWithRelations extends ReferenceSpeech {
-	author: Author;
-	text: PracticeText;
+// Data Table
+interface ReferencesDataTableProps {
+	data: ReferenceSpeechWithRelations[];
+	onDelete: (ref: ReferenceSpeechWithRelations) => void;
+	onDeleteSelected: (rows: ReferenceSpeechWithRelations[]) => void;
+	textFilter: string | null;
+	onTextFilterChange: (textId: string | null) => void;
+	texts: PracticeText[];
 }
 
-interface ReferenceTableProps {
-	references: ReferenceWithRelations[];
-	onDelete: (id: string) => void;
-}
+function ReferencesDataTable({
+	data,
+	onDelete,
+	onDeleteSelected,
+	textFilter,
+	onTextFilterChange,
+	texts,
+}: ReferencesDataTableProps) {
+	const [sorting, setSorting] = useState<SortingState>([]);
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [rowSelection, setRowSelection] = useState({});
+	const [expanded, setExpanded] = useState<ExpandedState>({});
 
-function ReferenceTable({ references, onDelete }: ReferenceTableProps) {
-	const [playingId, setPlayingId] = useState<string | null>(null);
+	const filteredData = textFilter
+		? data.filter((r) => r.textId === textFilter)
+		: data;
 
-	const togglePlay = (id: string) => {
-		setPlayingId(playingId === id ? null : id);
+	const columns = createColumns(onDelete);
+
+	const table = useReactTable({
+		data: filteredData,
+		columns,
+		onSortingChange: setSorting,
+		onColumnFiltersChange: setColumnFilters,
+		onExpandedChange: setExpanded,
+		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getExpandedRowModel: getExpandedRowModel(),
+		onRowSelectionChange: setRowSelection,
+		state: {
+			sorting,
+			columnFilters,
+			rowSelection,
+			expanded,
+		},
+	});
+
+	const selectedRows = table.getFilteredSelectedRowModel().rows;
+	const hasSelection = selectedRows.length > 0;
+
+	const handleDeleteSelected = () => {
+		if (hasSelection) {
+			onDeleteSelected(selectedRows.map((row) => row.original));
+			setRowSelection({});
+		}
 	};
 
-	if (references.length === 0) {
-		return (
-			<EmptyState
-				title="No references found"
-				description="Add reference speeches to help users practice pronunciation."
-			/>
-		);
-	}
-
 	return (
-		<div className="overflow-x-auto">
-			<table className="w-full text-sm">
-				<thead>
-					<tr className="border-b text-left">
-						<th className="pb-3 font-medium">Author</th>
-						<th className="pb-3 font-medium">Text</th>
-						<th className="pb-3 font-medium">Method</th>
-						<th className="pb-3 font-medium">Duration</th>
-						<th className="pb-3 text-right font-medium">Actions</th>
-					</tr>
-				</thead>
-				<tbody className="divide-y">
-					{references.map((ref) => (
-						<tr key={ref.id} className="group">
-							<td className="py-3">
-								<div className="flex items-center gap-2">
-									<span>{ref.author.name}</span>
-									<Badge variant="secondary" className="text-xs">
-										{ref.author.accent}
-									</Badge>
-								</div>
-							</td>
-							<td className="max-w-xs truncate py-3 text-muted-foreground">
-								{ref.text.content.slice(0, 40)}...
-							</td>
-							<td className="py-3">
-								<Badge
-									variant={
-										ref.generationMethod === "native" ? "default" : "secondary"
-									}
-								>
-									{ref.generationMethod}
-								</Badge>
-							</td>
-							<td className="py-3 text-muted-foreground tabular-nums">
-								{formatDuration(ref.durationMs)}
-							</td>
-							<td className="py-3">
-								<div className="flex justify-end gap-1">
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Button
-													variant="ghost"
-													size="icon-sm"
-													onClick={() => togglePlay(ref.id)}
-													disabled
-												>
-													{playingId === ref.id ? (
-														<Pause size={14} />
-													) : (
-														<Play size={14} />
-													)}
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>
-												<p>Audio playback requires backend integration</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-									<Button
-										variant="ghost"
-										size="icon-sm"
-										className="text-destructive hover:text-destructive"
-										onClick={() => onDelete(ref.id)}
+		<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<div className="w-full sm:w-80">
+					<TextCombobox
+						texts={texts}
+						value={textFilter}
+						onValueChange={onTextFilterChange}
+						placeholder="Filter by text..."
+						emptyMessage="No texts found."
+					/>
+				</div>
+				<div className="flex items-center gap-2">
+					{hasSelection && (
+						<Button
+							variant="destructive"
+							size="sm"
+							onClick={handleDeleteSelected}
+						>
+							<Trash2 size={16} />
+							Delete {selectedRows.length}
+						</Button>
+					)}
+				</div>
+			</div>
+			<div className="overflow-hidden rounded-md border">
+				<Table className="table-fixed">
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => (
+									<TableHead
+										key={header.id}
+										style={{
+											width:
+												header.getSize() !== 150 ? header.getSize() : undefined,
+										}}
 									>
-										<Trash2 size={14} />
-									</Button>
-								</div>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
+									</TableHead>
+								))}
+							</TableRow>
+						))}
+					</TableHeader>
+					<TableBody>
+						{table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => (
+								<Fragment key={row.id}>
+									<TableRow data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+									{row.getIsExpanded() && (
+										<TableRow className="bg-muted/30">
+											<TableCell colSpan={columns.length} className="p-4">
+												<AudioPlayerProvider>
+													<div className="flex max-w-md items-center gap-3">
+														<AudioPlayerButton
+															item={{
+																id: row.original.id,
+																src: `/api/audio/${row.original.id}`,
+															}}
+															variant="outline"
+															size="icon"
+														/>
+														<AudioPlayerProgress className="flex-1" />
+														<div className="flex items-center gap-1 text-muted-foreground text-xs">
+															<AudioPlayerTime />
+															<span>/</span>
+															<AudioPlayerDuration />
+														</div>
+													</div>
+												</AudioPlayerProvider>
+											</TableCell>
+										</TableRow>
+									)}
+								</Fragment>
+							))
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="h-24 text-center"
+								>
+									No results.
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			</div>
+			<div className="flex items-center justify-between">
+				<div className="flex-1 text-muted-foreground text-sm">
+					{selectedRows.length} of {table.getFilteredRowModel().rows.length}{" "}
+					row(s) selected.
+				</div>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+					>
+						Previous
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+					>
+						Next
+					</Button>
+				</div>
+			</div>
 		</div>
 	);
 }
 
-// SKELETON
-
+// Loading state
 function ReferencesSkeleton() {
 	return (
 		<AdminLayout
 			title="Reference Speeches"
 			description="Manage reference audio for practice texts"
 		>
-			<div className="flex flex-col gap-6">
-				<div className="flex items-center justify-end">
-					<Skeleton className="h-9 w-32" />
-				</div>
-				<Skeleton className="h-12" />
-				<Skeleton className="h-64" />
+			<div className="flex min-h-64 flex-col items-center justify-center">
+				<ShimmeringText
+					text="Loading references..."
+					className="text-lg"
+					duration={1.5}
+				/>
 			</div>
 		</AdminLayout>
 	);
 }
 
-// MAIN PAGE
-
+// Main Page
 function ReferencesPage() {
 	const {
 		isAdmin,
@@ -376,31 +467,89 @@ function ReferencesPage() {
 		isLoading: authLoading,
 	} = useRequireAdmin();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
+	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+	const queryClient = useQueryClient();
+	const getReferencesFn = useServerFn(serverGetReferences);
+	const getTextsFn = useServerFn(serverGetPracticeTexts);
+	const getAuthorsFn = useServerFn(serverGetAuthors);
+	const deleteReferenceFn = useServerFn(serverDeleteReference);
 	const { toast } = useToast();
 
 	const {
 		data: referencesData,
-		isLoading: dataLoading,
-		isError,
-		error,
+		isLoading: refsLoading,
+		isError: refsError,
 	} = useQuery({
 		queryKey: ["references"],
 		queryFn: async () => {
-			// Simulate async operation
-			await new Promise((resolve) => setTimeout(resolve, 100));
-			return {
-				texts: MOCK_TEXTS,
-				authors: MOCK_AUTHORS,
-				references: MOCK_REFERENCES.map((ref) => ({
-					...ref,
-					author: MOCK_AUTHORS.find((a) => a.id === ref.authorId)!,
-					text: MOCK_TEXTS.find((t) => t.id === ref.textId)!,
-				})),
-			};
+			const result = await getReferencesFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
 		},
 	});
 
-	if (authLoading || dataLoading) {
+	const { data: textsData, isLoading: textsLoading } = useQuery({
+		queryKey: ["texts"],
+		queryFn: async () => {
+			const result = await getTextsFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
+		},
+	});
+
+	const { data: authorsData, isLoading: authorsLoading } = useQuery({
+		queryKey: ["authors"],
+		queryFn: async () => {
+			const result = await getAuthorsFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
+		},
+	});
+
+	const { mutate: deleteReference } = useMutation({
+		mutationFn: async (id: string) => {
+			return deleteReferenceFn({ data: { id } });
+		},
+		onSuccess: async (result) => {
+			if (result.success) {
+				await queryClient.invalidateQueries({ queryKey: ["references"] });
+				toast({
+					title: "Reference deleted",
+					description: "The reference speech has been removed.",
+				});
+			} else {
+				toast({
+					title: "Error",
+					description: result.error.message,
+					variant: "destructive",
+				});
+			}
+		},
+	});
+
+	const { mutate: deleteMultiple } = useMutation({
+		mutationFn: async (ids: string[]) => {
+			return Promise.all(ids.map((id) => deleteReferenceFn({ data: { id } })));
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["references"] });
+			toast({
+				title: "References deleted",
+				description: "Selected reference speeches have been removed.",
+			});
+		},
+	});
+
+	const isLoading =
+		authLoading || refsLoading || textsLoading || authorsLoading;
+
+	if (authLoading) {
 		return null;
 	}
 
@@ -408,42 +557,33 @@ function ReferencesPage() {
 		return <Navigate to="/login" />;
 	}
 
-	if (isError) {
+	if (isLoading) {
+		return <ReferencesSkeleton />;
+	}
+
+	if (refsError) {
 		return (
 			<AdminLayout
 				title="Reference Speeches"
 				description="Manage reference audio for practice texts"
 			>
-				<div className="text-destructive">Error: {error?.message}</div>
+				<div className="text-destructive">
+					Failed to load reference speeches.
+				</div>
 			</AdminLayout>
 		);
 	}
 
-	if (!referencesData) {
-		return null;
-	}
+	const references = referencesData ?? [];
+	const texts = textsData ?? [];
+	const authors = authorsData ?? [];
 
-	const { texts, authors, references } = referencesData;
-
-	const filteredReferences = selectedTextId
-		? references.filter((r) => r.textId === selectedTextId)
-		: references;
-
-	const queryClient = useQueryClient();
-
-	const handleDelete = (_id: string) => {
-		// In production, call API to delete
-		toast({
-			title: "Reference deleted",
-			description: "The reference speech has been removed.",
-		});
-		// Invalidate and refetch
-		queryClient.invalidateQueries({ queryKey: ["references"] });
+	const handleDelete = (ref: ReferenceSpeechWithRelations) => {
+		deleteReference(ref.id);
 	};
 
-	const handleAddSuccess = () => {
-		// Invalidate and refetch
-		queryClient.invalidateQueries({ queryKey: ["references"] });
+	const handleDeleteSelected = (refs: ReferenceSpeechWithRelations[]) => {
+		deleteMultiple(refs.map((r) => r.id));
 	};
 
 	return (
@@ -451,42 +591,39 @@ function ReferencesPage() {
 			title="Reference Speeches"
 			description="Manage reference audio for practice texts"
 			headerActions={
-				<AddReferenceModal
-					texts={texts}
-					authors={authors}
-					selectedTextId={selectedTextId}
-					onSuccess={handleAddSuccess}
-				/>
+				<Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
+					<Plus size={16} />
+					Add Reference
+				</Button>
 			}
 		>
-			<div className="flex flex-col gap-6">
-				{/* Auto-generate toggle (disabled) */}
-				<AutoGenerateToggle />
-
-				{/* Filters */}
-				<Card>
-					<CardHeader className="pb-3">
-						<CardTitle className="text-base">Filter References</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<TextSelector
-							texts={texts}
-							selectedTextId={selectedTextId}
-							onSelect={setSelectedTextId}
+			<Card>
+				<CardContent className="p-4">
+					{references.length === 0 ? (
+						<EmptyState
+							title="No reference speeches yet"
+							description="Add reference audio to help users practice pronunciation."
 						/>
-					</CardContent>
-				</Card>
-
-				{/* Reference Table */}
-				<Card>
-					<CardContent className="p-4">
-						<ReferenceTable
-							references={filteredReferences}
+					) : (
+						<ReferencesDataTable
+							data={references}
 							onDelete={handleDelete}
+							onDeleteSelected={handleDeleteSelected}
+							textFilter={selectedTextId}
+							onTextFilterChange={setSelectedTextId}
+							texts={texts}
 						/>
-					</CardContent>
-				</Card>
-			</div>
+					)}
+				</CardContent>
+			</Card>
+
+			<AddReferenceDialog
+				open={isAddDialogOpen}
+				onOpenChange={setIsAddDialogOpen}
+				texts={texts}
+				authors={authors}
+				preSelectedTextId={selectedTextId}
+			/>
 		</AdminLayout>
 	);
 }

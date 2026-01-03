@@ -85,6 +85,7 @@ export const authors = pgTable("authors", {
 	accent: varchar("accent", { length: 50 }),
 	style: varchar("style", { length: 50 }),
 	languageCode: varchar("language_code", { length: 10 }),
+	elevenlabsVoiceId: varchar("elevenlabs_voice_id", { length: 255 }),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

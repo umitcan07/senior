@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { PracticeText } from "@/db/text";
 import {
 	deletePracticeText,
 	getPracticeTextById,
 	getPracticeTexts,
+	getPracticeTextsWithReferenceCounts,
 	insertPracticeText,
+	type PracticeText,
+	type PracticeTextWithReferenceCount,
 	updatePracticeText,
 } from "@/db/text";
 import type { ApiResponse } from "./errors";
@@ -98,10 +100,6 @@ export const serverInsertPracticeText = createServerFn({ method: "POST" })
 
 export const serverGetPracticeTexts = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ApiResponse<PracticeText[]>> => {
-		// Note: Server-side auth check requires request access
-		// Currently relying on client-side protection via <Protect> component in admin layout
-		// TODO: Implement proper server-side auth when request context is available
-
 		try {
 			const result = await getPracticeTexts();
 			return createSuccessResponse(result);
@@ -126,6 +124,33 @@ export const serverGetPracticeTexts = createServerFn({ method: "GET" }).handler(
 		}
 	},
 );
+
+export const serverGetPracticeTextsWithReferences = createServerFn({
+	method: "GET",
+}).handler(async (): Promise<ApiResponse<PracticeTextWithReferenceCount[]>> => {
+	try {
+		const result = await getPracticeTextsWithReferenceCounts();
+		return createSuccessResponse(result);
+	} catch (error) {
+		console.error("Get practice texts with references error:", error);
+
+		if (error instanceof Error) {
+			return createErrorResponse(
+				ErrorCode.DATABASE_ERROR,
+				"An error occurred while getting the practice texts",
+				{ originalError: error.message },
+				500,
+			);
+		}
+
+		return createErrorResponse(
+			ErrorCode.DATABASE_ERROR,
+			"An error occurred while getting the practice texts",
+			undefined,
+			500,
+		);
+	}
+});
 
 const GetPracticeTextByIdSchema = z.object({
 	id: z.string().uuid(),

@@ -4,7 +4,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { FileJson, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
+import {
+	createColumns,
+	type TextTableActions,
+} from "@/components/admin/text-columns";
+import { DataTable } from "@/components/admin/text-data-table";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,21 +31,23 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import type { PracticeText } from "@/db/text";
+import type { Author } from "@/db/author";
+import type { ReferenceSpeechWithRelations } from "@/db/reference";
+import type { PracticeTextWithReferenceCount } from "@/db/text";
 import type { TextDifficulty, TextType } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
+import { serverGetAuthors } from "@/lib/author";
+import { serverDeleteReference, serverGetReferences } from "@/lib/reference";
 import {
 	serverDeletePracticeText,
-	serverGetPracticeTexts,
+	serverGetPracticeTextsWithReferences,
 	serverInsertPracticeText,
 	serverUpdatePracticeText,
 } from "@/lib/text";
-import { createColumns, type TextTableActions } from "./text-columns";
-import { DataTable } from "./text-data-table";
 
 export const Route = createFileRoute("/admin/text")({
 	component: RouteComponent,
@@ -67,7 +75,7 @@ function EditTextDialog({
 	open,
 	onOpenChange,
 }: {
-	text: PracticeText;
+	text: PracticeTextWithReferenceCount;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }) {
@@ -79,16 +87,6 @@ function EditTextDialog({
 	const [editNote, setEditNote] = useState(text.note || "");
 	const updateTextFn = useServerFn(serverUpdatePracticeText);
 	const queryClient = useQueryClient();
-
-	// Reset form when dialog opens or text changes
-	useEffect(() => {
-		if (open) {
-			setEditContent(text.content);
-			setEditDifficulty(text.difficulty);
-			setEditType(text.type);
-			setEditNote(text.note || "");
-		}
-	}, [text.content, text.difficulty, text.type, text.note, open]);
 
 	const { mutate: updateText, isPending: isUpdating } = useMutation({
 		mutationFn: async (data: {
@@ -138,7 +136,7 @@ function EditTextDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+			<DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Edit Practice Text</DialogTitle>
 					<DialogDescription>
@@ -232,10 +230,23 @@ function EditTextDialog({
 }
 
 function TextList() {
-	const getTextsFn = useServerFn(serverGetPracticeTexts);
-	const [editingText, setEditingText] = useState<PracticeText | null>(null);
+	const getTextsFn = useServerFn(serverGetPracticeTextsWithReferences);
+	const getReferencesFn = useServerFn(serverGetReferences);
+	const getAuthorsFn = useServerFn(serverGetAuthors);
+	const deleteReferenceFn = useServerFn(serverDeleteReference);
 
-	const { data, isLoading, isError, error } = useQuery({
+	const [editingText, setEditingText] =
+		useState<PracticeTextWithReferenceCount | null>(null);
+	const [addReferenceText, setAddReferenceText] =
+		useState<PracticeTextWithReferenceCount | null>(null);
+	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+	const {
+		data: textsData,
+		isLoading,
+		isError,
+		error,
+	} = useQuery({
 		queryKey: ["texts"],
 		queryFn: async () => {
 			const result = await getTextsFn();
@@ -246,8 +257,31 @@ function TextList() {
 		},
 	});
 
+	const { data: referencesData, isLoading: referencesLoading } = useQuery({
+		queryKey: ["references"],
+		queryFn: async () => {
+			const result = await getReferencesFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
+		},
+	});
+
+	const { data: authorsData } = useQuery({
+		queryKey: ["authors"],
+		queryFn: async () => {
+			const result = await getAuthorsFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data;
+		},
+	});
+
 	const deleteTextFn = useServerFn(serverDeletePracticeText);
 	const queryClient = useQueryClient();
+	const { toast } = useToast();
 
 	const { mutate: deleteText } = useMutation({
 		mutationFn: async (id: string) => {
@@ -267,26 +301,67 @@ function TextList() {
 		},
 	});
 
+	const { mutate: deleteReference } = useMutation({
+		mutationFn: async (id: string) => {
+			return deleteReferenceFn({ data: { id } });
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["references"] });
+			await queryClient.invalidateQueries({ queryKey: ["texts"] });
+			toast({
+				title: "Reference deleted",
+				description: "The reference speech has been removed.",
+			});
+		},
+	});
+
+	const toggleExpand = (textId: string) => {
+		setExpandedRows((prev) => {
+			const next = new Set(prev);
+			if (next.has(textId)) {
+				next.delete(textId);
+			} else {
+				next.add(textId);
+			}
+			return next;
+		});
+	};
+
 	const actions: TextTableActions = {
 		onEdit: (text) => setEditingText(text),
 		onDelete: (text) => deleteText(text.id),
+		onAddReference: (text) => setAddReferenceText(text),
+		onToggleExpand: toggleExpand,
+		expandedRows,
 	};
 
-	const handleDeleteSelected = (rows: PracticeText[]) => {
+	const handleDeleteSelected = (rows: PracticeTextWithReferenceCount[]) => {
 		deleteMultiple(rows.map((row) => row.id));
+	};
+
+	const handleDeleteReference = (ref: ReferenceSpeechWithRelations) => {
+		deleteReference(ref.id);
 	};
 
 	const columns = createColumns(actions);
 
 	if (isLoading) {
-		return <Skeleton className="h-64" />;
+		return (
+			<div className="flex min-h-64 flex-col items-center justify-center">
+				<ShimmeringText
+					text="Loading texts..."
+					className="text-lg"
+					duration={1.5}
+				/>
+			</div>
+		);
 	}
 
 	if (isError) {
 		return <div className="text-destructive">Error: {error?.message}</div>;
 	}
 
-	if (!data || data.length === 0) {
+	if (!textsData || textsData.length === 0) {
 		return (
 			<EmptyState
 				title="No practice texts yet"
@@ -294,6 +369,18 @@ function TextList() {
 			/>
 		);
 	}
+
+	// Convert to PracticeText array for AddReferenceDialog
+	const textsForDialog = textsData.map((t) => ({
+		id: t.id,
+		content: t.content,
+		difficulty: t.difficulty,
+		type: t.type,
+		wordCount: t.wordCount,
+		note: t.note,
+		createdAt: t.createdAt,
+		updatedAt: t.updatedAt,
+	}));
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -308,10 +395,28 @@ function TextList() {
 					}}
 				/>
 			)}
+			<AddReferenceDialog
+				open={!!addReferenceText}
+				onOpenChange={(open) => {
+					if (!open) {
+						setAddReferenceText(null);
+					}
+				}}
+				texts={textsForDialog}
+				authors={(authorsData as Author[]) ?? []}
+				preSelectedTextId={addReferenceText?.id}
+				onSuccess={() => {
+					queryClient.invalidateQueries({ queryKey: ["texts"] });
+				}}
+			/>
 			<DataTable
 				columns={columns}
-				data={data}
+				data={textsData}
 				onDeleteSelected={handleDeleteSelected}
+				expandedRows={expandedRows}
+				references={referencesData ?? []}
+				referencesLoading={referencesLoading}
+				onDeleteReference={handleDeleteReference}
 			/>
 		</div>
 	);
@@ -607,13 +712,12 @@ function TextManagementSkeleton() {
 			title="Text Management"
 			description="Create, edit, and manage practice texts for pronunciation exercises"
 		>
-			<div className="flex flex-col gap-8">
-				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{Array.from({ length: 6 }).map((_, i) => (
-						<Skeleton key={i} className="h-40" />
-					))}
-				</div>
-				<Skeleton className="h-48" />
+			<div className="flex min-h-64 flex-col items-center justify-center">
+				<ShimmeringText
+					text="Loading texts..."
+					className="text-lg"
+					duration={1.5}
+				/>
 			</div>
 		</AdminLayout>
 	);

@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, User2 } from "lucide-react";
 import { cva } from "class-variance-authority";
+import { ArrowRight, User2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Table,
 	TableBody,
@@ -11,8 +10,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import type { TextDifficulty, TextType } from "@/db/types";
+import { cn } from "@/lib/utils";
 
 // Types
 
@@ -167,73 +166,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											<ArrowRight size={14} />
 										</Link>
 									</Button>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
-		</div>
-	);
-}
-
-// Skeleton
-
-const skeletonRowKeys = [
-	"skeleton-row-1",
-	"skeleton-row-2",
-	"skeleton-row-3",
-	"skeleton-row-4",
-	"skeleton-row-5",
-	"skeleton-row-6",
-	"skeleton-row-7",
-	"skeleton-row-8",
-];
-
-export function PracticeTextTableSkeleton() {
-	return (
-		<div className="overflow-hidden rounded-lg border">
-			<div className="overflow-x-auto">
-				<Table>
-					<TableHeader>
-						<TableRow className="hover:bg-transparent">
-							<TableHead>Content</TableHead>
-							<TableHead className="hidden w-24 sm:table-cell">
-								Difficulty
-							</TableHead>
-							<TableHead className="hidden w-16 text-right md:table-cell">
-								Words
-							</TableHead>
-							<TableHead className="hidden w-16 text-right md:table-cell">
-								Voices
-							</TableHead>
-							<TableHead className="w-20 sm:w-24" />
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{skeletonRowKeys.map((key) => (
-							<TableRow key={key}>
-								<TableCell>
-									<div className="flex items-start gap-3">
-										<Skeleton className="size-8 shrink-0 rounded-full" />
-										<div className="flex flex-1 flex-col gap-1">
-											<Skeleton className="h-3 w-20" />
-											<Skeleton className="h-5 w-full" />
-											<Skeleton className="h-3 w-24 md:hidden" />
-										</div>
-									</div>
-								</TableCell>
-								<TableCell className="hidden sm:table-cell">
-									<Skeleton className="h-4 w-16" />
-								</TableCell>
-								<TableCell className="hidden text-right md:table-cell">
-									<Skeleton className="ml-auto h-4 w-8" />
-								</TableCell>
-								<TableCell className="hidden text-right md:table-cell">
-									<Skeleton className="ml-auto h-4 w-8" />
-								</TableCell>
-								<TableCell className="text-right">
-									<Skeleton className="ml-auto size-8 rounded-md sm:h-8 sm:w-20" />
 								</TableCell>
 							</TableRow>
 						))}

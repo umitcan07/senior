@@ -17,29 +17,45 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-	type Attempt,
-	type CommonError,
-	formatRelativeTime,
-	MOCK_ATTEMPTS,
-	MOCK_COMMON_ERRORS,
-	MOCK_TEXTS,
-	MOCK_USER_STATS,
-	type UserStats,
-} from "@/data/mock";
+import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { getScoreLevel, scoreColorVariants } from "@/lib/score";
-import { cn } from "@/lib/utils";
+import { cn, formatRelativeTime } from "@/lib/utils";
+
+type Attempt = {
+	id: string;
+	textId: string;
+	textPreview: string;
+	score: number;
+	date: Date;
+	analysisId: string;
+};
+
+type SummaryLoaderData = {
+	attempts: Attempt[];
+	stats: {
+		totalAttempts: number;
+		weeklyAttempts: number;
+		averageScore: number;
+		weeklyProgress: number;
+	};
+	commonErrors: Array<{ phoneme: string; count: number }>;
+	texts: Array<{ id: string; content: string }>;
+};
 
 export const Route = createFileRoute("/summary")({
 	component: FeedPage,
-	loader: async () => {
-		// In production, fetch from database
+	loader: async (): Promise<SummaryLoaderData> => {
+		// TODO: Implement database queries for user attempts, stats, and common errors
 		return {
-			attempts: MOCK_ATTEMPTS,
-			stats: MOCK_USER_STATS,
-			commonErrors: MOCK_COMMON_ERRORS,
-			texts: MOCK_TEXTS,
+			attempts: [],
+			stats: {
+				totalAttempts: 0,
+				weeklyAttempts: 0,
+				averageScore: 0,
+				weeklyProgress: 0,
+			},
+			commonErrors: [],
+			texts: [],
 		};
 	},
 	pendingComponent: FeedSkeleton,
@@ -48,7 +64,12 @@ export const Route = createFileRoute("/summary")({
 // STATS SUMMARY
 
 interface StatsSummaryProps {
-	stats: UserStats;
+	stats: {
+		totalAttempts: number;
+		weeklyAttempts: number;
+		averageScore: number;
+		weeklyProgress: number;
+	};
 }
 
 function StatCard({
@@ -109,7 +130,7 @@ function StatsSummary({ stats }: StatsSummaryProps) {
 // COMMON ERRORS
 
 interface CommonErrorsProps {
-	errors: CommonError[];
+	errors: Array<{ phoneme: string; count: number }>;
 }
 
 function CommonErrors({ errors }: CommonErrorsProps) {
@@ -181,7 +202,11 @@ function FilterBar({
 
 				<Select
 					value={sortBy}
-					onValueChange={(v) => onSortChange(v as "date" | "score")}
+					onValueChange={(v) => {
+						if (v === "date" || v === "score") {
+							onSortChange(v);
+						}
+					}}
 				>
 					<SelectTrigger className="w-32">
 						<SelectValue />
@@ -210,7 +235,14 @@ function FilterBar({
 // ATTEMPT CARD
 
 interface AttemptCardProps {
-	attempt: Attempt;
+	attempt: {
+		id: string;
+		textId: string;
+		textPreview: string;
+		score: number;
+		date: Date;
+		analysisId: string;
+	};
 }
 
 function AttemptCard({ attempt }: AttemptCardProps) {
@@ -246,7 +278,14 @@ function AttemptCard({ attempt }: AttemptCardProps) {
 // ATTEMPT LIST
 
 interface AttemptListProps {
-	attempts: Attempt[];
+	attempts: Array<{
+		id: string;
+		textId: string;
+		textPreview: string;
+		score: number;
+		date: Date;
+		analysisId: string;
+	}>;
 	onLoadMore?: () => void;
 	hasMore?: boolean;
 	isLoading?: boolean;
@@ -292,28 +331,18 @@ function AttemptList({
 	);
 }
 
-// SKELETON
+// Loading state
 
 function FeedSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-8">
-					<div className="flex flex-col gap-2">
-						<Skeleton className="h-8 w-32" />
-						<Skeleton className="h-4 w-64" />
-					</div>
-					<div className="grid gap-4 sm:grid-cols-3">
-						{[1, 2, 3].map((i) => (
-							<Skeleton key={i} className="h-24" />
-						))}
-					</div>
-					<Skeleton className="h-32" />
-					<div className="flex flex-col gap-3">
-						{[1, 2, 3, 4, 5].map((i) => (
-							<Skeleton key={i} className="h-20" />
-						))}
-					</div>
+				<div className="flex min-h-64 flex-col items-center justify-center">
+					<ShimmeringText
+						text="Loading your progress..."
+						className="text-lg"
+						duration={1.5}
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>

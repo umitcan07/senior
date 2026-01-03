@@ -1,0 +1,1 @@
+ALTER TABLE "authors" ADD COLUMN "elevenlabs_voice_id" varchar(255);

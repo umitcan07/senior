@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "./index";
-import { practiceTexts } from "./schema";
+import { practiceTexts, referenceSpeeches } from "./schema";
 import type {
 	NewPracticeText,
 	PracticeText,
@@ -9,6 +9,11 @@ import type {
 } from "./types";
 
 export type { PracticeText, NewPracticeText };
+
+// Use schema-inferred type with additional computed field
+export type PracticeTextWithReferenceCount = PracticeText & {
+	referenceCount: number;
+};
 
 /**
  * Calculate word count from text content
@@ -22,6 +27,29 @@ function calculateWordCount(content: string): number {
 
 export async function getPracticeTexts(): Promise<PracticeText[]> {
 	return await db.select().from(practiceTexts);
+}
+
+export async function getPracticeTextsWithReferenceCounts(): Promise<
+	PracticeTextWithReferenceCount[]
+> {
+	const result = await db
+		.select({
+			id: practiceTexts.id,
+			content: practiceTexts.content,
+			difficulty: practiceTexts.difficulty,
+			wordCount: practiceTexts.wordCount,
+			type: practiceTexts.type,
+			note: practiceTexts.note,
+			createdAt: practiceTexts.createdAt,
+			updatedAt: practiceTexts.updatedAt,
+			referenceCount: count(referenceSpeeches.id),
+		})
+		.from(practiceTexts)
+		.leftJoin(referenceSpeeches, eq(practiceTexts.id, referenceSpeeches.textId))
+		.groupBy(practiceTexts.id)
+		.orderBy(practiceTexts.createdAt);
+
+	return result;
 }
 
 export async function getPracticeTextById(

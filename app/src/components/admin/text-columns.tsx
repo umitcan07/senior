@@ -1,7 +1,15 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+	ArrowUpDown,
+	ChevronDown,
+	ChevronRight,
+	MoreHorizontal,
+	Pencil,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -12,9 +20,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import type { PracticeText } from "@/db/text";
+import type { PracticeTextWithReferenceCount } from "@/db/text";
 import type { TextDifficulty } from "@/db/types";
+import { cn } from "@/lib/utils";
 
 export function formatDate(date: Date) {
 	return new Intl.DateTimeFormat("en-US", {
@@ -40,13 +48,16 @@ function getDifficultyColor(difficulty: TextDifficulty) {
 }
 
 export interface TextTableActions {
-	onEdit: (text: PracticeText) => void;
-	onDelete: (text: PracticeText) => void;
+	onEdit: (text: PracticeTextWithReferenceCount) => void;
+	onDelete: (text: PracticeTextWithReferenceCount) => void;
+	onAddReference: (text: PracticeTextWithReferenceCount) => void;
+	onToggleExpand: (textId: string) => void;
+	expandedRows: Set<string>;
 }
 
 export function createColumns(
 	actions: TextTableActions,
-): ColumnDef<PracticeText>[] {
+): ColumnDef<PracticeTextWithReferenceCount>[] {
 	return [
 		{
 			id: "select",
@@ -65,6 +76,37 @@ export function createColumns(
 					aria-label="Select row"
 				/>
 			),
+			enableSorting: false,
+			enableHiding: false,
+		},
+		{
+			id: "expand",
+			size: 40,
+			header: () => null,
+			cell: ({ row }) => {
+				const text = row.original;
+				const isExpanded = actions.expandedRows.has(text.id);
+				const hasReferences = text.referenceCount > 0;
+
+				if (!hasReferences) {
+					return <div className="w-8" />;
+				}
+
+				return (
+					<Button
+						variant="ghost"
+						size="sm"
+						className="h-8 w-8 p-0"
+						onClick={() => actions.onToggleExpand(text.id)}
+					>
+						{isExpanded ? (
+							<ChevronDown className="h-4 w-4" />
+						) : (
+							<ChevronRight className="h-4 w-4" />
+						)}
+					</Button>
+				);
+			},
 			enableSorting: false,
 			enableHiding: false,
 		},
@@ -111,7 +153,7 @@ export function createColumns(
 				return (
 					<span
 						className={cn(
-							"text-sm capitalize font-medium",
+							"font-medium text-sm capitalize",
 							getDifficultyColor(difficulty),
 						)}
 					>
@@ -138,9 +180,49 @@ export function createColumns(
 			cell: ({ row }) => {
 				const type = row.getValue("type") as string;
 				return (
-					<span className="text-sm capitalize text-muted-foreground">
+					<span className="text-muted-foreground text-sm capitalize">
 						{type.replace("_", " ")}
 					</span>
+				);
+			},
+		},
+		{
+			accessorKey: "referenceCount",
+			size: 120,
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+						className="h-8 px-2"
+					>
+						References
+						<ArrowUpDown className="ml-2 h-4 w-4" />
+					</Button>
+				);
+			},
+			cell: ({ row }) => {
+				const count = row.original.referenceCount;
+				return (
+					<div className="flex items-center gap-2">
+						<span
+							className={cn(
+								"text-sm tabular-nums",
+								count === 0 ? "text-muted-foreground" : "text-foreground",
+							)}
+						>
+							{count}
+						</span>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-6 w-6 p-0"
+							onClick={() => actions.onAddReference(row.original)}
+							title="Add reference"
+						>
+							<Plus className="h-3 w-3" />
+						</Button>
+					</div>
 				);
 			},
 		},
@@ -208,6 +290,10 @@ export function createColumns(
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuLabel>Actions</DropdownMenuLabel>
+							<DropdownMenuItem onClick={() => actions.onAddReference(text)}>
+								<Plus className="mr-2 h-4 w-4" />
+								Add Reference
+							</DropdownMenuItem>
 							<DropdownMenuItem onClick={() => actions.onEdit(text)}>
 								<Pencil className="mr-2 h-4 w-4" />
 								Edit
