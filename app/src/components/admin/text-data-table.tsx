@@ -97,13 +97,13 @@ function ReferenceRow({
 				<AudioPlayerButton
 					item={audioItem}
 					variant="ghost"
-					size="icon-sm"
+					size="sm"
 					title="Play reference"
 				/>
 				{onDelete && (
 					<Button
 						variant="ghost"
-						size="icon-sm"
+						size="sm"
 						className="text-destructive hover:text-destructive"
 						onClick={() => onDelete(reference)}
 						title="Delete reference"

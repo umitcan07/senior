@@ -1,10 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-	ArrowRightIcon,
-	BookIcon,
-	BookOpenIcon,
-	ChartBarIncreasingIcon,
-} from "lucide-react";
+import { BookIcon, BookOpenIcon, ChartBarIncreasingIcon } from "lucide-react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +22,7 @@ const features = [
 		title: "Get Insights",
 		description:
 			"Track your progress over time and identify patterns in your pronunciation to focus your practice.",
-		href: "/feed",
+		href: "/summary",
 		icon: <ChartBarIncreasingIcon size={20} />,
 	},
 	{
@@ -91,11 +86,14 @@ function HomePage() {
 		<MainLayout>
 			<PageContainer>
 				<div className="flex flex-col gap-12">
-					<section className="py-8 md:py-20">
+					<section className="py-4 md:py-12">
 						<HeroSection />
 					</section>
 
-					<section>
+					<div className="h-px bg-border/60" />
+
+					<section className="flex flex-col gap-6">
+						<h2 className="font-semibold text-lg">Features</h2>
 						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 							{features.map((feature) => (
 								<FeatureCard key={feature.title} {...feature} />

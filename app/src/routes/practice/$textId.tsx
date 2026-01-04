@@ -7,6 +7,7 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import {
+	AlertCircle,
 	ArrowLeft,
 	Check,
 	ChevronDown,
@@ -89,6 +90,7 @@ function useRecording(textId: string) {
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 	const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+	const [error, setError] = useState<string | null>(null);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
@@ -107,20 +109,29 @@ function useRecording(textId: string) {
 		};
 	}, [audioPreviewUrl]);
 
-	const startRecording = useCallback(() => {
-		chunksRef.current = [];
-		setAudioBlob(null);
-		setState("recording");
-		setRecordingTime(0);
+	const startRecording = useCallback(async () => {
+		try {
+			setError(null);
+			chunksRef.current = [];
+			setAudioBlob(null);
+			setState("recording");
+			setRecordingTime(0);
 
-		timerRef.current = setInterval(() => {
-			setRecordingTime((t) => {
-				if (t >= 59) {
-					return 60;
-				}
-				return t + 1;
-			});
-		}, 1000);
+			timerRef.current = setInterval(() => {
+				setRecordingTime((t) => {
+					if (t >= 59) {
+						stopRecording();
+						return 60;
+					}
+					return t + 1;
+				});
+			}, 1000);
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : "Failed to start recording",
+			);
+			setState("idle");
+		}
 	}, []);
 
 	const stopRecording = useCallback(() => {
@@ -152,17 +163,33 @@ function useRecording(textId: string) {
 		}, 500);
 	}, [mediaStream]);
 
-	const handleStreamReady = useCallback((stream: MediaStream) => {
-		setMediaStream(stream);
-		const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-		mediaRecorder.ondataavailable = (event) => {
-			if (event.data.size > 0) {
-				chunksRef.current.push(event.data);
-			}
-		};
-		mediaRecorderRef.current = mediaRecorder;
-		mediaRecorder.start(100);
+	const handleStreamError = useCallback((err: Error) => {
+		setError(err.message || "Microphone access denied");
+		setState("idle");
 	}, []);
+
+	const handleStreamReady = useCallback(
+		(stream: MediaStream) => {
+			try {
+				setMediaStream(stream);
+				const mediaRecorder = new MediaRecorder(stream, {
+					mimeType: "audio/webm",
+				});
+				mediaRecorder.ondataavailable = (event) => {
+					if (event.data.size > 0) {
+						chunksRef.current.push(event.data);
+					}
+				};
+				mediaRecorderRef.current = mediaRecorder;
+				mediaRecorder.start(100);
+			} catch (err) {
+				handleStreamError(
+					err instanceof Error ? err : new Error("Failed to start recording"),
+				);
+			}
+		},
+		[handleStreamError],
+	);
 
 	const handleStreamEnd = useCallback(() => {
 		setMediaStream(null);
@@ -194,6 +221,7 @@ function useRecording(textId: string) {
 		setRecordingTime(0);
 		setUploadProgress(0);
 		setAudioBlob(null);
+		setError(null);
 		chunksRef.current = [];
 	}, []);
 
@@ -202,12 +230,14 @@ function useRecording(textId: string) {
 		recordingTime,
 		uploadProgress,
 		audioPreviewUrl,
+		error,
 		startRecording,
 		stopRecording,
 		submitRecording,
 		resetRecording,
 		handleStreamReady,
 		handleStreamEnd,
+		handleStreamError,
 	};
 }
 
@@ -217,7 +247,7 @@ function formatTime(seconds: number) {
 	return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-// Reference Voice Section (collapsible, secondary)
+// Reference Voice Section - Prominent and emphasized
 interface ReferenceVoiceProps {
 	references: (ReferenceSpeech & { author: Author })[];
 	selectedId: string | null;
@@ -237,119 +267,134 @@ function ReferenceVoice({
 	}
 
 	return (
-		<div className="flex flex-col gap-3">
-			{/* Always visible: voice selector row */}
-			<div className="flex h-10 items-center justify-between">
-				<Collapsible open={isOpen} onOpenChange={setIsOpen} className="flex-1">
-					<CollapsibleTrigger asChild>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="gap-2 text-muted-foreground"
-						>
-							<Volume2 size={16} />
-							<span>
-								{selectedReference
-									? `${selectedReference.author.name} · ${selectedReference.author.accent}`
-									: "Select reference voice"}
-							</span>
-							<ChevronDown
-								size={14}
-								className={cn("transition-transform", isOpen && "rotate-180")}
-							/>
-						</Button>
-					</CollapsibleTrigger>
-				</Collapsible>
-
-				{/* Inline player - always rendered, visibility controlled */}
-				{selectedReference && (
-					<AudioPlayerProvider>
-						<div
-							className={cn(
-								"flex items-center gap-2 transition-opacity",
-								isOpen ? "pointer-events-none opacity-0" : "opacity-100",
-							)}
-						>
-							<AudioPlayerButton
-								item={{
-									id: selectedReference.id,
-									src: `/api/audio/${selectedReference.id}`,
-								}}
-								variant="ghost"
-								size="sm"
-								className="size-8"
-							/>
-							<AudioPlayerProgress className="hidden w-24 sm:flex" />
+		<div className="flex flex-col gap-4">
+			{/* Selection area - fixed height to prevent shifts */}
+			<div className="flex min-h-18 flex-col gap-3">
+				{/* Always visible: selected voice display */}
+				{selectedReference ? (
+					<div className="flex items-center gap-3 rounded-lg border-2 border-primary/20 bg-primary/5 p-4 transition-colors">
+						<div className="flex min-w-0 flex-1 items-center gap-3">
+							<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+								<Volume2 size={18} className="text-primary" />
+							</div>
+							<div className="min-w-0 flex-1">
+								<div className="font-medium text-sm">
+									{selectedReference.author.name}
+								</div>
+								<div className="flex items-center gap-2 text-muted-foreground text-xs">
+									<Badge variant="secondary" className="text-xs">
+										{selectedReference.author.accent}
+									</Badge>
+									{selectedReference.durationMs && (
+										<span>
+											· {formatDuration(selectedReference.durationMs)}
+										</span>
+									)}
+								</div>
+							</div>
 						</div>
-					</AudioPlayerProvider>
+						<Collapsible open={isOpen} onOpenChange={setIsOpen}>
+							<CollapsibleTrigger asChild>
+								<Button variant="ghost" size="icon" className="size-8">
+									<ChevronDown
+										size={16}
+										className={cn(
+											"transition-transform",
+											isOpen && "rotate-180",
+										)}
+									/>
+								</Button>
+							</CollapsibleTrigger>
+						</Collapsible>
+					</div>
+				) : (
+					<Collapsible open={isOpen} onOpenChange={setIsOpen}>
+						<CollapsibleTrigger asChild>
+							<Button
+								variant="outline"
+								size="lg"
+								className="h-16 w-full justify-between"
+							>
+								<div className="flex items-center gap-3">
+									<Volume2 size={18} />
+									<span>Select voice</span>
+								</div>
+								<ChevronDown
+									size={16}
+									className={cn("transition-transform", isOpen && "rotate-180")}
+								/>
+							</Button>
+						</CollapsibleTrigger>
+					</Collapsible>
+				)}
+
+				{/* Expandable options */}
+				{isOpen && (
+					<div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+						<div className="flex flex-wrap gap-2">
+							{references.map((ref) => {
+								const isSelected = selectedId === ref.id;
+								return (
+									<button
+										key={ref.id}
+										type="button"
+										onClick={() => {
+											onSelect(ref.id);
+											setIsOpen(false);
+										}}
+										className={cn(
+											"group flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all",
+											isSelected
+												? "border-primary bg-primary/10 text-primary shadow-sm"
+												: "border-border hover:border-primary/50 hover:bg-muted/50",
+										)}
+									>
+										{isSelected && <Check size={14} className="text-primary" />}
+										<span className="font-medium">{ref.author.name}</span>
+										<Badge variant="secondary" className="text-xs">
+											{ref.author.accent}
+										</Badge>
+										{ref.durationMs && (
+											<span className="text-muted-foreground text-xs">
+												{formatDuration(ref.durationMs)}
+											</span>
+										)}
+									</button>
+								);
+							})}
+						</div>
+					</div>
 				)}
 			</div>
 
-			{/* Expandable content */}
-			{isOpen && (
-				<div className="flex flex-col gap-3 border-t pt-3">
-					{/* Voice options */}
-					<div className="flex flex-wrap gap-2">
-						{references.map((ref) => {
-							const isSelected = selectedId === ref.id;
-							return (
-								<button
-									key={ref.id}
-									type="button"
-									onClick={() => {
-										onSelect(ref.id);
-										setIsOpen(false);
-									}}
-									className={cn(
-										"flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
-										isSelected
-											? "border-primary bg-primary/10 text-primary"
-											: "border-border hover:border-primary/50",
-									)}
-								>
-									<span className="font-medium">{ref.author.name}</span>
-									<Badge variant="secondary" className="text-xs">
-										{ref.author.accent}
-									</Badge>
-									{ref.durationMs && (
-										<span className="text-muted-foreground text-xs">
-											{formatDuration(ref.durationMs)}
-										</span>
-									)}
-								</button>
-							);
-						})}
+			{/* Audio player - always rendered, fixed height */}
+			{selectedReference && (
+				<AudioPlayerProvider>
+					<div className="flex min-h-16 items-center gap-3 rounded-lg border bg-card p-4">
+						<AudioPlayerButton
+							item={{
+								id: selectedReference.id,
+								src: `/api/audio/${selectedReference.id}`,
+							}}
+							variant="default"
+							size="icon"
+							className="size-10"
+						/>
+						<AudioPlayerProgress className="flex-1" />
+						<div className="flex items-center gap-2 text-muted-foreground text-xs">
+							<AudioPlayerTime />
+							<span>/</span>
+							<AudioPlayerDuration />
+						</div>
+						<AudioPlayerSpeed />
 					</div>
-
-					{/* Full player for selected voice */}
-					{selectedReference && (
-						<AudioPlayerProvider>
-							<div className="flex items-center gap-3">
-								<AudioPlayerButton
-									item={{
-										id: selectedReference.id,
-										src: `/api/audio/${selectedReference.id}`,
-									}}
-									variant="outline"
-									size="icon"
-								/>
-								<AudioPlayerProgress className="flex-1" />
-								<div className="flex items-center gap-2 text-muted-foreground text-xs">
-									<AudioPlayerTime />
-									<span>/</span>
-									<AudioPlayerDuration />
-								</div>
-								<AudioPlayerSpeed />
-							</div>
-						</AudioPlayerProvider>
-					)}
-				</div>
+				</AudioPlayerProvider>
 			)}
 		</div>
 	);
 }
 
-// Recent Attempts (minimal)
+// Recent Attempts
 interface RecentAttemptsProps {
 	attempts: Array<{
 		id: string;
@@ -366,7 +411,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 	if (attempts.length === 0) return null;
 
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-3 border-t pt-6">
 			<h3 className="font-medium text-muted-foreground text-sm">
 				Recent Attempts
 			</h3>
@@ -376,7 +421,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 						key={attempt.id}
 						to="/practice/$textId/analysis/$analysisId"
 						params={{ textId, analysisId: attempt.analysisId }}
-						className="flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors hover:border-primary/50 hover:bg-muted/50"
+						className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:border-primary/50 hover:bg-muted/50"
 					>
 						<span
 							className={cn(
@@ -386,7 +431,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 						>
 							{attempt.score}%
 						</span>
-						<span className="text-muted-foreground">
+						<span className="text-muted-foreground text-xs">
 							{formatRelativeTime(attempt.date)}
 						</span>
 					</Link>
@@ -401,12 +446,22 @@ function TextDetailSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer maxWidth="md">
-				<div className="flex min-h-64 flex-col items-center justify-center">
-					<ShimmeringText
-						text="Loading practice text..."
-						className="text-lg"
-						duration={1.5}
-					/>
+				<div className="flex flex-col gap-8">
+					<div className="flex items-center gap-3">
+						<Button variant="ghost" size="sm" asChild>
+							<Link to="/practice" className="gap-2">
+								<ArrowLeft size={16} />
+								Back
+							</Link>
+						</Button>
+					</div>
+					<div className="flex min-h-48 flex-col items-center justify-center rounded-2xl border-2 border-border bg-card p-6 md:p-8">
+						<ShimmeringText
+							text="Loading practice text..."
+							className="text-lg text-muted-foreground"
+							duration={1.5}
+						/>
+					</div>
 				</div>
 			</PageContainer>
 		</MainLayout>
@@ -474,22 +529,22 @@ function PracticeTextPage() {
 						</Button>
 					</div>
 
-					{/* Main content area */}
+					{/* Main content */}
 					<div className="flex flex-col gap-6">
-						{/* Reference voice selector (secondary, collapsible) */}
+						{/* Reference voice - prominent */}
 						<ReferenceVoice
 							references={references}
 							selectedId={selectedReferenceId}
 							onSelect={setSelectedReferenceId}
 						/>
 
-						{/* THE TEXT - Main focus */}
+						{/* Practice text */}
 						<div
 							className={cn(
-								"rounded-2xl border-2 p-6 transition-colors md:p-8",
+								"rounded-2xl border-2 p-6 transition-all md:p-8",
 								isRecording
-									? "border-destructive/50 bg-destructive/5"
-									: "border-border bg-card",
+									? "border-destructive/50 bg-destructive/5 shadow-destructive/10 shadow-lg"
+									: "border-border",
 							)}
 						>
 							<p className="font-serif text-xl leading-relaxed md:text-2xl md:leading-relaxed">
@@ -497,10 +552,10 @@ function PracticeTextPage() {
 							</p>
 						</div>
 
-						{/* Recording controls - fixed height container to prevent shifts */}
-						<div className="flex flex-col items-center">
-							{/* Waveform visualization - fixed height */}
-							<div className="h-20 w-full">
+						{/* Recording section - fixed heights */}
+						<div className="flex flex-col gap-4">
+							{/* Waveform - fixed height */}
+							<div className="h-20 w-full overflow-hidden rounded-lg">
 								<LiveWaveform
 									active={isRecording}
 									processing={isProcessing}
@@ -515,11 +570,32 @@ function PracticeTextPage() {
 								/>
 							</div>
 
-							{/* Controls container - fixed min-height */}
-							<div className="flex min-h-32 w-full flex-col items-center justify-center gap-4 pt-4">
+							{/* Controls - fixed min-height */}
+							<div className="flex min-h-32 flex-col items-center justify-center gap-4">
 								<SignedIn>
+									{/* Error state */}
+									{recording.error && (
+										<div className="flex w-full max-w-md flex-col gap-3 rounded-lg border border-destructive/50 bg-destructive/5 p-4">
+											<div className="flex items-center gap-2 text-destructive text-sm">
+												<AlertCircle size={16} />
+												<span className="font-medium">Recording Error</span>
+											</div>
+											<p className="text-destructive text-xs">
+												{recording.error}
+											</p>
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={recording.resetRecording}
+												className="w-full"
+											>
+												Try Again
+											</Button>
+										</div>
+									)}
+
 									{/* Idle state */}
-									{isIdle && (
+									{isIdle && !recording.error && (
 										<Button
 											size="lg"
 											onClick={recording.startRecording}
@@ -527,15 +603,13 @@ function PracticeTextPage() {
 											className="gap-2"
 										>
 											<Mic size={18} />
-											{selectedReferenceId
-												? "Start Recording"
-												: "Select a voice first"}
+											{selectedReferenceId ? "Record" : "Select voice first"}
 										</Button>
 									)}
 
 									{/* Recording state */}
 									{isRecording && (
-										<>
+										<div className="flex w-full max-w-md flex-col items-center gap-4">
 											<div className="flex items-center gap-3">
 												<span className="relative flex size-3">
 													<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
@@ -560,28 +634,31 @@ function PracticeTextPage() {
 													Auto-stop at 60s
 												</p>
 											)}
-										</>
+										</div>
 									)}
 
 									{/* Processing state */}
 									{isProcessing && (
-										<p className="text-muted-foreground text-sm">
-											Processing...
-										</p>
+										<ShimmeringText
+											text="Processing..."
+											className="text-muted-foreground text-sm"
+											duration={1.5}
+										/>
 									)}
 
 									{/* Preview state */}
 									{hasPreview && (
-										<>
+										<div className="flex w-full max-w-md flex-col gap-4">
 											<AudioPlayerProvider>
-												<div className="flex w-full max-w-md items-center gap-3">
+												<div className="flex items-center gap-3 rounded-lg border bg-card p-4">
 													<AudioPlayerButton
 														item={{
 															id: "preview",
 															src: recording.audioPreviewUrl!,
 														}}
-														variant="outline"
+														variant="default"
 														size="icon"
+														className="size-10"
 													/>
 													<AudioPlayerProgress className="flex-1" />
 													<span className="font-mono text-muted-foreground text-sm tabular-nums">
@@ -593,25 +670,25 @@ function PracticeTextPage() {
 												<Button
 													variant="outline"
 													onClick={recording.resetRecording}
-													className="gap-2"
+													className="flex-1 gap-2"
 												>
 													<RotateCcw size={16} />
 													Re-record
 												</Button>
 												<Button
 													onClick={recording.submitRecording}
-													className="gap-2"
+													className="flex-1 gap-2"
 												>
 													<Check size={16} />
 													Submit
 												</Button>
 											</div>
-										</>
+										</div>
 									)}
 
 									{/* Uploading state */}
 									{isUploading && (
-										<div className="flex w-full max-w-xs flex-col gap-2">
+										<div className="flex w-full max-w-md flex-col gap-3">
 											<Progress
 												value={recording.uploadProgress}
 												className="h-2"
@@ -627,7 +704,7 @@ function PracticeTextPage() {
 									{/* Analyzing state */}
 									{isAnalyzing && (
 										<ShimmeringText
-											text="Analyzing pronunciation..."
+											text="Analyzing..."
 											className="text-muted-foreground text-sm"
 											duration={1.5}
 										/>
@@ -635,21 +712,23 @@ function PracticeTextPage() {
 								</SignedIn>
 
 								<SignedOut>
-									<Button disabled className="gap-2">
-										<Mic size={18} />
-										Sign in to record
-									</Button>
-									<Button variant="outline" asChild>
-										<SignInButton mode="modal">
-											Sign in to start practicing
-										</SignInButton>
-									</Button>
+									<div className="flex w-full max-w-md flex-col gap-3">
+										<Button disabled className="gap-2" size="lg">
+											<Mic size={18} />
+											Sign in to record
+										</Button>
+										<Button variant="outline" asChild size="lg">
+											<SignInButton mode="modal">
+												Sign in to start practicing
+											</SignInButton>
+										</Button>
+									</div>
 								</SignedOut>
 							</div>
 						</div>
 					</div>
 
-					{/* Recent attempts (minimal) */}
+					{/* Recent attempts */}
 					<SignedIn>
 						<RecentAttempts attempts={recentAttempts} textId={text.id} />
 					</SignedIn>

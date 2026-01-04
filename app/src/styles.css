@@ -29,6 +29,10 @@ code {
 		source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	@apply font-display;
+}
+
 :root {
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.1450 0 0);
@@ -62,6 +66,7 @@ code {
 	--sidebar-accent-foreground: oklch(0.2050 0 0);
 	--sidebar-border: oklch(0.9220 0 0);
 	--sidebar-ring: oklch(0.7080 0 0);
+	--font-display: "Innovator Grotesk", sans-serif;
 	--font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 	--font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

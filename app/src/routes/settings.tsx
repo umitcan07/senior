@@ -1,7 +1,7 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/clerk-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mic, Monitor, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	MainLayout,
 	PageContainer,
@@ -21,6 +21,10 @@ import { Spinner } from "@/components/ui/spinner";
 import type { Author } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";
+import {
+	serverGetUserPreferences,
+	serverUpdateUserPreferences,
+} from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/settings")({
 	component: SettingsPage,
@@ -28,7 +32,6 @@ export const Route = createFileRoute("/settings")({
 		const authorsResult = await serverGetAuthors();
 		const authors = authorsResult.success ? authorsResult.data : [];
 
-		// TODO: Fetch user preferences from database
 		return {
 			authors,
 			currentPreferredAuthorId: authors[0]?.id ?? null,
@@ -169,30 +172,93 @@ function GuestSettings() {
 // MAIN PAGE
 
 function SettingsPage() {
-	const { authors, currentPreferredAuthorId } = Route.useLoaderData();
+	const { authors, currentPreferredAuthorId: initialAuthorId } =
+		Route.useLoaderData();
+	const { user, isLoaded } = useUser();
 	const [savedAuthorId, setSavedAuthorId] = useState<string | null>(
-		currentPreferredAuthorId,
+		initialAuthorId,
 	);
 	const [pendingAuthorId, setPendingAuthorId] = useState<string | null>(
-		currentPreferredAuthorId,
+		initialAuthorId,
 	);
+	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const { toast } = useToast();
+
+	// Load user preferences when user is available
+	useEffect(() => {
+		if (!isLoaded || !user?.id) {
+			setIsLoading(false);
+			return;
+		}
+
+		const loadPreferences = async () => {
+			try {
+				const result = await serverGetUserPreferences({
+					data: { userId: user.id },
+				});
+
+				if (result.success && result.data?.preferredAuthorId) {
+					const preferredId = result.data.preferredAuthorId;
+					setSavedAuthorId(preferredId);
+					setPendingAuthorId(preferredId);
+				}
+			} catch (error) {
+				console.error("Load preferences error:", error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		loadPreferences();
+	}, [isLoaded, user?.id]);
 
 	const hasChanges = pendingAuthorId !== savedAuthorId;
 
 	const handleSave = async () => {
+		if (!user?.id) {
+			toast({
+				title: "Authentication required",
+				description: "Please sign in to save preferences.",
+				variant: "destructive",
+			});
+			return;
+		}
+
 		setIsSaving(true);
 
-		// Simulate API call
-		await new Promise((resolve) => setTimeout(resolve, 500));
+		try {
+			const result = await serverUpdateUserPreferences({
+				data: {
+					userId: user.id,
+					preferredAuthorId: pendingAuthorId,
+				},
+			});
 
-		setSavedAuthorId(pendingAuthorId);
-		setIsSaving(false);
-		toast({
-			title: "Preferences saved",
-			description: "Your preferred voice has been updated.",
-		});
+			if (!result.success) {
+				toast({
+					title: "Failed to save preferences",
+					description: result.error.message,
+					variant: "destructive",
+				});
+				return;
+			}
+
+			setSavedAuthorId(pendingAuthorId);
+			toast({
+				title: "Preferences saved",
+				description: "Your preferred voice has been updated.",
+			});
+		} catch (error) {
+			console.error("Save preferences error:", error);
+			toast({
+				title: "Failed to save preferences",
+				description: "An unexpected error occurred. Please try again.",
+				variant: "destructive",
+			});
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const handleCancel = () => {
@@ -219,36 +285,45 @@ function SettingsPage() {
 									description="Choose your default reference voice for practice sessions. This voice will be pre-selected when you start a new practice."
 									icon={<Mic className="size-5" />}
 								>
-									<div className="flex gap-4">
-										<AuthorSelector
-											authors={authors}
-											selectedAuthorId={pendingAuthorId}
-											onSelect={setPendingAuthorId}
-											disabled={isSaving}
-										/>
-										{hasChanges && (
-											<div className="ml-auto flex items-center gap-2">
-												<Button
-													onClick={handleSave}
-													disabled={isSaving}
-													size="sm"
-												>
-													{isSaving && (
-														<Spinner className="size-4 text-primary-foreground" />
-													)}
-													Save
-												</Button>
-												<Button
-													onClick={handleCancel}
-													disabled={isSaving}
-													variant="outline"
-													size="sm"
-												>
-													Cancel
-												</Button>
-											</div>
-										)}
-									</div>
+									{isLoading ? (
+										<div className="flex items-center gap-2">
+											<Spinner className="size-4" />
+											<span className="text-muted-foreground text-sm">
+												Loading preferences...
+											</span>
+										</div>
+									) : (
+										<div className="flex gap-4">
+											<AuthorSelector
+												authors={authors}
+												selectedAuthorId={pendingAuthorId}
+												onSelect={setPendingAuthorId}
+												disabled={isSaving}
+											/>
+											{hasChanges && (
+												<div className="ml-auto flex items-center gap-2">
+													<Button
+														onClick={handleSave}
+														disabled={isSaving}
+														size="sm"
+													>
+														{isSaving && (
+															<Spinner className="size-4 text-primary-foreground" />
+														)}
+														Save
+													</Button>
+													<Button
+														onClick={handleCancel}
+														disabled={isSaving}
+														variant="outline"
+														size="sm"
+													>
+														Cancel
+													</Button>
+												</div>
+											)}
+										</div>
+									)}
 								</SettingsSection>
 
 								<div className="border-t" />

@@ -4,6 +4,7 @@ import {
 	HeadContent,
 	Scripts,
 } from "@tanstack/react-router";
+import { GlobalError } from "@/components/error-boundary";
 import { NotFound } from "@/components/not-found";
 import { ThemeInitializer } from "@/components/theme-initializer";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -22,7 +23,7 @@ const appDescription =
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	notFoundComponent: NotFound,
-	errorComponent: () => <div>Error</div>,
+	errorComponent: GlobalError,
 	head: () => ({
 		meta: [
 			{

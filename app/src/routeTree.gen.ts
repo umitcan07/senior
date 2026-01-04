@@ -14,6 +14,8 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LearnRouteImport } from './routes/learn'
+import { Route as ErrorRouteImport } from './routes/error'
+import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PracticeIndexRouteImport } from './routes/practice/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -48,6 +50,16 @@ const LoginRoute = LoginRouteImport.update({
 const LearnRoute = LearnRouteImport.update({
   id: '/learn',
   path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErrorRoute = ErrorRouteImport.update({
+  id: '/error',
+  path: '/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R404Route = R404RouteImport.update({
+  id: '/404',
+  path: '/404',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -104,6 +116,8 @@ const ApiAudioLearnKeyRoute = ApiAudioLearnKeyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/error': typeof ErrorRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
@@ -121,6 +135,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/error': typeof ErrorRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
@@ -138,6 +154,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/error': typeof ErrorRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
@@ -157,6 +175,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/404'
+    | '/error'
     | '/learn'
     | '/login'
     | '/practice'
@@ -174,6 +194,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/404'
+    | '/error'
     | '/learn'
     | '/login'
     | '/settings'
@@ -190,6 +212,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/404'
+    | '/error'
     | '/learn'
     | '/login'
     | '/practice'
@@ -208,6 +232,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R404Route: typeof R404Route
+  ErrorRoute: typeof ErrorRoute
   LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
   PracticeRoute: typeof PracticeRouteWithChildren
@@ -256,6 +282,20 @@ declare module '@tanstack/react-router' {
       path: '/learn'
       fullPath: '/learn'
       preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/error': {
+      id: '/error'
+      path: '/error'
+      fullPath: '/error'
+      preLoaderRoute: typeof ErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/404': {
+      id: '/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof R404RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -359,6 +399,8 @@ const PracticeRouteWithChildren = PracticeRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R404Route: R404Route,
+  ErrorRoute: ErrorRoute,
   LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
   PracticeRoute: PracticeRouteWithChildren,

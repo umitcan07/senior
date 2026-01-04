@@ -69,7 +69,6 @@
 		"pg": "^8.11.0",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
-		"react-voice-visualizer": "^2.0.8",
 		"remixicon": "^4.7.0",
 		"tailwind-merge": "^3.0.2",
 		"tailwindcss": "^4.0.6",

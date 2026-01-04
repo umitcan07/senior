@@ -1,11 +1,7 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-	MainLayout,
-	PageContainer,
-	PageHeader,
-} from "@/components/layout/main-layout";
+import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -337,12 +333,14 @@ function FeedSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex min-h-64 flex-col items-center justify-center">
-					<ShimmeringText
-						text="Loading your progress..."
-						className="text-lg"
-						duration={1.5}
-					/>
+				<div className="flex flex-col gap-12">
+					<div className="flex min-h-64 flex-col items-center justify-center">
+						<ShimmeringText
+							text="Loading your progress..."
+							className="text-lg"
+							duration={1.5}
+						/>
+					</div>
 				</div>
 			</PageContainer>
 		</MainLayout>
@@ -355,12 +353,7 @@ function GuestFeed() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-8">
-					<PageHeader
-						title="Your History"
-						description="Track your pronunciation progress over time"
-					/>
-
+				<div className="flex flex-col gap-16">
 					<Card className="bg-muted/30">
 						<CardContent className="flex flex-col items-center gap-4 py-12 text-center">
 							<div className="flex flex-col gap-2">
@@ -408,32 +401,33 @@ function FeedPage() {
 			<SignedIn>
 				<MainLayout>
 					<PageContainer>
-						<div className="flex flex-col gap-8">
-							<PageHeader
-								title="Your History"
-								description="Track your pronunciation progress over time"
-							/>
-
+						<div className="flex flex-col gap-16">
 							{/* Stats Summary */}
-							<StatsSummary stats={stats} />
+							<section className="flex flex-col gap-6">
+								<h2 className="font-semibold text-lg">Overview</h2>
+								<StatsSummary stats={stats} />
+							</section>
 
 							{/* Common Errors */}
-							<CommonErrors errors={commonErrors} />
+							{commonErrors.length > 0 && (
+								<CommonErrors errors={commonErrors} />
+							)}
 
-							{/* Filter Bar */}
-							<FilterBar
-								texts={texts}
-								selectedTextId={selectedTextId}
-								sortBy={sortBy}
-								onTextChange={setSelectedTextId}
-								onSortChange={setSortBy}
-							/>
-
-							{/* Attempt List */}
-							<AttemptList
-								attempts={filteredAttempts}
-								hasMore={filteredAttempts.length >= 10}
-							/>
+							{/* Filter Bar & Attempt List */}
+							<section className="flex flex-col gap-6">
+								<h2 className="font-semibold text-lg">Practice History</h2>
+								<FilterBar
+									texts={texts}
+									selectedTextId={selectedTextId}
+									sortBy={sortBy}
+									onTextChange={setSelectedTextId}
+									onSortChange={setSortBy}
+								/>
+								<AttemptList
+									attempts={filteredAttempts}
+									hasMore={filteredAttempts.length >= 10}
+								/>
+							</section>
 						</div>
 					</PageContainer>
 				</MainLayout>

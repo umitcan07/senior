@@ -1,11 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronDown, Flame, Layers, Leaf, Zap } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import {
-	MainLayout,
-	PageContainer,
-	PageHeader,
-} from "@/components/layout/main-layout";
+import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import {
 	categoryGradientVariants,
 	categoryLabels,
@@ -159,12 +155,14 @@ function PracticePageSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex min-h-64 flex-col items-center justify-center">
-					<ShimmeringText
-						text="Loading practice texts..."
-						className="text-lg"
-						duration={1.5}
-					/>
+				<div className="flex flex-col gap-12">
+					<div className="flex min-h-64 flex-col items-center justify-center">
+						<ShimmeringText
+							text="Loading practice texts..."
+							className="text-lg"
+							duration={1.5}
+						/>
+					</div>
 				</div>
 			</PageContainer>
 		</MainLayout>
@@ -233,68 +231,71 @@ function PracticePage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-4 sm:gap-6">
-					<PageHeader
-						title="Practice Texts"
-						description="Choose a text to practice your pronunciation."
-					/>
-
+				<div className="flex flex-col gap-16">
 					{allTexts.length > 0 && (
 						<>
-							{/* Category cards - grid with padding for ring */}
-							<div className="-mx-1 px-1 py-1">
-								<div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6 sm:gap-3">
-									{categoryTypes.map((type) => (
-										<CategoryCard
-											key={type}
-											type={type}
-											isSelected={typeFilter === type}
-											onClick={() => handleTypeFilterChange(type)}
-										/>
-									))}
+							{/* Filters Section */}
+							<section className="flex flex-col gap-6">
+								{/* Category cards - grid with padding for ring */}
+								<div className="-mx-1 px-1 py-1">
+									<div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6 sm:gap-3">
+										{categoryTypes.map((type) => (
+											<CategoryCard
+												key={type}
+												type={type}
+												isSelected={typeFilter === type}
+												onClick={() => handleTypeFilterChange(type)}
+											/>
+										))}
+									</div>
 								</div>
-							</div>
 
-							{/* Difficulty switcher */}
-							<DifficultySwitcher
-								value={difficultyFilter}
-								onChange={handleDifficultyFilterChange}
+								{/* Difficulty switcher */}
+								<DifficultySwitcher
+									value={difficultyFilter}
+									onChange={handleDifficultyFilterChange}
+								/>
+							</section>
+
+							<div className="h-px bg-border/60" />
+						</>
+					)}
+
+					{/* Results Section */}
+					<section className="flex flex-col gap-6">
+						{filteredTexts.length > 0 ? (
+							<>
+								<PracticeTextTable texts={visibleTexts} />
+								{hasMore && (
+									<div className="flex justify-center pb-4">
+										<Button variant="outline" onClick={handleLoadMore}>
+											<ChevronDown size={16} />
+											Load More
+										</Button>
+									</div>
+								)}
+							</>
+						) : allTexts.length > 0 ? (
+							<EmptyState
+								title="No texts match your filters"
+								description="Try adjusting your difficulty or type filters to see more texts."
 							/>
-						</>
-					)}
-
-					{filteredTexts.length > 0 ? (
-						<>
-							<PracticeTextTable texts={visibleTexts} />
-							{hasMore && (
-								<div className="flex justify-center pb-4">
-									<Button variant="outline" onClick={handleLoadMore}>
-										<ChevronDown size={16} />
-										Load More
-									</Button>
-								</div>
-							)}
-						</>
-					) : allTexts.length > 0 ? (
-						<EmptyState
-							title="No texts match your filters"
-							description="Try adjusting your difficulty or type filters to see more texts."
-						/>
-					) : (
-						<EmptyState
-							title="No practice texts available"
-							description={
-								<>
-									The application is still in early development.
-									<br />
-									Feel free to contact us at{" "}
-									<InlineLink href="mailto:umit.evleksiz@std.bogazici.edu.tr">
-										umit.evleksiz@std.bogazici.edu.tr
-									</InlineLink>
-								</>
-							}
-						/>
-					)}
+						) : (
+							<EmptyState
+								title="No practice texts available"
+								description={
+									<>
+										The application is still in early development.
+										<br />
+										Feel free to contact us at{" "}
+										<InlineLink href="mailto:umit.evleksiz@std.bogazici.edu.tr">
+											umit.evleksiz@std.bogazici.edu.tr
+										</InlineLink>
+									</>
+								}
+							/>
+						)}
+					</section>
 				</div>
 			</PageContainer>
 		</MainLayout>

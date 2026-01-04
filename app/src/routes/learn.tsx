@@ -1,15 +1,26 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Volume2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { RefreshCw, Volume2 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import {
-	MainLayout,
-	PageContainer,
-	PageHeader,
-} from "@/components/layout/main-layout";
+import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import { useRequireAdmin } from "@/lib/auth";
+import {
+	serverGenerateIPAAudio,
+	serverGetIPAAudioStatus,
+} from "@/lib/ipa-audio";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/learn")({
@@ -18,6 +29,7 @@ export const Route = createFileRoute("/learn")({
 
 // Static R2 audio map for IPA sounds
 // Keys are R2 storage paths, values will be fetched via /api/audio/learn/{key}
+// Using WAV PCM 16kHz format
 const IPA_AUDIO_MAP: Record<
 	string,
 	{ word: string; wordAudio: string; soundAudio: string }
@@ -25,225 +37,225 @@ const IPA_AUDIO_MAP: Record<
 	// Vowels
 	iː: {
 		word: "see",
-		wordAudio: "ipa/words/see.mp3",
-		soundAudio: "ipa/sounds/i-long.mp3",
+		wordAudio: "ipa/words/see.wav",
+		soundAudio: "ipa/sounds/i-long.wav",
 	},
 	ɪ: {
 		word: "sit",
-		wordAudio: "ipa/words/sit.mp3",
-		soundAudio: "ipa/sounds/i-short.mp3",
+		wordAudio: "ipa/words/sit.wav",
+		soundAudio: "ipa/sounds/i-short.wav",
 	},
 	e: {
 		word: "bed",
-		wordAudio: "ipa/words/bed.mp3",
-		soundAudio: "ipa/sounds/e.mp3",
+		wordAudio: "ipa/words/bed.wav",
+		soundAudio: "ipa/sounds/e.wav",
 	},
 	æ: {
 		word: "cat",
-		wordAudio: "ipa/words/cat.mp3",
-		soundAudio: "ipa/sounds/ae.mp3",
+		wordAudio: "ipa/words/cat.wav",
+		soundAudio: "ipa/sounds/ae.wav",
 	},
 	ɑː: {
 		word: "father",
-		wordAudio: "ipa/words/father.mp3",
-		soundAudio: "ipa/sounds/a-long.mp3",
+		wordAudio: "ipa/words/father.wav",
+		soundAudio: "ipa/sounds/a-long.wav",
 	},
 	ɒ: {
 		word: "hot",
-		wordAudio: "ipa/words/hot.mp3",
-		soundAudio: "ipa/sounds/o-short.mp3",
+		wordAudio: "ipa/words/hot.wav",
+		soundAudio: "ipa/sounds/o-short.wav",
 	},
 	ɔː: {
 		word: "saw",
-		wordAudio: "ipa/words/saw.mp3",
-		soundAudio: "ipa/sounds/o-long.mp3",
+		wordAudio: "ipa/words/saw.wav",
+		soundAudio: "ipa/sounds/o-long.wav",
 	},
 	ʊ: {
 		word: "put",
-		wordAudio: "ipa/words/put.mp3",
-		soundAudio: "ipa/sounds/u-short.mp3",
+		wordAudio: "ipa/words/put.wav",
+		soundAudio: "ipa/sounds/u-short.wav",
 	},
 	uː: {
 		word: "too",
-		wordAudio: "ipa/words/too.mp3",
-		soundAudio: "ipa/sounds/u-long.mp3",
+		wordAudio: "ipa/words/too.wav",
+		soundAudio: "ipa/sounds/u-long.wav",
 	},
 	ʌ: {
 		word: "cup",
-		wordAudio: "ipa/words/cup.mp3",
-		soundAudio: "ipa/sounds/uh.mp3",
+		wordAudio: "ipa/words/cup.wav",
+		soundAudio: "ipa/sounds/uh.wav",
 	},
 	ɜː: {
 		word: "bird",
-		wordAudio: "ipa/words/bird.mp3",
-		soundAudio: "ipa/sounds/er.mp3",
+		wordAudio: "ipa/words/bird.wav",
+		soundAudio: "ipa/sounds/er.wav",
 	},
 	ə: {
 		word: "about",
-		wordAudio: "ipa/words/about.mp3",
-		soundAudio: "ipa/sounds/schwa.mp3",
+		wordAudio: "ipa/words/about.wav",
+		soundAudio: "ipa/sounds/schwa.wav",
 	},
 	// Diphthongs
 	eɪ: {
 		word: "day",
-		wordAudio: "ipa/words/day.mp3",
-		soundAudio: "ipa/sounds/ei.mp3",
+		wordAudio: "ipa/words/day.wav",
+		soundAudio: "ipa/sounds/ei.wav",
 	},
 	aɪ: {
 		word: "my",
-		wordAudio: "ipa/words/my.mp3",
-		soundAudio: "ipa/sounds/ai.mp3",
+		wordAudio: "ipa/words/my.wav",
+		soundAudio: "ipa/sounds/ai.wav",
 	},
 	ɔɪ: {
 		word: "boy",
-		wordAudio: "ipa/words/boy.mp3",
-		soundAudio: "ipa/sounds/oi.mp3",
+		wordAudio: "ipa/words/boy.wav",
+		soundAudio: "ipa/sounds/oi.wav",
 	},
 	aʊ: {
 		word: "now",
-		wordAudio: "ipa/words/now.mp3",
-		soundAudio: "ipa/sounds/au.mp3",
+		wordAudio: "ipa/words/now.wav",
+		soundAudio: "ipa/sounds/au.wav",
 	},
 	əʊ: {
 		word: "go",
-		wordAudio: "ipa/words/go.mp3",
-		soundAudio: "ipa/sounds/ou.mp3",
+		wordAudio: "ipa/words/go.wav",
+		soundAudio: "ipa/sounds/ou.wav",
 	},
 	ɪə: {
 		word: "near",
-		wordAudio: "ipa/words/near.mp3",
-		soundAudio: "ipa/sounds/ia.mp3",
+		wordAudio: "ipa/words/near.wav",
+		soundAudio: "ipa/sounds/ia.wav",
 	},
 	eə: {
 		word: "hair",
-		wordAudio: "ipa/words/hair.mp3",
-		soundAudio: "ipa/sounds/ea.mp3",
+		wordAudio: "ipa/words/hair.wav",
+		soundAudio: "ipa/sounds/ea.wav",
 	},
 	ʊə: {
 		word: "pure",
-		wordAudio: "ipa/words/pure.mp3",
-		soundAudio: "ipa/sounds/ua.mp3",
+		wordAudio: "ipa/words/pure.wav",
+		soundAudio: "ipa/sounds/ua.wav",
 	},
 	// Consonants
 	p: {
 		word: "pet",
-		wordAudio: "ipa/words/pet.mp3",
-		soundAudio: "ipa/sounds/p.mp3",
+		wordAudio: "ipa/words/pet.wav",
+		soundAudio: "ipa/sounds/p.wav",
 	},
 	b: {
 		word: "bed",
-		wordAudio: "ipa/words/bed.mp3",
-		soundAudio: "ipa/sounds/b.mp3",
+		wordAudio: "ipa/words/bed.wav",
+		soundAudio: "ipa/sounds/b.wav",
 	},
 	t: {
 		word: "ten",
-		wordAudio: "ipa/words/ten.mp3",
-		soundAudio: "ipa/sounds/t.mp3",
+		wordAudio: "ipa/words/ten.wav",
+		soundAudio: "ipa/sounds/t.wav",
 	},
 	d: {
 		word: "dog",
-		wordAudio: "ipa/words/dog.mp3",
-		soundAudio: "ipa/sounds/d.mp3",
+		wordAudio: "ipa/words/dog.wav",
+		soundAudio: "ipa/sounds/d.wav",
 	},
 	k: {
 		word: "cat",
-		wordAudio: "ipa/words/cat-k.mp3",
-		soundAudio: "ipa/sounds/k.mp3",
+		wordAudio: "ipa/words/cat-k.wav",
+		soundAudio: "ipa/sounds/k.wav",
 	},
 	g: {
 		word: "go",
-		wordAudio: "ipa/words/go-g.mp3",
-		soundAudio: "ipa/sounds/g.mp3",
+		wordAudio: "ipa/words/go-g.wav",
+		soundAudio: "ipa/sounds/g.wav",
 	},
 	f: {
 		word: "fan",
-		wordAudio: "ipa/words/fan.mp3",
-		soundAudio: "ipa/sounds/f.mp3",
+		wordAudio: "ipa/words/fan.wav",
+		soundAudio: "ipa/sounds/f.wav",
 	},
 	v: {
 		word: "van",
-		wordAudio: "ipa/words/van.mp3",
-		soundAudio: "ipa/sounds/v.mp3",
+		wordAudio: "ipa/words/van.wav",
+		soundAudio: "ipa/sounds/v.wav",
 	},
 	θ: {
 		word: "think",
-		wordAudio: "ipa/words/think.mp3",
-		soundAudio: "ipa/sounds/th-voiceless.mp3",
+		wordAudio: "ipa/words/think.wav",
+		soundAudio: "ipa/sounds/th-voiceless.wav",
 	},
 	ð: {
 		word: "this",
-		wordAudio: "ipa/words/this.mp3",
-		soundAudio: "ipa/sounds/th-voiced.mp3",
+		wordAudio: "ipa/words/this.wav",
+		soundAudio: "ipa/sounds/th-voiced.wav",
 	},
 	s: {
 		word: "sit",
-		wordAudio: "ipa/words/sit-s.mp3",
-		soundAudio: "ipa/sounds/s.mp3",
+		wordAudio: "ipa/words/sit-s.wav",
+		soundAudio: "ipa/sounds/s.wav",
 	},
 	z: {
 		word: "zoo",
-		wordAudio: "ipa/words/zoo.mp3",
-		soundAudio: "ipa/sounds/z.mp3",
+		wordAudio: "ipa/words/zoo.wav",
+		soundAudio: "ipa/sounds/z.wav",
 	},
 	ʃ: {
 		word: "ship",
-		wordAudio: "ipa/words/ship.mp3",
-		soundAudio: "ipa/sounds/sh.mp3",
+		wordAudio: "ipa/words/ship.wav",
+		soundAudio: "ipa/sounds/sh.wav",
 	},
 	ʒ: {
 		word: "measure",
-		wordAudio: "ipa/words/measure.mp3",
-		soundAudio: "ipa/sounds/zh.mp3",
+		wordAudio: "ipa/words/measure.wav",
+		soundAudio: "ipa/sounds/zh.wav",
 	},
 	h: {
 		word: "hat",
-		wordAudio: "ipa/words/hat.mp3",
-		soundAudio: "ipa/sounds/h.mp3",
+		wordAudio: "ipa/words/hat.wav",
+		soundAudio: "ipa/sounds/h.wav",
 	},
 	tʃ: {
 		word: "church",
-		wordAudio: "ipa/words/church.mp3",
-		soundAudio: "ipa/sounds/ch.mp3",
+		wordAudio: "ipa/words/church.wav",
+		soundAudio: "ipa/sounds/ch.wav",
 	},
 	dʒ: {
 		word: "judge",
-		wordAudio: "ipa/words/judge.mp3",
-		soundAudio: "ipa/sounds/j.mp3",
+		wordAudio: "ipa/words/judge.wav",
+		soundAudio: "ipa/sounds/j.wav",
 	},
 	m: {
 		word: "man",
-		wordAudio: "ipa/words/man.mp3",
-		soundAudio: "ipa/sounds/m.mp3",
+		wordAudio: "ipa/words/man.wav",
+		soundAudio: "ipa/sounds/m.wav",
 	},
 	n: {
 		word: "no",
-		wordAudio: "ipa/words/no.mp3",
-		soundAudio: "ipa/sounds/n.mp3",
+		wordAudio: "ipa/words/no.wav",
+		soundAudio: "ipa/sounds/n.wav",
 	},
 	ŋ: {
 		word: "sing",
-		wordAudio: "ipa/words/sing.mp3",
-		soundAudio: "ipa/sounds/ng.mp3",
+		wordAudio: "ipa/words/sing.wav",
+		soundAudio: "ipa/sounds/ng.wav",
 	},
 	l: {
 		word: "let",
-		wordAudio: "ipa/words/let.mp3",
-		soundAudio: "ipa/sounds/l.mp3",
+		wordAudio: "ipa/words/let.wav",
+		soundAudio: "ipa/sounds/l.wav",
 	},
 	r: {
 		word: "red",
-		wordAudio: "ipa/words/red.mp3",
-		soundAudio: "ipa/sounds/r.mp3",
+		wordAudio: "ipa/words/red.wav",
+		soundAudio: "ipa/sounds/r.wav",
 	},
 	j: {
 		word: "yes",
-		wordAudio: "ipa/words/yes.mp3",
-		soundAudio: "ipa/sounds/y.mp3",
+		wordAudio: "ipa/words/yes.wav",
+		soundAudio: "ipa/sounds/y.wav",
 	},
 	w: {
 		word: "wet",
-		wordAudio: "ipa/words/wet.mp3",
-		soundAudio: "ipa/sounds/w.mp3",
+		wordAudio: "ipa/words/wet.wav",
+		soundAudio: "ipa/sounds/w.wav",
 	},
 };
 
@@ -360,13 +372,13 @@ function IPAItem({
 			)}
 		>
 			{/* Listen icon - absolute top right */}
-			<div className="absolute top-2 right-2 z-10">
+			<div className="absolute top-3 right-3 z-10">
 				{isLoading ? (
-					<Spinner className="size-3.5" />
+					<Spinner className="size-4" />
 				) : (
 					<Volume2
 						className={cn(
-							"size-3.5 text-muted-foreground transition-opacity",
+							"size-4 text-muted-foreground transition-opacity",
 							"opacity-0 group-hover:opacity-100",
 							isPlaying && "text-primary opacity-100",
 						)}
@@ -434,57 +446,114 @@ function IPASection({
 	);
 }
 
-// TIPS SECTION
+// ADMIN SECTION
 
-const tips = [
-	{
-		title: "Listen First",
-		description:
-			"Before speaking, listen to the reference audio several times to understand the rhythm and intonation.",
-	},
-	{
-		title: "Record Yourself",
-		description:
-			"Recording and listening to your own speech helps you identify areas for improvement.",
-	},
-	{
-		title: "Focus on Problem Sounds",
-		description:
-			"Identify the sounds that are most challenging for you and practice them in isolation first.",
-	},
-	{
-		title: "Slow Down",
-		description:
-			"Speed comes with practice. Start slowly to ensure accuracy, then gradually increase speed.",
-	},
-	{
-		title: "Use Minimal Pairs",
-		description:
-			"Practice words that differ by only one sound (like 'ship' and 'sheep') to train your ear.",
-	},
-	{
-		title: "Practice Daily",
-		description:
-			"Consistent short practice sessions are more effective than occasional long sessions.",
-	},
-];
+function AdminAudioSection() {
+	const { isAdmin } = useRequireAdmin();
+	const queryClient = useQueryClient();
+	const getStatusFn = useServerFn(serverGetIPAAudioStatus);
+	const generateFn = useServerFn(serverGenerateIPAAudio);
 
-function TipsSection() {
+	const { data: status, isLoading: statusLoading } = useQuery({
+		queryKey: ["ipa-audio-status"],
+		queryFn: async () => {
+			const result = await getStatusFn();
+			if (!result.success) throw new Error(result.error.message);
+			return result.data;
+		},
+		enabled: isAdmin,
+	});
+
+	const { mutate: generateAudio, isPending: isGenerating } = useMutation({
+		mutationFn: async () => {
+			const result = await generateFn();
+			if (!result.success) throw new Error(result.error.message);
+			return result.data;
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ["ipa-audio-status"] });
+			console.log("Generation complete:", data);
+		},
+	});
+
+	if (!isAdmin) return null;
+
 	return (
-		<section className="flex flex-col gap-4">
-			<h3 className="font-medium">Pronunciation Tips</h3>
-			<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{tips.map((tip) => (
-					<div key={tip.title} className="flex flex-col gap-1">
-						<h4 className="font-medium text-muted-foreground text-sm">
-							{tip.title}
-						</h4>
-						<p className="text-muted-foreground text-xs leading-relaxed">
-							{tip.description}
-						</p>
-					</div>
-				))}
+		<section className="flex flex-col gap-4 rounded-lg bg-muted/30 p-6">
+			<div className="flex flex-col gap-1">
+				<h3 className="font-medium">IPA Audio Management</h3>
 			</div>
+
+			{statusLoading ? (
+				<div className="flex items-center gap-2 text-muted-foreground text-sm">
+					<Spinner className="size-4" />
+					Checking audio status...
+				</div>
+			) : status ? (
+				<div className="flex flex-col gap-4">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Status</TableHead>
+								<TableHead className="text-right">Count</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							<TableRow>
+								<TableCell>Existing</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{status.existing.length}
+								</TableCell>
+							</TableRow>
+							<TableRow>
+								<TableCell>Missing</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{status.missing.length}
+								</TableCell>
+							</TableRow>
+							<TableRow className="font-medium">
+								<TableCell>Total</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{status.total}
+								</TableCell>
+							</TableRow>
+						</TableBody>
+					</Table>
+
+					<div className="flex items-center gap-2">
+						<Button
+							onClick={() => generateAudio()}
+							disabled={isGenerating || status.missing.length === 0}
+							size="sm"
+						>
+							{isGenerating ? (
+								<>
+									<Spinner className="size-4" />
+									Generating...
+								</>
+							) : (
+								<>
+									<RefreshCw className="size-4" />
+									Generate Missing Audio ({status.missing.length})
+								</>
+							)}
+						</Button>
+					</div>
+
+					{status.missing.length > 0 && (
+						<details className="text-xs">
+							<summary className="cursor-pointer text-muted-foreground">
+								Show missing files
+							</summary>
+							<div className="mt-2 max-h-32 overflow-auto rounded bg-muted/50 p-2 font-mono">
+								{status.missing.map((key) => (
+									<div key={key}>{key}</div>
+								))}
+							</div>
+						</details>
+					)}
+				</div>
+			) : null}
 		</section>
 	);
 }
@@ -560,14 +629,9 @@ function LearningPage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-10">
-					<PageHeader
-						title="Learning Resources"
-						description="Learn about the International Phonetic Alphabet and improve your pronunciation skills"
-					/>
-
+				<div className="flex flex-col gap-16">
 					{/* IPA Section Header with Controls */}
-					<div className="flex flex-col gap-6">
+					<section className="flex flex-col gap-12">
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex flex-col gap-1">
 								<h2 className="font-semibold text-lg">
@@ -614,7 +678,7 @@ function LearningPage() {
 						</div>
 
 						{/* IPA Charts */}
-						<div className="flex flex-col gap-8">
+						<div className="flex flex-col gap-12">
 							<IPASection
 								title="Vowels"
 								description="Pure vowel sounds (monophthongs)"
@@ -645,13 +709,15 @@ function LearningPage() {
 								loadingId={loadingId}
 							/>
 						</div>
-					</div>
+					</section>
 
-					{/* Tips Section */}
-					<TipsSection />
+					{/* Admin Section - only visible to admins */}
+					<AdminAudioSection />
+
+					<div className="h-px bg-border/60" />
 
 					{/* Quick Start CTA */}
-					<div className="flex flex-col items-center gap-4 rounded-xl bg-muted/30 py-10 text-center sm:flex-row sm:justify-between sm:px-8 sm:text-left">
+					<section className="flex flex-col items-center gap-4 rounded-xl bg-muted/30 py-10 text-center sm:flex-row sm:justify-between sm:px-8 sm:text-left">
 						<div className="flex flex-col gap-1 px-6 sm:px-0">
 							<h3 className="font-medium">Ready to practice?</h3>
 							<p className="text-muted-foreground text-sm">
@@ -661,7 +727,7 @@ function LearningPage() {
 						<Button asChild className="mx-6 sm:mx-0">
 							<Link to="/practice">Start Practicing</Link>
 						</Button>
-					</div>
+					</section>
 				</div>
 			</PageContainer>
 		</MainLayout>
