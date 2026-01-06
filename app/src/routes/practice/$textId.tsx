@@ -14,6 +14,7 @@ import {
 	Mic,
 	RotateCcw,
 	Square,
+	Upload,
 	Volume2,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -38,6 +39,7 @@ import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetPracticeTextById } from "@/lib/text";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import { serverUploadRecording } from "@/lib/server-recording";
 
 export const Route = createFileRoute("/practice/$textId")({
 	component: PracticeTextLayout,
@@ -66,10 +68,47 @@ export const Route = createFileRoute("/practice/$textId")({
 					}))
 				: [];
 
+		// Mock attempts for this specific text
+		const now = new Date();
+		const recentAttempts = [
+			{
+				id: "attempt-1",
+				textId: params.textId,
+				textPreview: textResult.data.content.slice(0, 50) + "...",
+				score: 88,
+				date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+				analysisId: crypto.randomUUID(),
+			},
+			{
+				id: "attempt-2",
+				textId: params.textId,
+				textPreview: textResult.data.content.slice(0, 50) + "...",
+				score: 82,
+				date: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+				analysisId: crypto.randomUUID(),
+			},
+			{
+				id: "attempt-3",
+				textId: params.textId,
+				textPreview: textResult.data.content.slice(0, 50) + "...",
+				score: 79,
+				date: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+				analysisId: crypto.randomUUID(),
+			},
+			{
+				id: "attempt-4",
+				textId: params.textId,
+				textPreview: textResult.data.content.slice(0, 50) + "...",
+				score: 75,
+				date: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+				analysisId: crypto.randomUUID(),
+			},
+		];
+
 		return {
 			text: textResult.data,
 			references,
-			recentAttempts: [], // TODO: Implement when user recordings/analyses are available
+			recentAttempts,
 		};
 	},
 	pendingComponent: TextDetailSkeleton,
@@ -195,26 +234,63 @@ function useRecording(textId: string) {
 		setMediaStream(null);
 	}, []);
 
-	const submitRecording = useCallback(() => {
-		setState("uploading");
-		setUploadProgress(0);
-		const interval = setInterval(() => {
-			setUploadProgress((p) => {
-				if (p >= 100) {
-					clearInterval(interval);
+	const submitRecording = useCallback(async (referenceId: string) => {
+		if (!audioBlob) return;
+
+		try {
+			setState("uploading");
+			setUploadProgress(10);
+
+			// Convert blob to base64
+			const reader = new FileReader();
+			reader.readAsDataURL(audioBlob);
+			reader.onloadend = async () => {
+				const base64String = reader.result as string;
+				const base64Data = base64String.split(",")[1];
+
+				if (!base64Data) {
+					setError("Failed to process audio");
+					setState("idle");
+					return;
+				}
+
+				setUploadProgress(40);
+
+				const response = await serverUploadRecording({
+					data: {
+						textId,
+						referenceId,
+						audioBase64: base64Data,
+						mimeType: audioBlob.type,
+						durationMs: recordingTime * 1000, // approximate
+					},
+				});
+
+				if (response.success) {
+					setUploadProgress(100);
 					setState("analyzing");
+					// Small delay to show complete state
 					setTimeout(() => {
 						navigate({
 							to: "/practice/$textId/analysis/$analysisId",
-							params: { textId, analysisId: "analysis-1" },
+							params: { textId, analysisId: response.data.analysisId },
 						});
-					}, 2000);
-					return 100;
+					}, 500);
+				} else {
+					setError(response.error.message || "Upload failed");
+					setState("idle");
 				}
-				return p + 10;
-			});
-		}, 200);
-	}, [textId, navigate]);
+			};
+
+			reader.onerror = () => {
+				setError("Failed to read audio file");
+				setState("idle");
+			};
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Upload failed");
+			setState("idle");
+		}
+	}, [textId, navigate, audioBlob, recordingTime]);
 
 	const resetRecording = useCallback(() => {
 		setState("idle");
@@ -223,6 +299,44 @@ function useRecording(textId: string) {
 		setAudioBlob(null);
 		setError(null);
 		chunksRef.current = [];
+	}, []);
+
+	const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		// Validate type
+		if (!file.type.startsWith("audio/")) {
+			setError("Please upload an audio file");
+			return;
+		}
+
+		// Validate size (10MB limit)
+		if (file.size > 10 * 1024 * 1024) {
+			setError("File size must be less than 10MB");
+			return;
+		}
+
+		try {
+			setState("processing");
+			setError(null);
+			const url = URL.createObjectURL(file);
+			const audio = new Audio(url);
+
+			audio.onloadedmetadata = () => {
+				setRecordingTime(audio.duration);
+				setAudioBlob(file);
+				setState("preview");
+			};
+
+			audio.onerror = () => {
+				setError("Failed to load audio file");
+				setState("idle");
+			};
+		} catch (err) {
+			setError("Failed to process file");
+			setState("idle");
+		}
 	}, []);
 
 	return {
@@ -238,6 +352,7 @@ function useRecording(textId: string) {
 		handleStreamReady,
 		handleStreamEnd,
 		handleStreamError,
+		handleFileUpload,
 	};
 }
 
@@ -596,15 +711,36 @@ function PracticeTextPage() {
 
 									{/* Idle state */}
 									{isIdle && !recording.error && (
-										<Button
-											size="lg"
-											onClick={recording.startRecording}
-											disabled={!selectedReferenceId}
-											className="gap-2"
-										>
-											<Mic size={18} />
-											{selectedReferenceId ? "Record" : "Select voice first"}
-										</Button>
+										<div className="flex w-full items-center justify-center gap-3">
+											<Button
+												size="lg"
+												onClick={recording.startRecording}
+												disabled={!selectedReferenceId}
+												className="gap-2"
+											>
+												<Mic size={18} />
+												{selectedReferenceId ? "Record" : "Select voice first"}
+											</Button>
+											
+											<div className="relative">
+												<input
+													type="file"
+													accept="audio/*"
+													className="absolute inset-0 cursor-pointer opacity-0"
+													onChange={recording.handleFileUpload}
+													disabled={!selectedReferenceId}
+												/>
+												<Button
+													variant="outline"
+													size="lg"
+													className="gap-2"
+													disabled={!selectedReferenceId}
+												>
+													<Upload size={18} />
+													Upload
+												</Button>
+											</div>
+										</div>
 									)}
 
 									{/* Recording state */}
@@ -676,7 +812,7 @@ function PracticeTextPage() {
 													Re-record
 												</Button>
 												<Button
-													onClick={recording.submitRecording}
+													onClick={() => selectedReferenceId && recording.submitRecording(selectedReferenceId)}
 													className="flex-1 gap-2"
 												>
 													<Check size={16} />

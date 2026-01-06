@@ -41,17 +41,113 @@ type SummaryLoaderData = {
 export const Route = createFileRoute("/summary")({
 	component: FeedPage,
 	loader: async (): Promise<SummaryLoaderData> => {
-		// TODO: Implement database queries for user attempts, stats, and common errors
-		return {
-			attempts: [],
-			stats: {
-				totalAttempts: 0,
-				weeklyAttempts: 0,
-				averageScore: 0,
-				weeklyProgress: 0,
+		// Mock data for demonstration
+		const now = new Date();
+		const mockAttempts: Attempt[] = [
+			{
+				id: "attempt-1",
+				textId: "text-1",
+				textPreview: "The quick brown fox jumps over the lazy dog",
+				score: 85,
+				date: new Date(now.getTime() - 2 * 60 * 60 * 1000), // 2 hours ago
+				analysisId: "analysis-1",
 			},
-			commonErrors: [],
-			texts: [],
+			{
+				id: "attempt-2",
+				textId: "text-1",
+				textPreview: "The quick brown fox jumps over the lazy dog",
+				score: 82,
+				date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+				analysisId: "analysis-2",
+			},
+			{
+				id: "attempt-3",
+				textId: "text-2",
+				textPreview: "She sells seashells by the seashore",
+				score: 78,
+				date: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+				analysisId: "analysis-3",
+			},
+			{
+				id: "attempt-4",
+				textId: "text-1",
+				textPreview: "The quick brown fox jumps over the lazy dog",
+				score: 88,
+				date: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+				analysisId: "analysis-4",
+			},
+			{
+				id: "attempt-5",
+				textId: "text-3",
+				textPreview: "How much wood would a woodchuck chuck",
+				score: 75,
+				date: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+				analysisId: "analysis-5",
+			},
+			{
+				id: "attempt-6",
+				textId: "text-2",
+				textPreview: "She sells seashells by the seashore",
+				score: 80,
+				date: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+				analysisId: "analysis-6",
+			},
+			{
+				id: "attempt-7",
+				textId: "text-1",
+				textPreview: "The quick brown fox jumps over the lazy dog",
+				score: 79,
+				date: new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
+				analysisId: "analysis-7",
+			},
+			{
+				id: "attempt-8",
+				textId: "text-4",
+				textPreview: "Peter Piper picked a peck of pickled peppers",
+				score: 72,
+				date: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+				analysisId: "analysis-8",
+			},
+		];
+
+		const weeklyAttempts = mockAttempts.filter(
+			(a) => now.getTime() - a.date.getTime() <= 7 * 24 * 60 * 60 * 1000,
+		).length;
+
+		const averageScore =
+			mockAttempts.length > 0
+				? Math.round(
+						mockAttempts.reduce((sum, a) => sum + a.score, 0) /
+							mockAttempts.length,
+					)
+				: 0;
+
+		return {
+			attempts: mockAttempts,
+			stats: {
+				totalAttempts: mockAttempts.length,
+				weeklyAttempts,
+				averageScore,
+				weeklyProgress: 5, // Mock progress percentage
+			},
+			commonErrors: [
+				{ phoneme: "/θ/", count: 12 },
+				{ phoneme: "/ð/", count: 8 },
+				{ phoneme: "/r/", count: 6 },
+				{ phoneme: "/l/", count: 5 },
+			],
+			texts: [
+				{
+					id: "text-1",
+					content: "The quick brown fox jumps over the lazy dog",
+				},
+				{ id: "text-2", content: "She sells seashells by the seashore" },
+				{ id: "text-3", content: "How much wood would a woodchuck chuck" },
+				{
+					id: "text-4",
+					content: "Peter Piper picked a peck of pickled peppers",
+				},
+			],
 		};
 	},
 	pendingComponent: FeedSkeleton,

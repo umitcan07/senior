@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { DiffViewer } from "@/components/diff-viewer";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,15 @@ import {
 	scoreBgColorVariants,
 	scoreColorVariants,
 } from "@/lib/score";
-import { cn } from "@/lib/utils";
+import { cn, formatRelativeTime } from "@/lib/utils";
+import { serverGetAnalysisDetails } from "@/lib/server-analysis";
+
+type PreviousAttempt = {
+	id: string;
+	analysisId: string;
+	score: number;
+	date: Date;
+};
 
 type AnalysisLoaderData = {
 	analysis: Analysis | null;
@@ -33,21 +42,44 @@ type AnalysisLoaderData = {
 	author: Author | null;
 	phonemeErrors: PhonemeError[];
 	wordErrors: WordError[];
+	previousAttempts: PreviousAttempt[];
 	textId: string;
 };
 
 export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 	component: AnalysisPage,
 	loader: async ({ params }): Promise<AnalysisLoaderData> => {
-		// TODO: Implement database query for analysis
-		// For now, return null to show empty state
+		const response = await serverGetAnalysisDetails({
+			data: { analysisId: params.analysisId },
+		});
+
+		if (!response.success || !response.data) {
+			// Return nulls to trigger empty/error state
+			return {
+				analysis: null,
+				reference: null,
+				text: null,
+				author: null,
+				phonemeErrors: [],
+				wordErrors: [],
+				previousAttempts: [],
+				textId: params.textId,
+			};
+		}
+
+		const { analysis, phonemeErrors, wordErrors } = response.data;
+
+		// TODO: Fetch previous attempts
+		const mockPreviousAttempts: PreviousAttempt[] = [];
+
 		return {
-			analysis: null,
+			analysis,
 			reference: null,
 			text: null,
 			author: null,
-			phonemeErrors: [],
-			wordErrors: [],
+			phonemeErrors,
+			wordErrors,
+			previousAttempts: mockPreviousAttempts,
 			textId: params.textId,
 		};
 	},
@@ -156,93 +188,71 @@ function ScoreOverview({
 	);
 }
 
-// TEXT COMPARISON
+// PREVIOUS ATTEMPTS
 
-interface TextComparisonProps {
-	target: string;
-	recognized: string;
-	errors: WordError[];
+interface PreviousAttemptsProps {
+	attempts: Array<{
+		id: string;
+		analysisId: string;
+		score: number;
+		date: Date;
+	}>;
+	currentAnalysisId: string;
+	textId: string;
 }
 
-function TextComparison({ target, recognized, errors }: TextComparisonProps) {
-	const recognizedWords = recognized.split(" ");
-
-	const getErrorForPosition = (position: number) =>
-		errors.find((e) => e.position === position);
+function PreviousAttempts({
+	attempts,
+	currentAnalysisId,
+	textId,
+}: PreviousAttemptsProps) {
+	if (attempts.length === 0) return null;
 
 	return (
 		<Card>
 			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Sentence Comparison</CardTitle>
+				<CardTitle className="text-base">Previous Attempts</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="space-y-2">
-					<div className="text-muted-foreground text-xs uppercase tracking-wide">
-						Target
-					</div>
-					<p className="rounded-lg bg-muted/50 p-3 text-sm leading-relaxed">
-						{target}
-					</p>
-				</div>
-				<div className="space-y-2">
-					<div className="text-muted-foreground text-xs uppercase tracking-wide">
-						Your Speech
-					</div>
-					<p className="rounded-lg bg-muted/50 p-3 text-sm leading-relaxed">
-						{recognizedWords.map((word, i) => {
-							const error = getErrorForPosition(i);
-							const uniqueKey = error
-								? `error-${error.id}-${i}`
-								: `word-${word}-${i}`;
-							if (error) {
-								return (
-									<span
-										key={uniqueKey}
-										className="mx-0.5 rounded bg-destructive/20 px-1 text-destructive"
-										title={`Expected: ${error.expected}`}
-									>
-										{word}
-									</span>
-								);
-							}
-							return <span key={uniqueKey}>{word} </span>;
-						})}
-					</p>
-				</div>
-			</CardContent>
-		</Card>
-	);
-}
-
-// PHONEME COMPARISON
-
-interface PhonemeComparisonProps {
-	target: string;
-	recognized: string;
-}
-
-function PhonemeComparison({ target, recognized }: PhonemeComparisonProps) {
-	return (
-		<Card>
-			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Phoneme Comparison</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="space-y-2">
-					<div className="text-muted-foreground text-xs uppercase tracking-wide">
-						Target Phonemes
-					</div>
-					<p className="rounded-lg bg-muted/50 p-3 font-mono text-sm">
-						{target}
-					</p>
-				</div>
-				<div className="space-y-2">
-					<div className="text-muted-foreground text-xs uppercase tracking-wide">
-						Recognized Phonemes
-					</div>
-					<p className="rounded-lg bg-muted/50 p-3 font-mono text-sm">
-						{recognized}
-					</p>
+			<CardContent>
+				<div className="flex flex-wrap gap-2">
+					{attempts.map((attempt) => {
+						const isCurrent = attempt.analysisId === currentAnalysisId;
+						return (
+							<Link
+								key={attempt.id}
+								to="/practice/$textId/analysis/$analysisId"
+								params={{
+									textId,
+									analysisId: attempt.analysisId,
+								}}
+								className={cn(
+									"flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+									isCurrent
+										? "border-primary bg-primary/5"
+										: "hover:border-primary/50 hover:bg-muted/50",
+								)}
+							>
+								<span
+									className={cn(
+										"font-medium tabular-nums",
+										scoreColorVariants({
+											level: getScoreLevel(attempt.score),
+										}),
+									)}
+								>
+									{attempt.score}%
+								</span>
+								<span className="text-muted-foreground text-xs">
+									{formatRelativeTime(attempt.date)}
+								</span>
+								{isCurrent && (
+									<Badge variant="secondary" className="text-xs">
+										Current
+									</Badge>
+								)}
+							</Link>
+						);
+					})}
 				</div>
 			</CardContent>
 		</Card>
@@ -419,16 +429,19 @@ function AnalysisPage() {
 					{/* Comparisons */}
 					<div className="grid gap-6 lg:grid-cols-2">
 						{analysis.targetWords && analysis.recognizedWords && (
-							<TextComparison
+							<DiffViewer
 								target={analysis.targetWords}
 								recognized={analysis.recognizedWords}
 								errors={wordErrors ?? []}
+								type="word"
 							/>
 						)}
 						{analysis.targetPhonemes && analysis.recognizedPhonemes && (
-							<PhonemeComparison
+							<DiffViewer
 								target={analysis.targetPhonemes}
 								recognized={analysis.recognizedPhonemes}
+								errors={phonemeErrors ?? []}
+								type="phoneme"
 							/>
 						)}
 					</div>
@@ -439,6 +452,13 @@ function AnalysisPage() {
 						wordErrors={wordErrors ?? []}
 					/>
 
+					{/* Previous Attempts */}
+					<PreviousAttempts
+						attempts={Route.useLoaderData().previousAttempts}
+						currentAnalysisId={analysis.id}
+						textId={textId}
+					/>
+
 					{/* Actions */}
 					<div className="flex flex-col justify-center gap-3 sm:flex-row">
 						<Button asChild>
@@ -447,9 +467,7 @@ function AnalysisPage() {
 							</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link to="/summary" params={{ textId, analysisId: analysis.id }}>
-								View All Attempts
-							</Link>
+							<Link to="/summary">View All Attempts</Link>
 						</Button>
 					</div>
 				</div>
