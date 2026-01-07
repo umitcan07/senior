@@ -1,6 +1,6 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, max } from "drizzle-orm";
 import { db } from "./index";
-import { practiceTexts, referenceSpeeches } from "./schema";
+import { analyses, practiceTexts, referenceSpeeches, userRecordings } from "./schema";
 import type {
 	NewPracticeText,
 	PracticeText,
@@ -13,6 +13,13 @@ export type { PracticeText, NewPracticeText };
 // Use schema-inferred type with additional computed field
 export type PracticeTextWithReferenceCount = PracticeText & {
 	referenceCount: number;
+};
+
+// Extended type with attempt stats
+export type PracticeTextWithAttemptStats = PracticeTextWithReferenceCount & {
+	attemptCount: number;
+	bestScore: number | null;
+	lastAttemptDate: Date | null;
 };
 
 /**
@@ -131,4 +138,50 @@ export async function updatePracticeText(
 
 export async function deletePracticeText(id: string): Promise<void> {
 	await db.delete(practiceTexts).where(eq(practiceTexts.id, id));
+}
+
+/**
+ * Get practice texts with reference counts AND user attempt stats
+ * This function fetches texts and enriches them with the user's attempt history
+ */
+export async function getPracticeTextsWithAttemptStats(
+	userId: string,
+): Promise<PracticeTextWithAttemptStats[]> {
+	// First, get texts with reference counts
+	const textsWithRefs = await getPracticeTextsWithReferenceCounts();
+
+	// Then, get attempt stats for this user
+	const attemptStats = await db
+		.select({
+			textId: referenceSpeeches.textId,
+			attemptCount: count(analyses.id),
+			bestScore: max(analyses.overallScore),
+			lastAttemptDate: max(analyses.createdAt),
+		})
+		.from(analyses)
+		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
+		.innerJoin(
+			referenceSpeeches,
+			eq(userRecordings.referenceSpeechId, referenceSpeeches.id),
+		)
+		.where(eq(userRecordings.userId, userId))
+		.groupBy(referenceSpeeches.textId);
+
+	// Create a map for O(1) lookup
+	const statsMap = new Map(
+		attemptStats.map((stat) => [stat.textId, stat]),
+	);
+
+	// Merge the data
+	return textsWithRefs.map((text) => {
+		const stats = statsMap.get(text.id);
+		return {
+			...text,
+			attemptCount: stats?.attemptCount ?? 0,
+			bestScore: stats?.bestScore
+				? Number.parseFloat(stats.bestScore) * 100
+				: null,
+			lastAttemptDate: stats?.lastAttemptDate ?? null,
+		};
+	});
 }

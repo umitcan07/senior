@@ -1,6 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-
 /**
  * Error background color variants using CVA
  */
@@ -61,4 +60,3 @@ export function getErrorsForPositionRange<T extends { position: number }>(
 ): T[] {
 	return errors.filter((e) => e.position === position);
 }
-

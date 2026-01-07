@@ -11,7 +11,8 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { TextDifficulty, TextType } from "@/db/types";
-import { cn } from "@/lib/utils";
+import { getScoreLevel } from "@/lib/score";
+import { cn, formatRelativeTime } from "@/lib/utils";
 
 // Types
 
@@ -23,6 +24,10 @@ export interface PracticeTextData {
 	note?: string | null;
 	referenceCount: number;
 	wordCount: number;
+	// User attempt stats
+	attemptCount?: number;
+	bestScore?: number | null;
+	lastAttemptDate?: Date | null;
 }
 
 // Category config with gradient colors - dark mode compatible
@@ -102,12 +107,23 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 							<TableHead className="hidden w-16 text-right md:table-cell">
 								Voices
 							</TableHead>
+							<TableHead className="hidden w-24 text-right lg:table-cell">
+								Score
+							</TableHead>
 							<TableHead className="w-20 sm:w-24" />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{texts.map((text) => (
-							<TableRow key={text.id} className="group">
+							<TableRow
+								key={text.id}
+								className={cn(
+									"group",
+									// Subtle left border for attempted texts
+									text.bestScore != null &&
+										"border-l-2 border-l-primary/30",
+								)}
+							>
 								<TableCell>
 									<div className="flex items-start gap-3">
 										<CategoryIcon type={text.type} />
@@ -124,7 +140,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											<p className="line-clamp-2 text-sm sm:text-base">
 												{text.content}
 											</p>
-											{/* Show word count inline on mobile */}
+											{/* Show word count and score inline on mobile */}
 											<div className="flex items-center gap-3 text-muted-foreground text-xs md:hidden">
 												<span className="tabular-nums">
 													{text.wordCount} words
@@ -133,6 +149,21 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 													<User2 size={12} />
 													{text.referenceCount}
 												</span>
+												{text.bestScore != null && (
+													<span
+														className={cn(
+															"font-medium tabular-nums",
+															getScoreLevel(text.bestScore) === "high" &&
+																"text-emerald-600",
+															getScoreLevel(text.bestScore) === "medium" &&
+																"text-amber-600",
+															getScoreLevel(text.bestScore) === "low" &&
+																"text-red-600",
+														)}
+													>
+														{Math.round(text.bestScore)}%
+													</span>
+												)}
 											</div>
 										</div>
 									</div>
@@ -153,9 +184,36 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 										<span className="text-sm tabular-nums">
 											{text.referenceCount}
 										</span>
+										</div>
+							</TableCell>
+							{/* Score column - shows best score and last attempt */}
+							<TableCell className="hidden text-right lg:table-cell">
+								{text.bestScore != null ? (
+									<div className="flex flex-col items-end gap-0.5">
+										<span
+											className={cn(
+												"font-medium text-sm tabular-nums",
+												getScoreLevel(text.bestScore) === "high" &&
+													"text-emerald-600",
+												getScoreLevel(text.bestScore) === "medium" &&
+													"text-amber-600",
+												getScoreLevel(text.bestScore) === "low" &&
+													"text-red-600",
+											)}
+										>
+											{Math.round(text.bestScore)}%
+										</span>
+										{text.lastAttemptDate && (
+											<span className="text-muted-foreground text-xs">
+												{formatRelativeTime(text.lastAttemptDate)}
+											</span>
+										)}
 									</div>
-								</TableCell>
-								<TableCell className="text-right">
+								) : (
+									<span className="text-muted-foreground/50 text-sm">—</span>
+								)}
+							</TableCell>
+							<TableCell className="text-right">
 									<Button
 										asChild
 										size="sm"

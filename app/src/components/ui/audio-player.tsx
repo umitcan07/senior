@@ -309,7 +309,7 @@ export const AudioPlayerProgress = ({
 				otherProps.onPointerUp?.(e);
 			}}
 			className={cn(
-				"group/player relative flex h-4 touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
+				"group/player relative flex h-4 touch-none select-none items-center data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col data-[disabled]:opacity-50",
 				otherProps.className,
 			)}
 			onKeyDown={(e) => {
@@ -329,14 +329,14 @@ export const AudioPlayerProgress = ({
 				Number.isNaN(player.duration)
 			}
 		>
-			<SliderPrimitive.Track className="bg-muted relative h-[4px] w-full grow overflow-hidden rounded-full">
-				<SliderPrimitive.Range className="bg-primary absolute h-full" />
+			<SliderPrimitive.Track className="relative h-[4px] w-full grow overflow-hidden rounded-full bg-muted">
+				<SliderPrimitive.Range className="absolute h-full bg-primary" />
 			</SliderPrimitive.Track>
 			<SliderPrimitive.Thumb
-				className="relative flex h-0 w-0 items-center justify-center opacity-0 group-hover/player:opacity-100 focus-visible:opacity-100 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+				className="relative flex h-0 w-0 items-center justify-center opacity-0 focus-visible:opacity-100 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 group-hover/player:opacity-100"
 				data-slot="slider-thumb"
 			>
-				<div className="bg-foreground absolute size-3 rounded-full" />
+				<div className="absolute size-3 rounded-full bg-foreground" />
 			</SliderPrimitive.Thumb>
 		</SliderPrimitive.Root>
 	);
@@ -384,7 +384,7 @@ function Spinner({ className }: SpinnerProps) {
 	return (
 		<div
 			className={cn(
-				"border-muted border-t-foreground size-3.5 animate-spin rounded-full border-2",
+				"size-3.5 animate-spin rounded-full border-2 border-muted border-t-foreground",
 				className,
 			)}
 			role="status"

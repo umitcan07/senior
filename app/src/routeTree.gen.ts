@@ -25,6 +25,7 @@ import { Route as AdminReferencesRouteImport } from './routes/admin/references'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
 import { Route as ApiAudioIdRouteImport } from './routes/api/audio.$id'
 import { Route as PracticeTextIdAnalysisAnalysisIdRouteImport } from './routes/practice/$textId.analysis.$analysisId'
+import { Route as ApiAudioUserIdRouteImport } from './routes/api/audio.user.$id'
 import { Route as ApiAudioLearnKeyRouteImport } from './routes/api/audio.learn.$key'
 
 const SummaryRoute = SummaryRouteImport.update({
@@ -108,6 +109,11 @@ const PracticeTextIdAnalysisAnalysisIdRoute =
     path: '/analysis/$analysisId',
     getParentRoute: () => PracticeTextIdRoute,
   } as any)
+const ApiAudioUserIdRoute = ApiAudioUserIdRouteImport.update({
+  id: '/api/audio/user/$id',
+  path: '/api/audio/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAudioLearnKeyRoute = ApiAudioLearnKeyRouteImport.update({
   id: '/api/audio/learn/$key',
   path: '/api/audio/learn/$key',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/practice/': typeof PracticeIndexRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
+  '/api/audio/user/$id': typeof ApiAudioUserIdRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
 export interface FileRoutesByTo {
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/practice': typeof PracticeIndexRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
+  '/api/audio/user/$id': typeof ApiAudioUserIdRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
 export interface FileRoutesById {
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/practice/': typeof PracticeIndexRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
+  '/api/audio/user/$id': typeof ApiAudioUserIdRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
 }
 export interface FileRouteTypes {
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/practice/'
     | '/api/audio/$id'
     | '/api/audio/learn/$key'
+    | '/api/audio/user/$id'
     | '/practice/$textId/analysis/$analysisId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/practice'
     | '/api/audio/$id'
     | '/api/audio/learn/$key'
+    | '/api/audio/user/$id'
     | '/practice/$textId/analysis/$analysisId'
   id:
     | '__root__'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/practice/'
     | '/api/audio/$id'
     | '/api/audio/learn/$key'
+    | '/api/audio/user/$id'
     | '/practice/$textId/analysis/$analysisId'
   fileRoutesById: FileRoutesById
 }
@@ -245,6 +257,7 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   ApiAudioIdRoute: typeof ApiAudioIdRoute
   ApiAudioLearnKeyRoute: typeof ApiAudioLearnKeyRoute
+  ApiAudioUserIdRoute: typeof ApiAudioUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -361,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeTextIdAnalysisAnalysisIdRouteImport
       parentRoute: typeof PracticeTextIdRoute
     }
+    '/api/audio/user/$id': {
+      id: '/api/audio/user/$id'
+      path: '/api/audio/user/$id'
+      fullPath: '/api/audio/user/$id'
+      preLoaderRoute: typeof ApiAudioUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/audio/learn/$key': {
       id: '/api/audio/learn/$key'
       path: '/api/audio/learn/$key'
@@ -412,6 +432,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   ApiAudioIdRoute: ApiAudioIdRoute,
   ApiAudioLearnKeyRoute: ApiAudioLearnKeyRoute,
+  ApiAudioUserIdRoute: ApiAudioUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

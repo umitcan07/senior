@@ -4,9 +4,11 @@ import {
 	deletePracticeText,
 	getPracticeTextById,
 	getPracticeTexts,
+	getPracticeTextsWithAttemptStats,
 	getPracticeTextsWithReferenceCounts,
 	insertPracticeText,
 	type PracticeText,
+	type PracticeTextWithAttemptStats,
 	type PracticeTextWithReferenceCount,
 	updatePracticeText,
 } from "@/db/text";
@@ -133,6 +135,39 @@ export const serverGetPracticeTextsWithReferences = createServerFn({
 		return createSuccessResponse(result);
 	} catch (error) {
 		console.error("Get practice texts with references error:", error);
+
+		if (error instanceof Error) {
+			return createErrorResponse(
+				ErrorCode.DATABASE_ERROR,
+				"An error occurred while getting the practice texts",
+				{ originalError: error.message },
+				500,
+			);
+		}
+
+		return createErrorResponse(
+			ErrorCode.DATABASE_ERROR,
+			"An error occurred while getting the practice texts",
+			undefined,
+			500,
+		);
+	}
+});
+
+/**
+ * Get practice texts with reference counts AND user attempt stats
+ * This combines text data with the user's practice history in a single call
+ */
+export const serverGetPracticeTextsWithAttemptStats = createServerFn({
+	method: "GET",
+}).handler(async (): Promise<ApiResponse<PracticeTextWithAttemptStats[]>> => {
+	try {
+		// TODO: Replace with actual user ID from auth context
+		const userId = "guest";
+		const result = await getPracticeTextsWithAttemptStats(userId);
+		return createSuccessResponse(result);
+	} catch (error) {
+		console.error("Get practice texts with attempt stats error:", error);
 
 		if (error instanceof Error) {
 			return createErrorResponse(

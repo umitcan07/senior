@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookIcon, BookOpenIcon, ChartBarIncreasingIcon } from "lucide-react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
@@ -34,21 +33,24 @@ const features = [
 	},
 ];
 
-function FeatureCard({ title, description, icon }: (typeof features)[0]) {
+function FeatureCard({ title, description, icon, href }: (typeof features)[0]) {
 	return (
-		<Card className="h-full">
-			<CardContent className="flex flex-col gap-4 p-5">
-				<div className="flex size-10 items-center justify-center rounded-sm p-2 text-primary ring-1 ring-accent-foreground/10">
-					{icon}
-				</div>
-				<div className="flex flex-col items-start gap-1">
-					<h3 className="font-medium">{title}</h3>
-					<p className="text-balance text-muted-foreground text-sm leading-relaxed">
-						{description}
-					</p>
-				</div>
-			</CardContent>
-		</Card>
+		<Link
+			to={href}
+			className="group flex flex-col gap-4 rounded-2xl bg-transparent p-6 transition-colors hover:bg-muted/30"
+		>
+			<div className="flex size-12 items-center justify-center rounded-xl bg-primary/5 text-primary ring-1 ring-primary/10 transition-colors group-hover:bg-primary/10 group-hover:ring-primary/20">
+				{icon}
+			</div>
+			<div className="flex flex-col items-start gap-2">
+				<h3 className="font-medium text-lg leading-tight transition-colors group-hover:text-primary">
+					{title}
+				</h3>
+				<p className="text-balance text-muted-foreground text-sm leading-relaxed">
+					{description}
+				</p>
+			</div>
+		</Link>
 	);
 }
 

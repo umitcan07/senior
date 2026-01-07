@@ -403,7 +403,7 @@ export function AddReferenceDialog({
 									</div>
 
 									<div className="border-t pt-4">
-										<h3 className="font-semibold text-sm mb-4">
+										<h3 className="mb-4 font-semibold text-sm">
 											Voice Settings
 										</h3>
 										<div className="flex flex-col gap-6">

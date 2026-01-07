@@ -8,14 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
+
 import { useRequireAdmin } from "@/lib/auth";
 import {
 	serverGenerateIPAAudio,
@@ -346,6 +339,8 @@ function HighlightedWord({
 	);
 }
 
+// IPA ITEM
+
 function IPAItem({
 	item,
 	playbackMode,
@@ -365,20 +360,20 @@ function IPAItem({
 			onClick={() => onPlay(item.symbol, playbackMode)}
 			disabled={isLoading}
 			className={cn(
-				"group relative flex flex-col overflow-hidden rounded-lg text-center transition-colors",
-				"bg-muted/20 hover:bg-muted/40",
+				"group relative flex flex-col items-center justify-center overflow-hidden rounded-xl text-center transition-all duration-200",
+				"border border-transparent hover:border-border/40 hover:bg-muted/30 hover:shadow-sm",
 				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-				isPlaying && "bg-primary/10 ring-2 ring-primary/30",
+				isPlaying && "bg-primary/5 ring-1 ring-primary/20",
 			)}
 		>
 			{/* Listen icon - absolute top right */}
-			<div className="absolute top-3 right-3 z-10">
+			<div className="absolute top-2 right-2 z-10">
 				{isLoading ? (
-					<Spinner className="size-4" />
+					<Spinner className="size-3" />
 				) : (
 					<Volume2
 						className={cn(
-							"size-4 text-muted-foreground transition-opacity",
+							"size-3 text-muted-foreground transition-opacity",
 							"opacity-0 group-hover:opacity-100",
 							isPlaying && "text-primary opacity-100",
 						)}
@@ -387,12 +382,14 @@ function IPAItem({
 			</div>
 
 			{/* Top section - IPA symbol */}
-			<div className="flex flex-1 items-center justify-center px-3 py-4">
-				<span className="font-mono text-xl tracking-wide">{item.symbol}</span>
+			<div className="flex flex-1 items-center justify-center px-3 pt-4 pb-2">
+				<span className="font-mono text-foreground/80 text-xl tracking-wide transition-colors group-hover:text-foreground">
+					{item.symbol}
+				</span>
 			</div>
 
-			{/* Bottom section - word with darker background */}
-			<div className="w-full bg-muted/40 px-3 py-2.5">
+			{/* Bottom section - word */}
+			<div className="w-full px-3 pb-3 text-sm">
 				<HighlightedWord
 					word={item.word}
 					highlightIndices={item.highlightIndices}
@@ -420,14 +417,14 @@ function IPASection({
 	loadingId: string | null;
 }) {
 	return (
-		<section className="flex flex-col gap-4">
-			<div className="flex flex-col gap-1">
-				<h3 className="font-medium">{title}</h3>
+		<section className="flex flex-col gap-6">
+			<div className="flex flex-col gap-1 border-primary/20 border-l-2 pl-4">
+				<h3 className="font-medium text-lg">{title}</h3>
 				{description && (
 					<p className="text-muted-foreground text-sm">{description}</p>
 				)}
 			</div>
-			<div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+			<div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
 				{symbols.map((item) => {
 					const id = `${item.symbol}-${playbackMode}`;
 					return (
@@ -479,9 +476,11 @@ function AdminAudioSection() {
 	if (!isAdmin) return null;
 
 	return (
-		<section className="flex flex-col gap-4 rounded-lg bg-muted/30 p-6">
+		<section className="mt-8 flex flex-col gap-4 border-border/40 border-t pt-8">
 			<div className="flex flex-col gap-1">
-				<h3 className="font-medium">IPA Audio Management</h3>
+				<h3 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
+					Admin: IPA Audio Management
+				</h3>
 			</div>
 
 			{statusLoading ? (
@@ -491,40 +490,37 @@ function AdminAudioSection() {
 				</div>
 			) : status ? (
 				<div className="flex flex-col gap-4">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Status</TableHead>
-								<TableHead className="text-right">Count</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							<TableRow>
-								<TableCell>Existing</TableCell>
-								<TableCell className="text-right tabular-nums">
-									{status.existing.length}
-								</TableCell>
-							</TableRow>
-							<TableRow>
-								<TableCell>Missing</TableCell>
-								<TableCell className="text-right tabular-nums">
-									{status.missing.length}
-								</TableCell>
-							</TableRow>
-							<TableRow className="font-medium">
-								<TableCell>Total</TableCell>
-								<TableCell className="text-right tabular-nums">
-									{status.total}
-								</TableCell>
-							</TableRow>
-						</TableBody>
-					</Table>
+					<div className="flex gap-8">
+						<div className="flex flex-col">
+							<span className="text-muted-foreground text-xs uppercase">
+								Existing
+							</span>
+							<span className="font-mono text-xl">
+								{status.existing.length}
+							</span>
+						</div>
+						<div className="flex flex-col">
+							<span className="text-muted-foreground text-xs uppercase">
+								Missing
+							</span>
+							<span className="font-mono text-destructive text-xl">
+								{status.missing.length}
+							</span>
+						</div>
+						<div className="flex flex-col">
+							<span className="text-muted-foreground text-xs uppercase">
+								Total
+							</span>
+							<span className="font-mono text-xl">{status.total}</span>
+						</div>
+					</div>
 
 					<div className="flex items-center gap-2">
 						<Button
 							onClick={() => generateAudio()}
 							disabled={isGenerating || status.missing.length === 0}
 							size="sm"
+							variant="outline"
 						>
 							{isGenerating ? (
 								<>
@@ -545,7 +541,7 @@ function AdminAudioSection() {
 							<summary className="cursor-pointer text-muted-foreground">
 								Show missing files
 							</summary>
-							<div className="mt-2 max-h-32 overflow-auto rounded bg-muted/50 p-2 font-mono">
+							<div className="mt-2 max-h-32 overflow-auto rounded bg-muted/20 p-2 font-mono">
 								{status.missing.map((key) => (
 									<div key={key}>{key}</div>
 								))}
@@ -634,17 +630,18 @@ function LearningPage() {
 					<section className="flex flex-col gap-12">
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex flex-col gap-1">
-								<h2 className="font-semibold text-lg">
+								<h2 className="font-semibold text-2xl tracking-tight">
 									International Phonetic Alphabet
 								</h2>
-								<p className="text-muted-foreground text-sm">
+								<div className="mt-2 mb-2 h-1 w-12 rounded-full bg-primary/20" />
+								<p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
 									Click any symbol to hear it pronounced. Highlighted letters
 									show which part of the word makes each sound.
 								</p>
 							</div>
 
 							{/* Playback Mode Toggle */}
-							<div className="flex items-center gap-3 rounded-lg bg-muted/40 px-4 py-2.5">
+							<div className="flex items-center gap-3 rounded-full bg-muted/30 px-5 py-2">
 								<Label
 									htmlFor="playback-mode"
 									className={cn(
@@ -678,7 +675,7 @@ function LearningPage() {
 						</div>
 
 						{/* IPA Charts */}
-						<div className="flex flex-col gap-12">
+						<div className="flex flex-col gap-16">
 							<IPASection
 								title="Vowels"
 								description="Pure vowel sounds (monophthongs)"
@@ -711,22 +708,281 @@ function LearningPage() {
 						</div>
 					</section>
 
+					{/* Why Learn IPA Section */}
+					<section className="flex flex-col gap-8">
+						<div className="flex flex-col gap-2 border-primary/20 border-l-2 pl-4">
+							<h3 className="font-semibold text-xl">Why Learn IPA?</h3>
+							<p className="max-w-2xl text-muted-foreground text-sm">
+								The International Phonetic Alphabet is your key to mastering
+								pronunciation in any language.
+							</p>
+						</div>
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+									<Volume2 size={20} />
+								</div>
+								<h4 className="font-medium">Improve Pronunciation</h4>
+								<p className="text-muted-foreground text-sm leading-relaxed">
+									IPA shows you exactly how to pronounce words, eliminating
+									guesswork from spelling. Each symbol represents one specific
+									sound, ensuring precision.
+								</p>
+							</div>
+							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+									<svg
+										className="size-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										strokeWidth={2}
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+										/>
+									</svg>
+								</div>
+								<h4 className="font-medium">Use Any Dictionary</h4>
+								<p className="text-muted-foreground text-sm leading-relaxed">
+									Most dictionaries use IPA for pronunciation guides. Once you
+									learn it, you can look up pronunciation anywhere in the world.
+								</p>
+							</div>
+							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+									<svg
+										className="size-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										strokeWidth={2}
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+								</div>
+								<h4 className="font-medium">Reduce Your Accent</h4>
+								<p className="text-muted-foreground text-sm leading-relaxed">
+									Understanding phonemes helps you identify sounds that don't
+									exist in your native language, making it easier to correct
+									them.
+								</p>
+							</div>
+							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+									<svg
+										className="size-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										strokeWidth={2}
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M13 10V3L4 14h7v7l9-11h-7z"
+										/>
+									</svg>
+								</div>
+								<h4 className="font-medium">Learn Languages Faster</h4>
+								<p className="text-muted-foreground text-sm leading-relaxed">
+									IPA knowledge transfers to any language. Once you understand
+									the system, picking up new languages becomes significantly
+									easier.
+								</p>
+							</div>
+						</div>
+					</section>
+
+					<div className="h-px bg-border/40" />
+
+					{/* Accent Differences Section */}
+					<section className="flex flex-col gap-8">
+						<div className="flex flex-col gap-2 border-primary/20 border-l-2 pl-4">
+							<h3 className="font-semibold text-xl">
+								American vs British English
+							</h3>
+							<p className="max-w-2xl text-muted-foreground text-sm">
+								Understanding these differences helps you target your preferred
+								accent.
+							</p>
+						</div>
+						<div className="grid gap-6 md:grid-cols-2">
+							<div className="flex flex-col gap-4 rounded-xl border border-border/40 p-5">
+								<div className="flex items-center gap-3">
+									<span className="text-2xl">🇺🇸</span>
+									<h4 className="font-semibold">American English</h4>
+								</div>
+								<ul className="space-y-2 text-muted-foreground text-sm">
+									<li className="flex items-start gap-2">
+										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
+										<span>
+											<strong className="text-foreground">Rhotic /r/</strong> —
+											The "r" is pronounced in all positions (car, bird,
+											better)
+										</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
+										<span>
+											<strong className="text-foreground">Flap /t/</strong> —
+											"T" sounds like a soft "d" between vowels (water, butter)
+										</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
+										<span>
+											<strong className="text-foreground">/æ/ sound</strong> —
+											Broader in words like "dance" and "bath"
+										</span>
+									</li>
+								</ul>
+							</div>
+							<div className="flex flex-col gap-4 rounded-xl border border-border/40 p-5">
+								<div className="flex items-center gap-3">
+									<span className="text-2xl">🇬🇧</span>
+									<h4 className="font-semibold">British English</h4>
+								</div>
+								<ul className="space-y-2 text-muted-foreground text-sm">
+									<li className="flex items-start gap-2">
+										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
+										<span>
+											<strong className="text-foreground">Non-rhotic</strong> —
+											"R" is often silent after vowels (car → /kɑː/)
+										</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
+										<span>
+											<strong className="text-foreground">Clear /t/</strong> —
+											"T" is fully pronounced (water → /ˈwɔːtə/)
+										</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
+										<span>
+											<strong className="text-foreground">/ɑː/ sound</strong> —
+											Used in words like "bath" and "dance"
+										</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+
+					<div className="h-px bg-border/40" />
+
+					{/* Additional Resources Section */}
+					<section className="flex flex-col gap-8">
+						<div className="flex flex-col gap-2 border-primary/20 border-l-2 pl-4">
+							<h3 className="font-semibold text-xl">Additional Resources</h3>
+							<p className="max-w-2xl text-muted-foreground text-sm">
+								Explore these external resources to deepen your understanding of
+								phonetics.
+							</p>
+						</div>
+						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							<a
+								href="https://upload.wikimedia.org/wikipedia/commons/8/8f/IPA_chart_2020.svg"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
+							>
+								<h4 className="font-medium transition-colors group-hover:text-primary">
+									Official IPA Chart
+								</h4>
+								<p className="text-muted-foreground text-sm">
+									The complete 2020 IPA chart from Wikimedia Commons with all
+									phonetic symbols.
+								</p>
+								<span className="text-primary text-xs">
+									↗ Wikipedia Commons
+								</span>
+							</a>
+							<a
+								href="https://www.ipachart.com/"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
+							>
+								<h4 className="font-medium transition-colors group-hover:text-primary">
+									Interactive IPA Chart
+								</h4>
+								<p className="text-muted-foreground text-sm">
+									Click any symbol to hear its pronunciation with audio samples.
+								</p>
+								<span className="text-primary text-xs">↗ ipachart.com</span>
+							</a>
+							<a
+								href="https://ipachart.app/ipa-translator"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
+							>
+								<h4 className="font-medium transition-colors group-hover:text-primary">
+									IPA Translator
+								</h4>
+								<p className="text-muted-foreground text-sm">
+									Convert English text to IPA transcription with support for
+									American and British accents.
+								</p>
+								<span className="text-primary text-xs">↗ ipachart.app</span>
+							</a>
+						</div>
+					</section>
+
+					<div className="h-px bg-border/40" />
+
+					{/* Attribution Section */}
+					<section className="rounded-xl bg-muted/20 p-6">
+						<h4 className="mb-3 font-medium text-muted-foreground text-sm">
+							Sound Clip Attribution
+						</h4>
+						<p className="text-muted-foreground text-xs leading-relaxed">
+							Individual sound clips are the work of Peter Isotalo,
+							User:Denelson83, UCLA Phonetics Lab Archive 2003, User:Halibutt,
+							User:Pmx, and User:Octane, made available under free and/or
+							copyleft licenses. For licensing details, see the{" "}
+							<a
+								href="https://commons.wikimedia.org/wiki/Category:IPA_phonetics"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-primary underline underline-offset-2 hover:no-underline"
+							>
+								Wikimedia Commons phonetics page
+							</a>
+							. Vowel trapezoid background by User:Denelson83. Example words and
+							TTS speeches are generated via ElevenLabs.
+						</p>
+					</section>
+
 					{/* Admin Section - only visible to admins */}
 					<AdminAudioSection />
 
-					<div className="h-px bg-border/60" />
+					<div className="h-px bg-border/40" />
 
 					{/* Quick Start CTA */}
-					<section className="flex flex-col items-center gap-4 rounded-xl bg-muted/30 py-10 text-center sm:flex-row sm:justify-between sm:px-8 sm:text-left">
-						<div className="flex flex-col gap-1 px-6 sm:px-0">
-							<h3 className="font-medium">Ready to practice?</h3>
-							<p className="text-muted-foreground text-sm">
-								Put your knowledge to the test with our practice texts.
-							</p>
+					<section className="py-8 text-center">
+						<div className="flex flex-col items-center gap-6">
+							<div className="flex flex-col gap-2">
+								<h3 className="font-medium text-lg">
+									Ready to test your pronunciation?
+								</h3>
+								<p className="mx-auto max-w-md text-muted-foreground text-sm">
+									Practice with our curated texts and get instant AI feedback on
+									your pronunciation accuracy.
+								</p>
+							</div>
+							<Button asChild size="lg" className="rounded-full px-8">
+								<Link to="/practice">Start Practicing</Link>
+							</Button>
 						</div>
-						<Button asChild className="mx-6 sm:mx-0">
-							<Link to="/practice">Start Practicing</Link>
-						</Button>
 					</section>
 				</div>
 			</PageContainer>

@@ -2,9 +2,7 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
 	Select,
@@ -14,7 +12,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
-import { getScoreLevel, scoreColorVariants } from "@/lib/score";
+import { getScoreLevel } from "@/lib/score";
 import { cn, formatRelativeTime } from "@/lib/utils";
 
 type Attempt = {
@@ -164,7 +162,7 @@ interface StatsSummaryProps {
 	};
 }
 
-function StatCard({
+function StatItem({
 	label,
 	value,
 	suffix,
@@ -176,45 +174,47 @@ function StatCard({
 	trend?: number;
 }) {
 	return (
-		<Card>
-			<CardContent className="p-4 sm:p-6">
-				<div className="flex flex-col gap-1">
-					<p className="text-muted-foreground text-xs uppercase tracking-wide">
-						{label}
-					</p>
-					<div className="flex items-baseline gap-2">
-						<span className="font-medium text-2xl tabular-nums sm:text-3xl">
-							{value}
-							{suffix}
-						</span>
-						{trend !== undefined && trend !== 0 && (
-							<span
-								className={cn(
-									"text-xs",
-									trend > 0 ? "text-green-600" : "text-red-600",
-								)}
-							>
-								{trend > 0 ? "+" : ""}
-								{trend}%
-							</span>
+		<div className="flex flex-col gap-1">
+			<p className="text-muted-foreground text-xs uppercase tracking-wide">
+				{label}
+			</p>
+			<div className="flex items-baseline gap-2">
+				<span className="font-medium text-2xl tabular-nums sm:text-3xl">
+					{value}
+					{suffix}
+				</span>
+				{trend !== undefined && trend !== 0 && (
+					<span
+						className={cn(
+							"font-medium text-xs",
+							trend > 0 ? "text-emerald-600" : "text-red-600",
 						)}
-					</div>
-				</div>
-			</CardContent>
-		</Card>
+					>
+						{trend > 0 ? "+" : ""}
+						{trend}%
+					</span>
+				)}
+			</div>
+		</div>
 	);
 }
 
 function StatsSummary({ stats }: StatsSummaryProps) {
 	return (
-		<div className="grid gap-4 sm:grid-cols-3">
-			<StatCard label="Total Attempts" value={stats.totalAttempts} />
-			<StatCard
+		<div className="flex flex-col gap-6 sm:flex-row sm:gap-12">
+			<StatItem label="Total Attempts" value={stats.totalAttempts} />
+
+			<div className="hidden h-auto w-px bg-border/40 sm:block" />
+
+			<StatItem
 				label="This Week"
 				value={stats.weeklyAttempts}
 				trend={stats.weeklyProgress}
 			/>
-			<StatCard label="Average Score" value={stats.averageScore} suffix="%" />
+
+			<div className="hidden h-auto w-px bg-border/40 sm:block" />
+
+			<StatItem label="Average Score" value={stats.averageScore} suffix="%" />
 		</div>
 	);
 }
@@ -229,29 +229,25 @@ function CommonErrors({ errors }: CommonErrorsProps) {
 	if (errors.length === 0) return null;
 
 	return (
-		<Card>
-			<CardHeader className="pb-3">
-				<CardTitle className="text-base">Most Challenging Sounds</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<div className="flex flex-wrap gap-2">
-					{errors.map((error) => (
-						<div
-							key={error.phoneme}
-							className="flex items-center gap-2 rounded-md bg-muted px-3 py-2"
-						>
-							<span className="font-mono text-base">{error.phoneme}</span>
-							<Badge variant="secondary" className="text-xs">
-								{error.count}
-							</Badge>
-						</div>
-					))}
-				</div>
-				<p className="mt-3 text-muted-foreground text-xs">
-					Focus on these sounds to improve your pronunciation accuracy.
-				</p>
-			</CardContent>
-		</Card>
+		<div className="flex flex-col gap-3">
+			<h3 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
+				Most Challenging Sounds
+			</h3>
+			<div className="flex flex-wrap gap-2">
+				{errors.map((error) => (
+					<div
+						key={error.phoneme}
+						className="flex items-center gap-2 rounded-full border border-border/40 bg-muted/20 px-3 py-1.5 transition-colors hover:bg-muted/40"
+					>
+						<span className="font-mono text-base">{error.phoneme}</span>
+						<span className="text-muted-foreground text-xs">{error.count}</span>
+					</div>
+				))}
+			</div>
+			<p className="text-muted-foreground text-xs">
+				Focus on these sounds to improve your pronunciation accuracy.
+			</p>
+		</div>
 	);
 }
 
@@ -279,7 +275,7 @@ function FilterBar({
 					value={selectedTextId ?? "all"}
 					onValueChange={(v) => onTextChange(v === "all" ? null : v)}
 				>
-					<SelectTrigger className="w-48">
+					<SelectTrigger className="w-48 border-border/60 bg-transparent shadow-none hover:bg-muted/20">
 						<SelectValue placeholder="All texts" />
 					</SelectTrigger>
 					<SelectContent>
@@ -300,7 +296,7 @@ function FilterBar({
 						}
 					}}
 				>
-					<SelectTrigger className="w-32">
+					<SelectTrigger className="w-32 border-border/60 bg-transparent shadow-none hover:bg-muted/20">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -315,7 +311,7 @@ function FilterBar({
 					variant="ghost"
 					size="sm"
 					onClick={() => onTextChange(null)}
-					className="text-muted-foreground"
+					className="h-8 px-2 text-muted-foreground hover:text-foreground"
 				>
 					Clear filter
 				</Button>
@@ -324,9 +320,9 @@ function FilterBar({
 	);
 }
 
-// ATTEMPT CARD
+// ATTEMPT LIST ITEM
 
-interface AttemptCardProps {
+interface AttemptItemProps {
 	attempt: {
 		id: string;
 		textId: string;
@@ -337,32 +333,40 @@ interface AttemptCardProps {
 	};
 }
 
-function AttemptCard({ attempt }: AttemptCardProps) {
+function AttemptItem({ attempt }: AttemptItemProps) {
 	return (
 		<Link
 			to="/practice/$textId/analysis/$analysisId"
 			params={{ textId: attempt.textId, analysisId: attempt.analysisId }}
-			className="block"
+			className="group block"
 		>
-			<Card>
-				<CardContent className="flex items-center gap-4 p-4">
-					<div
-						className={cn(
-							"flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted font-semibold text-sm",
-							scoreColorVariants({ level: getScoreLevel(attempt.score) }),
-						)}
-					>
-						{attempt.score}%
+			<div className="flex items-center gap-6 border-border/40 border-b py-4 transition-colors group-last:border-0 group-hover:bg-muted/10">
+				<div
+					className={cn(
+						"flex size-12 shrink-0 items-center justify-center rounded-lg font-medium text-lg",
+						// Using minimal text color instead of heavy background
+						getScoreLevel(attempt.score) === "high" &&
+							"bg-emerald-500/10 text-emerald-600",
+						getScoreLevel(attempt.score) === "medium" &&
+							"bg-amber-500/10 text-amber-600",
+						getScoreLevel(attempt.score) === "low" &&
+							"bg-red-500/10 text-red-600",
+					)}
+				>
+					{attempt.score}
+				</div>
+				<div className="min-w-0 flex-1 space-y-1">
+					<p className="truncate font-medium text-base text-foreground/90 transition-colors group-hover:text-primary">
+						{attempt.textPreview}
+					</p>
+					<div className="flex items-center gap-2 text-muted-foreground text-xs">
+						<span>{formatRelativeTime(attempt.date)}</span>
 					</div>
-					<div className="min-w-0 flex-1">
-						<p className="truncate text-sm">{attempt.textPreview}</p>
-						<p className="text-muted-foreground text-xs">
-							{formatRelativeTime(attempt.date)}
-						</p>
-					</div>
-					<span className="text-muted-foreground text-xs">View →</span>
-				</CardContent>
-			</Card>
+				</div>
+				<span className="hidden text-muted-foreground/0 text-sm transition-all group-hover:translate-x-1 group-hover:text-muted-foreground/100 sm:block">
+					View Details →
+				</span>
+			</div>
 		</Link>
 	);
 }
@@ -405,16 +409,21 @@ function AttemptList({
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
-			<div className="flex flex-col gap-3">
+		<div className="flex flex-col">
+			<div className="flex flex-col">
 				{attempts.map((attempt) => (
-					<AttemptCard key={attempt.id} attempt={attempt} />
+					<AttemptItem key={attempt.id} attempt={attempt} />
 				))}
 			</div>
 
 			{hasMore && (
-				<div className="flex justify-center pt-4">
-					<Button variant="outline" onClick={onLoadMore} disabled={isLoading}>
+				<div className="flex justify-center pt-8">
+					<Button
+						variant="outline"
+						onClick={onLoadMore}
+						disabled={isLoading}
+						className="border-border/60 bg-transparent hover:bg-muted/20"
+					>
 						Load More
 					</Button>
 				</div>
@@ -449,23 +458,21 @@ function GuestFeed() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-16">
-					<Card className="bg-muted/30">
-						<CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-							<div className="flex flex-col gap-2">
-								<h2 className="font-medium text-lg">
-									Sign in to see your progress
-								</h2>
-								<p className="max-w-md text-muted-foreground text-sm">
-									Track your pronunciation improvements, identify challenging
-									sounds, and review your practice history.
-								</p>
-							</div>
-							<Button asChild>
-								<SignInButton mode="modal">Sign in</SignInButton>
-							</Button>
-						</CardContent>
-					</Card>
+				<div className="flex flex-col gap-16 py-12">
+					<div className="flex flex-col items-center gap-6 text-center">
+						<div className="flex flex-col gap-2">
+							<h2 className="font-medium text-xl">
+								Sign in to see your progress
+							</h2>
+							<p className="max-w-md text-muted-foreground text-sm leading-relaxed">
+								Track your pronunciation improvements, identify challenging
+								sounds, and review your practice history.
+							</p>
+						</div>
+						<Button asChild size="lg" className="rounded-full px-8">
+							<SignInButton mode="modal">Sign in</SignInButton>
+						</Button>
+					</div>
 				</div>
 			</PageContainer>
 		</MainLayout>

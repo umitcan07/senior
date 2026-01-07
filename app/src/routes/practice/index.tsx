@@ -13,7 +13,7 @@ import { InlineLink } from "@/components/ui/inline-link";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TextDifficulty, TextType } from "@/db/types";
-import { serverGetPracticeTextsWithReferences } from "@/lib/text";
+import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
 import { cn } from "@/lib/utils";
 import { getWordCountCategory, useTextFilterStore } from "@/stores/text-store";
 
@@ -133,7 +133,8 @@ function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
 export const Route = createFileRoute("/practice/")({
 	component: PracticePage,
 	loader: async () => {
-		const result = await serverGetPracticeTextsWithReferences();
+		const result = await serverGetPracticeTextsWithAttemptStats();
+
 		if (result.success) {
 			return {
 				texts: result.data.map((text) => ({
@@ -231,7 +232,7 @@ function PracticePage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-16">
+				<div className="flex flex-col gap-10">
 					{allTexts.length > 0 && (
 						<>
 							{/* Filters Section */}
@@ -256,8 +257,6 @@ function PracticePage() {
 									onChange={handleDifficultyFilterChange}
 								/>
 							</section>
-
-							<div className="h-px bg-border/60" />
 						</>
 					)}
 

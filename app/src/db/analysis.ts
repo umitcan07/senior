@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "./index";
 import { analyses, phonemeErrors, wordErrors } from "./schema";
 import type {
+	Analysis,
 	NewAnalysis,
 	NewPhonemeError,
 	NewWordError,
-	Analysis,
 	PhonemeError,
 	WordError,
 } from "./types";
@@ -17,9 +17,7 @@ export async function insertAnalysis(
 	return result;
 }
 
-export async function getAnalysisById(
-	id: string,
-): Promise<Analysis | null> {
+export async function getAnalysisById(id: string): Promise<Analysis | null> {
 	const [result] = await db
 		.select()
 		.from(analyses)

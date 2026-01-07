@@ -1,4 +1,4 @@
-import { ClerkProvider } from "@clerk/clerk-react";
+import { ClerkProvider } from "@clerk/tanstack-start";
 import { shadcn } from "@clerk/themes";
 
 // Handle both client-side (import.meta.env) and server-side (process.env) contexts

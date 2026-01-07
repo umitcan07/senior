@@ -1,5 +1,7 @@
 import { createClerkClient } from "@clerk/backend";
+import { getAuth } from "@clerk/tanstack-start/server";
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import {
 	getUserPreferences,
@@ -48,6 +50,36 @@ async function validateUserId(userId: string): Promise<boolean> {
 		return false;
 	}
 }
+
+/**
+ * Server function to get preferred author ID.
+ * Uses getAuth from @clerk/tanstack-start/server for SSR auth context.
+ * Falls back to "guest" if user is not authenticated.
+ */
+export const serverGetPreferredAuthorId = createServerFn({
+	method: "GET",
+}).handler(async (): Promise<string | null> => {
+	try {
+		let userId = "guest";
+
+		// Try to get authenticated userId from Clerk
+		try {
+			const request = getRequest();
+			const auth = await getAuth(request);
+			if (auth.userId) {
+				userId = auth.userId;
+			}
+		} catch {
+			// Auth not available in this context, use guest
+		}
+
+		const prefs = await getUserPreferences(userId);
+		return prefs?.preferredAuthorId ?? null;
+	} catch (error) {
+		console.error("Get preferred author ID error:", error);
+		return null;
+	}
+});
 
 // Server Functions
 
