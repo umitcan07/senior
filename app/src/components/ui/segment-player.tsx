@@ -2,6 +2,7 @@
 
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -10,11 +11,18 @@ interface SegmentPlayerProps {
 	startMs?: number;
 	endMs?: number;
 	label?: string;
+	errorType?: "substitute" | "insert" | "delete";
 	className?: string;
 	variant?: "default" | "compact" | "inline";
 	showTimestamps?: boolean;
 	defaultSpeed?: number;
 }
+
+const errorTypeLabels: Record<string, { label: string; color: string }> = {
+	substitute: { label: "Substitution", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+	insert: { label: "Insertion", color: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+	delete: { label: "Deletion", color: "bg-red-500/10 text-red-600 border-red-500/20" },
+};
 
 function formatTimestamp(ms: number): string {
 	const seconds = Math.floor(ms / 1000);
@@ -29,6 +37,7 @@ export function SegmentPlayer({
 	startMs = 0,
 	endMs,
 	label,
+	errorType,
 	className,
 	variant = "default",
 	showTimestamps = true,
@@ -169,7 +178,21 @@ export function SegmentPlayer({
 				className,
 			)}
 		>
-			{label && <div className="font-medium text-sm">{label}</div>}
+			{(label || errorType) && (
+				<div className="flex items-center gap-2">
+					{errorType && (
+						<Badge variant="outline" className={cn("text-xs", errorTypeLabels[errorType]?.color)}>
+							{errorTypeLabels[errorType]?.label}
+						</Badge>
+					)}
+					{showTimestamps && startMs !== undefined && endMs !== undefined && (
+						<span className="font-mono text-muted-foreground text-xs">
+							{formatTimestamp(startMs)} - {formatTimestamp(endMs)}
+						</span>
+					)}
+					{label && <span className="font-medium text-sm">{label}</span>}
+				</div>
+			)}
 
 			<div className="flex items-center gap-3">
 				<Button
@@ -254,6 +277,7 @@ export function SegmentPlayer({
 interface ErrorSegmentPlayerProps {
 	src: string;
 	error: {
+		errorType?: string | null;
 		timestampStartMs?: number | null;
 		timestampEndMs?: number | null;
 		expected?: string | null;
@@ -279,7 +303,8 @@ export function ErrorSegmentPlayer({
 			src={src}
 			startMs={error.timestampStartMs!}
 			endMs={error.timestampEndMs!}
-			variant="compact"
+			errorType={error.errorType as "substitute" | "insert" | "delete" | undefined}
+			variant="default"
 			className={className}
 		/>
 	);

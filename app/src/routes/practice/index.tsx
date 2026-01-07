@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronDown, Flame, Layers, Leaf, Zap } from "lucide-react";
+import { ChevronDown, Flame, Layers, Leaf, Search, Zap } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import {
@@ -10,12 +10,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InlineLink } from "@/components/ui/inline-link";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { SectionTitle } from "@/components/ui/section-title";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TextDifficulty, TextType } from "@/db/types";
 import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
 import { cn } from "@/lib/utils";
-import { getWordCountCategory, useTextFilterStore } from "@/stores/text-store";
+import { 
+	getWordCountCategory, 
+	useTextFilterStore,
+	type WordCountCategory 
+} from "@/stores/text-store";
+
 
 const ITEMS_PER_PAGE = 10;
 
@@ -54,31 +68,39 @@ interface CategoryCardProps {
 }
 
 function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
+	// Map types to Lucide icons
+	const Icon = {
+		all: Layers,
+		daily: Leaf,
+		professional: Zap,
+		academic: Flame,
+		phonetic_challenge: Search, // Using Search as a placeholder for phonetic
+		common_phrase: ChevronDown, // Placeholder
+	}[type] || Layers;
+
 	return (
 		<button
 			type="button"
 			onClick={onClick}
 			aria-pressed={isSelected}
 			className={cn(
-				"relative flex aspect-4/3 min-h-14 flex-col justify-end overflow-hidden rounded-xl p-2 transition-all sm:min-h-16 sm:p-3",
+				"group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-xl p-3 transition-colors",
 				categoryGradientVariants({ type }),
 				isSelected
 					? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-					: "opacity-60 hover:opacity-90",
+					: "opacity-80 hover:opacity-100",
 			)}
 		>
-			{/* Placeholder icon area */}
-			<svg
-				className="absolute top-1.5 right-1.5 size-5 text-white/30 sm:top-2 sm:right-2 sm:size-6"
-				viewBox="0 0 24 24"
-				fill="currentColor"
-				aria-hidden="true"
-			>
-				<circle cx="12" cy="12" r="10" />
-			</svg>
-			<span className="relative font-medium text-[10px] text-white drop-shadow-sm sm:text-xs md:text-sm">
-				{categoryLabels[type]}
-			</span>
+			<Icon 
+				className="absolute -right-4 -top-4 size-24 text-white/20 rotate-12 transition-transform" 
+				strokeWidth={1.5}
+			/>
+			
+			<div className="relative z-10 flex flex-col items-start gap-1">
+				<span className="font-semibold text-white tracking-tight text-sm sm:text-base leading-tight">
+					{categoryLabels[type]}
+				</span>
+			</div>
 		</button>
 	);
 }
@@ -153,6 +175,7 @@ export const Route = createFileRoute("/practice/")({
 });
 
 function PracticePageSkeleton() {
+
 	return (
 		<MainLayout>
 			<PageContainer>
@@ -175,17 +198,22 @@ function PracticePageSkeleton() {
 function PracticePage() {
 	const { texts: allTexts } = Route.useLoaderData();
 	const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+	const [searchQuery, setSearchQuery] = useState("");
 	const {
 		difficultyFilter,
 		typeFilter,
 		wordCountFilter,
 		setDifficultyFilter,
 		setTypeFilter,
+		setWordCountFilter,
 	} = useTextFilterStore();
 
 	// Memoize filtered texts to prevent unnecessary recalculations
 	const filteredTexts = useMemo(() => {
 		return allTexts.filter((text) => {
+			if (searchQuery && !text.content.toLowerCase().includes(searchQuery.toLowerCase())) {
+				return false;
+			}
 			if (difficultyFilter !== "all" && text.difficulty !== difficultyFilter) {
 				return false;
 			}
@@ -200,12 +228,17 @@ function PracticePage() {
 			}
 			return true;
 		});
-	}, [allTexts, difficultyFilter, typeFilter, wordCountFilter]);
+	}, [allTexts, difficultyFilter, typeFilter, wordCountFilter, searchQuery]);
 
-	const visibleTexts = useMemo(
-		() => filteredTexts.slice(0, visibleCount),
-		[filteredTexts, visibleCount],
-	);
+	// Split into groups
+	const { attemptedTexts, newTexts } = useMemo(() => {
+		const attempted = filteredTexts.filter((t) => t.bestScore != null);
+		const newItems = filteredTexts.filter((t) => t.bestScore == null);
+		return { attemptedTexts: attempted, newTexts: newItems };
+	}, [filteredTexts]);
+
+	// Combined list for "searchedTexts" check, but we render groups separately
+	const searchedTexts = filteredTexts;
 	const hasMore = visibleCount < filteredTexts.length;
 
 	// Reset pagination when filters change
@@ -236,10 +269,44 @@ function PracticePage() {
 					{allTexts.length > 0 && (
 						<>
 							{/* Filters Section */}
-							<section className="flex flex-col gap-6">
-								{/* Category cards - grid with padding for ring */}
-								<div className="-mx-1 px-1 py-1">
-									<div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6 sm:gap-3">
+							<section className="flex flex-col gap-8">
+								<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+									<div className="flex flex-1 items-end gap-4">
+										<div className="relative flex-1 max-w-md">
+											<Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+											<Input
+												type="search"
+												placeholder="Search texts..."
+												className="pl-9 bg-muted/40 border-border/40 focus-visible:bg-background transition-colors h-10"
+												value={searchQuery}
+												onChange={(e) => {
+													setSearchQuery(e.target.value);
+													setVisibleCount(ITEMS_PER_PAGE);
+												}}
+											/>
+										</div>
+										<Select
+											value={wordCountFilter}
+											onValueChange={(v) =>
+												setWordCountFilter(v as WordCountCategory)
+											}
+										>
+											<SelectTrigger className="w-[140px] bg-muted/40 border-border/40">
+												<SelectValue placeholder="Length" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="all">Any Length</SelectItem>
+												<SelectItem value="short">Short (&lt;15)</SelectItem>
+												<SelectItem value="medium">Medium (15-30)</SelectItem>
+												<SelectItem value="long">Long (30+)</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+								</div>
+
+								<div className="flex flex-col gap-2">
+									<h3 className="text-sm font-medium text-muted-foreground">Category</h3>
+									<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
 										{categoryTypes.map((type) => (
 											<CategoryCard
 												key={type}
@@ -251,22 +318,46 @@ function PracticePage() {
 									</div>
 								</div>
 
-								{/* Difficulty switcher */}
-								<DifficultySwitcher
-									value={difficultyFilter}
-									onChange={handleDifficultyFilterChange}
-								/>
+								<div className="flex flex-col gap-2">
+									<h3 className="text-sm font-medium text-muted-foreground">Difficulty</h3>
+									<DifficultySwitcher
+										value={difficultyFilter}
+										onChange={handleDifficultyFilterChange}
+									/>
+								</div>
 							</section>
 						</>
 					)}
 
 					{/* Results Section */}
-					<section className="flex flex-col gap-6">
-						{filteredTexts.length > 0 ? (
+					<section className="flex flex-col gap-10">
+						{searchedTexts.length > 0 ? (
 							<>
-								<PracticeTextTable texts={visibleTexts} />
+								{/* Previously Attempted Texts */}
+								{attemptedTexts.length > 0 && (
+									<div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+										<SectionTitle 
+											title="Ready to try again?" 
+											variant="playful"
+											description="Beat your high score on these texts."
+										/>
+										<PracticeTextTable texts={attemptedTexts.slice(0, visibleCount)} />
+									</div>
+								)}
+
+								{/* New Texts */}
+								{newTexts.length > 0 && (
+									<div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+										<SectionTitle 
+											title={attemptedTexts.length > 0 ? "New Challenges" : "Practice Texts"} 
+											variant="default"
+										/>
+										<PracticeTextTable texts={newTexts.slice(0, Math.max(0, visibleCount - attemptedTexts.length))} />
+									</div>
+								)}
+
 								{hasMore && (
-									<div className="flex justify-center pb-4">
+									<div className="flex justify-center pb-4 pt-4">
 										<Button variant="outline" onClick={handleLoadMore}>
 											<ChevronDown size={16} />
 											Load More
@@ -277,7 +368,17 @@ function PracticePage() {
 						) : allTexts.length > 0 ? (
 							<EmptyState
 								title="No texts match your filters"
-								description="Try adjusting your difficulty or type filters to see more texts."
+								description="Try adjusting your difficulty, type filters, or search query to see more texts."
+								icon={<Search className="size-full" />}
+								variant="minimal"
+								primaryAction={{
+									label: "Clear Filters",
+									onClick: () => {
+										setSearchQuery("");
+										setTypeFilter("all");
+										setDifficultyFilter("all");
+									}
+								}}
 							/>
 						) : (
 							<EmptyState

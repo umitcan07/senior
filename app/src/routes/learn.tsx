@@ -6,8 +6,11 @@ import { useCallback, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
+import { motion } from "motion/react";
+import { pageVariants } from "@/components/ui/animations";
 
 import { useRequireAdmin } from "@/lib/auth";
 import {
@@ -361,7 +364,7 @@ function IPAItem({
 			disabled={isLoading}
 			className={cn(
 				"group relative flex flex-col items-center justify-center overflow-hidden rounded-xl text-center transition-all duration-200",
-				"border border-transparent hover:border-border/40 hover:bg-muted/30 hover:shadow-sm",
+				"border border-transparent hover:border-border/40 hover:bg-muted/30",
 				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 				isPlaying && "bg-primary/5 ring-1 ring-primary/20",
 			)}
@@ -382,14 +385,14 @@ function IPAItem({
 			</div>
 
 			{/* Top section - IPA symbol */}
-			<div className="flex flex-1 items-center justify-center px-3 pt-4 pb-2">
+			<div className="flex flex-1 items-center justify-center px-4 pt-6 pb-3">
 				<span className="font-mono text-foreground/80 text-xl tracking-wide transition-colors group-hover:text-foreground">
 					{item.symbol}
 				</span>
 			</div>
 
 			{/* Bottom section - word */}
-			<div className="w-full px-3 pb-3 text-sm">
+			<div className="w-full px-4 pb-4 text-sm">
 				<HighlightedWord
 					word={item.word}
 					highlightIndices={item.highlightIndices}
@@ -417,13 +420,12 @@ function IPASection({
 	loadingId: string | null;
 }) {
 	return (
-		<section className="flex flex-col gap-6">
-			<div className="flex flex-col gap-1 border-primary/20 border-l-2 pl-4">
-				<h3 className="font-medium text-lg">{title}</h3>
-				{description && (
-					<p className="text-muted-foreground text-sm">{description}</p>
-				)}
-			</div>
+		<section className="flex flex-col gap-8">
+			<SectionTitle 
+				title={title} 
+				description={description} 
+				variant="default"
+			/>
 			<div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
 				{symbols.map((item) => {
 					const id = `${item.symbol}-${playbackMode}`;
@@ -554,6 +556,229 @@ function AdminAudioSection() {
 	);
 }
 
+// ACCENT DIFFERENCES DATA
+
+interface AccentDifference {
+	id: string;
+	title: string;
+	subtitle?: string;
+	ame: string;
+	bre: string;
+}
+
+interface AccentCategory {
+	title: string;
+	items: AccentDifference[];
+}
+
+const ACCENT_DATA: AccentCategory[] = [
+	{
+		title: "1. Major Vowel System Differences",
+		items: [
+			{
+				id: "lot-palm",
+				title: "LOT–PALM relation",
+				subtitle: "'bother' vs 'father'",
+				ame: "LOT close to PALM. 'bother' ≈ 'father' in vowel quality for many speakers.",
+				bre: "LOT (/ɒ/) distinct from PALM (/ɑː/). 'bother' (/ˈbɒðə/) vs 'father' (/ˈfɑːðə/).",
+			},
+			{
+				id: "cot-caught",
+				title: "Cot–caught merger",
+				subtitle: "LOT–THOUGHT",
+				ame: "Many regions merge cot and caught (same vowel).",
+				bre: "Usually distinct /ɒ/ vs /ɔː/ in many accents.",
+			},
+			{
+				id: "bath-trap",
+				title: "BATH/TRAP split",
+				subtitle: "bath, dance, ask",
+				ame: "Commonly keeps /æ/. (bath, dance, ask)",
+				bre: "Many words take /ɑː/. (bath, dance, ask, laugh, after)",
+			},
+			{
+				id: "short-a",
+				title: "Short 'a' behavior",
+				subtitle: "/æ/ tensing",
+				ame: "Often has /æ/ tensing in specific environments (man, can't → [eə]).",
+				bre: "Generally more stable /æ/ (no big tensing system).",
+			},
+			{
+				id: "weak-vowel",
+				title: "Weak vowel /ə/ vs /ɪ/",
+				subtitle: "In unstressed syllables",
+				ame: "More often uses schwa /ə/ (Rosa's vs roses). Final happy vowel often [i].",
+				bre: "Often uses /ɪ/ (boxes, wanted). Final happy vowel tenser [i].",
+			},
+		],
+	},
+	{
+		title: "2. Diphthongs: GOAT and FACE",
+		items: [
+			{
+				id: "goat",
+				title: "GOAT",
+				ame: "/oʊ/ with a back rounded start.",
+				bre: "/əʊ/ often more central start (RP-ish).",
+			},
+			{
+				id: "face",
+				title: "FACE",
+				ame: "/eɪ/ (often fairly 'pure' starting vowel).",
+				bre: "/eɪ/ too, but typical realizations can be narrower/tenser.",
+			},
+		],
+	},
+	{
+		title: "3. Yod (/j/) differences after consonants",
+		items: [
+			{
+				id: "yod-dropping",
+				title: "Yod dropping",
+				subtitle: "After /t d n s z l/",
+				ame: "tune /tuːn/, new /nuː/, duty /ˈduːti/",
+				bre: "tune /tjuːn/, new /njuː/, duty /ˈdjuːti/",
+			},
+			{
+				id: "yod-coalescence",
+				title: "Yod coalescence",
+				subtitle: "In casual speech",
+				ame: "Tends to keep /t/+/j/ more separate, or drop /j/.",
+				bre: "Tuesday ≈ /ˈtʃuːzdeɪ/, during ≈ /ˈdʒʊərɪŋ/.",
+			},
+		],
+	},
+	{
+		title: "4. T quality and placement",
+		items: [
+			{
+				id: "glottal-t",
+				title: "Glottal /t/",
+				subtitle: "bottle, football",
+				ame: "Far less typical in mainstream AmE.",
+				bre: "Common in many accents (bottle [ˈbɒʔl]).",
+			},
+			{
+				id: "aspiration",
+				title: "Aspiration",
+				ame: "Transitions differ due to rhoticity.",
+				bre: "Timing/strength of aspiration can differ.",
+			},
+		],
+	},
+	{
+		title: "5. R-linking phenomena",
+		items: [
+			{
+				id: "linking-r",
+				title: "Linking & Intrusive R",
+				ame: "Generally doesn't have intrusive R (pronounces /r/ when present).",
+				bre: "Non-rhotic accents use Linking R (far away → /fɑːr əˈweɪ/) and Intrusive R (idea-r-of).",
+			},
+		],
+	},
+	{
+		title: "6. L ('dark l') distribution",
+		items: [
+			{
+				id: "dark-l",
+				title: "Dark L placement",
+				ame: "Often has very 'dark' [ɫ] in positions, even onset.",
+				bre: "RP has clear [l] in onset, dark in coda. Some accents vocalize (milk ≈ [mɪʊk]).",
+			},
+		],
+	},
+	{
+		title: "7. Tapping of /r/ & Coloring",
+		items: [
+			{
+				id: "r-coloring",
+				title: "R-coloring",
+				ame: "Strong rhotic coloring (bird, nurse).",
+				bre: "Non-rhotic: vowel quality/length carries contrast; /r/ disappears in coda.",
+			},
+		],
+	},
+	{
+		title: "8. Stress",
+		items: [
+			{
+				id: "stress",
+				title: "Word Stress",
+				subtitle: "garage, advertisement, laboratory",
+				ame: "Stress placement differs by variety.",
+				bre: "Stress placement differs by variety.",
+			},
+		],
+	},
+];
+
+function AccentDifferenceCard({ item }: { item: AccentDifference }) {
+	return (
+		<div className="flex flex-col gap-3 rounded-lg border border-border/40 bg-card p-4 transition-all hover:bg-muted/10 hover:shadow-sm">
+			<div className="flex flex-col gap-1">
+				<h4 className="font-semibold text-foreground text-sm">{item.title}</h4>
+				{item.subtitle && (
+					<span className="text-muted-foreground text-xs">{item.subtitle}</span>
+				)}
+			</div>
+
+			<div className="grid grid-cols-2 gap-4 pt-2 text-sm">
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase tracking-wider">
+						<span className="text-base">🇺🇸</span> AmE
+					</div>
+					<p className="leading-relaxed text-muted-foreground text-xs">
+						{item.ame}
+					</p>
+				</div>
+
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase tracking-wider">
+						<span className="text-base">🇬🇧</span> BrE
+					</div>
+					<p className="leading-relaxed text-muted-foreground text-xs">
+						{item.bre}
+					</p>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function AccentCategorySection({ category }: { category: AccentCategory }) {
+	return (
+		<div className="flex flex-col gap-4">
+			<h3 className="font-medium text-lg tracking-tight text-primary/80">
+				{category.title}
+			</h3>
+			<div className="grid gap-4 md:grid-cols-2">
+				{category.items.map((item) => (
+					<AccentDifferenceCard key={item.id} item={item} />
+				))}
+			</div>
+		</div>
+	);
+}
+
+function AccentDifferencesSection() {
+	return (
+		<section className="flex flex-col gap-10">
+			<SectionTitle
+				title="American vs British English"
+				variant="playful"
+				description="Major pronunciation differences beyond just the 'R' and 'T' sounds. Understanding these helps you target your preferred accent."
+			/>
+
+			<div className="flex flex-col gap-10">
+				{ACCENT_DATA.map((category) => (
+					<AccentCategorySection key={category.title} category={category} />
+				))}
+			</div>
+		</section>
+	);
+}
+
 // MAIN PAGE
 
 function LearningPage() {
@@ -624,8 +849,14 @@ function LearningPage() {
 
 	return (
 		<MainLayout>
-			<PageContainer>
-				<div className="flex flex-col gap-16">
+			<motion.div 
+				variants={pageVariants} 
+				initial="initial" 
+				animate="animate" 
+				exit="exit"
+			>
+				<PageContainer>
+					<div className="flex flex-col gap-16">
 					{/* IPA Section Header with Controls */}
 					<section className="flex flex-col gap-12">
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -686,6 +917,8 @@ function LearningPage() {
 								loadingId={loadingId}
 							/>
 
+							<div className="h-px bg-border/40" />
+
 							<IPASection
 								title="Diphthongs"
 								description="Gliding vowel sounds that transition between two positions"
@@ -695,6 +928,8 @@ function LearningPage() {
 								playingId={playingId}
 								loadingId={loadingId}
 							/>
+
+							<div className="h-px bg-border/40" />
 
 							<IPASection
 								title="Consonants"
@@ -710,13 +945,11 @@ function LearningPage() {
 
 					{/* Why Learn IPA Section */}
 					<section className="flex flex-col gap-8">
-						<div className="flex flex-col gap-2 border-primary/20 border-l-2 pl-4">
-							<h3 className="font-semibold text-xl">Why Learn IPA?</h3>
-							<p className="max-w-2xl text-muted-foreground text-sm">
-								The International Phonetic Alphabet is your key to mastering
-								pronunciation in any language.
-							</p>
-						</div>
+						<SectionTitle 
+							title="Why Learn IPA?" 
+							variant="playful" 
+							description="The International Phonetic Alphabet is your key to mastering pronunciation in any language."
+						/>
 						<div className="grid gap-4 sm:grid-cols-2">
 							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
 								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -803,90 +1036,17 @@ function LearningPage() {
 					<div className="h-px bg-border/40" />
 
 					{/* Accent Differences Section */}
-					<section className="flex flex-col gap-8">
-						<div className="flex flex-col gap-2 border-primary/20 border-l-2 pl-4">
-							<h3 className="font-semibold text-xl">
-								American vs British English
-							</h3>
-							<p className="max-w-2xl text-muted-foreground text-sm">
-								Understanding these differences helps you target your preferred
-								accent.
-							</p>
-						</div>
-						<div className="grid gap-6 md:grid-cols-2">
-							<div className="flex flex-col gap-4 rounded-xl border border-border/40 p-5">
-								<div className="flex items-center gap-3">
-									<span className="text-2xl">🇺🇸</span>
-									<h4 className="font-semibold">American English</h4>
-								</div>
-								<ul className="space-y-2 text-muted-foreground text-sm">
-									<li className="flex items-start gap-2">
-										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
-										<span>
-											<strong className="text-foreground">Rhotic /r/</strong> —
-											The "r" is pronounced in all positions (car, bird,
-											better)
-										</span>
-									</li>
-									<li className="flex items-start gap-2">
-										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
-										<span>
-											<strong className="text-foreground">Flap /t/</strong> —
-											"T" sounds like a soft "d" between vowels (water, butter)
-										</span>
-									</li>
-									<li className="flex items-start gap-2">
-										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
-										<span>
-											<strong className="text-foreground">/æ/ sound</strong> —
-											Broader in words like "dance" and "bath"
-										</span>
-									</li>
-								</ul>
-							</div>
-							<div className="flex flex-col gap-4 rounded-xl border border-border/40 p-5">
-								<div className="flex items-center gap-3">
-									<span className="text-2xl">🇬🇧</span>
-									<h4 className="font-semibold">British English</h4>
-								</div>
-								<ul className="space-y-2 text-muted-foreground text-sm">
-									<li className="flex items-start gap-2">
-										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
-										<span>
-											<strong className="text-foreground">Non-rhotic</strong> —
-											"R" is often silent after vowels (car → /kɑː/)
-										</span>
-									</li>
-									<li className="flex items-start gap-2">
-										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
-										<span>
-											<strong className="text-foreground">Clear /t/</strong> —
-											"T" is fully pronounced (water → /ˈwɔːtə/)
-										</span>
-									</li>
-									<li className="flex items-start gap-2">
-										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
-										<span>
-											<strong className="text-foreground">/ɑː/ sound</strong> —
-											Used in words like "bath" and "dance"
-										</span>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</section>
+					<AccentDifferencesSection />
 
 					<div className="h-px bg-border/40" />
 
 					{/* Additional Resources Section */}
 					<section className="flex flex-col gap-8">
-						<div className="flex flex-col gap-2 border-primary/20 border-l-2 pl-4">
-							<h3 className="font-semibold text-xl">Additional Resources</h3>
-							<p className="max-w-2xl text-muted-foreground text-sm">
-								Explore these external resources to deepen your understanding of
-								phonetics.
-							</p>
-						</div>
+						<SectionTitle 
+							title="Additional Resources" 
+							variant="default" 
+							description="Explore these external resources to deepen your understanding of phonetics."
+						/>
 						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 							<a
 								href="https://upload.wikimedia.org/wikipedia/commons/8/8f/IPA_chart_2020.svg"
@@ -945,20 +1105,7 @@ function LearningPage() {
 							Sound Clip Attribution
 						</h4>
 						<p className="text-muted-foreground text-xs leading-relaxed">
-							Individual sound clips are the work of Peter Isotalo,
-							User:Denelson83, UCLA Phonetics Lab Archive 2003, User:Halibutt,
-							User:Pmx, and User:Octane, made available under free and/or
-							copyleft licenses. For licensing details, see the{" "}
-							<a
-								href="https://commons.wikimedia.org/wiki/Category:IPA_phonetics"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-primary underline underline-offset-2 hover:no-underline"
-							>
-								Wikimedia Commons phonetics page
-							</a>
-							. Vowel trapezoid background by User:Denelson83. Example words and
-							TTS speeches are generated via ElevenLabs.
+							Each audio clip is the work of Peter Isotalo, User:Denelson83, UCLA Phonetics Lab Archive 2003, User:Halibutt, User:Pmx or User:Octane, and made available under a free and/or copyleft licence. For details on the licensing and attribution requirements of a particular clip, browse to it from the general phonetics page at the Wikimedia Commons. Vowel trapezoid background by User:Denelson83; see File:Blank vowel trapezoid.png on Wikimedia Commons for details. Example words and TTS speeches are generated via ElevenLabs.
 						</p>
 					</section>
 
@@ -985,7 +1132,8 @@ function LearningPage() {
 						</div>
 					</section>
 				</div>
-			</PageContainer>
+				</PageContainer>
+			</motion.div>
 		</MainLayout>
 	);
 }

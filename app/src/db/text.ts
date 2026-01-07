@@ -1,6 +1,6 @@
-import { count, eq, max } from "drizzle-orm";
+import { count, eq, max, sql } from "drizzle-orm";
 import { db } from "./index";
-import { analyses, practiceTexts, referenceSpeeches, userRecordings } from "./schema";
+import { analyses, authors, practiceTexts, referenceSpeeches, userRecordings } from "./schema";
 import type {
 	NewPracticeText,
 	PracticeText,
@@ -13,6 +13,8 @@ export type { PracticeText, NewPracticeText };
 // Use schema-inferred type with additional computed field
 export type PracticeTextWithReferenceCount = PracticeText & {
 	referenceCount: number;
+	usCount: number;
+	ukCount: number;
 };
 
 // Extended type with attempt stats
@@ -50,9 +52,12 @@ export async function getPracticeTextsWithReferenceCounts(): Promise<
 			createdAt: practiceTexts.createdAt,
 			updatedAt: practiceTexts.updatedAt,
 			referenceCount: count(referenceSpeeches.id),
+			usCount: sql<number>`count(case when ${authors.accent} = 'US' then 1 end)`.mapWith(Number),
+			ukCount: sql<number>`count(case when ${authors.accent} = 'UK' then 1 end)`.mapWith(Number),
 		})
 		.from(practiceTexts)
 		.leftJoin(referenceSpeeches, eq(practiceTexts.id, referenceSpeeches.textId))
+		.leftJoin(authors, eq(referenceSpeeches.authorId, authors.id))
 		.groupBy(practiceTexts.id)
 		.orderBy(practiceTexts.createdAt);
 
@@ -182,6 +187,8 @@ export async function getPracticeTextsWithAttemptStats(
 				? Number.parseFloat(stats.bestScore) * 100
 				: null,
 			lastAttemptDate: stats?.lastAttemptDate ?? null,
+			usCount: text.usCount,
+			ukCount: text.ukCount,
 		};
 	});
 }

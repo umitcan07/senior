@@ -42,6 +42,8 @@ import type { Author, ReferenceSpeech } from "@/db/types";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel } from "@/lib/score";
+import { motion } from "motion/react";
+import { pageVariants } from "@/components/ui/animations";
 import { serverGetPracticeTextById } from "@/lib/text";
 import { serverGetPreferredAuthorId } from "@/lib/user-preferences";
 import { cn, formatRelativeTime } from "@/lib/utils";
@@ -168,9 +170,9 @@ function useRecording(textId: string) {
 
 			timerRef.current = setInterval(() => {
 				setRecordingTime((t) => {
-					if (t >= 59) {
+					if (t >= 19) {
 						stopRecording();
-						return 60;
+						return 20;
 					}
 					return t + 1;
 				});
@@ -592,9 +594,9 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 						key={attempt.id}
 						to="/practice/$textId/analysis/$analysisId"
 						params={{ textId, analysisId: attempt.analysisId }}
-						className="group -mx-2 flex items-center justify-between rounded-md border-border/40 border-b px-2 py-3 transition-colors last:border-0 hover:bg-muted/20"
+						className="group -mx-4 flex items-center justify-between rounded-md border-border/40 border-b px-4 py-4 transition-colors last:border-0 hover:bg-muted/20"
 					>
-						<div className="flex items-center gap-3">
+						<div className="flex items-center gap-4">
 							<span
 								className={cn(
 									"flex size-8 items-center justify-center rounded-md font-medium text-xs tabular-nums",
@@ -626,7 +628,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 function TextDetailSkeleton() {
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="md">
+			<PageContainer maxWidth="lg">
 				<div className="flex flex-col gap-12">
 					<div className="flex items-center gap-3">
 						<Button variant="ghost" size="sm" asChild>
@@ -713,11 +715,17 @@ function PracticeTextPage() {
 
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="md">
-				<div className="flex flex-col gap-12">
-					{/* Back button */}
+			<motion.div 
+				variants={pageVariants} 
+				initial="initial" 
+				animate="animate" 
+				exit="exit"
+			>
+				<PageContainer maxWidth="lg">
+					<div className="flex flex-col gap-8">
+						{/* Header with back button */}
 					<div className="flex items-center gap-3">
-						<Button variant="ghost" size="sm" asChild>
+						<Button variant="ghost" size="sm" asChild className="-ml-3">
 							<Link
 								to="/practice"
 								className="gap-2 text-muted-foreground hover:text-foreground"
@@ -836,7 +844,7 @@ function PracticeTextPage() {
 												<span className="font-mono text-2xl tabular-nums">
 													{formatTime(recording.recordingTime)}
 												</span>
-												<span className="text-muted-foreground">/ 1:00</span>
+												<span className="text-muted-foreground">/ 0:20</span>
 											</div>
 											<Button
 												variant="destructive"
@@ -847,9 +855,9 @@ function PracticeTextPage() {
 												<Square size={16} className="fill-current" />
 												Stop
 											</Button>
-											{recording.recordingTime >= 50 && (
+											{recording.recordingTime >= 15 && (
 												<p className="text-destructive text-xs">
-													Auto-stop at 60s
+													Auto-stop at 20s
 												</p>
 											)}
 										</div>
@@ -955,6 +963,7 @@ function PracticeTextPage() {
 					</SignedIn>
 				</div>
 			</PageContainer>
-		</MainLayout>
+		</motion.div>
+	</MainLayout>
 	);
 }

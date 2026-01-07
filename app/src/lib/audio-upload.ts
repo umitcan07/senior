@@ -98,6 +98,24 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 						timestampStartMs: 1200,
 						timestampEndMs: 1300,
 					},
+					{
+						analysisId: analysis.id,
+						errorType: "delete",
+						position: 8,
+						expected: "k",
+						actual: null,
+						timestampStartMs: 1800,
+						timestampEndMs: 1900,
+					},
+					{
+						analysisId: analysis.id,
+						errorType: "insert",
+						position: 12,
+						expected: null,
+						actual: "ə",
+						timestampStartMs: 2400,
+						timestampEndMs: 2500,
+					},
 				]);
 
 				await insertWordErrors([
@@ -107,6 +125,20 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 						position: 1,
 						expected: "quick",
 						actual: "kwick",
+					},
+					{
+						analysisId: analysis.id,
+						errorType: "delete",
+						position: 3,
+						expected: "fox",
+						actual: null,
+					},
+					{
+						analysisId: analysis.id,
+						errorType: "insert",
+						position: 5,
+						expected: null,
+						actual: "um",
 					},
 				]);
 			}

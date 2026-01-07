@@ -2,8 +2,20 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { SectionTitle } from "@/components/ui/section-title";
+import { motion } from "motion/react";
+import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
 	Select,
 	SelectContent,
@@ -162,59 +174,56 @@ interface StatsSummaryProps {
 	};
 }
 
-function StatItem({
-	label,
-	value,
-	suffix,
-	trend,
-}: {
-	label: string;
-	value: number;
-	suffix?: string;
-	trend?: number;
-}) {
-	return (
-		<div className="flex flex-col gap-1">
-			<p className="text-muted-foreground text-xs uppercase tracking-wide">
-				{label}
-			</p>
-			<div className="flex items-baseline gap-2">
-				<span className="font-medium text-2xl tabular-nums sm:text-3xl">
-					{value}
-					{suffix}
-				</span>
-				{trend !== undefined && trend !== 0 && (
-					<span
-						className={cn(
-							"font-medium text-xs",
-							trend > 0 ? "text-emerald-600" : "text-red-600",
-						)}
-					>
-						{trend > 0 ? "+" : ""}
-						{trend}%
-					</span>
-				)}
-			</div>
-		</div>
-	);
-}
+
 
 function StatsSummary({ stats }: StatsSummaryProps) {
 	return (
-		<div className="flex flex-col gap-6 sm:flex-row sm:gap-12">
-			<StatItem label="Total Attempts" value={stats.totalAttempts} />
+		<div className="grid gap-4 sm:grid-cols-3">
+			<Card className="bg-card/50">
+				<CardContent className="flex flex-col gap-2 p-6">
+					<p className="text-muted-foreground text-xs uppercase tracking-wide">
+						Total Attempts
+					</p>
+					<span className="font-medium text-3xl tabular-nums">
+						{stats.totalAttempts}
+					</span>
+				</CardContent>
+			</Card>
 
-			<div className="hidden h-auto w-px bg-border/40 sm:block" />
+			<Card className="bg-card/50">
+				<CardContent className="flex flex-col gap-2 p-6">
+					<p className="text-muted-foreground text-xs uppercase tracking-wide">
+						This Week
+					</p>
+					<div className="flex items-baseline gap-2">
+						<span className="font-medium text-3xl tabular-nums">
+							{stats.weeklyAttempts}
+						</span>
+						{stats.weeklyProgress !== 0 && (
+							<span
+								className={cn(
+									"font-medium text-xs",
+									stats.weeklyProgress > 0 ? "text-emerald-600" : "text-red-600",
+								)}
+							>
+								{stats.weeklyProgress > 0 ? "+" : ""}
+								{stats.weeklyProgress}%
+							</span>
+						)}
+					</div>
+				</CardContent>
+			</Card>
 
-			<StatItem
-				label="This Week"
-				value={stats.weeklyAttempts}
-				trend={stats.weeklyProgress}
-			/>
-
-			<div className="hidden h-auto w-px bg-border/40 sm:block" />
-
-			<StatItem label="Average Score" value={stats.averageScore} suffix="%" />
+			<Card className="bg-card/50">
+				<CardContent className="flex flex-col gap-2 p-6">
+					<p className="text-muted-foreground text-xs uppercase tracking-wide">
+						Average Score
+					</p>
+					<span className="font-medium text-3xl tabular-nums">
+						{stats.averageScore}%
+					</span>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }
@@ -340,7 +349,7 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 			params={{ textId: attempt.textId, analysisId: attempt.analysisId }}
 			className="group block"
 		>
-			<div className="flex items-center gap-6 border-border/40 border-b py-4 transition-colors group-last:border-0 group-hover:bg-muted/10">
+			<div className="flex items-center gap-6 border-border/40 border-b px-6 py-4 transition-colors group-last:border-0 group-hover:bg-muted/10">
 				<div
 					className={cn(
 						"flex size-12 shrink-0 items-center justify-center rounded-lg font-medium text-lg",
@@ -374,24 +383,17 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 // ATTEMPT LIST
 
 interface AttemptListProps {
-	attempts: Array<{
-		id: string;
-		textId: string;
-		textPreview: string;
-		score: number;
-		date: Date;
-		analysisId: string;
-	}>;
-	onLoadMore?: () => void;
-	hasMore?: boolean;
-	isLoading?: boolean;
+	attempts: Attempt[];
+	currentPage: number;
+	totalPages: number;
+	onPageChange: (page: number) => void;
 }
 
 function AttemptList({
 	attempts,
-	onLoadMore,
-	hasMore,
-	isLoading,
+	currentPage,
+	totalPages,
+	onPageChange,
 }: AttemptListProps) {
 	if (attempts.length === 0) {
 		return (
@@ -408,25 +410,76 @@ function AttemptList({
 		);
 	}
 
+	// Group attempts by date (Today, Yesterday, Previous)
+	const groupedAttempts = attempts.reduce((acc, attempt) => {
+		const today = new Date();
+		const attemptDate = new Date(attempt.date);
+		const isToday = attemptDate.toDateString() === today.toDateString();
+		const isYesterday = new Date(today.setDate(today.getDate() - 1)).toDateString() === attemptDate.toDateString();
+		
+		let group = "Previous";
+		if (isToday) group = "Today";
+		else if (isYesterday) group = "Yesterday";
+		
+		if (!acc[group]) acc[group] = [];
+		acc[group].push(attempt);
+		return acc;
+	}, {} as Record<string, Attempt[]>);
+
+	const groupOrder = ["Today", "Yesterday", "Previous"];
+
 	return (
-		<div className="flex flex-col">
-			<div className="flex flex-col">
-				{attempts.map((attempt) => (
-					<AttemptItem key={attempt.id} attempt={attempt} />
-				))}
+		<div className="flex flex-col gap-8">
+			<div className="flex flex-col gap-8">
+				{groupOrder.map(group => {
+					const groupAttempts = groupedAttempts[group];
+					if (!groupAttempts?.length) return null;
+
+					return (
+						<div key={group} className="flex flex-col gap-2">
+							<h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wider pl-1">
+								{group}
+							</h4>
+							<div className="rounded-xl border border-border/40 bg-card">
+								{groupAttempts.map((attempt) => (
+									<AttemptItem key={attempt.id} attempt={attempt} />
+								))}
+							</div>
+						</div>
+					);
+				})}
 			</div>
 
-			{hasMore && (
-				<div className="flex justify-center pt-8">
-					<Button
-						variant="outline"
-						onClick={onLoadMore}
-						disabled={isLoading}
-						className="border-border/60 bg-transparent hover:bg-muted/20"
-					>
-						Load More
-					</Button>
-				</div>
+			{totalPages > 1 && (
+				<Pagination className="pt-4">
+					<PaginationContent>
+						<PaginationItem>
+							<PaginationPrevious 
+								onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+								className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+							/>
+						</PaginationItem>
+						
+						{Array.from({ length: totalPages }).map((_, i) => (
+							<PaginationItem key={i}>
+								<PaginationLink
+									isActive={currentPage === i + 1}
+									onClick={() => onPageChange(i + 1)}
+									className="cursor-pointer"
+								>
+									{i + 1}
+								</PaginationLink>
+							</PaginationItem>
+						))}
+
+						<PaginationItem>
+							<PaginationNext
+								onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+								className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
 			)}
 		</div>
 	);
@@ -437,8 +490,14 @@ function AttemptList({
 function FeedSkeleton() {
 	return (
 		<MainLayout>
-			<PageContainer>
-				<div className="flex flex-col gap-12">
+			<motion.div 
+				variants={pageVariants} 
+				initial="initial" 
+				animate="animate" 
+				exit="exit"
+			>
+				<PageContainer maxWidth="xl">
+					<div className="flex flex-col gap-12">
 					<div className="flex min-h-64 flex-col items-center justify-center">
 						<ShimmeringText
 							text="Loading your progress..."
@@ -448,7 +507,8 @@ function FeedSkeleton() {
 					</div>
 				</div>
 			</PageContainer>
-		</MainLayout>
+		</motion.div>
+	</MainLayout>
 	);
 }
 
@@ -481,10 +541,14 @@ function GuestFeed() {
 
 // MAIN PAGE
 
+// MAIN PAGE
+
 function FeedPage() {
 	const { attempts, stats, commonErrors, texts } = Route.useLoaderData();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<"date" | "score">("date");
+	const [currentPage, setCurrentPage] = useState(1);
+	const ITEMS_PER_PAGE = 5;
 
 	// Filter and sort attempts
 	const filteredAttempts = attempts
@@ -496,6 +560,12 @@ function FeedPage() {
 			return b.score - a.score;
 		});
 
+	const totalPages = Math.ceil(filteredAttempts.length / ITEMS_PER_PAGE);
+	const currentAttempts = filteredAttempts.slice(
+		(currentPage - 1) * ITEMS_PER_PAGE,
+		currentPage * ITEMS_PER_PAGE
+	);
+
 	return (
 		<>
 			<SignedOut>
@@ -503,38 +573,63 @@ function FeedPage() {
 			</SignedOut>
 			<SignedIn>
 				<MainLayout>
-					<PageContainer>
-						<div className="flex flex-col gap-16">
+					<motion.div 
+						variants={pageVariants} 
+						initial="initial" 
+						animate="animate" 
+						exit="exit"
+					>
+						<PageContainer>
+							<div className="flex flex-col gap-16">
 							{/* Stats Summary */}
 							<section className="flex flex-col gap-6">
-								<h2 className="font-semibold text-lg">Overview</h2>
+								<SectionTitle 
+									title="Overview" 
+									variant="default"
+								/>
 								<StatsSummary stats={stats} />
 							</section>
 
 							{/* Common Errors */}
 							{commonErrors.length > 0 && (
-								<CommonErrors errors={commonErrors} />
+								<section className="flex flex-col gap-6">
+									<SectionTitle 
+										title="Needs Improvement" 
+										description="Focus on these sounds to improve your pronunciation accuracy."
+										variant="playful"
+									/>
+									<CommonErrors errors={commonErrors} />
+								</section>
 							)}
 
 							{/* Filter Bar & Attempt List */}
 							<section className="flex flex-col gap-6">
-								<h2 className="font-semibold text-lg">Practice History</h2>
+								<SectionTitle 
+									title="Practice History" 
+									variant="default"
+								/>
 								<FilterBar
 									texts={texts}
 									selectedTextId={selectedTextId}
 									sortBy={sortBy}
-									onTextChange={setSelectedTextId}
+									onTextChange={(id) => {
+										setSelectedTextId(id);
+										setCurrentPage(1);
+									}}
 									onSortChange={setSortBy}
 								/>
 								<AttemptList
-									attempts={filteredAttempts}
-									hasMore={filteredAttempts.length >= 10}
+									attempts={currentAttempts}
+									currentPage={currentPage}
+									totalPages={totalPages}
+									onPageChange={setCurrentPage}
 								/>
 							</section>
 						</div>
 					</PageContainer>
-				</MainLayout>
-			</SignedIn>
-		</>
+				</motion.div>
+			</MainLayout>
+		</SignedIn>
+	</>
 	);
 }

@@ -108,22 +108,17 @@ function ScoreRing({
 	const level = getScoreLevel(percentage);
 
 	const sizeConfig = {
-		sm: { ring: "size-12", text: "text-sm", label: "text-[10px]" },
-		md: { ring: "size-16", text: "text-lg", label: "text-xs" },
-		lg: { ring: "size-24", text: "text-2xl", label: "text-xs" },
-		xl: { ring: "size-32", text: "text-3xl", label: "text-sm" },
+		sm: { ring: "size-12", text: "text-xs", label: "text-[8px]" },
+		md: { ring: "size-16", text: "text-sm", label: "text-[10px]" },
+		lg: { ring: "size-24", text: "text-lg", label: "text-[10px]" },
+		xl: { ring: "size-32", text: "text-xl", label: "text-xs" },
 	};
 
 	const config = sizeConfig[size];
 	const circumference = 2 * Math.PI * 40;
 	const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
-	const getScoreLabel = (pct: number) => {
-		if (pct >= 90) return "Excellent!";
-		if (pct >= 75) return "Good";
-		if (pct >= 60) return "Fair";
-		return "Needs Work";
-	};
+
 
 	return (
 		<div className="flex flex-col items-center gap-2">
@@ -158,7 +153,7 @@ function ScoreRing({
 				<div className="absolute inset-0 flex flex-col items-center justify-center">
 					<motion.span
 						className={cn(
-							"font-bold tabular-nums",
+							"font-semibold tabular-nums",
 							config.text,
 							scoreColorVariants({ level }),
 						)}
@@ -179,16 +174,6 @@ function ScoreRing({
 				>
 					{label}
 				</span>
-			)}
-			{size === "xl" && (
-				<motion.span
-					className={cn("font-medium", scoreColorVariants({ level }))}
-					initial={animate ? { opacity: 0, y: 10 } : undefined}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.3, delay: 0.8 }}
-				>
-					{getScoreLabel(percentage)}
-				</motion.span>
 			)}
 		</div>
 	);
@@ -361,6 +346,16 @@ function ScoreOverview({
 	phonemeScore,
 	wordScore,
 }: ScoreOverviewProps) {
+	const percentage = Math.round(overallScore * 100);
+	const level = getScoreLevel(percentage);
+	
+	const getScoreLabel = (pct: number) => {
+		if (pct >= 90) return "Excellent!";
+		if (pct >= 75) return "Good";
+		if (pct >= 60) return "Fair";
+		return "Needs Work";
+	};
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
@@ -368,13 +363,25 @@ function ScoreOverview({
 			transition={{ duration: 0.4, delay: 0.1 }}
 		>
 			<Card className="overflow-hidden">
-				<CardHeader className="pb-4">
+				<CardHeader className="flex flex-row items-center justify-between pb-2">
 					<CardTitle className="text-base">Score Overview</CardTitle>
+					<Badge 
+						variant="secondary"
+						className={cn(
+							"font-medium",
+							scoreColorVariants({ level }).replace("text-", "bg-").replace("dark:text-", "dark:bg-").replace("600", "500/15").replace("500", "500/15").replace("400", "500/25") + " text-foreground", // Hacky color mapping, ideally use separate variants
+							level === "high" && "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+							level === "medium" && "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+							level === "low" && "bg-red-500/15 text-red-700 dark:text-red-400"
+						)}
+					>
+						{getScoreLabel(percentage)}
+					</Badge>
 				</CardHeader>
 				<CardContent>
-					<div className="flex items-center justify-around py-6">
+					<div className="flex flex-col items-center gap-8 py-6">
 						<ScoreRing score={overallScore} size="xl" label="Overall" />
-						<div className="flex flex-col gap-6">
+						<div className="flex w-full justify-center gap-16 border-t border-border/40 pt-8">
 							{phonemeScore !== null && (
 								<ScoreRing score={phonemeScore} size="md" label="Phonemes" />
 							)}
@@ -619,7 +626,7 @@ function ErrorList({
 function AnalysisSkeleton() {
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="lg">
+			<PageContainer maxWidth="xl">
 				<div className="flex min-h-64 flex-col items-center justify-center">
 					<ShimmeringText
 						text="Loading analysis..."
@@ -672,7 +679,7 @@ function AnalysisPage() {
 	if (!analysis) {
 		return (
 			<MainLayout>
-				<PageContainer maxWidth="lg">
+				<PageContainer maxWidth="xl">
 					<EmptyState
 						title="Analysis not found"
 						description="This analysis may have been removed or doesn't exist."
@@ -689,7 +696,7 @@ function AnalysisPage() {
 
 	return (
 		<MainLayout>
-			<PageContainer maxWidth="lg">
+			<PageContainer maxWidth="xl">
 				<div className="space-y-8">
 					{/* Header */}
 					<motion.div

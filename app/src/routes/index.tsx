@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookIcon, BookOpenIcon, ChartBarIncreasingIcon } from "lucide-react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
+import { Squares } from "@/components/ui/squares-background";
+import { motion } from "motion/react";
+import { pageVariants } from "@/components/ui/animations";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
@@ -13,21 +16,21 @@ const features = [
 	{
 		title: "Practice Texts",
 		description:
-			"Browse curated texts designed to help you master common pronunciation challenges in English.",
+			"Master English pronunciation with curated texts targeting challenging sounds and patterns.",
 		href: "/practice",
 		icon: <BookIcon size={20} />,
 	},
 	{
 		title: "Get Insights",
 		description:
-			"Track your progress over time and identify patterns in your pronunciation to focus your practice.",
+			"Visualize your improvements with detailed analytics and track your progress over time.",
 		href: "/summary",
 		icon: <ChartBarIncreasingIcon size={20} />,
 	},
 	{
 		title: "IPA & English Sounds",
 		description:
-			"Learn the International Phonetic Alphabet and understand the sounds of English at a deeper level.",
+			"Deepen your understanding of English phonetics with our interactive IPA guide.",
 		href: "/learn",
 		icon: <BookOpenIcon size={20} />,
 	},
@@ -56,8 +59,15 @@ function FeatureCard({ title, description, icon, href }: (typeof features)[0]) {
 
 function HeroSection() {
 	return (
-		<div className="flex flex-col items-center gap-6 text-center">
-			<div className="flex flex-col items-center gap-4">
+		<div className="relative isolate flex flex-col items-center gap-6 text-center">
+			<Squares 
+				className="absolute inset-0 -z-10 h-full w-full opacity-20 [mask-image:linear-gradient(to_bottom,white,transparent)]"
+				borderColor="var(--primary)"
+				hoverFillColor="var(--primary)"
+				speed={0.2} 
+				squareSize={50}
+			/>
+			<div className="flex flex-col items-center gap-4 py-12 md:py-20">
 				<span className="text-primary text-sm uppercase tracking-wide">
 					Free & Open Source
 				</span>
@@ -71,7 +81,7 @@ function HeroSection() {
 				</p>
 			</div>
 
-			<div className="flex flex-col justify-center gap-3 sm:flex-row">
+			<div className="flex flex-col justify-center gap-3 sm:flex-row pb-12">
 				<Button size="lg" asChild>
 					<Link to="/practice">Start Practicing</Link>
 				</Button>
@@ -86,8 +96,14 @@ function HeroSection() {
 function HomePage() {
 	return (
 		<MainLayout>
-			<PageContainer>
-				<div className="flex flex-col gap-12">
+			<motion.div 
+				variants={pageVariants} 
+				initial="initial" 
+				animate="animate" 
+				exit="exit"
+			>
+				<PageContainer>
+					<div className="flex flex-col gap-12">
 					<section className="py-4 md:py-12">
 						<HeroSection />
 					</section>
@@ -103,7 +119,8 @@ function HomePage() {
 						</div>
 					</section>
 				</div>
-			</PageContainer>
+				</PageContainer>
+			</motion.div>
 		</MainLayout>
 	);
 }

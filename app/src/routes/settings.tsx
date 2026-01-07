@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/clerk-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mic, Monitor, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	MainLayout,
 	PageContainer,
@@ -16,25 +16,35 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
+
+import { motion } from "motion/react";
+import { pageVariants } from "@/components/ui/animations";
 import type { Author } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";
 import {
-	serverGetUserPreferences,
+	serverGetPreferredAuthorId,
 	serverUpdateUserPreferences,
 } from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/settings")({
 	component: SettingsPage,
 	loader: async () => {
-		const authorsResult = await serverGetAuthors();
+		const [authorsResult, preferredAuthorIdResult] = await Promise.all([
+			serverGetAuthors(),
+			serverGetPreferredAuthorId(), // Assuming this handles auth internally or returns null if not authed
+		]);
+
 		const authors = authorsResult.success ? authorsResult.data : [];
+		const preferredAuthorId =
+			preferredAuthorIdResult ?? authors[0]?.id ?? null;
 
 		return {
 			authors,
-			currentPreferredAuthorId: authors[0]?.id ?? null,
+			currentPreferredAuthorId: preferredAuthorId,
 		};
 	},
 	pendingComponent: SettingsSkeleton,
@@ -174,44 +184,15 @@ function GuestSettings() {
 function SettingsPage() {
 	const { authors, currentPreferredAuthorId: initialAuthorId } =
 		Route.useLoaderData();
-	const { user, isLoaded } = useUser();
+	const { user } = useUser();
 	const [savedAuthorId, setSavedAuthorId] = useState<string | null>(
 		initialAuthorId,
 	);
 	const [pendingAuthorId, setPendingAuthorId] = useState<string | null>(
 		initialAuthorId,
 	);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const { toast } = useToast();
-
-	// Load user preferences when user is available
-	useEffect(() => {
-		if (!isLoaded || !user?.id) {
-			setIsLoading(false);
-			return;
-		}
-
-		const loadPreferences = async () => {
-			try {
-				const result = await serverGetUserPreferences({
-					data: { userId: user.id },
-				});
-
-				if (result.success && result.data?.preferredAuthorId) {
-					const preferredId = result.data.preferredAuthorId;
-					setSavedAuthorId(preferredId);
-					setPendingAuthorId(preferredId);
-				}
-			} catch (error) {
-				console.error("Load preferences error:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		loadPreferences();
-	}, [isLoaded, user?.id]);
 
 	const hasChanges = pendingAuthorId !== savedAuthorId;
 
@@ -272,8 +253,14 @@ function SettingsPage() {
 			</SignedOut>
 			<SignedIn>
 				<MainLayout>
-					<PageContainer maxWidth="md">
-						<div className="flex flex-col gap-12">
+					<motion.div 
+						variants={pageVariants} 
+						initial="initial" 
+						animate="animate" 
+						exit="exit"
+					>
+						<PageContainer maxWidth="md">
+							<div className="flex flex-col gap-12">
 							<PageHeader
 								title="Settings"
 								description="Manage your preferences"
@@ -285,45 +272,36 @@ function SettingsPage() {
 									description="Choose your default reference voice for practice sessions. This voice will be pre-selected when you start a new practice."
 									icon={<Mic className="size-5" />}
 								>
-									{isLoading ? (
-										<div className="flex items-center gap-2">
-											<Spinner className="size-4" />
-											<span className="text-muted-foreground text-sm">
-												Loading preferences...
-											</span>
-										</div>
-									) : (
-										<div className="flex gap-4">
-											<AuthorSelector
-												authors={authors}
-												selectedAuthorId={pendingAuthorId}
-												onSelect={setPendingAuthorId}
-												disabled={isSaving}
-											/>
-											{hasChanges && (
-												<div className="ml-auto flex items-center gap-2">
-													<Button
-														onClick={handleSave}
-														disabled={isSaving}
-														size="sm"
-													>
-														{isSaving && (
-															<Spinner className="size-4 text-primary-foreground" />
-														)}
-														Save
-													</Button>
-													<Button
-														onClick={handleCancel}
-														disabled={isSaving}
-														variant="outline"
-														size="sm"
-													>
-														Cancel
-													</Button>
-												</div>
-											)}
-										</div>
-									)}
+									<div className="flex gap-4">
+										<AuthorSelector
+											authors={authors}
+											selectedAuthorId={pendingAuthorId}
+											onSelect={setPendingAuthorId}
+											disabled={isSaving}
+										/>
+										{hasChanges && (
+											<div className="ml-auto flex items-center gap-2">
+												<Button
+													onClick={handleSave}
+													disabled={isSaving}
+													size="sm"
+												>
+													{isSaving && (
+														<Spinner className="size-4 text-primary-foreground" />
+													)}
+													Save
+												</Button>
+												<Button
+													onClick={handleCancel}
+													disabled={isSaving}
+													variant="outline"
+													size="sm"
+												>
+													Cancel
+												</Button>
+											</div>
+										)}
+									</div>
 								</SettingsSection>
 
 								<div className="border-t" />
@@ -351,7 +329,8 @@ function SettingsPage() {
 								</SettingsSection>
 							</div>
 						</div>
-					</PageContainer>
+						</PageContainer>
+					</motion.div>
 				</MainLayout>
 			</SignedIn>
 		</>

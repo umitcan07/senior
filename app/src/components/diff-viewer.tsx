@@ -219,12 +219,7 @@ export function DiffViewer({
 				</div>
 			</div>
 
-			{/* Divider */}
-			<div className="flex items-center gap-3 py-1">
-				<div className="h-px flex-1 bg-border/50" />
-				<span className="text-muted-foreground/50 text-xs">↓</span>
-				<div className="h-px flex-1 bg-border/50" />
-			</div>
+
 
 			{/* Recognized */}
 			<div className="space-y-2">

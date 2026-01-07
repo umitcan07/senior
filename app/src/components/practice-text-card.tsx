@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { cva } from "class-variance-authority";
-import { ArrowRight, User2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
 	Table,
 	TableBody,
@@ -23,6 +24,8 @@ export interface PracticeTextData {
 	type: TextType;
 	note?: string | null;
 	referenceCount: number;
+	usCount?: number;
+	ukCount?: number;
 	wordCount: number;
 	// User attempt stats
 	attemptCount?: number;
@@ -101,13 +104,10 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 							<TableHead className="hidden w-24 sm:table-cell">
 								Difficulty
 							</TableHead>
-							<TableHead className="hidden w-16 text-right md:table-cell">
-								Words
-							</TableHead>
-							<TableHead className="hidden w-16 text-right md:table-cell">
+							<TableHead className="hidden w-20 text-right md:table-cell">
 								Voices
 							</TableHead>
-							<TableHead className="hidden w-24 text-right lg:table-cell">
+							<TableHead className="hidden w-32 text-right lg:table-cell">
 								Score
 							</TableHead>
 							<TableHead className="w-20 sm:w-24" />
@@ -137,18 +137,19 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 													· {text.difficulty}
 												</span>
 											</div>
-											<p className="line-clamp-2 text-sm sm:text-base">
+											<p className="line-clamp-2 text-sm sm:text-base text-foreground/90 font-medium">
 												{text.content}
 											</p>
-											{/* Show word count and score inline on mobile */}
+											{/* Show score inline on mobile */}
 											<div className="flex items-center gap-3 text-muted-foreground text-xs md:hidden">
-												<span className="tabular-nums">
-													{text.wordCount} words
-												</span>
-												<span className="flex items-center gap-1 tabular-nums">
-													<User2 size={12} />
-													{text.referenceCount}
-												</span>
+												<div className="flex items-center gap-2 tabular-nums">
+													<div className="flex items-center gap-1">
+														<span>🇺🇸</span> {text.usCount ?? 0}
+													</div>
+													<div className="flex items-center gap-1">
+														<span>🇬🇧</span> {text.ukCount ?? 0}
+													</div>
+												</div>
 												{text.bestScore != null && (
 													<span
 														className={cn(
@@ -174,45 +175,49 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 									</span>
 								</TableCell>
 								<TableCell className="hidden text-right md:table-cell">
-									<span className="text-muted-foreground text-sm tabular-nums">
-										{text.wordCount}
-									</span>
-								</TableCell>
-								<TableCell className="hidden text-right md:table-cell">
-									<div className="flex items-center justify-end gap-1 text-muted-foreground">
-										<User2 size={14} />
-										<span className="text-sm tabular-nums">
-											{text.referenceCount}
-										</span>
-										</div>
-							</TableCell>
-							{/* Score column - shows best score and last attempt */}
-							<TableCell className="hidden text-right lg:table-cell">
-								{text.bestScore != null ? (
-									<div className="flex flex-col items-end gap-0.5">
-										<span
-											className={cn(
-												"font-medium text-sm tabular-nums",
-												getScoreLevel(text.bestScore) === "high" &&
-													"text-emerald-600",
-												getScoreLevel(text.bestScore) === "medium" &&
-													"text-amber-600",
-												getScoreLevel(text.bestScore) === "low" &&
-													"text-red-600",
-											)}
-										>
-											{Math.round(text.bestScore)}%
-										</span>
-										{text.lastAttemptDate && (
-											<span className="text-muted-foreground text-xs">
-												{formatRelativeTime(text.lastAttemptDate)}
+									<div className="flex items-center justify-end gap-3 text-muted-foreground">
+										<div className="flex items-center gap-1.5" title="US Voices">
+											<span className="text-base">🇺🇸</span>
+											<span className="text-sm tabular-nums font-medium">
+												{text.usCount ?? 0}
 											</span>
-										)}
+										</div>
+										<div className="flex items-center gap-1.5" title="UK Voices">
+											<span className="text-base">🇬🇧</span>
+											<span className="text-sm tabular-nums font-medium">
+												{text.ukCount ?? 0}
+											</span>
+										</div>
 									</div>
-								) : (
-									<span className="text-muted-foreground/50 text-sm">—</span>
-								)}
-							</TableCell>
+								</TableCell>
+								{/* Score column - shows best score and recent info */}
+								<TableCell className="hidden text-right lg:table-cell">
+									{text.bestScore != null ? (
+										<div className="flex flex-col items-end gap-1">
+											<Badge 
+												variant="secondary"
+												className={cn(
+													"font-mono tabular-nums",
+													getScoreLevel(text.bestScore) === "high" &&
+														"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25",
+													getScoreLevel(text.bestScore) === "medium" &&
+														"bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25",
+													getScoreLevel(text.bestScore) === "low" &&
+														"bg-red-500/15 text-red-700 dark:text-red-400 hover:bg-red-500/25",
+												)}
+											>
+												Best: {Math.round(text.bestScore)}%
+											</Badge>
+											{text.lastAttemptDate && (
+												<span className="text-muted-foreground text-[10px] uppercase tracking-wider">
+													{formatRelativeTime(text.lastAttemptDate)}
+												</span>
+											)}
+										</div>
+									) : (
+										<span className="text-muted-foreground/50 text-sm">—</span>
+									)}
+								</TableCell>
 							<TableCell className="text-right">
 									<Button
 										asChild
