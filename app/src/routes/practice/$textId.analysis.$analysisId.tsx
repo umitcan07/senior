@@ -297,7 +297,7 @@ function RecordingPlayer({
 
 				{/* Speed controls */}
 				<div className="flex gap-1">
-					{[0.5, 1].map((speed) => (
+					{[0.5, 0.75, 1].map((speed) => (
 						<button
 							key={speed}
 							type="button"

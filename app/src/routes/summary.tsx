@@ -580,9 +580,9 @@ function FeedPage() {
 						exit="exit"
 					>
 						<PageContainer>
-							<div className="flex flex-col gap-16">
+							<div className="flex flex-col gap-20">
 							{/* Stats Summary */}
-							<section className="flex flex-col gap-6">
+							<section className="flex flex-col gap-8">
 								<SectionTitle 
 									title="Overview" 
 									variant="default"
@@ -592,7 +592,7 @@ function FeedPage() {
 
 							{/* Common Errors */}
 							{commonErrors.length > 0 && (
-								<section className="flex flex-col gap-6">
+								<section className="flex flex-col gap-8">
 									<SectionTitle 
 										title="Needs Improvement" 
 										description="Focus on these sounds to improve your pronunciation accuracy."
@@ -603,7 +603,7 @@ function FeedPage() {
 							)}
 
 							{/* Filter Bar & Attempt List */}
-							<section className="flex flex-col gap-6">
+							<section className="flex flex-col gap-8">
 								<SectionTitle 
 									title="Practice History" 
 									variant="default"

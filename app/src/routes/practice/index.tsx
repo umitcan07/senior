@@ -265,11 +265,11 @@ function PracticePage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-10">
+				<div className="flex flex-col gap-12">
 					{allTexts.length > 0 && (
 						<>
 							{/* Filters Section */}
-							<section className="flex flex-col gap-8">
+							<section className="flex flex-col gap-10">
 								<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
 									<div className="flex flex-1 items-end gap-4">
 										<div className="relative flex-1 max-w-md">
@@ -330,7 +330,7 @@ function PracticePage() {
 					)}
 
 					{/* Results Section */}
-					<section className="flex flex-col gap-10">
+					<section className="flex flex-col gap-12">
 						{searchedTexts.length > 0 ? (
 							<>
 								{/* Previously Attempted Texts */}

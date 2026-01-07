@@ -137,7 +137,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 													· {text.difficulty}
 												</span>
 											</div>
-											<p className="line-clamp-2 text-sm sm:text-base text-foreground/90 font-medium">
+											<p className="line-clamp-2 text-sm sm:text-base text-foreground/90 font-medium break-words">
 												{text.content}
 											</p>
 											{/* Show score inline on mobile */}

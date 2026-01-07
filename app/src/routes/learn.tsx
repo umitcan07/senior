@@ -364,7 +364,7 @@ function IPAItem({
 			disabled={isLoading}
 			className={cn(
 				"group relative flex flex-col items-center justify-center overflow-hidden rounded-xl text-center transition-all duration-200",
-				"border border-transparent hover:border-border/40 hover:bg-muted/30",
+				"border border-border/30 hover:border-border/60 hover:bg-muted/20",
 				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 				isPlaying && "bg-primary/5 ring-1 ring-primary/20",
 			)}
@@ -856,7 +856,7 @@ function LearningPage() {
 				exit="exit"
 			>
 				<PageContainer>
-					<div className="flex flex-col gap-16">
+					<div className="flex flex-col gap-20">
 					{/* IPA Section Header with Controls */}
 					<section className="flex flex-col gap-12">
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -906,7 +906,7 @@ function LearningPage() {
 						</div>
 
 						{/* IPA Charts */}
-						<div className="flex flex-col gap-16">
+						<div className="flex flex-col gap-20">
 							<IPASection
 								title="Vowels"
 								description="Pure vowel sounds (monophthongs)"
