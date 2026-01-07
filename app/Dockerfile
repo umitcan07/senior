@@ -38,7 +38,6 @@ COPY --from=builder /app/.output ./.output
 # Copy migration files and scripts
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/src/db ./src/db
-COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 
 EXPOSE 3000
