@@ -17,3 +17,6 @@
 ## POWSM
 - [ ] Analyze the software to see whether the ASR model works with phonetic data under the hood. 
 - [ ] Canonical IPA fallback: CMUDict.
+
+## Static Content
+- [ ] Decide on whether to serve from R2 or /public folder

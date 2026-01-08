@@ -51,8 +51,16 @@ async def worker_loop(endpoint_id: str, worker_url: str):
         
         try:
             async with httpx.AsyncClient(timeout=600.0) as client:
-                response = await client.post(target_url, json={"input": job["input"]}, timeout=600.0)
-                
+                # Retry loop to handle container cold starts or network glitches
+                for attempt in range(3):
+                    try:
+                        response = await client.post(target_url, json={"input": job["input"]}, timeout=600.0)
+                        break
+                    except httpx.ConnectError:
+                        if attempt == 2: raise
+                        logger.warning(f"Connection failed to {target_url}, retrying in 2s...")
+                        await asyncio.sleep(2)
+
                 execution_time_ms = int((time.time() - start_time) * 1000)
                 
                 if response.status_code == 200:

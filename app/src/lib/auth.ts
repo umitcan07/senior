@@ -1,5 +1,5 @@
 import { createClerkClient } from "@clerk/backend";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/tanstack-react-start";
 import { createErrorResponse, ErrorCode } from "./errors";
 
 /**

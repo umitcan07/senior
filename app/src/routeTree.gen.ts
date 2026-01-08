@@ -14,15 +14,19 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LearnRouteImport } from './routes/learn'
+import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as ErrorRouteImport } from './routes/error'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PracticeIndexRouteImport } from './routes/practice/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PracticeTextIdRouteImport } from './routes/practice/$textId'
+import { Route as ApiJobsRouteImport } from './routes/api/jobs'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
 import { Route as AdminReferencesRouteImport } from './routes/admin/references'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
+import { Route as ApiWebhookJobsRouteImport } from './routes/api/webhook.jobs'
+import { Route as ApiJobsIdRouteImport } from './routes/api/jobs.$id'
 import { Route as ApiAudioIdRouteImport } from './routes/api/audio.$id'
 import { Route as PracticeTextIdAnalysisAnalysisIdRouteImport } from './routes/practice/$textId.analysis.$analysisId'
 import { Route as ApiAudioUserIdRouteImport } from './routes/api/audio.user.$id'
@@ -51,6 +55,11 @@ const LoginRoute = LoginRouteImport.update({
 const LearnRoute = LearnRouteImport.update({
   id: '/learn',
   path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorRoute = ErrorRouteImport.update({
@@ -83,6 +92,11 @@ const PracticeTextIdRoute = PracticeTextIdRouteImport.update({
   path: '/$textId',
   getParentRoute: () => PracticeRoute,
 } as any)
+const ApiJobsRoute = ApiJobsRouteImport.update({
+  id: '/api/jobs',
+  path: '/api/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTextRoute = AdminTextRouteImport.update({
   id: '/admin/text',
   path: '/admin/text',
@@ -97,6 +111,16 @@ const AdminAuthorsRoute = AdminAuthorsRouteImport.update({
   id: '/admin/authors',
   path: '/admin/authors',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhookJobsRoute = ApiWebhookJobsRouteImport.update({
+  id: '/api/webhook/jobs',
+  path: '/api/webhook/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiJobsIdRoute = ApiJobsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiJobsRoute,
 } as any)
 const ApiAudioIdRoute = ApiAudioIdRouteImport.update({
   id: '/api/audio/$id',
@@ -124,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
@@ -132,10 +157,13 @@ export interface FileRoutesByFullPath {
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/practice/': typeof PracticeIndexRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
+  '/api/jobs/$id': typeof ApiJobsIdRoute
+  '/api/webhook/jobs': typeof ApiWebhookJobsRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
   '/api/audio/user/$id': typeof ApiAudioUserIdRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
@@ -144,6 +172,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
@@ -151,10 +180,13 @@ export interface FileRoutesByTo {
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/practice': typeof PracticeIndexRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
+  '/api/jobs/$id': typeof ApiJobsIdRoute
+  '/api/webhook/jobs': typeof ApiWebhookJobsRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
   '/api/audio/user/$id': typeof ApiAudioUserIdRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
@@ -164,6 +196,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
   '/practice': typeof PracticeRouteWithChildren
@@ -172,10 +205,13 @@ export interface FileRoutesById {
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/practice/': typeof PracticeIndexRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
+  '/api/jobs/$id': typeof ApiJobsIdRoute
+  '/api/webhook/jobs': typeof ApiWebhookJobsRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
   '/api/audio/user/$id': typeof ApiAudioUserIdRoute
   '/practice/$textId/analysis/$analysisId': typeof PracticeTextIdAnalysisAnalysisIdRoute
@@ -186,6 +222,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/jobs'
     | '/learn'
     | '/login'
     | '/practice'
@@ -194,10 +231,13 @@ export interface FileRouteTypes {
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
+    | '/api/jobs'
     | '/practice/$textId'
     | '/admin'
     | '/practice/'
     | '/api/audio/$id'
+    | '/api/jobs/$id'
+    | '/api/webhook/jobs'
     | '/api/audio/learn/$key'
     | '/api/audio/user/$id'
     | '/practice/$textId/analysis/$analysisId'
@@ -206,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/jobs'
     | '/learn'
     | '/login'
     | '/settings'
@@ -213,10 +254,13 @@ export interface FileRouteTypes {
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
+    | '/api/jobs'
     | '/practice/$textId'
     | '/admin'
     | '/practice'
     | '/api/audio/$id'
+    | '/api/jobs/$id'
+    | '/api/webhook/jobs'
     | '/api/audio/learn/$key'
     | '/api/audio/user/$id'
     | '/practice/$textId/analysis/$analysisId'
@@ -225,6 +269,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/jobs'
     | '/learn'
     | '/login'
     | '/practice'
@@ -233,10 +278,13 @@ export interface FileRouteTypes {
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
+    | '/api/jobs'
     | '/practice/$textId'
     | '/admin/'
     | '/practice/'
     | '/api/audio/$id'
+    | '/api/jobs/$id'
+    | '/api/webhook/jobs'
     | '/api/audio/learn/$key'
     | '/api/audio/user/$id'
     | '/practice/$textId/analysis/$analysisId'
@@ -246,6 +294,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
   ErrorRoute: typeof ErrorRoute
+  JobsRoute: typeof JobsRoute
   LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
   PracticeRoute: typeof PracticeRouteWithChildren
@@ -254,8 +303,10 @@ export interface RootRouteChildren {
   AdminAuthorsRoute: typeof AdminAuthorsRoute
   AdminReferencesRoute: typeof AdminReferencesRoute
   AdminTextRoute: typeof AdminTextRoute
+  ApiJobsRoute: typeof ApiJobsRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   ApiAudioIdRoute: typeof ApiAudioIdRoute
+  ApiWebhookJobsRoute: typeof ApiWebhookJobsRoute
   ApiAudioLearnKeyRoute: typeof ApiAudioLearnKeyRoute
   ApiAudioUserIdRoute: typeof ApiAudioUserIdRoute
 }
@@ -295,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/learn'
       fullPath: '/learn'
       preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error': {
@@ -339,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeTextIdRouteImport
       parentRoute: typeof PracticeRoute
     }
+    '/api/jobs': {
+      id: '/api/jobs'
+      path: '/api/jobs'
+      fullPath: '/api/jobs'
+      preLoaderRoute: typeof ApiJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/text': {
       id: '/admin/text'
       path: '/admin/text'
@@ -359,6 +424,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/authors'
       preLoaderRoute: typeof AdminAuthorsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/webhook/jobs': {
+      id: '/api/webhook/jobs'
+      path: '/api/webhook/jobs'
+      fullPath: '/api/webhook/jobs'
+      preLoaderRoute: typeof ApiWebhookJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/jobs/$id': {
+      id: '/api/jobs/$id'
+      path: '/$id'
+      fullPath: '/api/jobs/$id'
+      preLoaderRoute: typeof ApiJobsIdRouteImport
+      parentRoute: typeof ApiJobsRoute
     }
     '/api/audio/$id': {
       id: '/api/audio/$id'
@@ -417,10 +496,22 @@ const PracticeRouteWithChildren = PracticeRoute._addFileChildren(
   PracticeRouteChildren,
 )
 
+interface ApiJobsRouteChildren {
+  ApiJobsIdRoute: typeof ApiJobsIdRoute
+}
+
+const ApiJobsRouteChildren: ApiJobsRouteChildren = {
+  ApiJobsIdRoute: ApiJobsIdRoute,
+}
+
+const ApiJobsRouteWithChildren =
+  ApiJobsRoute._addFileChildren(ApiJobsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
   ErrorRoute: ErrorRoute,
+  JobsRoute: JobsRoute,
   LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
   PracticeRoute: PracticeRouteWithChildren,
@@ -429,8 +520,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAuthorsRoute: AdminAuthorsRoute,
   AdminReferencesRoute: AdminReferencesRoute,
   AdminTextRoute: AdminTextRoute,
+  ApiJobsRoute: ApiJobsRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   ApiAudioIdRoute: ApiAudioIdRoute,
+  ApiWebhookJobsRoute: ApiWebhookJobsRoute,
   ApiAudioLearnKeyRoute: ApiAudioLearnKeyRoute,
   ApiAudioUserIdRoute: ApiAudioUserIdRoute,
 }

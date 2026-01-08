@@ -372,7 +372,7 @@ function ScoreOverview({
 								.replace("dark:text-", "dark:bg-")
 								.replace("600", "500/15")
 								.replace("500", "500/15")
-								.replace("400", "500/25") + " text-foreground", // Hacky color mapping, ideally use separate variants
+								.replace("400", "500/25") + "text-foreground", // Hacky color mapping, ideally use separate variants
 							level === "high" &&
 								"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
 							level === "medium" &&
@@ -386,7 +386,7 @@ function ScoreOverview({
 				<CardContent>
 					<div className="flex flex-col items-center gap-8 py-6">
 						<ScoreRing score={overallScore} size="xl" label="Overall" />
-						<div className="flex w-full justify-center gap-16 border-t border-border/40 pt-8">
+						<div className="flex w-full justify-center gap-16 border-border/40 border-t pt-8">
 							{phonemeScore !== null && (
 								<ScoreRing score={phonemeScore} size="md" label="Phonemes" />
 							)}

@@ -1,9 +1,8 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
-import { SectionTitle } from "@/components/ui/section-title";
-import { motion } from "motion/react";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +15,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
+import { SectionTitle } from "@/components/ui/section-title";
 import {
 	Select,
 	SelectContent,
@@ -442,7 +442,7 @@ function AttemptList({
 
 					return (
 						<div key={group} className="flex flex-col gap-2">
-							<h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wider pl-1">
+							<h4 className="pl-1 font-medium text-muted-foreground text-xs uppercase tracking-wider">
 								{group}
 							</h4>
 							<div className="rounded-xl border border-border/40 bg-card">

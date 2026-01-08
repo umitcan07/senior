@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
 import {
 	createFileRoute,
 	Link,
@@ -17,8 +17,10 @@ import {
 	Upload,
 	Volume2,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { pageVariants } from "@/components/ui/animations";
 import {
 	AudioPlayerButton,
 	AudioPlayerDuration,
@@ -42,8 +44,6 @@ import type { Author, ReferenceSpeech } from "@/db/types";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel } from "@/lib/score";
-import { motion } from "motion/react";
-import { pageVariants } from "@/components/ui/animations";
 import { serverGetPracticeTextById } from "@/lib/text";
 import { serverGetPreferredAuthorId } from "@/lib/user-preferences";
 import { cn, formatRelativeTime } from "@/lib/utils";

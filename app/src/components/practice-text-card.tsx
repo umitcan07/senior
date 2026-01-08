@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { cva } from "class-variance-authority";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Table,
 	TableBody,
@@ -136,7 +136,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 													· {text.difficulty}
 												</span>
 											</div>
-											<p className="line-clamp-2 text-sm sm:text-base text-foreground/90 font-medium break-words">
+											<p className="line-clamp-2 break-words font-medium text-foreground/90 text-sm sm:text-base">
 												{text.content}
 											</p>
 											{/* Show score inline on mobile */}
@@ -180,7 +180,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											title="US Voices"
 										>
 											<span className="text-base">🇺🇸</span>
-											<span className="text-sm tabular-nums font-medium">
+											<span className="font-medium text-sm tabular-nums">
 												{text.usCount ?? 0}
 											</span>
 										</div>
@@ -189,7 +189,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											title="UK Voices"
 										>
 											<span className="text-base">🇬🇧</span>
-											<span className="text-sm tabular-nums font-medium">
+											<span className="font-medium text-sm tabular-nums">
 												{text.ukCount ?? 0}
 											</span>
 										</div>
@@ -204,17 +204,17 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 												className={cn(
 													"font-mono tabular-nums",
 													getScoreLevel(text.bestScore) === "high" &&
-														"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25",
+														"bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/25 dark:text-emerald-400",
 													getScoreLevel(text.bestScore) === "medium" &&
-														"bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25",
+														"bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400",
 													getScoreLevel(text.bestScore) === "low" &&
-														"bg-red-500/15 text-red-700 dark:text-red-400 hover:bg-red-500/25",
+														"bg-red-500/15 text-red-700 hover:bg-red-500/25 dark:text-red-400",
 												)}
 											>
 												Best: {Math.round(text.bestScore)}%
 											</Badge>
 											{text.lastAttemptDate && (
-												<span className="text-muted-foreground text-[10px] uppercase tracking-wider">
+												<span className="text-[10px] text-muted-foreground uppercase tracking-wider">
 													{formatRelativeTime(text.lastAttemptDate)}
 												</span>
 											)}

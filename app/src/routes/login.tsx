@@ -1,4 +1,4 @@
-import { SignedIn, SignIn } from "@clerk/clerk-react";
+import { SignedIn, SignIn } from "@clerk/tanstack-react-start";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { NonceLogo } from "@/components/ui/nonce";
 import { ThemeToggle } from "@/components/ui/theme-toggle";

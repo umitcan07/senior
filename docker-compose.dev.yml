@@ -30,7 +30,10 @@ services:
       dockerfile: assessment/Dockerfile
     environment:
       - RUNPOD_DEBUG=true
-    command: python assessment/handler.py --rp_serve_api
+      - RUNPOD_PORT=8000
+      - RUNPOD_API_HOST=0.0.0.0
+
+    command: python assessment/handler.py --rp_serve_api --rp_api_host 0.0.0.0
     volumes:
       # Optional: Mount code for hot-reloading if your handler supports it (RunPod SDK might not auto-reload)
       - ./mod/assessment:/worker/assessment
@@ -52,7 +55,9 @@ services:
       dockerfile: ipa_generation/Dockerfile
     environment:
       - RUNPOD_DEBUG=true
-    command: python ipa_generation/handler.py --rp_serve_api
+      - RUNPOD_PORT=8000
+      - RUNPOD_API_HOST=0.0.0.0
+    command: python ipa_generation/handler.py --rp_serve_api --rp_api_host 0.0.0.0
     volumes:
       - ./mod/ipa_generation:/worker/ipa_generation
     networks:

@@ -2,15 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { RefreshCw, Volume2 } from "lucide-react";
+import { motion } from "motion/react";
 import { useCallback, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "@/components/ui/section-title";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
-import { motion } from "motion/react";
-import { pageVariants } from "@/components/ui/animations";
 
 import { useRequireAdmin } from "@/lib/auth";
 import {
@@ -34,62 +34,62 @@ const IPA_AUDIO_MAP: Record<
 	iː: {
 		word: "see",
 		wordAudio: "ipa/words/see.wav",
-		soundAudio: "ipa/sounds/i-long.wav",
+		soundAudio: "ipa/sounds/i.ogg",
 	},
 	ɪ: {
 		word: "sit",
 		wordAudio: "ipa/words/sit.wav",
-		soundAudio: "ipa/sounds/i-short.wav",
+		soundAudio: "ipa/sounds/ɪ.ogg",
 	},
 	e: {
 		word: "bed",
 		wordAudio: "ipa/words/bed.wav",
-		soundAudio: "ipa/sounds/e.wav",
+		soundAudio: "ipa/sounds/e.ogg",
 	},
 	æ: {
 		word: "cat",
 		wordAudio: "ipa/words/cat.wav",
-		soundAudio: "ipa/sounds/ae.wav",
+		soundAudio: "ipa/sounds/æ.ogg",
 	},
 	ɑː: {
 		word: "father",
 		wordAudio: "ipa/words/father.wav",
-		soundAudio: "ipa/sounds/a-long.wav",
+		soundAudio: "ipa/sounds/ɑ.ogg",
 	},
 	ɒ: {
 		word: "hot",
 		wordAudio: "ipa/words/hot.wav",
-		soundAudio: "ipa/sounds/o-short.wav",
+		soundAudio: "ipa/sounds/ɒ.ogg",
 	},
 	ɔː: {
 		word: "saw",
 		wordAudio: "ipa/words/saw.wav",
-		soundAudio: "ipa/sounds/o-long.wav",
+		soundAudio: "ipa/sounds/ɔ.ogg",
 	},
 	ʊ: {
 		word: "put",
 		wordAudio: "ipa/words/put.wav",
-		soundAudio: "ipa/sounds/u-short.wav",
+		soundAudio: "ipa/sounds/ʊ.ogg",
 	},
 	uː: {
 		word: "too",
 		wordAudio: "ipa/words/too.wav",
-		soundAudio: "ipa/sounds/u-long.wav",
+		soundAudio: "ipa/sounds/u.ogg",
 	},
 	ʌ: {
 		word: "cup",
 		wordAudio: "ipa/words/cup.wav",
-		soundAudio: "ipa/sounds/uh.wav",
+		soundAudio: "ipa/sounds/ʌ.ogg",
 	},
 	ɜː: {
 		word: "bird",
 		wordAudio: "ipa/words/bird.wav",
-		soundAudio: "ipa/sounds/er.wav",
+		soundAudio: "ipa/sounds/ɜ.ogg",
 	},
 	ə: {
 		word: "about",
 		wordAudio: "ipa/words/about.wav",
-		soundAudio: "ipa/sounds/schwa.wav",
+		soundAudio: "ipa/sounds/ə.ogg",
 	},
 	// Diphthongs
 	eɪ: {
@@ -136,77 +136,77 @@ const IPA_AUDIO_MAP: Record<
 	p: {
 		word: "pet",
 		wordAudio: "ipa/words/pet.wav",
-		soundAudio: "ipa/sounds/p.wav",
+		soundAudio: "ipa/sounds/p.ogg",
 	},
 	b: {
 		word: "bed",
 		wordAudio: "ipa/words/bed.wav",
-		soundAudio: "ipa/sounds/b.wav",
+		soundAudio: "ipa/sounds/b.ogg",
 	},
 	t: {
 		word: "ten",
 		wordAudio: "ipa/words/ten.wav",
-		soundAudio: "ipa/sounds/t.wav",
+		soundAudio: "ipa/sounds/t.ogg",
 	},
 	d: {
 		word: "dog",
 		wordAudio: "ipa/words/dog.wav",
-		soundAudio: "ipa/sounds/d.wav",
+		soundAudio: "ipa/sounds/d.ogg",
 	},
 	k: {
 		word: "cat",
 		wordAudio: "ipa/words/cat-k.wav",
-		soundAudio: "ipa/sounds/k.wav",
+		soundAudio: "ipa/sounds/k.ogg",
 	},
 	g: {
 		word: "go",
 		wordAudio: "ipa/words/go-g.wav",
-		soundAudio: "ipa/sounds/g.wav",
+		soundAudio: "ipa/sounds/g.ogg",
 	},
 	f: {
 		word: "fan",
 		wordAudio: "ipa/words/fan.wav",
-		soundAudio: "ipa/sounds/f.wav",
+		soundAudio: "ipa/sounds/f.ogg",
 	},
 	v: {
 		word: "van",
 		wordAudio: "ipa/words/van.wav",
-		soundAudio: "ipa/sounds/v.wav",
+		soundAudio: "ipa/sounds/v.ogg",
 	},
 	θ: {
 		word: "think",
 		wordAudio: "ipa/words/think.wav",
-		soundAudio: "ipa/sounds/th-voiceless.wav",
+		soundAudio: "ipa/sounds/θ.ogg",
 	},
 	ð: {
 		word: "this",
 		wordAudio: "ipa/words/this.wav",
-		soundAudio: "ipa/sounds/th-voiced.wav",
+		soundAudio: "ipa/sounds/ð.ogg",
 	},
 	s: {
 		word: "sit",
 		wordAudio: "ipa/words/sit-s.wav",
-		soundAudio: "ipa/sounds/s.wav",
+		soundAudio: "ipa/sounds/s.ogg",
 	},
 	z: {
 		word: "zoo",
 		wordAudio: "ipa/words/zoo.wav",
-		soundAudio: "ipa/sounds/z.wav",
+		soundAudio: "ipa/sounds/z.ogg",
 	},
 	ʃ: {
 		word: "ship",
 		wordAudio: "ipa/words/ship.wav",
-		soundAudio: "ipa/sounds/sh.wav",
+		soundAudio: "ipa/sounds/ʃ.ogg",
 	},
 	ʒ: {
 		word: "measure",
 		wordAudio: "ipa/words/measure.wav",
-		soundAudio: "ipa/sounds/zh.wav",
+		soundAudio: "ipa/sounds/ʒ.ogg",
 	},
 	h: {
 		word: "hat",
 		wordAudio: "ipa/words/hat.wav",
-		soundAudio: "ipa/sounds/h.wav",
+		soundAudio: "ipa/sounds/h.ogg",
 	},
 	tʃ: {
 		word: "church",
@@ -221,37 +221,37 @@ const IPA_AUDIO_MAP: Record<
 	m: {
 		word: "man",
 		wordAudio: "ipa/words/man.wav",
-		soundAudio: "ipa/sounds/m.wav",
+		soundAudio: "ipa/sounds/m.ogg",
 	},
 	n: {
 		word: "no",
 		wordAudio: "ipa/words/no.wav",
-		soundAudio: "ipa/sounds/n.wav",
+		soundAudio: "ipa/sounds/n.ogg",
 	},
 	ŋ: {
 		word: "sing",
 		wordAudio: "ipa/words/sing.wav",
-		soundAudio: "ipa/sounds/ng.wav",
+		soundAudio: "ipa/sounds/ŋ.ogg",
 	},
 	l: {
 		word: "let",
 		wordAudio: "ipa/words/let.wav",
-		soundAudio: "ipa/sounds/l.wav",
+		soundAudio: "ipa/sounds/l.ogg",
 	},
 	r: {
 		word: "red",
 		wordAudio: "ipa/words/red.wav",
-		soundAudio: "ipa/sounds/r.wav",
+		soundAudio: "ipa/sounds/r.ogg",
 	},
 	j: {
 		word: "yes",
 		wordAudio: "ipa/words/yes.wav",
-		soundAudio: "ipa/sounds/y.wav",
+		soundAudio: "ipa/sounds/j.ogg",
 	},
 	w: {
 		word: "wet",
 		wordAudio: "ipa/words/wet.wav",
-		soundAudio: "ipa/sounds/w.wav",
+		soundAudio: "ipa/sounds/w.ogg",
 	},
 };
 
@@ -724,7 +724,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 					<div className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase tracking-wider">
 						<span className="text-base">🇺🇸</span> AmE
 					</div>
-					<p className="leading-relaxed text-muted-foreground text-xs">
+					<p className="text-muted-foreground text-xs leading-relaxed">
 						{item.ame}
 					</p>
 				</div>
@@ -733,7 +733,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 					<div className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase tracking-wider">
 						<span className="text-base">🇬🇧</span> BrE
 					</div>
-					<p className="leading-relaxed text-muted-foreground text-xs">
+					<p className="text-muted-foreground text-xs leading-relaxed">
 						{item.bre}
 					</p>
 				</div>
@@ -745,7 +745,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 function AccentCategorySection({ category }: { category: AccentCategory }) {
 	return (
 		<div className="flex flex-col gap-4">
-			<h3 className="font-medium text-lg tracking-tight text-primary/80">
+			<h3 className="font-medium text-lg text-primary/80 tracking-tight">
 				{category.title}
 			</h3>
 			<div className="grid gap-4 md:grid-cols-2">
@@ -810,7 +810,9 @@ function LearningPage() {
 
 			const audioKey =
 				mode === "word" ? audioData.wordAudio : audioData.soundAudio;
-			const audioUrl = `/api/audio/learn/${encodeURIComponent(audioKey)}`;
+			const audioUrl = audioKey.endsWith(".ogg")
+				? `/${audioKey}`
+				: `/api/audio/learn/${encodeURIComponent(audioKey)}`;
 
 			setLoadingId(id);
 

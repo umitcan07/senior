@@ -3,7 +3,7 @@ import {
 	SignedOut,
 	SignInButton,
 	UserButton,
-} from "@clerk/clerk-react";
+} from "@clerk/tanstack-react-start";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { NonceLogo } from "@/components/ui/nonce";

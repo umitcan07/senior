@@ -3,7 +3,7 @@ import {
 	SignedOut,
 	SignInButton,
 	UserButton,
-} from "@clerk/clerk-react";
+} from "@clerk/tanstack-react-start";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, Settings2Icon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";

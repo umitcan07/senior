@@ -1,7 +1,7 @@
 import { createClerkClient } from "@clerk/backend";
-import { getAuth } from "@clerk/tanstack-start/server";
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+
 import { z } from "zod";
 import {
 	getUserPreferences,
@@ -53,7 +53,7 @@ async function validateUserId(userId: string): Promise<boolean> {
 
 /**
  * Server function to get preferred author ID.
- * Uses getAuth from @clerk/tanstack-start/server for SSR auth context.
+ * Uses getAuth from @clerk/tanstack-react-start/server for SSR auth context.
  * Falls back to "guest" if user is not authenticated.
  */
 export const serverGetPreferredAuthorId = createServerFn({
@@ -64,10 +64,9 @@ export const serverGetPreferredAuthorId = createServerFn({
 
 		// Try to get authenticated userId from Clerk
 		try {
-			const request = getRequest();
-			const auth = await getAuth(request);
-			if (auth.userId) {
-				userId = auth.userId;
+			const authObj = await auth();
+			if (authObj.userId) {
+				userId = authObj.userId;
 			}
 		} catch {
 			// Auth not available in this context, use guest

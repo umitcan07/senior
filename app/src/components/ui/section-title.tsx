@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 const sectionTitleVariants = cva("flex flex-col gap-2", {
 	variants: {
@@ -35,7 +35,7 @@ export function SectionTitle({
 		>
 			{variant === "playful" ? (
 				<div className="flex flex-col gap-1">
-					<h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+					<h2 className="font-semibold text-xl tracking-tight sm:text-2xl">
 						<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
 							{title}
 						</span>
@@ -46,9 +46,9 @@ export function SectionTitle({
 				</div>
 			) : variant === "accent" ? (
 				<div className="flex flex-col gap-1">
-					<h2 className="relative inline-block text-xl font-semibold tracking-tight">
+					<h2 className="relative inline-block font-semibold text-xl tracking-tight">
 						{title}
-						<span className="absolute -bottom-1 left-0 h-0.5 w-1/4 rounded-full bg-primary/30" />
+						<span className="-bottom-1 absolute left-0 h-0.5 w-1/4 rounded-full bg-primary/30" />
 					</h2>
 					{description && (
 						<p className="text-muted-foreground text-xs">{description}</p>
@@ -56,9 +56,9 @@ export function SectionTitle({
 				</div>
 			) : (
 				<>
-					<h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+					<h3 className="font-semibold text-lg tracking-tight">{title}</h3>
 					{description && (
-						<p className="text-xs text-muted-foreground">{description}</p>
+						<p className="text-muted-foreground text-xs">{description}</p>
 					)}
 				</>
 			)}

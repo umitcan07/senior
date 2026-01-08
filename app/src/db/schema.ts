@@ -2,6 +2,7 @@ import {
 	decimal,
 	index,
 	integer,
+	jsonb,
 	pgEnum,
 	pgTable,
 	smallint,
@@ -47,6 +48,18 @@ export const textTypeEnum = pgEnum("text_type", [
 	"academic",
 	"phonetic_challenge",
 	"common_phrase",
+]);
+export const analysisStatusEnum = pgEnum("analysis_status", [
+	"pending",
+	"processing",
+	"completed",
+	"failed",
+]);
+export const jobStatusEnum = pgEnum("job_status", [
+	"in_queue",
+	"in_progress",
+	"completed",
+	"failed",
 ]);
 
 // TABLES
@@ -200,10 +213,13 @@ export const analyses = pgTable(
 		recognizedWords: text("recognized_words"),
 		wordDistance: integer("word_distance"),
 		wordScore: decimal("word_score", { precision: 5, scale: 4 }),
+		jobId: varchar("job_id", { length: 255 }),
+		status: analysisStatusEnum("status").default("pending").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
 		index("idx_analyses_user_recording_id").on(table.userRecordingId),
+		index("idx_analyses_job_id").on(table.jobId),
 		index("idx_analyses_created_at").on(table.createdAt),
 	],
 );
@@ -283,5 +299,30 @@ export const wordErrors = pgTable(
 		index("idx_word_errors_type").on(table.errorType),
 		index("idx_word_errors_expected").on(table.expected),
 		index("idx_word_errors_actual").on(table.actual),
+	],
+);
+
+/**
+ * RunPod job tracking for testing the simulation flow
+ */
+export const jobs = pgTable(
+	"jobs",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		externalJobId: varchar("external_job_id", { length: 255 })
+			.notNull()
+			.unique(),
+		status: jobStatusEnum("status").default("in_queue").notNull(),
+		result: jsonb("result"),
+		error: text("error"),
+		executionTimeMs: integer("execution_time_ms"),
+		delayTimeMs: integer("delay_time_ms"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	},
+	(table) => [
+		index("idx_jobs_external_job_id").on(table.externalJobId),
+		index("idx_jobs_status").on(table.status),
+		index("idx_jobs_created_at").on(table.createdAt),
 	],
 );

@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookIcon, BookOpenIcon, ChartBarIncreasingIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
 import { Squares } from "@/components/ui/squares-background";
-import { motion } from "motion/react";
-import { pageVariants } from "@/components/ui/animations";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
@@ -61,14 +61,14 @@ function HeroSection() {
 	return (
 		<div className="relative isolate flex flex-col items-center gap-6 text-center">
 			<Squares
-				className="absolute inset-0 -z-10 h-full w-full opacity-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]"
+				className="-z-10 absolute inset-0 h-full w-full opacity-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]"
 				borderColor="var(--primary)"
 				hoverFillColor="var(--primary)"
 				speed={0.2}
 				squareSize={50}
 			/>
 			<div className="flex flex-col items-center gap-4 py-12 md:py-20">
-				<span className="text-primary text-xs uppercase tracking-widest flex items-center gap-2">
+				<span className="flex items-center gap-2 text-primary text-xs uppercase tracking-widest">
 					<span className="h-[1px] w-3 bg-primary/20"></span> Free & Open Source{" "}
 					<span className="h-[1px] w-3 bg-primary/20"></span>
 				</span>
@@ -80,7 +80,7 @@ function HeroSection() {
 					personalized feedback, and track your progress over time with detailed
 					insights.
 				</p>
-				<div className="flex flex-col justify-center gap-3 sm:flex-row py-6">
+				<div className="flex flex-col justify-center gap-3 py-6 sm:flex-row">
 					<Button size="lg" asChild>
 						<Link to="/practice">Start Practicing</Link>
 					</Button>
@@ -88,6 +88,18 @@ function HeroSection() {
 						<Link to="/learn">Learn More</Link>
 					</Button>
 				</div>
+				<p className="mt-6 rounded-sm px-2 py-1 text-muted-foreground text-xs ring-1 ring-muted">
+					Powered by{" "}
+					<a
+						href="https://huggingface.co/espnet/powsm"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="font-medium decoration-primary/50 underline-offset-4 hover:underline"
+					>
+						POWSM
+					</a>
+					: A Phonetic Open Whisper-Style Speech Foundation Model
+				</p>
 			</div>
 		</div>
 	);
@@ -117,23 +129,6 @@ function HomePage() {
 									<FeatureCard key={feature.title} {...feature} />
 								))}
 							</div>
-						</section>
-
-						<div className="h-px bg-border/60" />
-
-						<section className="flex flex-col items-center gap-4 py-8 text-center">
-							<p className="text-muted-foreground text-sm">
-								Powered by{" "}
-								<a
-									href="https://huggingface.co/espnet/powsm"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="font-medium decoration-primary/50 underline-offset-4 hover:underline"
-								>
-									POWSM
-								</a>
-								: A Phonetic Open Whisper-Style Speech Foundation Model
-							</p>
 						</section>
 					</div>
 				</PageContainer>

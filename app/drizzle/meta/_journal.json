@@ -36,6 +36,20 @@
       "when": 1767443778524,
       "tag": "0004_tricky_pepper_potts",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767900897789,
+      "tag": "0005_low_skrulls",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767907484276,
+      "tag": "0006_pale_doctor_octopus",
+      "breakpoints": true
     }
   ]
 }

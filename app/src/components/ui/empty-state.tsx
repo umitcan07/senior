@@ -45,7 +45,7 @@ export function EmptyState({
 				</div>
 			)}
 
-			<div className="flex flex-col gap-1 max-w-md">
+			<div className="flex max-w-md flex-col gap-1">
 				<h3
 					className={cn(
 						"font-medium",
@@ -92,7 +92,7 @@ export function EmptyState({
 		return (
 			<div
 				className={cn(
-					"flex flex-col items-center justify-center py-12 px-4",
+					"flex flex-col items-center justify-center px-4 py-12",
 					className,
 				)}
 			>

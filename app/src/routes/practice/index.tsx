@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InlineLink } from "@/components/ui/inline-link";
 import { Input } from "@/components/ui/input";
+import { SectionTitle } from "@/components/ui/section-title";
 import {
 	Select,
 	SelectContent,
@@ -18,7 +19,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { SectionTitle } from "@/components/ui/section-title";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TextDifficulty, TextType } from "@/db/types";
@@ -92,13 +92,13 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 			)}
 		>
 			<Icon
-				className="absolute -right-4 -top-4 size-24 text-white/20 rotate-12 transition-transform"
+				className="-right-4 -top-4 absolute size-24 rotate-12 text-white/20 transition-transform"
 				strokeWidth={1.5}
 			/>
 
 			<div className="relative z-10 flex flex-col items-start gap-1">
-				<span className="font-semibold text-white tracking-tight text-sm sm:text-base leading-tight">
-					{categoryLabels[type]}be
+				<span className="font-semibold text-sm text-white leading-tight tracking-tight sm:text-base">
+					{categoryLabels[type]}
 				</span>
 			</div>
 		</button>
@@ -274,12 +274,12 @@ function PracticePage() {
 							<section className="flex flex-col gap-10">
 								<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
 									<div className="flex flex-1 items-end gap-4">
-										<div className="relative flex-1 max-w-md">
-											<Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+										<div className="relative max-w-md flex-1">
+											<Search className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 											<Input
 												type="search"
 												placeholder="Search texts..."
-												className="pl-9 bg-muted/40 border-border/40 focus-visible:bg-background transition-colors h-10"
+												className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
 												value={searchQuery}
 												onChange={(e) => {
 													setSearchQuery(e.target.value);
@@ -293,7 +293,7 @@ function PracticePage() {
 												setWordCountFilter(v as WordCountCategory)
 											}
 										>
-											<SelectTrigger className="w-[140px] bg-muted/40 border-border/40">
+											<SelectTrigger className="w-[140px] border-border/40 bg-muted/40">
 												<SelectValue placeholder="Length" />
 											</SelectTrigger>
 											<SelectContent>
@@ -307,7 +307,7 @@ function PracticePage() {
 								</div>
 
 								<div className="flex flex-col gap-2">
-									<h3 className="text-sm font-medium text-muted-foreground">
+									<h3 className="font-medium text-muted-foreground text-sm">
 										Category
 									</h3>
 									<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
@@ -323,7 +323,7 @@ function PracticePage() {
 								</div>
 
 								<div className="flex flex-col gap-2">
-									<h3 className="text-sm font-medium text-muted-foreground">
+									<h3 className="font-medium text-muted-foreground text-sm">
 										Difficulty
 									</h3>
 									<DifficultySwitcher
@@ -341,7 +341,7 @@ function PracticePage() {
 							<>
 								{/* Previously Attempted Texts */}
 								{attemptedTexts.length > 0 && (
-									<div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+									<div className="fade-in slide-in-from-bottom-4 flex animate-in flex-col gap-4 duration-500">
 										<SectionTitle
 											title="Ready to try again?"
 											variant="playful"
@@ -355,7 +355,7 @@ function PracticePage() {
 
 								{/* New Texts */}
 								{newTexts.length > 0 && (
-									<div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+									<div className="fade-in slide-in-from-bottom-4 flex animate-in flex-col gap-4 delay-100 duration-500">
 										<SectionTitle
 											title={
 												attemptedTexts.length > 0
@@ -374,7 +374,7 @@ function PracticePage() {
 								)}
 
 								{hasMore && (
-									<div className="flex justify-center pb-4 pt-4">
+									<div className="flex justify-center pt-4 pb-4">
 										<Button variant="outline" onClick={handleLoadMore}>
 											<ChevronDown size={16} />
 											Load More

@@ -1,12 +1,19 @@
-import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/clerk-react";
+import {
+	SignedIn,
+	SignedOut,
+	SignInButton,
+	useUser,
+} from "@clerk/tanstack-react-start";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mic, Monitor, User } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import {
 	MainLayout,
 	PageContainer,
 	PageHeader,
 } from "@/components/layout/main-layout";
+import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -16,12 +23,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
-
-import { motion } from "motion/react";
-import { pageVariants } from "@/components/ui/animations";
 import type { Author } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";

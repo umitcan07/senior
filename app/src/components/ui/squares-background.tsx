@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface SquaresProps {
 	direction?: "diagonal" | "up" | "right" | "down" | "left";
