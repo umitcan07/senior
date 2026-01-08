@@ -24,12 +24,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TextDifficulty, TextType } from "@/db/types";
 import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
 import { cn } from "@/lib/utils";
-import { 
-	getWordCountCategory, 
+import {
+	getWordCountCategory,
 	useTextFilterStore,
-	type WordCountCategory 
+	type WordCountCategory,
 } from "@/stores/text-store";
-
 
 const ITEMS_PER_PAGE = 10;
 
@@ -69,14 +68,15 @@ interface CategoryCardProps {
 
 function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 	// Map types to Lucide icons
-	const Icon = {
-		all: Layers,
-		daily: Leaf,
-		professional: Zap,
-		academic: Flame,
-		phonetic_challenge: Search, // Using Search as a placeholder for phonetic
-		common_phrase: ChevronDown, // Placeholder
-	}[type] || Layers;
+	const Icon =
+		{
+			all: Layers,
+			daily: Leaf,
+			professional: Zap,
+			academic: Flame,
+			phonetic_challenge: Search, // Using Search as a placeholder for phonetic
+			common_phrase: ChevronDown, // Placeholder
+		}[type] || Layers;
 
 	return (
 		<button
@@ -91,14 +91,14 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 					: "opacity-80 hover:opacity-100",
 			)}
 		>
-			<Icon 
-				className="absolute -right-4 -top-4 size-24 text-white/20 rotate-12 transition-transform" 
+			<Icon
+				className="absolute -right-4 -top-4 size-24 text-white/20 rotate-12 transition-transform"
 				strokeWidth={1.5}
 			/>
-			
+
 			<div className="relative z-10 flex flex-col items-start gap-1">
 				<span className="font-semibold text-white tracking-tight text-sm sm:text-base leading-tight">
-					{categoryLabels[type]}
+					{categoryLabels[type]}be
 				</span>
 			</div>
 		</button>
@@ -175,7 +175,6 @@ export const Route = createFileRoute("/practice/")({
 });
 
 function PracticePageSkeleton() {
-
 	return (
 		<MainLayout>
 			<PageContainer>
@@ -211,7 +210,10 @@ function PracticePage() {
 	// Memoize filtered texts to prevent unnecessary recalculations
 	const filteredTexts = useMemo(() => {
 		return allTexts.filter((text) => {
-			if (searchQuery && !text.content.toLowerCase().includes(searchQuery.toLowerCase())) {
+			if (
+				searchQuery &&
+				!text.content.toLowerCase().includes(searchQuery.toLowerCase())
+			) {
 				return false;
 			}
 			if (difficultyFilter !== "all" && text.difficulty !== difficultyFilter) {
@@ -305,7 +307,9 @@ function PracticePage() {
 								</div>
 
 								<div className="flex flex-col gap-2">
-									<h3 className="text-sm font-medium text-muted-foreground">Category</h3>
+									<h3 className="text-sm font-medium text-muted-foreground">
+										Category
+									</h3>
 									<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
 										{categoryTypes.map((type) => (
 											<CategoryCard
@@ -319,7 +323,9 @@ function PracticePage() {
 								</div>
 
 								<div className="flex flex-col gap-2">
-									<h3 className="text-sm font-medium text-muted-foreground">Difficulty</h3>
+									<h3 className="text-sm font-medium text-muted-foreground">
+										Difficulty
+									</h3>
 									<DifficultySwitcher
 										value={difficultyFilter}
 										onChange={handleDifficultyFilterChange}
@@ -336,23 +342,34 @@ function PracticePage() {
 								{/* Previously Attempted Texts */}
 								{attemptedTexts.length > 0 && (
 									<div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-										<SectionTitle 
-											title="Ready to try again?" 
+										<SectionTitle
+											title="Ready to try again?"
 											variant="playful"
 											description="Beat your high score on these texts."
 										/>
-										<PracticeTextTable texts={attemptedTexts.slice(0, visibleCount)} />
+										<PracticeTextTable
+											texts={attemptedTexts.slice(0, visibleCount)}
+										/>
 									</div>
 								)}
 
 								{/* New Texts */}
 								{newTexts.length > 0 && (
 									<div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-										<SectionTitle 
-											title={attemptedTexts.length > 0 ? "New Challenges" : "Practice Texts"} 
+										<SectionTitle
+											title={
+												attemptedTexts.length > 0
+													? "New Challenges"
+													: "Practice Texts"
+											}
 											variant="default"
 										/>
-										<PracticeTextTable texts={newTexts.slice(0, Math.max(0, visibleCount - attemptedTexts.length))} />
+										<PracticeTextTable
+											texts={newTexts.slice(
+												0,
+												Math.max(0, visibleCount - attemptedTexts.length),
+											)}
+										/>
 									</div>
 								)}
 
@@ -377,7 +394,7 @@ function PracticePage() {
 										setSearchQuery("");
 										setTypeFilter("all");
 										setDifficultyFilter("all");
-									}
+									},
 								}}
 							/>
 						) : (

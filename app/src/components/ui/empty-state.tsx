@@ -30,12 +30,12 @@ export function EmptyState({
 	const Content = (
 		<div className="flex flex-col items-center justify-center gap-3 text-center">
 			{icon && (
-				<div 
+				<div
 					className={cn(
 						"flex items-center justify-center rounded-full bg-muted/40 text-muted-foreground/40",
-						variant === "minimal" 
-							? "mb-1 size-10" 
-							: "size-12 rounded-xl bg-muted/50"
+						variant === "minimal"
+							? "mb-1 size-10"
+							: "size-12 rounded-xl bg-muted/50",
 					)}
 				>
 					{/* Clone icon to enforce size if needed, or rely on parent sizing */}
@@ -44,18 +44,22 @@ export function EmptyState({
 					</div>
 				</div>
 			)}
-			
+
 			<div className="flex flex-col gap-1 max-w-md">
-				<h3 className={cn(
-					"font-medium", 
-					variant === "minimal" ? "text-base" : "text-lg"
-				)}>
+				<h3
+					className={cn(
+						"font-medium",
+						variant === "minimal" ? "text-base" : "text-lg",
+					)}
+				>
 					{title}
 				</h3>
-				<div className={cn(
-					"text-balanced text-muted-foreground leading-relaxed",
-					variant === "minimal" ? "text-xs" : "text-sm"
-				)}>
+				<div
+					className={cn(
+						"text-balanced text-muted-foreground leading-relaxed",
+						variant === "minimal" ? "text-xs" : "text-sm",
+					)}
+				>
 					{description}
 				</div>
 			</div>
@@ -63,12 +67,19 @@ export function EmptyState({
 			{(primaryAction || secondaryAction) && (
 				<div className="mt-2 flex flex-col items-center gap-2 sm:flex-row">
 					{primaryAction && (
-						<Button onClick={primaryAction.onClick} size={variant === "minimal" ? "sm" : "default"}>
+						<Button
+							onClick={primaryAction.onClick}
+							size={variant === "minimal" ? "sm" : "default"}
+						>
 							{primaryAction.label}
 						</Button>
 					)}
 					{secondaryAction && (
-						<Button variant="outline" onClick={secondaryAction.onClick} size={variant === "minimal" ? "sm" : "default"}>
+						<Button
+							variant="outline"
+							onClick={secondaryAction.onClick}
+							size={variant === "minimal" ? "sm" : "default"}
+						>
 							{secondaryAction.label}
 						</Button>
 					)}
@@ -79,17 +90,22 @@ export function EmptyState({
 
 	if (variant === "minimal") {
 		return (
-			<div className={cn("flex flex-col items-center justify-center py-12 px-4", className)}>
+			<div
+				className={cn(
+					"flex flex-col items-center justify-center py-12 px-4",
+					className,
+				)}
+			>
 				{Content}
 			</div>
 		);
 	}
 
 	return (
-		<div 
+		<div
 			className={cn(
-				"rounded-xl border border-border/40 bg-card/50 px-6 py-16", 
-				className
+				"rounded-xl border border-border/40 bg-card/50 px-6 py-16",
+				className,
 			)}
 		>
 			{Content}

@@ -421,11 +421,7 @@ function IPASection({
 }) {
 	return (
 		<section className="flex flex-col gap-8">
-			<SectionTitle 
-				title={title} 
-				description={description} 
-				variant="default"
-			/>
+			<SectionTitle title={title} description={description} variant="default" />
 			<div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
 				{symbols.map((item) => {
 					const id = `${item.symbol}-${playbackMode}`;
@@ -849,289 +845,299 @@ function LearningPage() {
 
 	return (
 		<MainLayout>
-			<motion.div 
-				variants={pageVariants} 
-				initial="initial" 
-				animate="animate" 
+			<motion.div
+				variants={pageVariants}
+				initial="initial"
+				animate="animate"
 				exit="exit"
 			>
 				<PageContainer>
 					<div className="flex flex-col gap-20">
-					{/* IPA Section Header with Controls */}
-					<section className="flex flex-col gap-12">
-						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-							<div className="flex flex-col gap-1">
-								<h2 className="font-semibold text-2xl tracking-tight">
-									International Phonetic Alphabet
-								</h2>
-								<div className="mt-2 mb-2 h-1 w-12 rounded-full bg-primary/20" />
-								<p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
-									Click any symbol to hear it pronounced. Highlighted letters
-									show which part of the word makes each sound.
-								</p>
+						{/* IPA Section Header with Controls */}
+						<section className="flex flex-col gap-12">
+							<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+								<div className="flex flex-col gap-1">
+									<h2 className="font-semibold text-2xl tracking-tight">
+										International Phonetic Alphabet
+									</h2>
+									<div className="mt-2 mb-2 h-1 w-12 rounded-full bg-primary/20" />
+									<p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
+										Click any symbol to hear it pronounced. Highlighted letters
+										show which part of the word makes each sound.
+									</p>
+								</div>
+
+								{/* Playback Mode Toggle */}
+								<div className="flex items-center gap-3 rounded-full bg-muted/30 px-5 py-2">
+									<Label
+										htmlFor="playback-mode"
+										className={cn(
+											"cursor-pointer text-sm transition-colors",
+											playbackMode === "sound"
+												? "font-medium text-foreground"
+												: "text-muted-foreground",
+										)}
+									>
+										Sound
+									</Label>
+									<Switch
+										id="playback-mode"
+										checked={playbackMode === "word"}
+										onCheckedChange={(checked) =>
+											setPlaybackMode(checked ? "word" : "sound")
+										}
+									/>
+									<Label
+										htmlFor="playback-mode"
+										className={cn(
+											"cursor-pointer text-sm transition-colors",
+											playbackMode === "word"
+												? "font-medium text-foreground"
+												: "text-muted-foreground",
+										)}
+									>
+										Word
+									</Label>
+								</div>
 							</div>
 
-							{/* Playback Mode Toggle */}
-							<div className="flex items-center gap-3 rounded-full bg-muted/30 px-5 py-2">
-								<Label
-									htmlFor="playback-mode"
-									className={cn(
-										"cursor-pointer text-sm transition-colors",
-										playbackMode === "sound"
-											? "font-medium text-foreground"
-											: "text-muted-foreground",
-									)}
-								>
-									Sound
-								</Label>
-								<Switch
-									id="playback-mode"
-									checked={playbackMode === "word"}
-									onCheckedChange={(checked) =>
-										setPlaybackMode(checked ? "word" : "sound")
-									}
+							{/* IPA Charts */}
+							<div className="flex flex-col gap-20">
+								<IPASection
+									title="Vowels"
+									description="Pure vowel sounds (monophthongs)"
+									symbols={vowels}
+									playbackMode={playbackMode}
+									onPlay={handlePlay}
+									playingId={playingId}
+									loadingId={loadingId}
 								/>
-								<Label
-									htmlFor="playback-mode"
-									className={cn(
-										"cursor-pointer text-sm transition-colors",
-										playbackMode === "word"
-											? "font-medium text-foreground"
-											: "text-muted-foreground",
-									)}
+
+								<div className="h-px bg-border/40" />
+
+								<IPASection
+									title="Diphthongs"
+									description="Gliding vowel sounds that transition between two positions"
+									symbols={diphthongs}
+									playbackMode={playbackMode}
+									onPlay={handlePlay}
+									playingId={playingId}
+									loadingId={loadingId}
+								/>
+
+								<div className="h-px bg-border/40" />
+
+								<IPASection
+									title="Consonants"
+									description="Sounds made by obstructing airflow"
+									symbols={consonants}
+									playbackMode={playbackMode}
+									onPlay={handlePlay}
+									playingId={playingId}
+									loadingId={loadingId}
+								/>
+							</div>
+						</section>
+
+						{/* Why Learn IPA Section */}
+						<section className="flex flex-col gap-8">
+							<SectionTitle
+								title="Why Learn IPA?"
+								variant="playful"
+								description="The International Phonetic Alphabet is your key to mastering pronunciation in any language."
+							/>
+							<div className="grid gap-4 sm:grid-cols-2">
+								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+										<Volume2 size={20} />
+									</div>
+									<h4 className="font-medium">Improve Pronunciation</h4>
+									<p className="text-muted-foreground text-sm leading-relaxed">
+										IPA shows you exactly how to pronounce words, eliminating
+										guesswork from spelling. Each symbol represents one specific
+										sound, ensuring precision.
+									</p>
+								</div>
+								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+										<svg
+											className="size-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											strokeWidth={2}
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+											/>
+										</svg>
+									</div>
+									<h4 className="font-medium">Use Any Dictionary</h4>
+									<p className="text-muted-foreground text-sm leading-relaxed">
+										Most dictionaries use IPA for pronunciation guides. Once you
+										learn it, you can look up pronunciation anywhere in the
+										world.
+									</p>
+								</div>
+								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+										<svg
+											className="size-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											strokeWidth={2}
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+									</div>
+									<h4 className="font-medium">Reduce Your Accent</h4>
+									<p className="text-muted-foreground text-sm leading-relaxed">
+										Understanding phonemes helps you identify sounds that don't
+										exist in your native language, making it easier to correct
+										them.
+									</p>
+								</div>
+								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
+									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+										<svg
+											className="size-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											strokeWidth={2}
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M13 10V3L4 14h7v7l9-11h-7z"
+											/>
+										</svg>
+									</div>
+									<h4 className="font-medium">Learn Languages Faster</h4>
+									<p className="text-muted-foreground text-sm leading-relaxed">
+										IPA knowledge transfers to any language. Once you understand
+										the system, picking up new languages becomes significantly
+										easier.
+									</p>
+								</div>
+							</div>
+						</section>
+
+						<div className="h-px bg-border/40" />
+
+						{/* Accent Differences Section */}
+						<AccentDifferencesSection />
+
+						<div className="h-px bg-border/40" />
+
+						{/* Additional Resources Section */}
+						<section className="flex flex-col gap-8">
+							<SectionTitle
+								title="Additional Resources"
+								variant="default"
+								description="Explore these external resources to deepen your understanding of phonetics."
+							/>
+							<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+								<a
+									href="https://upload.wikimedia.org/wikipedia/commons/8/8f/IPA_chart_2020.svg"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
 								>
-									Word
-								</Label>
+									<h4 className="font-medium transition-colors group-hover:text-primary">
+										Official IPA Chart
+									</h4>
+									<p className="text-muted-foreground text-sm">
+										The complete 2020 IPA chart from Wikimedia Commons with all
+										phonetic symbols.
+									</p>
+									<span className="text-primary text-xs">
+										↗ Wikipedia Commons
+									</span>
+								</a>
+								<a
+									href="https://www.ipachart.com/"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
+								>
+									<h4 className="font-medium transition-colors group-hover:text-primary">
+										Interactive IPA Chart
+									</h4>
+									<p className="text-muted-foreground text-sm">
+										Click any symbol to hear its pronunciation with audio
+										samples.
+									</p>
+									<span className="text-primary text-xs">↗ ipachart.com</span>
+								</a>
+								<a
+									href="https://ipachart.app/ipa-translator"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
+								>
+									<h4 className="font-medium transition-colors group-hover:text-primary">
+										IPA Translator
+									</h4>
+									<p className="text-muted-foreground text-sm">
+										Convert English text to IPA transcription with support for
+										American and British accents.
+									</p>
+									<span className="text-primary text-xs">↗ ipachart.app</span>
+								</a>
 							</div>
-						</div>
+						</section>
 
-						{/* IPA Charts */}
-						<div className="flex flex-col gap-20">
-							<IPASection
-								title="Vowels"
-								description="Pure vowel sounds (monophthongs)"
-								symbols={vowels}
-								playbackMode={playbackMode}
-								onPlay={handlePlay}
-								playingId={playingId}
-								loadingId={loadingId}
-							/>
+						<div className="h-px bg-border/40" />
 
-							<div className="h-px bg-border/40" />
+						{/* Attribution Section */}
+						<section className="rounded-xl bg-muted/20 p-6">
+							<h4 className="mb-3 font-medium text-muted-foreground text-sm">
+								Sound Clip Attribution
+							</h4>
+							<p className="text-muted-foreground text-xs leading-relaxed">
+								Each audio clip is the work of Peter Isotalo, User:Denelson83,
+								UCLA Phonetics Lab Archive 2003, User:Halibutt, User:Pmx or
+								User:Octane, and made available under a free and/or copyleft
+								licence. For details on the licensing and attribution
+								requirements of a particular clip, browse to it from the general
+								phonetics page at the Wikimedia Commons. Vowel trapezoid
+								background by User:Denelson83; see File:Blank vowel
+								trapezoid.png on Wikimedia Commons for details. Example words
+								and TTS speeches are generated via ElevenLabs.
+							</p>
+						</section>
 
-							<IPASection
-								title="Diphthongs"
-								description="Gliding vowel sounds that transition between two positions"
-								symbols={diphthongs}
-								playbackMode={playbackMode}
-								onPlay={handlePlay}
-								playingId={playingId}
-								loadingId={loadingId}
-							/>
+						{/* Admin Section - only visible to admins */}
+						<AdminAudioSection />
 
-							<div className="h-px bg-border/40" />
+						<div className="h-px bg-border/40" />
 
-							<IPASection
-								title="Consonants"
-								description="Sounds made by obstructing airflow"
-								symbols={consonants}
-								playbackMode={playbackMode}
-								onPlay={handlePlay}
-								playingId={playingId}
-								loadingId={loadingId}
-							/>
-						</div>
-					</section>
-
-					{/* Why Learn IPA Section */}
-					<section className="flex flex-col gap-8">
-						<SectionTitle 
-							title="Why Learn IPA?" 
-							variant="playful" 
-							description="The International Phonetic Alphabet is your key to mastering pronunciation in any language."
-						/>
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
-								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-									<Volume2 size={20} />
+						{/* Quick Start CTA */}
+						<section className="py-8 text-center">
+							<div className="flex flex-col items-center gap-6">
+								<div className="flex flex-col gap-2">
+									<h3 className="font-medium text-lg">
+										Ready to test your pronunciation?
+									</h3>
+									<p className="mx-auto max-w-md text-muted-foreground text-sm">
+										Practice with our curated texts and get instant AI feedback
+										on your pronunciation accuracy.
+									</p>
 								</div>
-								<h4 className="font-medium">Improve Pronunciation</h4>
-								<p className="text-muted-foreground text-sm leading-relaxed">
-									IPA shows you exactly how to pronounce words, eliminating
-									guesswork from spelling. Each symbol represents one specific
-									sound, ensuring precision.
-								</p>
+								<Button asChild size="lg" className="rounded-full px-8">
+									<Link to="/practice">Start Practicing</Link>
+								</Button>
 							</div>
-							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
-								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-									<svg
-										className="size-5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										strokeWidth={2}
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-										/>
-									</svg>
-								</div>
-								<h4 className="font-medium">Use Any Dictionary</h4>
-								<p className="text-muted-foreground text-sm leading-relaxed">
-									Most dictionaries use IPA for pronunciation guides. Once you
-									learn it, you can look up pronunciation anywhere in the world.
-								</p>
-							</div>
-							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
-								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-									<svg
-										className="size-5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										strokeWidth={2}
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/>
-									</svg>
-								</div>
-								<h4 className="font-medium">Reduce Your Accent</h4>
-								<p className="text-muted-foreground text-sm leading-relaxed">
-									Understanding phonemes helps you identify sounds that don't
-									exist in your native language, making it easier to correct
-									them.
-								</p>
-							</div>
-							<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
-								<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-									<svg
-										className="size-5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										strokeWidth={2}
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M13 10V3L4 14h7v7l9-11h-7z"
-										/>
-									</svg>
-								</div>
-								<h4 className="font-medium">Learn Languages Faster</h4>
-								<p className="text-muted-foreground text-sm leading-relaxed">
-									IPA knowledge transfers to any language. Once you understand
-									the system, picking up new languages becomes significantly
-									easier.
-								</p>
-							</div>
-						</div>
-					</section>
-
-					<div className="h-px bg-border/40" />
-
-					{/* Accent Differences Section */}
-					<AccentDifferencesSection />
-
-					<div className="h-px bg-border/40" />
-
-					{/* Additional Resources Section */}
-					<section className="flex flex-col gap-8">
-						<SectionTitle 
-							title="Additional Resources" 
-							variant="default" 
-							description="Explore these external resources to deepen your understanding of phonetics."
-						/>
-						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							<a
-								href="https://upload.wikimedia.org/wikipedia/commons/8/8f/IPA_chart_2020.svg"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
-							>
-								<h4 className="font-medium transition-colors group-hover:text-primary">
-									Official IPA Chart
-								</h4>
-								<p className="text-muted-foreground text-sm">
-									The complete 2020 IPA chart from Wikimedia Commons with all
-									phonetic symbols.
-								</p>
-								<span className="text-primary text-xs">
-									↗ Wikipedia Commons
-								</span>
-							</a>
-							<a
-								href="https://www.ipachart.com/"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
-							>
-								<h4 className="font-medium transition-colors group-hover:text-primary">
-									Interactive IPA Chart
-								</h4>
-								<p className="text-muted-foreground text-sm">
-									Click any symbol to hear its pronunciation with audio samples.
-								</p>
-								<span className="text-primary text-xs">↗ ipachart.com</span>
-							</a>
-							<a
-								href="https://ipachart.app/ipa-translator"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="group flex flex-col gap-3 rounded-xl border border-border/40 p-5 transition-colors hover:border-primary/40 hover:bg-muted/20"
-							>
-								<h4 className="font-medium transition-colors group-hover:text-primary">
-									IPA Translator
-								</h4>
-								<p className="text-muted-foreground text-sm">
-									Convert English text to IPA transcription with support for
-									American and British accents.
-								</p>
-								<span className="text-primary text-xs">↗ ipachart.app</span>
-							</a>
-						</div>
-					</section>
-
-					<div className="h-px bg-border/40" />
-
-					{/* Attribution Section */}
-					<section className="rounded-xl bg-muted/20 p-6">
-						<h4 className="mb-3 font-medium text-muted-foreground text-sm">
-							Sound Clip Attribution
-						</h4>
-						<p className="text-muted-foreground text-xs leading-relaxed">
-							Each audio clip is the work of Peter Isotalo, User:Denelson83, UCLA Phonetics Lab Archive 2003, User:Halibutt, User:Pmx or User:Octane, and made available under a free and/or copyleft licence. For details on the licensing and attribution requirements of a particular clip, browse to it from the general phonetics page at the Wikimedia Commons. Vowel trapezoid background by User:Denelson83; see File:Blank vowel trapezoid.png on Wikimedia Commons for details. Example words and TTS speeches are generated via ElevenLabs.
-						</p>
-					</section>
-
-					{/* Admin Section - only visible to admins */}
-					<AdminAudioSection />
-
-					<div className="h-px bg-border/40" />
-
-					{/* Quick Start CTA */}
-					<section className="py-8 text-center">
-						<div className="flex flex-col items-center gap-6">
-							<div className="flex flex-col gap-2">
-								<h3 className="font-medium text-lg">
-									Ready to test your pronunciation?
-								</h3>
-								<p className="mx-auto max-w-md text-muted-foreground text-sm">
-									Practice with our curated texts and get instant AI feedback on
-									your pronunciation accuracy.
-								</p>
-							</div>
-							<Button asChild size="lg" className="rounded-full px-8">
-								<Link to="/practice">Start Practicing</Link>
-							</Button>
-						</div>
-					</section>
-				</div>
+						</section>
+					</div>
 				</PageContainer>
 			</motion.div>
 		</MainLayout>

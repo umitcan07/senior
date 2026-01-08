@@ -60,16 +60,17 @@ function FeatureCard({ title, description, icon, href }: (typeof features)[0]) {
 function HeroSection() {
 	return (
 		<div className="relative isolate flex flex-col items-center gap-6 text-center">
-			<Squares 
-				className="absolute inset-0 -z-10 h-full w-full opacity-20 [mask-image:linear-gradient(to_bottom,white,transparent)]"
+			<Squares
+				className="absolute inset-0 -z-10 h-full w-full opacity-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]"
 				borderColor="var(--primary)"
 				hoverFillColor="var(--primary)"
-				speed={0.2} 
+				speed={0.2}
 				squareSize={50}
 			/>
 			<div className="flex flex-col items-center gap-4 py-12 md:py-20">
-				<span className="text-primary text-sm uppercase tracking-wide">
-					Free & Open Source
+				<span className="text-primary text-xs uppercase tracking-widest flex items-center gap-2">
+					<span className="h-[1px] w-3 bg-primary/20"></span> Free & Open Source{" "}
+					<span className="h-[1px] w-3 bg-primary/20"></span>
 				</span>
 				<h1 className="max-w-2xl text-balance bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-3xl text-transparent tracking-tight sm:text-5xl md:text-6xl">
 					Practice Pronunciation with Confidence
@@ -79,15 +80,14 @@ function HeroSection() {
 					personalized feedback, and track your progress over time with detailed
 					insights.
 				</p>
-			</div>
-
-			<div className="flex flex-col justify-center gap-3 sm:flex-row pb-12">
-				<Button size="lg" asChild>
-					<Link to="/practice">Start Practicing</Link>
-				</Button>
-				<Button variant="outline" size="lg" asChild>
-					<Link to="/learn">Learn More</Link>
-				</Button>
+				<div className="flex flex-col justify-center gap-3 sm:flex-row py-6">
+					<Button size="lg" asChild>
+						<Link to="/practice">Start Practicing</Link>
+					</Button>
+					<Button variant="outline" size="lg" asChild>
+						<Link to="/learn">Learn More</Link>
+					</Button>
+				</div>
 			</div>
 		</div>
 	);
@@ -96,29 +96,46 @@ function HeroSection() {
 function HomePage() {
 	return (
 		<MainLayout>
-			<motion.div 
-				variants={pageVariants} 
-				initial="initial" 
-				animate="animate" 
+			<motion.div
+				variants={pageVariants}
+				initial="initial"
+				animate="animate"
 				exit="exit"
 			>
 				<PageContainer>
 					<div className="flex flex-col gap-12">
-					<section className="py-4 md:py-12">
-						<HeroSection />
-					</section>
+						<section className="py-4 md:py-12">
+							<HeroSection />
+						</section>
 
-					<div className="h-px bg-border/60" />
+						<div className="h-px bg-border/60" />
 
-					<section className="flex flex-col gap-6">
-						<h2 className="font-semibold text-lg">Features</h2>
-						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							{features.map((feature) => (
-								<FeatureCard key={feature.title} {...feature} />
-							))}
-						</div>
-					</section>
-				</div>
+						<section className="flex flex-col gap-6">
+							<h2 className="font-semibold text-lg">Features</h2>
+							<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+								{features.map((feature) => (
+									<FeatureCard key={feature.title} {...feature} />
+								))}
+							</div>
+						</section>
+
+						<div className="h-px bg-border/60" />
+
+						<section className="flex flex-col items-center gap-4 py-8 text-center">
+							<p className="text-muted-foreground text-sm">
+								Powered by{" "}
+								<a
+									href="https://huggingface.co/espnet/powsm"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="font-medium decoration-primary/50 underline-offset-4 hover:underline"
+								>
+									POWSM
+								</a>
+								: A Phonetic Open Whisper-Style Speech Foundation Model
+							</p>
+						</section>
+					</div>
 				</PageContainer>
 			</motion.div>
 		</MainLayout>

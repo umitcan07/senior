@@ -12,7 +12,7 @@
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 Nonce combines signal processing and machine learning to provide pronunciation feedback. The system focuses on English with US accent (potentially including UK), with initial development targeting Turkish-native English speakers.
 
@@ -25,7 +25,7 @@ Nonce combines signal processing and machine learning to provide pronunciation f
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 The project is organized as a monorepo with the following components:
 
@@ -79,7 +79,7 @@ Jupyter notebooks for research and experimentation:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -92,9 +92,9 @@ Jupyter notebooks for research and experimentation:
 
 ---
 
-## 📊 Current Status
+## Current Status
 
-### ✅ Completed
+### Completed
 
 - [x] Web application foundation with TanStack Start
 - [x] User authentication with Clerk
@@ -113,7 +113,7 @@ Jupyter notebooks for research and experimentation:
 - [ ] Reference speech playback functionality
 - [ ] Database tables for recording results
 
-### 🔬 Research
+### Research
 
 Active research areas (see [`meeting.md`](meeting.md) for details):
 
@@ -125,7 +125,7 @@ Active research areas (see [`meeting.md`](meeting.md) for details):
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 senior/
@@ -140,7 +140,7 @@ senior/
 
 ---
 
-## 🔧 Technology Stack
+## Technology Stack
 
 ### Frontend
 - **React 19** with **TanStack Start** (SSR framework)
@@ -172,7 +172,7 @@ senior/
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **[App Documentation](app/README.md)**: Detailed setup, database, and development guide
 - **[Backend API Documentation](mod/README.md)**: Endpoint specifications and deployment
@@ -183,7 +183,7 @@ senior/
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Backend tests
@@ -197,19 +197,47 @@ pnpm test
 
 ---
 
-## 📝 License
+## License
 
 See [LICENSE](license) file for details.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is an academic senior project. For questions or collaboration, please contact the author.
 
 ---
 
-## 🙏 Acknowledgments
+## Citations
+
+If you use this work or the underlying models, please cite the following papers:
+
+```bibtex
+@article{powsm,
+  title={POWSM: A Phonetic Open Whisper-Style Speech Foundation Model},
+  author={Chin-Jou Li and Kalvin Chang and Shikhar Bharadwaj and Eunjung Yeo and Kwanghee Choi and Jian Zhu and David Mortensen and Shinji Watanabe},
+  year={2025},
+  eprint={2510.24992},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2510.24992},
+}
+
+@inproceedings{zhu-etal-2025-zipa,
+  title = "{ZIPA}: A family of efficient models for multilingual phone recognition",
+  author = "Zhu, Jian  and  Samir, Farhan  and  Chodroff, Eleanor  and  Mortensen, David R.",
+  booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+  month = jul,
+  year = "2025",
+  publisher = "Association for Computational Linguistics",
+  url = "https://aclanthology.org/2025.acl-long.961/",
+}
+```
+
+---
+
+## Acknowledgments
 
 - **POWSM**: Phonetic Word Segmentation Model
 - **Montreal Forced Aligner (MFA)**: Forced alignment toolkit

@@ -715,255 +715,257 @@ function PracticeTextPage() {
 
 	return (
 		<MainLayout>
-			<motion.div 
-				variants={pageVariants} 
-				initial="initial" 
-				animate="animate" 
+			<motion.div
+				variants={pageVariants}
+				initial="initial"
+				animate="animate"
 				exit="exit"
 			>
 				<PageContainer maxWidth="lg">
 					<div className="flex flex-col gap-8">
 						{/* Header with back button */}
-					<div className="flex items-center gap-3">
-						<Button variant="ghost" size="sm" asChild className="-ml-3">
-							<Link
-								to="/practice"
-								className="gap-2 text-muted-foreground hover:text-foreground"
-							>
-								<ArrowLeft size={16} />
-								Back
-							</Link>
-						</Button>
-					</div>
-
-					{/* Main content */}
-					<div className="flex flex-col gap-10">
-						{/* Reference voice - clean selector */}
-						<ReferenceVoice
-							references={references}
-							selectedId={selectedReferenceId}
-							onSelect={setSelectedReferenceId}
-						/>
-
-						{/* Practice text - clean typography, no box */}
-						<div
-							className={cn(
-								"relative transition-all",
-								isRecording && "opacity-80",
-							)}
-						>
-							<p className="font-serif text-2xl text-foreground/90 leading-relaxed md:text-3xl md:leading-relaxed">
-								{text.content}
-							</p>
+						<div className="flex items-center gap-3">
+							<Button variant="ghost" size="sm" asChild className="-ml-3">
+								<Link
+									to="/practice"
+									className="gap-2 text-muted-foreground hover:text-foreground"
+								>
+									<ArrowLeft size={16} />
+									Back
+								</Link>
+							</Button>
 						</div>
 
-						{/* Recording section - fixed heights */}
-						<div className="flex flex-col gap-4">
-							{/* Waveform - fixed height */}
-							<div className="h-20 w-full overflow-hidden rounded-lg">
-								<LiveWaveform
-									active={isRecording}
-									processing={isProcessing}
-									height={80}
-									barWidth={3}
-									barGap={2}
-									mode="static"
-									fadeEdges
-									sensitivity={1.5}
-									onStreamReady={recording.handleStreamReady}
-									onStreamEnd={recording.handleStreamEnd}
-								/>
+						{/* Main content */}
+						<div className="flex flex-col gap-10">
+							{/* Reference voice - clean selector */}
+							<ReferenceVoice
+								references={references}
+								selectedId={selectedReferenceId}
+								onSelect={setSelectedReferenceId}
+							/>
+
+							{/* Practice text - clean typography, no box */}
+							<div
+								className={cn(
+									"relative transition-all",
+									isRecording && "opacity-80",
+								)}
+							>
+								<p className="font-serif text-2xl text-foreground/90 leading-relaxed md:text-3xl md:leading-relaxed">
+									{text.content}
+								</p>
 							</div>
 
-							{/* Controls - fixed min-height */}
-							<div className="flex min-h-32 flex-col items-center justify-center gap-4">
-								<SignedIn>
-									{/* Error state */}
-									{recording.error && (
-										<div className="flex w-full max-w-md flex-col gap-3 rounded-lg border border-destructive/50 bg-destructive/5 p-4">
-											<div className="flex items-center gap-2 text-destructive text-sm">
-												<AlertCircle size={16} />
-												<span className="font-medium">Recording Error</span>
-											</div>
-											<p className="text-destructive text-xs">
-												{recording.error}
-											</p>
-											<Button
-												variant="outline"
-												size="sm"
-												onClick={recording.resetRecording}
-												className="w-full"
-											>
-												Try Again
-											</Button>
-										</div>
-									)}
+							{/* Recording section - fixed heights */}
+							<div className="flex flex-col gap-4">
+								{/* Waveform - fixed height */}
+								<div className="h-20 w-full overflow-hidden rounded-lg">
+									<LiveWaveform
+										active={isRecording}
+										processing={isProcessing}
+										height={80}
+										barWidth={3}
+										barGap={2}
+										mode="static"
+										fadeEdges
+										sensitivity={1.5}
+										onStreamReady={recording.handleStreamReady}
+										onStreamEnd={recording.handleStreamEnd}
+									/>
+								</div>
 
-									{/* Idle state */}
-									{isIdle && !recording.error && (
-										<div className="flex w-full items-center justify-center gap-3">
-											<Button
-												size="lg"
-												onClick={recording.startRecording}
-												disabled={!selectedReferenceId}
-												className="gap-2"
-											>
-												<Mic size={18} />
-												{selectedReferenceId ? "Record" : "Select voice first"}
-											</Button>
-
-											<div className="relative">
-												<input
-													type="file"
-													accept="audio/*"
-													className="absolute inset-0 cursor-pointer opacity-0"
-													onChange={recording.handleFileUpload}
-													disabled={!selectedReferenceId}
-												/>
+								{/* Controls - fixed min-height */}
+								<div className="flex min-h-32 flex-col items-center justify-center gap-4">
+									<SignedIn>
+										{/* Error state */}
+										{recording.error && (
+											<div className="flex w-full max-w-md flex-col gap-3 rounded-lg border border-destructive/50 bg-destructive/5 p-4">
+												<div className="flex items-center gap-2 text-destructive text-sm">
+													<AlertCircle size={16} />
+													<span className="font-medium">Recording Error</span>
+												</div>
+												<p className="text-destructive text-xs">
+													{recording.error}
+												</p>
 												<Button
 													variant="outline"
-													size="lg"
-													className="gap-2"
-													disabled={!selectedReferenceId}
+													size="sm"
+													onClick={recording.resetRecording}
+													className="w-full"
 												>
-													<Upload size={18} />
-													Upload
+													Try Again
 												</Button>
 											</div>
-										</div>
-									)}
+										)}
 
-									{/* Recording state */}
-									{isRecording && (
-										<div className="flex w-full max-w-md flex-col items-center gap-4">
-											<div className="flex items-center gap-3">
-												<span className="relative flex size-3">
-													<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
-													<span className="relative inline-flex size-3 rounded-full bg-destructive" />
-												</span>
-												<span className="font-mono text-2xl tabular-nums">
-													{formatTime(recording.recordingTime)}
-												</span>
-												<span className="text-muted-foreground">/ 0:20</span>
-											</div>
-											<Button
-												variant="destructive"
-												size="lg"
-												onClick={recording.stopRecording}
-												className="gap-2"
-											>
-												<Square size={16} className="fill-current" />
-												Stop
-											</Button>
-											{recording.recordingTime >= 15 && (
-												<p className="text-destructive text-xs">
-													Auto-stop at 20s
-												</p>
-											)}
-										</div>
-									)}
+										{/* Idle state */}
+										{isIdle && !recording.error && (
+											<div className="flex w-full items-center justify-center gap-3">
+												<Button
+													size="lg"
+													onClick={recording.startRecording}
+													disabled={!selectedReferenceId}
+													className="gap-2"
+												>
+													<Mic size={18} />
+													{selectedReferenceId
+														? "Record"
+														: "Select voice first"}
+												</Button>
 
-									{/* Processing state */}
-									{isProcessing && (
-										<ShimmeringText
-											text="Processing..."
-											className="text-muted-foreground text-sm"
-											duration={1.5}
-										/>
-									)}
-
-									{/* Preview state */}
-									{hasPreview && (
-										<div className="flex w-full max-w-md flex-col gap-4">
-											<AudioPlayerProvider>
-												<div className="flex items-center gap-3 rounded-lg border bg-card p-4">
-													<AudioPlayerButton
-														item={{
-															id: "preview",
-															src: recording.audioPreviewUrl!,
-														}}
-														variant="default"
-														size="icon"
-														className="size-10"
+												<div className="relative">
+													<input
+														type="file"
+														accept="audio/*"
+														className="absolute inset-0 cursor-pointer opacity-0"
+														onChange={recording.handleFileUpload}
+														disabled={!selectedReferenceId}
 													/>
-													<AudioPlayerProgress className="flex-1" />
-													<span className="font-mono text-muted-foreground text-sm tabular-nums">
+													<Button
+														variant="outline"
+														size="lg"
+														className="gap-2"
+														disabled={!selectedReferenceId}
+													>
+														<Upload size={18} />
+														Upload
+													</Button>
+												</div>
+											</div>
+										)}
+
+										{/* Recording state */}
+										{isRecording && (
+											<div className="flex w-full max-w-md flex-col items-center gap-4">
+												<div className="flex items-center gap-3">
+													<span className="relative flex size-3">
+														<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+														<span className="relative inline-flex size-3 rounded-full bg-destructive" />
+													</span>
+													<span className="font-mono text-2xl tabular-nums">
 														{formatTime(recording.recordingTime)}
 													</span>
+													<span className="text-muted-foreground">/ 0:20</span>
 												</div>
-											</AudioPlayerProvider>
-											<div className="flex gap-3">
 												<Button
-													variant="outline"
-													onClick={recording.resetRecording}
-													className="flex-1 gap-2"
+													variant="destructive"
+													size="lg"
+													onClick={recording.stopRecording}
+													className="gap-2"
 												>
-													<RotateCcw size={16} />
-													Re-record
+													<Square size={16} className="fill-current" />
+													Stop
 												</Button>
-												<Button
-													onClick={() =>
-														selectedReferenceId &&
-														recording.submitRecording(selectedReferenceId)
-													}
-													className="flex-1 gap-2"
-												>
-													<Check size={16} />
-													Submit
-												</Button>
+												{recording.recordingTime >= 15 && (
+													<p className="text-destructive text-xs">
+														Auto-stop at 20s
+													</p>
+												)}
 											</div>
-										</div>
-									)}
+										)}
 
-									{/* Uploading state */}
-									{isUploading && (
-										<div className="flex w-full max-w-md flex-col gap-3">
-											<Progress
-												value={recording.uploadProgress}
-												className="h-2"
-											/>
+										{/* Processing state */}
+										{isProcessing && (
 											<ShimmeringText
-												text={`Uploading ${recording.uploadProgress}%`}
-												className="text-center text-muted-foreground text-sm"
+												text="Processing..."
+												className="text-muted-foreground text-sm"
 												duration={1.5}
 											/>
+										)}
+
+										{/* Preview state */}
+										{hasPreview && (
+											<div className="flex w-full max-w-md flex-col gap-4">
+												<AudioPlayerProvider>
+													<div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+														<AudioPlayerButton
+															item={{
+																id: "preview",
+																src: recording.audioPreviewUrl!,
+															}}
+															variant="default"
+															size="icon"
+															className="size-10"
+														/>
+														<AudioPlayerProgress className="flex-1" />
+														<span className="font-mono text-muted-foreground text-sm tabular-nums">
+															{formatTime(recording.recordingTime)}
+														</span>
+													</div>
+												</AudioPlayerProvider>
+												<div className="flex gap-3">
+													<Button
+														variant="outline"
+														onClick={recording.resetRecording}
+														className="flex-1 gap-2"
+													>
+														<RotateCcw size={16} />
+														Re-record
+													</Button>
+													<Button
+														onClick={() =>
+															selectedReferenceId &&
+															recording.submitRecording(selectedReferenceId)
+														}
+														className="flex-1 gap-2"
+													>
+														<Check size={16} />
+														Submit
+													</Button>
+												</div>
+											</div>
+										)}
+
+										{/* Uploading state */}
+										{isUploading && (
+											<div className="flex w-full max-w-md flex-col gap-3">
+												<Progress
+													value={recording.uploadProgress}
+													className="h-2"
+												/>
+												<ShimmeringText
+													text={`Uploading ${recording.uploadProgress}%`}
+													className="text-center text-muted-foreground text-sm"
+													duration={1.5}
+												/>
+											</div>
+										)}
+
+										{/* Analyzing state */}
+										{isAnalyzing && (
+											<ShimmeringText
+												text="Analyzing..."
+												className="text-muted-foreground text-sm"
+												duration={1.5}
+											/>
+										)}
+									</SignedIn>
+
+									<SignedOut>
+										<div className="flex w-full max-w-md flex-col gap-3">
+											<Button disabled className="gap-2" size="lg">
+												<Mic size={18} />
+												Sign in to record
+											</Button>
+											<Button variant="outline" asChild size="lg">
+												<SignInButton mode="modal">
+													Sign in to start practicing
+												</SignInButton>
+											</Button>
 										</div>
-									)}
-
-									{/* Analyzing state */}
-									{isAnalyzing && (
-										<ShimmeringText
-											text="Analyzing..."
-											className="text-muted-foreground text-sm"
-											duration={1.5}
-										/>
-									)}
-								</SignedIn>
-
-								<SignedOut>
-									<div className="flex w-full max-w-md flex-col gap-3">
-										<Button disabled className="gap-2" size="lg">
-											<Mic size={18} />
-											Sign in to record
-										</Button>
-										<Button variant="outline" asChild size="lg">
-											<SignInButton mode="modal">
-												Sign in to start practicing
-											</SignInButton>
-										</Button>
-									</div>
-								</SignedOut>
+									</SignedOut>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					{/* Recent attempts */}
-					<SignedIn>
-						<RecentAttempts attempts={recentAttempts} textId={text.id} />
-					</SignedIn>
-				</div>
-			</PageContainer>
-		</motion.div>
-	</MainLayout>
+						{/* Recent attempts */}
+						<SignedIn>
+							<RecentAttempts attempts={recentAttempts} textId={text.id} />
+						</SignedIn>
+					</div>
+				</PageContainer>
+			</motion.div>
+		</MainLayout>
 	);
 }

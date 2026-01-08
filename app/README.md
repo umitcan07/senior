@@ -131,10 +131,10 @@ The application automatically configures Neon's serverless driver with WebSocket
 
 ### Features
 
-- ✅ **Fully Typesafe** - TypeScript types are automatically inferred from your schema
-- ✅ **Auto Migrations** - Database migrations run automatically on Docker container startup
-- ✅ **Type Inference** - Get autocomplete and type checking for all database operations
-- ✅ **Connection Pooling** - Optimized connection management with error handling
+- **Fully Typesafe** - TypeScript types are automatically inferred from your schema
+- **Auto Migrations** - Database migrations run automatically on Docker container startup
+- **Type Inference** - Get autocomplete and type checking for all database operations
+- **Connection Pooling** - Optimized connection management with error handling
 
 ### Database Schema
 

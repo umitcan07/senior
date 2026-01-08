@@ -1,6 +1,12 @@
 import { count, eq, max, sql } from "drizzle-orm";
 import { db } from "./index";
-import { analyses, authors, practiceTexts, referenceSpeeches, userRecordings } from "./schema";
+import {
+	analyses,
+	authors,
+	practiceTexts,
+	referenceSpeeches,
+	userRecordings,
+} from "./schema";
 import type {
 	NewPracticeText,
 	PracticeText,
@@ -52,8 +58,14 @@ export async function getPracticeTextsWithReferenceCounts(): Promise<
 			createdAt: practiceTexts.createdAt,
 			updatedAt: practiceTexts.updatedAt,
 			referenceCount: count(referenceSpeeches.id),
-			usCount: sql<number>`count(case when ${authors.accent} = 'US' then 1 end)`.mapWith(Number),
-			ukCount: sql<number>`count(case when ${authors.accent} = 'UK' then 1 end)`.mapWith(Number),
+			usCount:
+				sql<number>`count(case when ${authors.accent} = 'US' then 1 end)`.mapWith(
+					Number,
+				),
+			ukCount:
+				sql<number>`count(case when ${authors.accent} = 'UK' then 1 end)`.mapWith(
+					Number,
+				),
 		})
 		.from(practiceTexts)
 		.leftJoin(referenceSpeeches, eq(practiceTexts.id, referenceSpeeches.textId))
@@ -173,9 +185,7 @@ export async function getPracticeTextsWithAttemptStats(
 		.groupBy(referenceSpeeches.textId);
 
 	// Create a map for O(1) lookup
-	const statsMap = new Map(
-		attemptStats.map((stat) => [stat.textId, stat]),
-	);
+	const statsMap = new Map(attemptStats.map((stat) => [stat.textId, stat]));
 
 	// Merge the data
 	return textsWithRefs.map((text) => {

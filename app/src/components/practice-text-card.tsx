@@ -120,8 +120,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 								className={cn(
 									"group",
 									// Subtle left border for attempted texts
-									text.bestScore != null &&
-										"border-l-2 border-l-primary/30",
+									text.bestScore != null && "border-l-2 border-l-primary/30",
 								)}
 							>
 								<TableCell>
@@ -176,13 +175,19 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 								</TableCell>
 								<TableCell className="hidden text-right md:table-cell">
 									<div className="flex items-center justify-end gap-3 text-muted-foreground">
-										<div className="flex items-center gap-1.5" title="US Voices">
+										<div
+											className="flex items-center gap-1.5"
+											title="US Voices"
+										>
 											<span className="text-base">🇺🇸</span>
 											<span className="text-sm tabular-nums font-medium">
 												{text.usCount ?? 0}
 											</span>
 										</div>
-										<div className="flex items-center gap-1.5" title="UK Voices">
+										<div
+											className="flex items-center gap-1.5"
+											title="UK Voices"
+										>
 											<span className="text-base">🇬🇧</span>
 											<span className="text-sm tabular-nums font-medium">
 												{text.ukCount ?? 0}
@@ -194,7 +199,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 								<TableCell className="hidden text-right lg:table-cell">
 									{text.bestScore != null ? (
 										<div className="flex flex-col items-end gap-1">
-											<Badge 
+											<Badge
 												variant="secondary"
 												className={cn(
 													"font-mono tabular-nums",
@@ -218,7 +223,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 										<span className="text-muted-foreground/50 text-sm">—</span>
 									)}
 								</TableCell>
-							<TableCell className="text-right">
+								<TableCell className="text-right">
 									<Button
 										asChild
 										size="sm"

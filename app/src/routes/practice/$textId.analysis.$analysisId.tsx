@@ -118,8 +118,6 @@ function ScoreRing({
 	const circumference = 2 * Math.PI * 40;
 	const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
-
-
 	return (
 		<div className="flex flex-col items-center gap-2">
 			<div className={cn("relative", config.ring)}>
@@ -348,7 +346,7 @@ function ScoreOverview({
 }: ScoreOverviewProps) {
 	const percentage = Math.round(overallScore * 100);
 	const level = getScoreLevel(percentage);
-	
+
 	const getScoreLabel = (pct: number) => {
 		if (pct >= 90) return "Excellent!";
 		if (pct >= 75) return "Good";
@@ -365,14 +363,21 @@ function ScoreOverview({
 			<Card className="overflow-hidden">
 				<CardHeader className="flex flex-row items-center justify-between pb-2">
 					<CardTitle className="text-base">Score Overview</CardTitle>
-					<Badge 
+					<Badge
 						variant="secondary"
 						className={cn(
 							"font-medium",
-							scoreColorVariants({ level }).replace("text-", "bg-").replace("dark:text-", "dark:bg-").replace("600", "500/15").replace("500", "500/15").replace("400", "500/25") + " text-foreground", // Hacky color mapping, ideally use separate variants
-							level === "high" && "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
-							level === "medium" && "bg-amber-500/15 text-amber-700 dark:text-amber-400",
-							level === "low" && "bg-red-500/15 text-red-700 dark:text-red-400"
+							scoreColorVariants({ level })
+								.replace("text-", "bg-")
+								.replace("dark:text-", "dark:bg-")
+								.replace("600", "500/15")
+								.replace("500", "500/15")
+								.replace("400", "500/25") + " text-foreground", // Hacky color mapping, ideally use separate variants
+							level === "high" &&
+								"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+							level === "medium" &&
+								"bg-amber-500/15 text-amber-700 dark:text-amber-400",
+							level === "low" && "bg-red-500/15 text-red-700 dark:text-red-400",
 						)}
 					>
 						{getScoreLabel(percentage)}

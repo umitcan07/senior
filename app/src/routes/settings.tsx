@@ -39,8 +39,7 @@ export const Route = createFileRoute("/settings")({
 		]);
 
 		const authors = authorsResult.success ? authorsResult.data : [];
-		const preferredAuthorId =
-			preferredAuthorIdResult ?? authors[0]?.id ?? null;
+		const preferredAuthorId = preferredAuthorIdResult ?? authors[0]?.id ?? null;
 
 		return {
 			authors,
@@ -253,82 +252,83 @@ function SettingsPage() {
 			</SignedOut>
 			<SignedIn>
 				<MainLayout>
-					<motion.div 
-						variants={pageVariants} 
-						initial="initial" 
-						animate="animate" 
+					<motion.div
+						variants={pageVariants}
+						initial="initial"
+						animate="animate"
 						exit="exit"
 					>
 						<PageContainer maxWidth="md">
 							<div className="flex flex-col gap-12">
-							<PageHeader
-								title="Settings"
-								description="Manage your preferences"
-							/>
+								<PageHeader
+									title="Settings"
+									description="Manage your preferences"
+								/>
 
-							<div className="flex flex-col gap-12">
-								<SettingsSection
-									title="Preferred Voice"
-									description="Choose your default reference voice for practice sessions. This voice will be pre-selected when you start a new practice."
-									icon={<Mic className="size-5" />}
-								>
-									<div className="flex gap-4">
-										<AuthorSelector
-											authors={authors}
-											selectedAuthorId={pendingAuthorId}
-											onSelect={setPendingAuthorId}
-											disabled={isSaving}
-										/>
-										{hasChanges && (
-											<div className="ml-auto flex items-center gap-2">
-												<Button
-													onClick={handleSave}
-													disabled={isSaving}
-													size="sm"
-												>
-													{isSaving && (
-														<Spinner className="size-4 text-primary-foreground" />
-													)}
-													Save
-												</Button>
-												<Button
-													onClick={handleCancel}
-													disabled={isSaving}
-													variant="outline"
-													size="sm"
-												>
-													Cancel
-												</Button>
-											</div>
-										)}
-									</div>
-								</SettingsSection>
+								<div className="flex flex-col gap-12">
+									<SettingsSection
+										title="Preferred Voice"
+										description="Choose your default reference voice for practice sessions. This voice will be pre-selected when you start a new practice."
+										icon={<Mic className="size-5" />}
+									>
+										<div className="flex gap-4">
+											<AuthorSelector
+												authors={authors}
+												selectedAuthorId={pendingAuthorId}
+												onSelect={setPendingAuthorId}
+												disabled={isSaving}
+											/>
+											{hasChanges && (
+												<div className="ml-auto flex items-center gap-2">
+													<Button
+														onClick={handleSave}
+														disabled={isSaving}
+														size="sm"
+													>
+														{isSaving && (
+															<Spinner className="size-4 text-primary-foreground" />
+														)}
+														Save
+													</Button>
+													<Button
+														onClick={handleCancel}
+														disabled={isSaving}
+														variant="outline"
+														size="sm"
+													>
+														Cancel
+													</Button>
+												</div>
+											)}
+										</div>
+									</SettingsSection>
 
-								<div className="border-t" />
+									<div className="border-t" />
 
-								<SettingsSection
-									title="Appearance"
-									description="Customize how the app looks and feels."
-									icon={<Monitor className="size-5" />}
-								>
-									<p className="text-muted-foreground text-sm">
-										Use the theme toggle in the navigation bar to switch between
-										light and dark mode. Your preference is saved automatically.
-									</p>
-								</SettingsSection>
+									<SettingsSection
+										title="Appearance"
+										description="Customize how the app looks and feels."
+										icon={<Monitor className="size-5" />}
+									>
+										<p className="text-muted-foreground text-sm">
+											Use the theme toggle in the navigation bar to switch
+											between light and dark mode. Your preference is saved
+											automatically.
+										</p>
+									</SettingsSection>
 
-								<div className="border-t" />
-								<SettingsSection
-									title="Account"
-									icon={<User className="size-5" />}
-								>
-									<p className="text-muted-foreground text-sm">
-										Click on your profile picture in the navigation bar to
-										access account settings.
-									</p>
-								</SettingsSection>
+									<div className="border-t" />
+									<SettingsSection
+										title="Account"
+										icon={<User className="size-5" />}
+									>
+										<p className="text-muted-foreground text-sm">
+											Click on your profile picture in the navigation bar to
+											access account settings.
+										</p>
+									</SettingsSection>
+								</div>
 							</div>
-						</div>
 						</PageContainer>
 					</motion.div>
 				</MainLayout>

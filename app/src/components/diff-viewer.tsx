@@ -219,8 +219,6 @@ export function DiffViewer({
 				</div>
 			</div>
 
-
-
 			{/* Recognized */}
 			<div className="space-y-2">
 				<span className="text-muted-foreground text-xs uppercase tracking-wider">

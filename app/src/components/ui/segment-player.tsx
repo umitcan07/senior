@@ -19,9 +19,18 @@ interface SegmentPlayerProps {
 }
 
 const errorTypeLabels: Record<string, { label: string; color: string }> = {
-	substitute: { label: "Substitution", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
-	insert: { label: "Insertion", color: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
-	delete: { label: "Deletion", color: "bg-red-500/10 text-red-600 border-red-500/20" },
+	substitute: {
+		label: "Substitution",
+		color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+	},
+	insert: {
+		label: "Insertion",
+		color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+	},
+	delete: {
+		label: "Deletion",
+		color: "bg-red-500/10 text-red-600 border-red-500/20",
+	},
 };
 
 function formatTimestamp(ms: number): string {
@@ -181,7 +190,10 @@ export function SegmentPlayer({
 			{(label || errorType) && (
 				<div className="flex items-center gap-2">
 					{errorType && (
-						<Badge variant="outline" className={cn("text-xs", errorTypeLabels[errorType]?.color)}>
+						<Badge
+							variant="outline"
+							className={cn("text-xs", errorTypeLabels[errorType]?.color)}
+						>
 							{errorTypeLabels[errorType]?.label}
 						</Badge>
 					)}
@@ -303,7 +315,9 @@ export function ErrorSegmentPlayer({
 			src={src}
 			startMs={error.timestampStartMs!}
 			endMs={error.timestampEndMs!}
-			errorType={error.errorType as "substitute" | "insert" | "delete" | undefined}
+			errorType={
+				error.errorType as "substitute" | "insert" | "delete" | undefined
+			}
 			variant="default"
 			className={className}
 		/>

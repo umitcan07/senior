@@ -174,8 +174,6 @@ interface StatsSummaryProps {
 	};
 }
 
-
-
 function StatsSummary({ stats }: StatsSummaryProps) {
 	return (
 		<div className="grid gap-4 sm:grid-cols-3">
@@ -203,7 +201,9 @@ function StatsSummary({ stats }: StatsSummaryProps) {
 							<span
 								className={cn(
 									"font-medium text-xs",
-									stats.weeklyProgress > 0 ? "text-emerald-600" : "text-red-600",
+									stats.weeklyProgress > 0
+										? "text-emerald-600"
+										: "text-red-600",
 								)}
 							>
 								{stats.weeklyProgress > 0 ? "+" : ""}
@@ -411,27 +411,32 @@ function AttemptList({
 	}
 
 	// Group attempts by date (Today, Yesterday, Previous)
-	const groupedAttempts = attempts.reduce((acc, attempt) => {
-		const today = new Date();
-		const attemptDate = new Date(attempt.date);
-		const isToday = attemptDate.toDateString() === today.toDateString();
-		const isYesterday = new Date(today.setDate(today.getDate() - 1)).toDateString() === attemptDate.toDateString();
-		
-		let group = "Previous";
-		if (isToday) group = "Today";
-		else if (isYesterday) group = "Yesterday";
-		
-		if (!acc[group]) acc[group] = [];
-		acc[group].push(attempt);
-		return acc;
-	}, {} as Record<string, Attempt[]>);
+	const groupedAttempts = attempts.reduce(
+		(acc, attempt) => {
+			const today = new Date();
+			const attemptDate = new Date(attempt.date);
+			const isToday = attemptDate.toDateString() === today.toDateString();
+			const isYesterday =
+				new Date(today.setDate(today.getDate() - 1)).toDateString() ===
+				attemptDate.toDateString();
+
+			let group = "Previous";
+			if (isToday) group = "Today";
+			else if (isYesterday) group = "Yesterday";
+
+			if (!acc[group]) acc[group] = [];
+			acc[group].push(attempt);
+			return acc;
+		},
+		{} as Record<string, Attempt[]>,
+	);
 
 	const groupOrder = ["Today", "Yesterday", "Previous"];
 
 	return (
 		<div className="flex flex-col gap-8">
 			<div className="flex flex-col gap-8">
-				{groupOrder.map(group => {
+				{groupOrder.map((group) => {
 					const groupAttempts = groupedAttempts[group];
 					if (!groupAttempts?.length) return null;
 
@@ -454,12 +459,16 @@ function AttemptList({
 				<Pagination className="pt-4">
 					<PaginationContent>
 						<PaginationItem>
-							<PaginationPrevious 
+							<PaginationPrevious
 								onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-								className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+								className={
+									currentPage === 1
+										? "pointer-events-none opacity-50"
+										: "cursor-pointer"
+								}
 							/>
 						</PaginationItem>
-						
+
 						{Array.from({ length: totalPages }).map((_, i) => (
 							<PaginationItem key={i}>
 								<PaginationLink
@@ -474,8 +483,14 @@ function AttemptList({
 
 						<PaginationItem>
 							<PaginationNext
-								onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-								className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+								onClick={() =>
+									onPageChange(Math.min(totalPages, currentPage + 1))
+								}
+								className={
+									currentPage === totalPages
+										? "pointer-events-none opacity-50"
+										: "cursor-pointer"
+								}
 							/>
 						</PaginationItem>
 					</PaginationContent>
@@ -490,25 +505,25 @@ function AttemptList({
 function FeedSkeleton() {
 	return (
 		<MainLayout>
-			<motion.div 
-				variants={pageVariants} 
-				initial="initial" 
-				animate="animate" 
+			<motion.div
+				variants={pageVariants}
+				initial="initial"
+				animate="animate"
 				exit="exit"
 			>
 				<PageContainer maxWidth="xl">
 					<div className="flex flex-col gap-12">
-					<div className="flex min-h-64 flex-col items-center justify-center">
-						<ShimmeringText
-							text="Loading your progress..."
-							className="text-lg"
-							duration={1.5}
-						/>
+						<div className="flex min-h-64 flex-col items-center justify-center">
+							<ShimmeringText
+								text="Loading your progress..."
+								className="text-lg"
+								duration={1.5}
+							/>
+						</div>
 					</div>
-				</div>
-			</PageContainer>
-		</motion.div>
-	</MainLayout>
+				</PageContainer>
+			</motion.div>
+		</MainLayout>
 	);
 }
 
@@ -563,7 +578,7 @@ function FeedPage() {
 	const totalPages = Math.ceil(filteredAttempts.length / ITEMS_PER_PAGE);
 	const currentAttempts = filteredAttempts.slice(
 		(currentPage - 1) * ITEMS_PER_PAGE,
-		currentPage * ITEMS_PER_PAGE
+		currentPage * ITEMS_PER_PAGE,
 	);
 
 	return (
@@ -573,63 +588,57 @@ function FeedPage() {
 			</SignedOut>
 			<SignedIn>
 				<MainLayout>
-					<motion.div 
-						variants={pageVariants} 
-						initial="initial" 
-						animate="animate" 
+					<motion.div
+						variants={pageVariants}
+						initial="initial"
+						animate="animate"
 						exit="exit"
 					>
 						<PageContainer>
 							<div className="flex flex-col gap-20">
-							{/* Stats Summary */}
-							<section className="flex flex-col gap-8">
-								<SectionTitle 
-									title="Overview" 
-									variant="default"
-								/>
-								<StatsSummary stats={stats} />
-							</section>
-
-							{/* Common Errors */}
-							{commonErrors.length > 0 && (
+								{/* Stats Summary */}
 								<section className="flex flex-col gap-8">
-									<SectionTitle 
-										title="Needs Improvement" 
-										description="Focus on these sounds to improve your pronunciation accuracy."
-										variant="playful"
-									/>
-									<CommonErrors errors={commonErrors} />
+									<SectionTitle title="Overview" variant="default" />
+									<StatsSummary stats={stats} />
 								</section>
-							)}
 
-							{/* Filter Bar & Attempt List */}
-							<section className="flex flex-col gap-8">
-								<SectionTitle 
-									title="Practice History" 
-									variant="default"
-								/>
-								<FilterBar
-									texts={texts}
-									selectedTextId={selectedTextId}
-									sortBy={sortBy}
-									onTextChange={(id) => {
-										setSelectedTextId(id);
-										setCurrentPage(1);
-									}}
-									onSortChange={setSortBy}
-								/>
-								<AttemptList
-									attempts={currentAttempts}
-									currentPage={currentPage}
-									totalPages={totalPages}
-									onPageChange={setCurrentPage}
-								/>
-							</section>
-						</div>
-					</PageContainer>
-				</motion.div>
-			</MainLayout>
-		</SignedIn>
-	</>
+								{/* Common Errors */}
+								{commonErrors.length > 0 && (
+									<section className="flex flex-col gap-8">
+										<SectionTitle
+											title="Needs Improvement"
+											description="Focus on these sounds to improve your pronunciation accuracy."
+											variant="playful"
+										/>
+										<CommonErrors errors={commonErrors} />
+									</section>
+								)}
+
+								{/* Filter Bar & Attempt List */}
+								<section className="flex flex-col gap-8">
+									<SectionTitle title="Practice History" variant="default" />
+									<FilterBar
+										texts={texts}
+										selectedTextId={selectedTextId}
+										sortBy={sortBy}
+										onTextChange={(id) => {
+											setSelectedTextId(id);
+											setCurrentPage(1);
+										}}
+										onSortChange={setSortBy}
+									/>
+									<AttemptList
+										attempts={currentAttempts}
+										currentPage={currentPage}
+										totalPages={totalPages}
+										onPageChange={setCurrentPage}
+									/>
+								</section>
+							</div>
+						</PageContainer>
+					</motion.div>
+				</MainLayout>
+			</SignedIn>
+		</>
 	);
 }

@@ -130,7 +130,7 @@ python ipa_generation/handler.py
 
 ## Implementation Status
 
-⚠️ **Current Implementation**: Dummy/placeholder results
+**Current Implementation**: Dummy/placeholder results
 - IPA transcription returns placeholder values
 - Timestamps are evenly distributed (dummy implementation)
 - Replace `extract_ipa_from_audio()` and `generate_ipa_*()` functions with actual POWSM model inference
