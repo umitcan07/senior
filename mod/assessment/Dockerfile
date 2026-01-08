@@ -4,8 +4,8 @@
 
 FROM runpod/pytorch:2.0.1-py3.10-cuda11.8.0-devel
 
-# Set working directory inside container (not related to monorepo's app/ directory)
-WORKDIR /app
+# Set working directory inside container (changed from /app to avoid confusion)
+WORKDIR /worker
 
 # Install system dependencies for audio processing
 # librosa uses soundfile (requires libsndfile1) and audioread (can use ffmpeg)
@@ -15,18 +15,18 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy shared modules first (for better caching)
-COPY shared/ /app/shared/
+COPY shared/ /worker/shared/
 
 # Copy assessment-specific files
-COPY assessment/ /app/assessment/
+COPY assessment/ /worker/assessment/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r assessment/requirements.txt
 
 # Set Python path so imports work correctly in container
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/worker
 
 # Run assessment handler
-WORKDIR /app
+WORKDIR /worker
 CMD ["python", "assessment/handler.py"]
 

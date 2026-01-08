@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # -----------------------------------------------------
+  # 1. The Gateway (Mimics RunPod Cloud API)
+  # -----------------------------------------------------
+  runpod-proxy:
+    image: python:3.10-slim
+    working_dir: /app
+    volumes:
+      - ./mod/dev:/app
+    command: >
+      bash -c "pip install fastapi uvicorn httpx pydantic && 
+      uvicorn runpod_proxy:app --host 0.0.0.0 --port 5000 --reload"
+    ports:
+      - "8008:5000"
+    environment:
+      # Maps ENDPOINT_ID -> WORKER_URL
+      # These IDs must match what your Frontend/App sends to /v2/{ID}/run
+      - 'WORKER_MAP={"pronunciation-assessment": "http://worker-assessment:8000", "ipa-generation": "http://worker-generation:8000"}'
+    networks:
+      - runpod-net
+
+  # -----------------------------------------------------
+  # 2. Assessment Worker (The Heavy Lifter)
+  # -----------------------------------------------------
+  worker-assessment:
+    build:
+      context: ./mod
+      dockerfile: assessment/Dockerfile
+    environment:
+      - RUNPOD_DEBUG=true
+    command: python assessment/handler.py --rp_serve_api
+    volumes:
+      # Optional: Mount code for hot-reloading if your handler supports it (RunPod SDK might not auto-reload)
+      - ./mod/assessment:/worker/assessment
+      - ./mod/shared:/worker/shared
+      - ./mod/alignment:/worker/alignment
+    networks:
+      - runpod-net
+    # No ports exposed to host needed, only proxy talks to it. 
+    # But exposing 8001 for debugging might be useful.
+    ports:
+      - "8001:8000"
+
+  # -----------------------------------------------------
+  # 3. IPA Generation Worker (The G2P Utility)
+  # -----------------------------------------------------
+  worker-generation:
+    build:
+      context: ./mod
+      dockerfile: ipa_generation/Dockerfile
+    environment:
+      - RUNPOD_DEBUG=true
+    command: python ipa_generation/handler.py --rp_serve_api
+    volumes:
+      - ./mod/ipa_generation:/worker/ipa_generation
+    networks:
+      - runpod-net
+    ports:
+      - "8002:8000"
+
+networks:
+  runpod-net:
+    driver: bridge
