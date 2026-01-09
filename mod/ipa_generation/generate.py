@@ -87,7 +87,7 @@ def generate_ipa(text: str, audio_uri: Optional[str] = None) -> Dict:
     
     Args:
         text: English text string
-        audio_uri: Optional URI to audio file for audio-guided G2P
+        audio_uri: URI to audio file for audio-guided G2P
     
     Returns:
         Dictionary with:
@@ -96,12 +96,12 @@ def generate_ipa(text: str, audio_uri: Optional[str] = None) -> Dict:
     """
     if not text:
         raise ValueError("text is required")
+        
+    if not audio_uri:
+        raise ValueError("audio_uri is required for audio-guided IPA generation")
     
-    # Use audio-guided G2P if audio_uri provided, otherwise text-only
-    if audio_uri:
-        ipa_phonemes = generate_ipa_audio_guided(text, audio_uri)
-    else:
-        ipa_phonemes = generate_ipa_text_only(text)
+    # Use audio-guided G2P
+    ipa_phonemes = generate_ipa_audio_guided(text, audio_uri)
     
     # Parse phonemes from POWSM format
     phonemes = parse_ipa_phonemes(ipa_phonemes)

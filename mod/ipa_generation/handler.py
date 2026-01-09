@@ -34,6 +34,9 @@ def handler(job):
         
         if not text:
             return {"error": "Missing 'text' in input"}
+            
+        if not audio_uri:
+            return {"error": "Missing 'audio_uri' in input"}
         
         result = generate_ipa(text, audio_uri)
         return result

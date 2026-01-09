@@ -39,14 +39,14 @@ Images are built from the `/mod` root to include shared modules.
 cd mod/
 
 # Build Assessment
-docker build -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
+docker build -f assessment/Dockerfile -t ucede/nonce-assessment:v0.1.0 .
 
 # Build IPA Generation
-docker build -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
+docker build -f ipa_generation/Dockerfile -t ucede/nonce-generation:v0.1.0 .
 
 # Push
-docker push ucede/nonce-assessment:latest
-docker push ucede/nonce-generation:latest
+docker push ucede/nonce-assessment:v0.1.0
+docker push ucede/nonce-generation:v0.1.0
 ```
 
 ### RunPod Configuration
@@ -59,5 +59,31 @@ docker push ucede/nonce-generation:latest
 
 ## 4. Maintenance
 
-- **Caching**: Large model weights (POWSM/ESPnet) are ideally cached in a Network Volume to reduce container start times.
 - **Monitoring**: RunPod console provides logs and request metrics. Use these to adjust your Scaling Policy (Queue Delay vs Request Count).
+
+---
+
+## 5. Network Volume Strategy
+
+To eliminate cold-start latency caused by model downloads, we use a **Network Volume**.
+
+### Storage Estimates
+
+| Component | Estimate | Details |
+| :--- | :--- | :--- |
+| **MFA** | ~1 GB | Acoustic models, dictionaries, and temporary alignment corpora. |
+| **ESPnet / POWSM** | ~3 GB | G2P and ASR model weights (cached from HuggingFace/Zenodo). |
+| **Whisper** | ~3 GB | `large-v3` weights (if used for transcription). |
+| **System / Logs** | ~3 GB | Persistent logs, pip cache, and debugging artifacts. |
+| **Buffer** | ~10 GB | Safety margin for future larger models. |
+| **Total Recommended** | **20 GB** | **~$1.40 / month** |
+
+### Implications
+
+1.  **Region Locking**: The generic "Anywhere" deployment cannot be used. You must pin your Template/Endpoint to the specific data center where the volume exists (e.g., `US-NV-1`).
+2.  **Environment Configuration**:
+    *   Mount Path: `/runpod-volume`
+    *   Env Var for MFA: `MFA_ROOT_DIRECTORY=/runpod-volume/mfa`
+    *   Env Var for ESPnet: `ESPNET_MODEL_ZOO_CACHE_DIR=/runpod-volume/espnet`
+    *   Env Var for HF: `HF_HOME=/runpod-volume/huggingface`
+3.  **Initialization**: The volume starts empty. The first worker to launch will spend time downloading. All subsequent workers (even after scaling to 0 and back) will be instant.
