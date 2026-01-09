@@ -46,3 +46,27 @@ export function getRunPodHeaders() {
 		Authorization: `Bearer ${config.apiKey}`,
 	};
 }
+
+/**
+ * Get webhook base URL for RunPod webhooks
+ * Prefers WEBHOOK_BASE_URL environment variable for security and consistency
+ * Falls back to request origin for local development
+ */
+export function getWebhookBaseUrl(request?: Request): string {
+	// Prefer environment variable (required in production)
+	if (process.env.WEBHOOK_BASE_URL) {
+		return process.env.WEBHOOK_BASE_URL;
+	}
+
+	// Fallback to origin-based logic for local development
+	if (request) {
+		const origin = request.headers.get("origin") ?? "http://localhost:3000";
+		// For Docker, use host.docker.internal
+		return origin.includes("localhost")
+			? "http://host.docker.internal:3000"
+			: origin;
+	}
+
+	// Final fallback
+	return "http://localhost:3000";
+}

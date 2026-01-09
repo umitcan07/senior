@@ -4,7 +4,7 @@ import {
 	SignInButton,
 	UserButton,
 } from "@clerk/tanstack-react-start";
-import { RiCloseLine, RiMenuLine, RiSettings2Line } from "@remixicon/react";
+import { RiCloseLine, RiMenuLine, RiSettings3Line } from "@remixicon/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -126,7 +126,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 					{/* Logo */}
 					<Link
 						to="/"
-						className="flex items-center transition-opacity hover:opacity-80"
+						className="flex min-w-32 items-center transition-opacity hover:opacity-80"
 					>
 						<NonceLogo height={22} />
 					</Link>
@@ -155,15 +155,16 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 					</div>
 
 					{/* Right Side Actions */}
-					<div className="flex items-center gap-4">
+					<div className="flex items-center justify-end gap-4">
 						<ThemeToggle />
 						<Button variant="ghost" size="icon" asChild>
 							<Link to="/settings">
-								<RiSettings2Line size={20} />
+								<RiSettings3Line size={20} />
 							</Link>
 						</Button>
-						<div className="flex min-w-10 items-center justify-end">
-							<SignedIn>
+						<SignedIn>
+							<div className="flex w-32 items-center gap-7">
+								<div className="h-3 w-px bg-border" />
 								<UserButton
 									appearance={{
 										elements: {
@@ -171,13 +172,15 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 										},
 									}}
 								/>
-							</SignedIn>
-							<SignedOut>
+							</div>
+						</SignedIn>
+						<SignedOut>
+							<div className="w-32">
 								<Button variant="default" size="sm" asChild>
 									<SignInButton />
 								</Button>
-							</SignedOut>
-						</div>
+							</div>
+						</SignedOut>
 
 						<Button
 							variant="ghost"

@@ -52,6 +52,14 @@ export type NewPhonemeError = InferInsertModel<typeof schema.phonemeErrors>;
 export type WordError = InferSelectModel<typeof schema.wordErrors>;
 export type NewWordError = InferInsertModel<typeof schema.wordErrors>;
 
+// IPA generation job types
+export type IpaGenerationJob = InferSelectModel<
+	typeof schema.ipaGenerationJobs
+>;
+export type NewIpaGenerationJob = InferInsertModel<
+	typeof schema.ipaGenerationJobs
+>;
+
 // Enum types
 export type GenerationMethod =
 	(typeof schema.generationMethodEnum.enumValues)[number];
@@ -66,3 +74,5 @@ export type ErrorType = (typeof schema.errorTypeEnum.enumValues)[number];
 export type TextDifficulty =
 	(typeof schema.textDifficultyEnum.enumValues)[number];
 export type TextType = (typeof schema.textTypeEnum.enumValues)[number];
+export type JobStatus = (typeof schema.jobStatusEnum.enumValues)[number];
+

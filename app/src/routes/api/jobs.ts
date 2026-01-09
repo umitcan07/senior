@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { createJob, getAllJobs, updateJob } from "@/db/job";
-import { getRunPodConfig, getRunPodHeaders } from "@/lib/runpod-config";
+import {
+	getRunPodConfig,
+	getRunPodHeaders,
+	getWebhookBaseUrl,
+} from "@/lib/runpod-config";
 import {
 	JobStatusResponseSchema,
 	mapRunPodStatusToDb,
@@ -96,13 +100,12 @@ export const Route = createFileRoute("/api/jobs")({
 					const { input } = parseResult.data;
 					const config = getRunPodConfig();
 
-					// Build webhook URL (using the request origin)
-					const origin =
-						request.headers.get("origin") ?? "http://localhost:3000";
-					// For Docker, use host.docker.internal
-					const webhookUrl = origin.includes("localhost")
-						? "http://host.docker.internal:3000/api/webhook/jobs"
-						: `${origin}/api/webhook/jobs`;
+					// Build webhook URL (prefers WEBHOOK_BASE_URL env var, falls back to request origin)
+					const webhookBaseUrl = getWebhookBaseUrl(request);
+					const webhookUrl = new URL(
+						"/api/webhook/jobs",
+						webhookBaseUrl,
+					).toString();
 
 					// Submit job to RunPod
 					const runpodResponse = await fetch(

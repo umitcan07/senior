@@ -204,5 +204,17 @@ export async function getFromR2(
  * Generate a public URL for an R2 object
  */
 export function getPublicUrl(key: string): string {
+	if (process.env.R2_PUBLIC_URL) {
+		// R2_PUBLIC_URL should be the base URL, e.g., https://pub-xxx.r2.dev
+		// It might or might not include trailing slash
+		const baseUrl = process.env.R2_PUBLIC_URL.replace(/\/$/, "");
+		// R2 public URLs for "dev" buckets usually map directly to the bucket contents
+		// so we append the key directly.
+		// NOTE: Ensure the key does not start with / if we handled the trailing slash
+		const cleanKey = key.startsWith("/") ? key.slice(1) : key;
+		return `${baseUrl}/${cleanKey}`;
+	}
+	
+	// Fallback to S3 endpoint (which likely fails for public access without auth)
 	return `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET_NAME}/${key}`;
 }

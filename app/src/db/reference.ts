@@ -81,6 +81,44 @@ export async function getReferenceSpeechById(
 	return result || null;
 }
 
+export async function getReferenceSpeechWithText(
+	id: string,
+): Promise<(ReferenceSpeech & { text: PracticeText }) | null> {
+	const [result] = await db
+		.select({
+			id: referenceSpeeches.id,
+			storageKey: referenceSpeeches.storageKey,
+			authorId: referenceSpeeches.authorId,
+			textId: referenceSpeeches.textId,
+			generationMethod: referenceSpeeches.generationMethod,
+			ipaTranscription: referenceSpeeches.ipaTranscription,
+			ipaMethod: referenceSpeeches.ipaMethod,
+			priority: referenceSpeeches.priority,
+			durationMs: referenceSpeeches.durationMs,
+			fileSizeBytes: referenceSpeeches.fileSizeBytes,
+			sampleRateHz: referenceSpeeches.sampleRateHz,
+			channels: referenceSpeeches.channels,
+			bitrateKbps: referenceSpeeches.bitrateKbps,
+			createdAt: referenceSpeeches.createdAt,
+			updatedAt: referenceSpeeches.updatedAt,
+			text: {
+				id: practiceTexts.id,
+				content: practiceTexts.content,
+				difficulty: practiceTexts.difficulty,
+				wordCount: practiceTexts.wordCount,
+				type: practiceTexts.type,
+				note: practiceTexts.note,
+				createdAt: practiceTexts.createdAt,
+				updatedAt: practiceTexts.updatedAt,
+			},
+		})
+		.from(referenceSpeeches)
+		.innerJoin(practiceTexts, eq(referenceSpeeches.textId, practiceTexts.id))
+		.where(eq(referenceSpeeches.id, id))
+		.limit(1);
+	return result || null;
+}
+
 export async function getReferenceSpeechesForText(
 	textId: string,
 ): Promise<ReferenceSpeechWithRelations[]> {

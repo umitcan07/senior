@@ -1,14 +1,12 @@
 import {
-	RiArrowDownSLine,
+	RiArrowDownLine,
 	RiBookOpenLine,
 	RiBriefcaseLine,
 	RiChatQuoteLine,
-	RiFireLine,
 	RiLeafLine,
 	RiMicLine,
-	RiSearchLine,
+	RiSearch2Line,
 	RiStackLine,
-	RiThunderstormsLine,
 } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
@@ -57,31 +55,26 @@ const categoryTypes: Array<TextType | "all"> = [
 const difficultyConfig: Array<{
 	value: TextDifficulty | "all";
 	label: string;
-	icon: typeof RiStackLine;
 	color: string;
 }> = [
 	{
 		value: "all",
 		label: "All",
-		icon: RiStackLine,
 		color: "text-muted-foreground",
 	},
 	{
 		value: "beginner",
 		label: "Beginner",
-		icon: RiLeafLine,
 		color: "text-green-500",
 	},
 	{
 		value: "intermediate",
 		label: "Intermediate",
-		icon: RiThunderstormsLine,
 		color: "text-amber-500",
 	},
 	{
 		value: "advanced",
 		label: "Advanced",
-		icon: RiFireLine,
 		color: "text-red-500",
 	},
 ];
@@ -160,16 +153,12 @@ function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
 		>
 			<TabsList className="w-full">
 				{difficultyConfig.map((item) => {
-					const Icon = item.icon;
 					const isActive = value === item.value;
 					return (
-						<TabsTrigger
-							key={item.value}
-							value={item.value}
-							className="flex-1 gap-1.5"
-						>
-							<Icon size={14} className={isActive ? item.color : undefined} />
-							<span className="hidden sm:inline">{item.label}</span>
+						<TabsTrigger key={item.value} value={item.value} className="flex-1">
+							<span className={isActive ? item.color : undefined}>
+								{item.label}
+							</span>
 						</TabsTrigger>
 					);
 				})}
@@ -301,7 +290,7 @@ function PracticePage() {
 								<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
 									<div className="flex flex-1 items-end gap-4">
 										<div className="relative max-w-md flex-1">
-											<RiSearchLine className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
+											<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 											<Input
 												type="search"
 												placeholder="Search texts..."
@@ -402,7 +391,7 @@ function PracticePage() {
 								{hasMore && (
 									<div className="flex justify-center pt-4 pb-4">
 										<Button variant="outline" onClick={handleLoadMore}>
-											<RiArrowDownSLine size={16} />
+											<RiArrowDownLine size={16} />
 											Load More
 										</Button>
 									</div>
@@ -412,7 +401,7 @@ function PracticePage() {
 							<EmptyState
 								title="No texts match your filters"
 								description="Try adjusting your difficulty, type filters, or search query to see more texts."
-								icon={<RiSearchLine className="size-full" />}
+								icon={<RiSearch2Line className="size-full" />}
 								variant="minimal"
 								primaryAction={{
 									label: "Clear Filters",

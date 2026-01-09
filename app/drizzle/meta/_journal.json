@@ -50,6 +50,13 @@
       "when": 1767907484276,
       "tag": "0006_pale_doctor_octopus",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1767993639442,
+      "tag": "0007_organic_wallop",
+      "breakpoints": true
     }
   ]
 }

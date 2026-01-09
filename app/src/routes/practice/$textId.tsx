@@ -42,6 +42,7 @@ import { Progress } from "@/components/ui/progress";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import type { Author, ReferenceSpeech } from "@/db/types";
 import { uploadAudioRecording } from "@/lib/audio-upload";
+import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel } from "@/lib/score";
 import { serverGetPracticeTextById } from "@/lib/text";
@@ -560,6 +561,28 @@ function ReferenceVoice({
 						<AudioPlayerSpeed className="h-6 shrink-0 text-[10px]" />
 					</div>
 				</AudioPlayerProvider>
+			)}
+
+			{/* IPA Transcription display */}
+			{selectedReference?.ipaTranscription && (
+				<div className="rounded-lg bg-muted/30 p-4">
+					<div className="mb-2 flex items-center justify-between">
+						<h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+							Target Pronunciation (IPA)
+						</h4>
+						<Badge
+							variant="outline"
+							className="h-5 px-1.5 font-normal text-[10px]"
+						>
+							{selectedReference.ipaMethod === "powsm"
+								? "Audio-guided"
+								: "Dictionary"}
+						</Badge>
+					</div>
+					<p className="font-mono text-lg leading-relaxed tracking-wide text-foreground/80">
+						{formatIpaForDisplay(selectedReference.ipaTranscription)}
+					</p>
+				</div>
 			)}
 		</div>
 	);

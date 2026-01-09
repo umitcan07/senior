@@ -326,3 +326,34 @@ export const jobs = pgTable(
 		index("idx_jobs_created_at").on(table.createdAt),
 	],
 );
+
+/**
+ * IPA generation job tracking for reference speeches
+ */
+export const ipaGenerationJobs = pgTable(
+	"ipa_generation_jobs",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		referenceSpeechId: uuid("reference_speech_id")
+			.notNull()
+			.references(() => referenceSpeeches.id, { onDelete: "cascade" }),
+		externalJobId: varchar("external_job_id", { length: 255 })
+			.notNull()
+			.unique(),
+		status: jobStatusEnum("status").default("in_queue").notNull(),
+		result: jsonb("result"),
+		error: text("error"),
+		executionTimeMs: integer("execution_time_ms"),
+		delayTimeMs: integer("delay_time_ms"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	},
+	(table) => [
+		index("idx_ipa_generation_jobs_reference_speech_id").on(
+			table.referenceSpeechId,
+		),
+		index("idx_ipa_generation_jobs_external_job_id").on(table.externalJobId),
+		index("idx_ipa_generation_jobs_status").on(table.status),
+	],
+);
+

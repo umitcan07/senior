@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/tanstack-react-start";
+import { useUser } from "@clerk/tanstack-react-start";
 import type { ReactNode } from "react";
 import { Navbar } from "@/components/navigation/navbar";
 import { cn } from "@/lib/utils";
@@ -9,8 +9,11 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children, className }: MainLayoutProps) {
-	const { has } = useAuth();
-	const isAdmin = has?.({ feature: "admin:admin" }) ?? false;
+	const { user } = useUser();
+	const isAdmin =
+		user?.publicMetadata &&
+		typeof user.publicMetadata.role === "string" &&
+		user.publicMetadata.role === "app_admin";
 
 	return (
 		<div className="min-h-screen bg-linear-to-b from-background to-muted/20">
