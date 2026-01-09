@@ -130,6 +130,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: Theme initialization script is safe and necessary for SSR
 					dangerouslySetInnerHTML={{
 						__html: `
 							(function() {

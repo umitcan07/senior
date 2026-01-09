@@ -1,5 +1,5 @@
+import { RiArrowLeftLine, RiSearchLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Search } from "lucide-react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,7 @@ export function NotFound() {
 					<div className="flex min-h-[40vh] flex-col items-center justify-center gap-8 text-center">
 						<div className="flex flex-col items-center gap-4">
 							<div className="flex size-16 items-center justify-center rounded-full bg-muted">
-								<Search className="size-8 text-muted-foreground" />
+								<RiSearchLine className="size-8 text-muted-foreground" />
 							</div>
 							<div className="flex flex-col items-center gap-2">
 								<span className="font-mono text-muted-foreground text-sm">
@@ -30,7 +30,7 @@ export function NotFound() {
 						<div className="flex flex-col gap-3 sm:flex-row">
 							<Button asChild>
 								<Link to="/">
-									<ArrowLeft className="size-4" />
+									<RiArrowLeftLine className="size-4" />
 									Back to Home
 								</Link>
 							</Button>

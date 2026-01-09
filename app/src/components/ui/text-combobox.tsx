@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from "lucide-react";
+import { RiArrowUpDownLine, RiCheckLine } from "@remixicon/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,7 +56,7 @@ export function TextCombobox({
 								(selectedText.content.length > 50 ? "..." : "")
 							: placeholder}
 					</span>
-					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-(--radix-popover-trigger-width) p-0">
@@ -74,7 +74,7 @@ export function TextCombobox({
 										setOpen(false);
 									}}
 								>
-									<Check
+									<RiCheckLine
 										className={cn(
 											"mr-2 h-4 w-4",
 											value === text.id ? "opacity-100" : "opacity-0",

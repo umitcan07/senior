@@ -1,15 +1,15 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
 import {
-	ArrowUpDown,
-	ChevronDown,
-	ChevronRight,
-	MoreHorizontal,
-	Pencil,
-	Plus,
-	Trash2,
-} from "lucide-react";
+	RiAddLine,
+	RiArrowDownSLine,
+	RiArrowRightSLine,
+	RiArrowUpDownLine,
+	RiDeleteBinLine,
+	RiEditLine,
+	RiMoreLine,
+} from "@remixicon/react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -100,9 +100,9 @@ export function createColumns(
 						onClick={() => actions.onToggleExpand(text.id)}
 					>
 						{isExpanded ? (
-							<ChevronDown className="h-4 w-4" />
+							<RiArrowDownSLine className="h-4 w-4" />
 						) : (
-							<ChevronRight className="h-4 w-4" />
+							<RiArrowRightSLine className="h-4 w-4" />
 						)}
 					</Button>
 				);
@@ -120,7 +120,7 @@ export function createColumns(
 						className="h-8 px-2"
 					>
 						Content
-						<ArrowUpDown className="ml-2 h-4 w-4" />
+						<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 					</Button>
 				);
 			},
@@ -144,7 +144,7 @@ export function createColumns(
 						className="h-8 px-2"
 					>
 						Difficulty
-						<ArrowUpDown className="ml-2 h-4 w-4" />
+						<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 					</Button>
 				);
 			},
@@ -173,7 +173,7 @@ export function createColumns(
 						className="h-8 px-2"
 					>
 						Type
-						<ArrowUpDown className="ml-2 h-4 w-4" />
+						<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 					</Button>
 				);
 			},
@@ -197,7 +197,7 @@ export function createColumns(
 						className="h-8 px-2"
 					>
 						References
-						<ArrowUpDown className="ml-2 h-4 w-4" />
+						<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 					</Button>
 				);
 			},
@@ -220,7 +220,7 @@ export function createColumns(
 							onClick={() => actions.onAddReference(row.original)}
 							title="Add reference"
 						>
-							<Plus className="h-3 w-3" />
+							<RiAddLine className="h-3 w-3" />
 						</Button>
 					</div>
 				);
@@ -237,7 +237,7 @@ export function createColumns(
 						className="h-8 px-2"
 					>
 						Words
-						<ArrowUpDown className="ml-2 h-4 w-4" />
+						<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 					</Button>
 				);
 			},
@@ -261,7 +261,7 @@ export function createColumns(
 						className="h-8 px-2"
 					>
 						Created
-						<ArrowUpDown className="ml-2 h-4 w-4" />
+						<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 					</Button>
 				);
 			},
@@ -285,17 +285,17 @@ export function createColumns(
 						<DropdownMenuTrigger asChild>
 							<Button variant="ghost" className="h-8 w-8 p-0">
 								<span className="sr-only">Open menu</span>
-								<MoreHorizontal className="h-4 w-4" />
+								<RiMoreLine className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuLabel>Actions</DropdownMenuLabel>
 							<DropdownMenuItem onClick={() => actions.onAddReference(text)}>
-								<Plus className="mr-2 h-4 w-4" />
+								<RiAddLine className="mr-2 h-4 w-4" />
 								Add Reference
 							</DropdownMenuItem>
 							<DropdownMenuItem onClick={() => actions.onEdit(text)}>
-								<Pencil className="mr-2 h-4 w-4" />
+								<RiEditLine className="mr-2 h-4 w-4" />
 								Edit
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
@@ -303,7 +303,7 @@ export function createColumns(
 								onClick={() => actions.onDelete(text)}
 								className="text-destructive"
 							>
-								<Trash2 className="mr-2 h-4 w-4" />
+								<RiDeleteBinLine className="mr-2 h-4 w-4" />
 								Delete
 							</DropdownMenuItem>
 						</DropdownMenuContent>

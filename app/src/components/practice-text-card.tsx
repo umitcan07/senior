@@ -1,6 +1,14 @@
+import {
+	RiArrowRightLine,
+	RiBookOpenLine,
+	RiBriefcaseLine,
+	RiChatQuoteLine,
+	RiLeafLine,
+	RiMicLine,
+	RiStackLine,
+} from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
 import { cva } from "class-variance-authority";
-import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,6 +76,16 @@ export function getTypeLabel(type: TextType): string {
 }
 
 function CategoryIcon({ type }: { type: TextType }) {
+	const Icon =
+		{
+			all: RiStackLine,
+			daily: RiLeafLine,
+			professional: RiBriefcaseLine,
+			academic: RiBookOpenLine,
+			phonetic_challenge: RiMicLine,
+			common_phrase: RiChatQuoteLine,
+		}[type] || RiStackLine;
+
 	return (
 		<div
 			className={cn(
@@ -75,14 +93,11 @@ function CategoryIcon({ type }: { type: TextType }) {
 				categoryGradientVariants({ type }),
 			)}
 		>
-			<svg
-				className="size-4 text-white/80"
-				viewBox="0 0 24 24"
-				fill="currentColor"
+			<Icon
+				className="size-4 text-white/90"
+				strokeWidth={1.5}
 				aria-hidden="true"
-			>
-				<circle cx="12" cy="12" r="8" />
-			</svg>
+			/>
 		</div>
 	);
 }
@@ -231,7 +246,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 									>
 										<Link to="/practice/$textId" params={{ textId: text.id }}>
 											<span className="hidden sm:inline">Practice</span>
-											<ArrowRight size={14} />
+											<RiArrowRightLine size={14} />
 										</Link>
 									</Button>
 								</TableCell>

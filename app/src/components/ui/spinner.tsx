@@ -5,7 +5,7 @@ export const Spinner = ({
 	...props
 }: React.ComponentProps<"span">) => {
 	return (
-		<span
+		<output
 			data-slot="spinner"
 			aria-label="Loading..."
 			aria-roledescription="spinner"
@@ -19,6 +19,7 @@ export const Spinner = ({
 				viewBox="0 0 24 24"
 				xmlns="http://www.w3.org/2000/svg"
 			>
+				<title>Loading</title>
 				<g>
 					<circle
 						cx="12"
@@ -56,6 +57,6 @@ export const Spinner = ({
 					/>
 				</g>
 			</svg>
-		</span>
+		</output>
 	);
 };

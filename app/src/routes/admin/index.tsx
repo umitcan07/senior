@@ -1,5 +1,5 @@
+import { RiFileTextLine, RiMicLine, RiTeamLine } from "@remixicon/react";
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { FileText, Mic, Users } from "lucide-react";
 import {
 	MainLayout,
 	PageContainer,
@@ -18,19 +18,19 @@ const adminSections = [
 		description:
 			"Create, edit, and manage practice texts for pronunciation exercises",
 		href: "/admin/text",
-		icon: FileText,
+		icon: RiFileTextLine,
 	},
 	{
 		title: "Reference Speeches",
 		description: "Upload and manage reference audio recordings",
 		href: "/admin/references",
-		icon: Mic,
+		icon: RiMicLine,
 	},
 	{
 		title: "Authors",
 		description: "Manage voices and authors for reference speeches",
 		href: "/admin/authors",
-		icon: Users,
+		icon: RiTeamLine,
 	},
 ];
 

@@ -4,8 +4,8 @@ import {
 	SignInButton,
 	UserButton,
 } from "@clerk/tanstack-react-start";
+import { RiCloseLine, RiMenuLine, RiSettings2Line } from "@remixicon/react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, Settings2Icon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NonceLogo } from "@/components/ui/nonce";
@@ -90,7 +90,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 	// Close mobile menu on route change
 	useEffect(() => {
 		closeMobileMenu();
-	}, [currentPath, closeMobileMenu]);
+	}, [closeMobileMenu]);
 
 	// Close mobile menu on escape key
 	useEffect(() => {
@@ -159,7 +159,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 						<ThemeToggle />
 						<Button variant="ghost" size="icon" asChild>
 							<Link to="/settings">
-								<Settings2Icon size={20} />
+								<RiSettings2Line size={20} />
 							</Link>
 						</Button>
 						<div className="flex min-w-10 items-center justify-end">
@@ -188,7 +188,11 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 							aria-controls="mobile-menu"
 							aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
 						>
-							{isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+							{isMobileMenuOpen ? (
+								<RiCloseLine size={24} />
+							) : (
+								<RiMenuLine size={24} />
+							)}
 						</Button>
 					</div>
 				</div>

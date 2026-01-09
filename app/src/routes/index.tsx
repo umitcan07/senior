@@ -1,5 +1,5 @@
+import { RiBarChartLine, RiBookLine, RiBookOpenLine } from "@remixicon/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookIcon, BookOpenIcon, ChartBarIncreasingIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
@@ -18,21 +18,21 @@ const features = [
 		description:
 			"Master English pronunciation with curated texts targeting challenging sounds and patterns.",
 		href: "/practice",
-		icon: <BookIcon size={20} />,
+		icon: <RiBookLine size={20} />,
 	},
 	{
 		title: "Get Insights",
 		description:
 			"Visualize your improvements with detailed analytics and track your progress over time.",
 		href: "/summary",
-		icon: <ChartBarIncreasingIcon size={20} />,
+		icon: <RiBarChartLine size={20} />,
 	},
 	{
 		title: "IPA & English Sounds",
 		description:
 			"Deepen your understanding of English phonetics with our interactive IPA guide.",
 		href: "/learn",
-		icon: <BookOpenIcon size={20} />,
+		icon: <RiBookOpenLine size={20} />,
 	},
 ];
 

@@ -1,13 +1,18 @@
 "use client";
 
 import * as SliderPrimitive from "@radix-ui/react-slider";
-import { Check, PauseIcon, PlayIcon, Settings } from "lucide-react";
 import {
-	ComponentProps,
+	RiCheckLine,
+	RiPauseLine,
+	RiPlayLine,
+	RiSettings3Line,
+} from "@remixicon/react";
+import {
+	type ComponentProps,
 	createContext,
-	HTMLProps,
-	ReactNode,
-	RefObject,
+	type HTMLProps,
+	type ReactNode,
+	type RefObject,
 	useCallback,
 	useContext,
 	useEffect,
@@ -250,7 +255,6 @@ export function AudioPlayerProvider<TData = unknown>({
 			setPlaybackRate,
 		}),
 		[
-			audioRef,
 			duration,
 			error,
 			isPlaying,
@@ -269,7 +273,9 @@ export function AudioPlayerProvider<TData = unknown>({
 	return (
 		<AudioPlayerContext.Provider value={api as AudioPlayerApi<unknown>}>
 			<AudioPlayerTimeContext.Provider value={time}>
-				<audio ref={audioRef} className="hidden" crossOrigin="anonymous" />
+				<audio ref={audioRef} className="hidden" crossOrigin="anonymous">
+					<track kind="captions" />
+				</audio>
 				{children}
 			</AudioPlayerTimeContext.Provider>
 		</AudioPlayerContext.Provider>
@@ -382,16 +388,15 @@ interface SpinnerProps {
 
 function Spinner({ className }: SpinnerProps) {
 	return (
-		<div
+		<output
 			className={cn(
 				"size-3.5 animate-spin rounded-full border-2 border-muted border-t-foreground",
 				className,
 			)}
-			role="status"
 			aria-label="Loading"
 		>
 			<span className="sr-only">Loading...</span>
-		</div>
+		</output>
 	);
 }
 
@@ -421,12 +426,12 @@ const PlayButton = ({
 			type="button"
 		>
 			{playing ? (
-				<PauseIcon
+				<RiPauseLine
 					className={cn("size-4", loading && "opacity-0")}
 					aria-hidden="true"
 				/>
 			) : (
-				<PlayIcon
+				<RiPlayLine
 					className={cn("size-4", loading && "opacity-0")}
 					aria-hidden="true"
 				/>
@@ -543,7 +548,7 @@ export function AudioPlayerSpeed({
 					aria-label="Playback speed"
 					{...props}
 				>
-					<Settings className="size-4" />
+					<RiSettings3Line className="size-4" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="min-w-[120px]">
@@ -556,7 +561,7 @@ export function AudioPlayerSpeed({
 						<span className={speed === 1 ? "" : "font-mono"}>
 							{speed === 1 ? "Normal" : `${speed}x`}
 						</span>
-						{currentSpeed === speed && <Check className="size-4" />}
+						{currentSpeed === speed && <RiCheckLine className="size-4" />}
 					</DropdownMenuItem>
 				))}
 			</DropdownMenuContent>
@@ -578,9 +583,8 @@ export function AudioPlayerSpeedButtonGroup({
 	const currentSpeed = player.playbackRate;
 
 	return (
-		<div
-			className={cn("flex items-center gap-1", className)}
-			role="group"
+		<fieldset
+			className={cn("m-0 flex items-center gap-1 border-none p-0", className)}
 			aria-label="Playback speed controls"
 			{...props}
 		>
@@ -595,7 +599,7 @@ export function AudioPlayerSpeedButtonGroup({
 					{speed}x
 				</Button>
 			))}
-		</div>
+		</fieldset>
 	);
 }
 

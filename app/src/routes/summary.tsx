@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
@@ -566,14 +566,18 @@ function FeedPage() {
 	const ITEMS_PER_PAGE = 5;
 
 	// Filter and sort attempts
-	const filteredAttempts = attempts
-		.filter((a) => !selectedTextId || a.textId === selectedTextId)
-		.sort((a, b) => {
-			if (sortBy === "date") {
-				return b.date.getTime() - a.date.getTime();
-			}
-			return b.score - a.score;
-		});
+	const filteredAttempts = useMemo(
+		() =>
+			attempts
+				.filter((a) => !selectedTextId || a.textId === selectedTextId)
+				.sort((a, b) => {
+					if (sortBy === "date") {
+						return b.date.getTime() - a.date.getTime();
+					}
+					return b.score - a.score;
+				}),
+		[attempts, selectedTextId, sortBy],
+	);
 
 	const totalPages = Math.ceil(filteredAttempts.length / ITEMS_PER_PAGE);
 	const currentAttempts = filteredAttempts.slice(

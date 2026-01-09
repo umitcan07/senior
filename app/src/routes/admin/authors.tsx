@@ -1,3 +1,10 @@
+import {
+	RiAddLine,
+	RiArrowUpDownLine,
+	RiDeleteBinLine,
+	RiEditLine,
+	RiMoreLine,
+} from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,13 +19,6 @@ import {
 	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
-import {
-	ArrowUpDown,
-	MoreHorizontal,
-	Pencil,
-	Plus,
-	Trash2,
-} from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
@@ -122,7 +122,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					Name
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => (
@@ -139,7 +139,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					Accent
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => {
@@ -159,7 +159,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					Style
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => {
@@ -193,7 +193,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					References
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => (
@@ -210,13 +210,13 @@ function createColumns(
 						<DropdownMenuTrigger asChild>
 							<Button variant="ghost" className="h-8 w-8 p-0">
 								<span className="sr-only">Open menu</span>
-								<MoreHorizontal className="h-4 w-4" />
+								<RiMoreLine className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuLabel>Actions</DropdownMenuLabel>
 							<DropdownMenuItem onClick={() => onEdit(author)}>
-								<Pencil className="mr-2 h-4 w-4" />
+								<RiEditLine className="mr-2 h-4 w-4" />
 								Edit
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
@@ -225,7 +225,7 @@ function createColumns(
 								className="text-destructive"
 								disabled={author.referenceCount > 0}
 							>
-								<Trash2 className="mr-2 h-4 w-4" />
+								<RiDeleteBinLine className="mr-2 h-4 w-4" />
 								Delete
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -496,7 +496,7 @@ function AuthorsDataTable({
 							size="sm"
 							onClick={handleDeleteSelected}
 						>
-							<Trash2 size={16} />
+							<RiDeleteBinLine size={16} />
 							Delete{" "}
 							{
 								selectedRows.filter((r) => r.original.referenceCount === 0)
@@ -712,7 +712,7 @@ function AuthorsPage() {
 			description="Manage voices for reference speeches"
 			headerActions={
 				<Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
-					<Plus size={16} />
+					<RiAddLine size={16} />
 					Add Author
 				</Button>
 			}

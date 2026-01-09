@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react";
+import { RiMoonLine, RiSunLine } from "@remixicon/react";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 
@@ -14,9 +14,9 @@ export function ThemeToggle() {
 			className="size-9"
 		>
 			{effectiveTheme === "dark" ? (
-				<Sun className="size-4" />
+				<RiSunLine className="size-4" />
 			) : (
-				<Moon className="size-4" />
+				<RiMoonLine className="size-4" />
 			)}
 		</Button>
 	);

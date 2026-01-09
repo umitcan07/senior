@@ -1,7 +1,7 @@
+import { RiCloudLine, RiMicLine, RiUploadLine } from "@remixicon/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Cloud, Mic, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	AudioPlayerButton,
@@ -288,7 +288,7 @@ export function AddReferenceDialog({
 					>
 						<TabsList className="grid w-full grid-cols-2">
 							<TabsTrigger value="upload" className="gap-2">
-								<Upload size={16} />
+								<RiUploadLine size={16} />
 								File Upload
 							</TabsTrigger>
 							<TabsTrigger
@@ -296,7 +296,7 @@ export function AddReferenceDialog({
 								className="gap-2"
 								disabled={!canUseElevenLabs && !!authorId}
 							>
-								<Cloud size={16} />
+								<RiCloudLine size={16} />
 								ElevenLabs
 							</TabsTrigger>
 						</TabsList>
@@ -312,7 +312,7 @@ export function AddReferenceDialog({
 								{file && audioPreviewUrl ? (
 									<div className="flex w-full flex-col gap-4">
 										<div className="flex items-center gap-3">
-											<Mic className="h-6 w-6 shrink-0 text-primary" />
+											<RiMicLine className="h-6 w-6 shrink-0 text-primary" />
 											<div className="min-w-0 flex-1">
 												<p className="truncate font-medium text-sm">
 													{file.name}
@@ -356,7 +356,7 @@ export function AddReferenceDialog({
 									</div>
 								) : (
 									<div className="flex flex-col items-center gap-2 text-center">
-										<Upload className="h-8 w-8 text-muted-foreground" />
+										<RiUploadLine className="h-8 w-8 text-muted-foreground" />
 										<div>
 											<p className="font-medium">Drop audio file here</p>
 											<p className="text-muted-foreground text-sm">
@@ -386,7 +386,7 @@ export function AddReferenceDialog({
 							{canUseElevenLabs ? (
 								<div className="flex flex-col gap-6">
 									<div className="flex flex-col items-center justify-center gap-4 rounded-lg bg-muted/30 p-6 text-center">
-										<Cloud className="h-12 w-12 text-primary" />
+										<RiCloudLine className="h-12 w-12 text-primary" />
 										<div>
 											<p className="font-medium">ElevenLabs TTS Generation</p>
 											<p className="text-muted-foreground text-sm">
@@ -490,7 +490,7 @@ export function AddReferenceDialog({
 								</div>
 							) : (
 								<div className="flex flex-col items-center justify-center gap-4 rounded-lg bg-muted/30 p-6 text-center">
-									<Cloud className="h-12 w-12 text-muted-foreground/50" />
+									<RiCloudLine className="h-12 w-12 text-muted-foreground/50" />
 									<div>
 										<p className="font-medium">ElevenLabs Not Available</p>
 										<p className="text-muted-foreground text-sm">

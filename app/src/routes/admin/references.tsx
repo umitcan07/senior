@@ -1,3 +1,11 @@
+import {
+	RiAddLine,
+	RiArrowDownSLine,
+	RiArrowRightSLine,
+	RiArrowUpDownLine,
+	RiDeleteBinLine,
+	RiMoreLine,
+} from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,14 +22,6 @@ import {
 	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
-import {
-	ArrowUpDown,
-	ChevronDown,
-	ChevronRight,
-	MoreHorizontal,
-	Plus,
-	Trash2,
-} from "lucide-react";
 import { Fragment, useState } from "react";
 import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
 import { AdminLayout } from "@/components/layout/admin-layout";
@@ -102,9 +102,9 @@ function createColumns(
 					aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
 				>
 					{row.getIsExpanded() ? (
-						<ChevronDown size={14} />
+						<RiArrowDownSLine size={14} />
 					) : (
-						<ChevronRight size={14} />
+						<RiArrowRightSLine size={14} />
 					)}
 				</Button>
 			),
@@ -141,7 +141,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					Author
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => {
@@ -183,7 +183,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					Method
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => {
@@ -210,7 +210,7 @@ function createColumns(
 					className="h-8 px-2"
 				>
 					Duration
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
 				</Button>
 			),
 			cell: ({ row }) => (
@@ -230,7 +230,7 @@ function createColumns(
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" className="h-8 w-8 p-0">
 									<span className="sr-only">Open menu</span>
-									<MoreHorizontal className="h-4 w-4" />
+									<RiMoreLine className="h-4 w-4" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
@@ -240,7 +240,7 @@ function createColumns(
 									onClick={() => onDelete(ref)}
 									className="text-destructive"
 								>
-									<Trash2 className="mr-2 h-4 w-4" />
+									<RiDeleteBinLine className="mr-2 h-4 w-4" />
 									Delete
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -330,7 +330,7 @@ function ReferencesDataTable({
 							size="sm"
 							onClick={handleDeleteSelected}
 						>
-							<Trash2 size={16} />
+							<RiDeleteBinLine size={16} />
 							Delete {selectedRows.length}
 						</Button>
 					)}
@@ -592,7 +592,7 @@ function ReferencesPage() {
 			description="Manage reference audio for practice texts"
 			headerActions={
 				<Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
-					<Plus size={16} />
+					<RiAddLine size={16} />
 					Add Reference
 				</Button>
 			}

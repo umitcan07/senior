@@ -1,4 +1,4 @@
-import { Info, Play } from "lucide-react";
+import { RiInformationLine, RiPlayLine } from "@remixicon/react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -62,15 +62,22 @@ function Segment({
 	const canPlay = audioSrc && hasTimestamps && onSegmentClick;
 
 	const handleClick = () => {
-		if (canPlay && error && "timestampStartMs" in error) {
-			onSegmentClick(error.timestampStartMs!, error.timestampEndMs!);
+		if (
+			canPlay &&
+			error &&
+			"timestampStartMs" in error &&
+			error.timestampStartMs != null &&
+			error.timestampEndMs != null
+		) {
+			onSegmentClick(error.timestampStartMs, error.timestampEndMs);
 		}
 	};
 
 	const content = (
-		<span
+		<button
+			type="button"
 			className={cn(
-				"relative inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 transition-all",
+				"relative inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-left outline-hidden transition-all focus-visible:ring-2 focus-visible:ring-primary/50",
 				hasError &&
 					cn(
 						errorBgVariants({ errorType: error.errorType }),
@@ -80,16 +87,23 @@ function Segment({
 					),
 				canPlay &&
 					"cursor-pointer hover:scale-105 hover:ring-2 hover:ring-primary/20",
+				!canPlay && "cursor-default",
 				!hasError && "text-foreground/70",
 			)}
 			onClick={handleClick}
+			disabled={!canPlay}
 		>
 			{isPhoneme ? `/${segment}/` : segment}
-			{canPlay && <Play size={10} className="opacity-50" />}
-		</span>
+			{canPlay && <RiPlayLine size={10} className="opacity-50" />}
+		</button>
 	);
 
-	if (hasTimestamps && error && "timestampStartMs" in error) {
+	if (
+		hasTimestamps &&
+		error &&
+		"timestampStartMs" in error &&
+		error.timestampStartMs != null
+	) {
 		return (
 			<TooltipProvider>
 				<Tooltip>
@@ -98,7 +112,7 @@ function Segment({
 						<span className="font-medium capitalize">{error.errorType}</span>
 						<span className="mx-1.5 text-muted-foreground">·</span>
 						<span className="font-mono text-muted-foreground">
-							{formatTimestamp(error.timestampStartMs!)}
+							{formatTimestamp(error.timestampStartMs)}
 						</span>
 						{canPlay && <span className="ml-1.5 text-primary">▶ Play</span>}
 					</TooltipContent>
@@ -151,7 +165,7 @@ export function DiffViewer({
 								type="button"
 								className="text-muted-foreground transition-colors hover:text-foreground"
 							>
-								<Info size={14} />
+								<RiInformationLine size={14} />
 							</button>
 						</TooltipTrigger>
 						<TooltipContent

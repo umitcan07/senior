@@ -1,9 +1,9 @@
+import { RiFileCodeLine, RiUploadLine } from "@remixicon/react";
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { FileJson, Upload } from "lucide-react";
 import { useState } from "react";
 import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
 import {
@@ -535,7 +535,7 @@ function TextForm() {
 					<TabsList className="grid w-full grid-cols-2">
 						<TabsTrigger value="form">Form Editor</TabsTrigger>
 						<TabsTrigger value="json" className="gap-2">
-							<FileJson size={16} />
+							<RiFileCodeLine size={16} />
 							JSON Import
 						</TabsTrigger>
 					</TabsList>
@@ -695,7 +695,7 @@ function TextForm() {
 								disabled={!jsonInput.trim() || isBulkInserting}
 								className="gap-2"
 							>
-								<Upload size={16} />
+								<RiUploadLine size={16} />
 								{isBulkInserting ? "Importing..." : "Import from JSON"}
 							</Button>
 						</div>

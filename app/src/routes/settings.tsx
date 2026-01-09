@@ -4,8 +4,8 @@ import {
 	SignInButton,
 	useUser,
 } from "@clerk/tanstack-react-start";
+import { RiComputerLine, RiMicLine, RiUserLine } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Mic, Monitor, User } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import {
@@ -272,7 +272,7 @@ function SettingsPage() {
 									<SettingsSection
 										title="Preferred Voice"
 										description="Choose your default reference voice for practice sessions. This voice will be pre-selected when you start a new practice."
-										icon={<Mic className="size-5" />}
+										icon={<RiMicLine className="size-5" />}
 									>
 										<div className="flex gap-4">
 											<AuthorSelector
@@ -311,7 +311,7 @@ function SettingsPage() {
 									<SettingsSection
 										title="Appearance"
 										description="Customize how the app looks and feels."
-										icon={<Monitor className="size-5" />}
+										icon={<RiComputerLine className="size-5" />}
 									>
 										<p className="text-muted-foreground text-sm">
 											Use the theme toggle in the navigation bar to switch
@@ -323,7 +323,7 @@ function SettingsPage() {
 									<div className="border-t" />
 									<SettingsSection
 										title="Account"
-										icon={<User className="size-5" />}
+										icon={<RiUserLine className="size-5" />}
 									>
 										<p className="text-muted-foreground text-sm">
 											Click on your profile picture in the navigation bar to

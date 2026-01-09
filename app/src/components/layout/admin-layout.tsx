@@ -1,5 +1,5 @@
+import { RiArrowLeftLine } from "@remixicon/react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MainLayout, PageContainer, PageHeader } from "./main-layout";
@@ -30,7 +30,7 @@ export function AdminLayout({
 							size="sm"
 							className="gap-2 text-muted-foreground hover:text-foreground"
 						>
-							<ArrowLeft size={16} />
+							<RiArrowLeftLine size={16} />
 							Back to Dashboard
 						</Button>
 					</Link>

@@ -1,6 +1,6 @@
+import { RiAlertLine, RiArrowLeftLine, RiRefreshLine } from "@remixicon/react";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { Link, useRouter } from "@tanstack/react-router";
-import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
 
@@ -28,7 +28,7 @@ export function GlobalError({ error, title, message }: GlobalErrorProps) {
 					<div className="flex min-h-[40vh] flex-col items-center justify-center gap-8 text-center">
 						<div className="flex flex-col items-center gap-4">
 							<div className="flex size-16 items-center justify-center rounded-full bg-destructive/5">
-								<AlertTriangle className="size-6 text-destructive" />
+								<RiAlertLine className="size-6 text-destructive" />
 							</div>
 							<h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-3xl text-transparent tracking-tight md:text-4xl">
 								{errorTitle}
@@ -40,12 +40,12 @@ export function GlobalError({ error, title, message }: GlobalErrorProps) {
 
 						<div className="flex flex-col gap-3 sm:flex-row">
 							<Button onClick={handleRetry}>
-								<RefreshCw className="size-4" />
+								<RiRefreshLine className="size-4" />
 								Try Again
 							</Button>
 							<Button variant="outline" asChild>
 								<Link to="/">
-									<ArrowLeft className="size-4" />
+									<RiArrowLeftLine className="size-4" />
 									Back to Home
 								</Link>
 							</Button>

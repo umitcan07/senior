@@ -1,22 +1,22 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
 import {
+	RiAlertLine,
+	RiArrowDownSLine,
+	RiArrowLeftLine,
+	RiCheckLine,
+	RiMicLine,
+	RiRestartLine,
+	RiStopLine,
+	RiUploadLine,
+	RiVolumeUpLine,
+} from "@remixicon/react";
+import {
 	createFileRoute,
 	Link,
 	Outlet,
 	useMatches,
 	useNavigate,
 } from "@tanstack/react-router";
-import {
-	AlertCircle,
-	ArrowLeft,
-	Check,
-	ChevronDown,
-	Mic,
-	RotateCcw,
-	Square,
-	Upload,
-	Volume2,
-} from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
@@ -85,7 +85,7 @@ export const Route = createFileRoute("/practice/$textId")({
 			{
 				id: "attempt-1",
 				textId: params.textId,
-				textPreview: textResult.data.content.slice(0, 50) + "...",
+				textPreview: `${textResult.data.content.slice(0, 50)}...`,
 				score: 88,
 				date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
 				analysisId: crypto.randomUUID(),
@@ -93,7 +93,7 @@ export const Route = createFileRoute("/practice/$textId")({
 			{
 				id: "attempt-2",
 				textId: params.textId,
-				textPreview: textResult.data.content.slice(0, 50) + "...",
+				textPreview: `${textResult.data.content.slice(0, 50)}...`,
 				score: 82,
 				date: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
 				analysisId: crypto.randomUUID(),
@@ -101,7 +101,7 @@ export const Route = createFileRoute("/practice/$textId")({
 			{
 				id: "attempt-3",
 				textId: params.textId,
-				textPreview: textResult.data.content.slice(0, 50) + "...",
+				textPreview: `${textResult.data.content.slice(0, 50)}...`,
 				score: 79,
 				date: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
 				analysisId: crypto.randomUUID(),
@@ -109,7 +109,7 @@ export const Route = createFileRoute("/practice/$textId")({
 			{
 				id: "attempt-4",
 				textId: params.textId,
-				textPreview: textResult.data.content.slice(0, 50) + "...",
+				textPreview: `${textResult.data.content.slice(0, 50)}...`,
 				score: 75,
 				date: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
 				analysisId: crypto.randomUUID(),
@@ -160,6 +160,37 @@ function useRecording(textId: string) {
 		};
 	}, [audioPreviewUrl]);
 
+	const stopRecording = useCallback(() => {
+		if (timerRef.current) {
+			clearInterval(timerRef.current);
+			timerRef.current = null;
+		}
+
+		if (
+			mediaRecorderRef.current &&
+			mediaRecorderRef.current.state !== "inactive"
+		) {
+			mediaRecorderRef.current.stop();
+		}
+
+		if (mediaStream) {
+			mediaStream.getTracks().forEach((track) => {
+				track.stop();
+			});
+			setMediaStream(null);
+		}
+
+		setState("processing");
+
+		setTimeout(() => {
+			if (chunksRef.current.length > 0) {
+				const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+				setAudioBlob(blob);
+			}
+			setState("preview");
+		}, 500);
+	}, [mediaStream]);
+
 	const startRecording = useCallback(async () => {
 		try {
 			setError(null);
@@ -183,36 +214,7 @@ function useRecording(textId: string) {
 			);
 			setState("idle");
 		}
-	}, []);
-
-	const stopRecording = useCallback(() => {
-		if (timerRef.current) {
-			clearInterval(timerRef.current);
-			timerRef.current = null;
-		}
-
-		if (
-			mediaRecorderRef.current &&
-			mediaRecorderRef.current.state !== "inactive"
-		) {
-			mediaRecorderRef.current.stop();
-		}
-
-		if (mediaStream) {
-			mediaStream.getTracks().forEach((track) => track.stop());
-			setMediaStream(null);
-		}
-
-		setState("processing");
-
-		setTimeout(() => {
-			if (chunksRef.current.length > 0) {
-				const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-				setAudioBlob(blob);
-			}
-			setState("preview");
-		}, 500);
-	}, [mediaStream]);
+	}, [stopRecording]);
 
 	const handleStreamError = useCallback((err: Error) => {
 		setError(err.message || "Microphone access denied");
@@ -356,7 +358,7 @@ function useRecording(textId: string) {
 					setError("Failed to load audio file");
 					setState("idle");
 				};
-			} catch (err) {
+			} catch (_err) {
 				setError("Failed to process file");
 				setState("idle");
 			}
@@ -407,7 +409,7 @@ function ReferenceVoice({
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex max-w-md flex-col gap-4">
 			{/* Selection area */}
 			<div className="flex flex-col gap-2">
 				{selectedReference ? (
@@ -419,17 +421,17 @@ function ReferenceVoice({
 									className="flex w-full items-center justify-between gap-3 rounded-xl bg-muted/30 px-4 py-3 text-left transition-colors hover:bg-muted/50"
 								>
 									<div className="flex items-center gap-3">
-										<div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-											<Volume2 size={16} />
+										<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+											<RiVolumeUpLine size={16} />
 										</div>
-										<div className="flex flex-col">
+										<div className="flex min-w-0 flex-1 flex-col">
 											<div className="flex items-center gap-2">
-												<span className="font-medium text-sm">
+												<span className="truncate font-medium text-sm">
 													{selectedReference.author.name}
 												</span>
 												<Badge
 													variant="secondary"
-													className="h-5 px-1.5 font-normal text-[10px]"
+													className="h-5 shrink-0 px-1.5 font-normal text-[10px]"
 												>
 													{selectedReference.author.accent}
 												</Badge>
@@ -442,10 +444,10 @@ function ReferenceVoice({
 											)}
 										</div>
 									</div>
-									<ChevronDown
+									<RiArrowDownSLine
 										size={16}
 										className={cn(
-											"text-muted-foreground transition-transform",
+											"shrink-0 text-muted-foreground transition-transform",
 											isOpen && "rotate-180",
 										)}
 									/>
@@ -471,13 +473,17 @@ function ReferenceVoice({
 														: "hover:bg-muted",
 												)}
 											>
-												<div className="flex items-center gap-3">
-													<div className="font-medium">{ref.author.name}</div>
-													<span className="text-muted-foreground text-xs">
+												<div className="flex min-w-0 items-center gap-3">
+													<div className="truncate font-medium">
+														{ref.author.name}
+													</div>
+													<span className="shrink-0 text-muted-foreground text-xs">
 														{ref.author.accent}
 													</span>
 												</div>
-												{isSelected && <Check size={14} />}
+												{isSelected && (
+													<RiCheckLine size={14} className="shrink-0" />
+												)}
 											</button>
 										);
 									})}
@@ -494,17 +500,16 @@ function ReferenceVoice({
 								className="h-14 w-full justify-between border-border/60 border-dashed bg-transparent hover:bg-muted/20"
 							>
 								<div className="flex items-center gap-3 text-muted-foreground">
-									<Volume2 size={18} />
+									<RiVolumeUpLine size={18} />
 									<span>Select a reference voice to start</span>
 								</div>
-								<ChevronDown
+								<RiArrowDownSLine
 									size={16}
 									className={cn("transition-transform", isOpen && "rotate-180")}
 								/>
 							</Button>
 						</CollapsibleTrigger>
 						<CollapsibleContent className="mt-2 rounded-xl border bg-popover p-1 shadow-lg">
-							{/* Dropdown content same as above */}
 							<div className="flex flex-col gap-1">
 								{references.map((ref) => (
 									<button
@@ -516,9 +521,11 @@ function ReferenceVoice({
 										}}
 										className="flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-muted"
 									>
-										<div className="flex items-center gap-3">
-											<div className="font-medium">{ref.author.name}</div>
-											<span className="text-muted-foreground text-xs">
+										<div className="flex min-w-0 items-center gap-3">
+											<div className="truncate font-medium">
+												{ref.author.name}
+											</div>
+											<span className="shrink-0 text-muted-foreground text-xs">
 												{ref.author.accent}
 											</span>
 										</div>
@@ -533,7 +540,7 @@ function ReferenceVoice({
 			{/* Audio player - minimalist inline */}
 			{selectedReference && (
 				<AudioPlayerProvider>
-					<div className="flex items-center gap-4 px-2">
+					<div className="flex items-center gap-3 rounded-lg border bg-card p-3">
 						<AudioPlayerButton
 							item={{
 								id: selectedReference.id,
@@ -543,14 +550,14 @@ function ReferenceVoice({
 							size="icon"
 							className="size-8 shrink-0 rounded-full border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
 						/>
-						<div className="flex flex-1 flex-col justify-center gap-1">
+						<div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
 							<AudioPlayerProgress className="h-1" />
 							<div className="flex justify-between font-mono text-[10px] text-muted-foreground">
 								<AudioPlayerTime />
 								<AudioPlayerDuration />
 							</div>
 						</div>
-						<AudioPlayerSpeed className="h-6 text-[10px]" />
+						<AudioPlayerSpeed className="h-6 shrink-0 text-[10px]" />
 					</div>
 				</AudioPlayerProvider>
 			)}
@@ -633,7 +640,7 @@ function TextDetailSkeleton() {
 					<div className="flex items-center gap-3">
 						<Button variant="ghost" size="sm" asChild>
 							<Link to="/practice" className="gap-2 text-muted-foreground">
-								<ArrowLeft size={16} />
+								<RiArrowLeftLine size={16} />
 								Back
 							</Link>
 						</Button>
@@ -730,7 +737,7 @@ function PracticeTextPage() {
 									to="/practice"
 									className="gap-2 text-muted-foreground hover:text-foreground"
 								>
-									<ArrowLeft size={16} />
+									<RiArrowLeftLine size={16} />
 									Back
 								</Link>
 							</Button>
@@ -782,7 +789,7 @@ function PracticeTextPage() {
 										{recording.error && (
 											<div className="flex w-full max-w-md flex-col gap-3 rounded-lg border border-destructive/50 bg-destructive/5 p-4">
 												<div className="flex items-center gap-2 text-destructive text-sm">
-													<AlertCircle size={16} />
+													<RiAlertLine size={16} />
 													<span className="font-medium">Recording Error</span>
 												</div>
 												<p className="text-destructive text-xs">
@@ -808,7 +815,7 @@ function PracticeTextPage() {
 													disabled={!selectedReferenceId}
 													className="gap-2"
 												>
-													<Mic size={18} />
+													<RiMicLine size={18} />
 													{selectedReferenceId
 														? "Record"
 														: "Select voice first"}
@@ -828,7 +835,7 @@ function PracticeTextPage() {
 														className="gap-2"
 														disabled={!selectedReferenceId}
 													>
-														<Upload size={18} />
+														<RiUploadLine size={18} />
 														Upload
 													</Button>
 												</div>
@@ -838,15 +845,30 @@ function PracticeTextPage() {
 										{/* Recording state */}
 										{isRecording && (
 											<div className="flex w-full max-w-md flex-col items-center gap-4">
-												<div className="flex items-center gap-3">
-													<span className="relative flex size-3">
-														<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
-														<span className="relative inline-flex size-3 rounded-full bg-destructive" />
-													</span>
-													<span className="font-mono text-2xl tabular-nums">
-														{formatTime(recording.recordingTime)}
-													</span>
-													<span className="text-muted-foreground">/ 0:20</span>
+												{/* Progress indicator */}
+												<div className="flex w-full flex-col gap-2">
+													<div className="flex items-center justify-between">
+														<div className="flex items-center gap-2">
+															<span className="relative flex size-2.5">
+																<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+																<span className="relative inline-flex size-2.5 rounded-full bg-destructive" />
+															</span>
+															<span className="font-mono text-lg tabular-nums">
+																{formatTime(recording.recordingTime)}
+															</span>
+															<span className="text-muted-foreground text-sm">
+																/ 0:20
+															</span>
+														</div>
+														<span className="font-mono text-muted-foreground text-xs tabular-nums">
+															{Math.round((recording.recordingTime / 20) * 100)}
+															%
+														</span>
+													</div>
+													<Progress
+														value={(recording.recordingTime / 20) * 100}
+														className="h-2"
+													/>
 												</div>
 												<Button
 													variant="destructive"
@@ -854,8 +876,8 @@ function PracticeTextPage() {
 													onClick={recording.stopRecording}
 													className="gap-2"
 												>
-													<Square size={16} className="fill-current" />
-													Stop
+													<RiStopLine size={16} />
+													Stop Recording
 												</Button>
 												{recording.recordingTime >= 15 && (
 													<p className="text-destructive text-xs">
@@ -875,14 +897,14 @@ function PracticeTextPage() {
 										)}
 
 										{/* Preview state */}
-										{hasPreview && (
+										{hasPreview && recording.audioPreviewUrl && (
 											<div className="flex w-full max-w-md flex-col gap-4">
 												<AudioPlayerProvider>
 													<div className="flex items-center gap-3 rounded-lg border bg-card p-4">
 														<AudioPlayerButton
 															item={{
 																id: "preview",
-																src: recording.audioPreviewUrl!,
+																src: recording.audioPreviewUrl,
 															}}
 															variant="default"
 															size="icon"
@@ -900,7 +922,7 @@ function PracticeTextPage() {
 														onClick={recording.resetRecording}
 														className="flex-1 gap-2"
 													>
-														<RotateCcw size={16} />
+														<RiRestartLine size={16} />
 														Re-record
 													</Button>
 													<Button
@@ -910,7 +932,7 @@ function PracticeTextPage() {
 														}
 														className="flex-1 gap-2"
 													>
-														<Check size={16} />
+														<RiCheckLine size={16} />
 														Submit
 													</Button>
 												</div>
@@ -945,7 +967,7 @@ function PracticeTextPage() {
 									<SignedOut>
 										<div className="flex w-full max-w-md flex-col gap-3">
 											<Button disabled className="gap-2" size="lg">
-												<Mic size={18} />
+												<RiMicLine size={18} />
 												Sign in to record
 											</Button>
 											<Button variant="outline" asChild size="lg">

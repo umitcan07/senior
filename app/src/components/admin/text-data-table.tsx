@@ -1,3 +1,4 @@
+import { RiDeleteBinLine, RiMicLine } from "@remixicon/react";
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -10,7 +11,6 @@ import {
 	useReactTable,
 	type VisibilityState,
 } from "@tanstack/react-table";
-import { Mic, Trash2 } from "lucide-react";
 import * as React from "react";
 import {
 	AudioPlayerButton,
@@ -64,7 +64,7 @@ function ReferenceRow({
 		<div className="flex items-center justify-between gap-4 rounded-md bg-muted/50 p-3">
 			<div className="flex items-center gap-3">
 				<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-					<Mic className="h-4 w-4 text-primary" />
+					<RiMicLine className="h-4 w-4 text-primary" />
 				</div>
 				<div className="flex flex-col gap-0.5">
 					<div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ function ReferenceRow({
 						onClick={() => onDelete(reference)}
 						title="Delete reference"
 					>
-						<Trash2 className="h-4 w-4" />
+						<RiDeleteBinLine className="h-4 w-4" />
 					</Button>
 				)}
 			</div>
@@ -226,7 +226,7 @@ export function DataTable({
 								size="sm"
 								onClick={handleDeleteSelected}
 							>
-								<Trash2 size={16} />
+								<RiDeleteBinLine size={16} />
 								Delete {selectedRows.length}
 							</Button>
 						)}

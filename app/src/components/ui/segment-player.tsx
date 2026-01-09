@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { RiPauseLine, RiPlayLine, RiRestartLine } from "@remixicon/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -151,9 +151,11 @@ export function SegmentPlayer({
 					className,
 				)}
 			>
-				{isPlaying ? <Pause size={12} /> : <Play size={12} />}
+				{isPlaying ? <RiPauseLine size={12} /> : <RiPlayLine size={12} />}
 				{label && <span>{label}</span>}
-				<audio ref={audioRef} src={src} preload="metadata" className="hidden" />
+				<audio ref={audioRef} src={src} preload="metadata" className="hidden">
+					<track kind="captions" />
+				</audio>
 			</button>
 		);
 	}
@@ -167,14 +169,16 @@ export function SegmentPlayer({
 					className="size-8"
 					onClick={togglePlay}
 				>
-					{isPlaying ? <Pause size={14} /> : <Play size={14} />}
+					{isPlaying ? <RiPauseLine size={14} /> : <RiPlayLine size={14} />}
 				</Button>
 				{showTimestamps && startMs !== undefined && endMs !== undefined && (
 					<span className="font-mono text-muted-foreground text-xs">
 						{formatTimestamp(startMs)} - {formatTimestamp(endMs)}
 					</span>
 				)}
-				<audio ref={audioRef} src={src} preload="metadata" className="hidden" />
+				<audio ref={audioRef} src={src} preload="metadata" className="hidden">
+					<track kind="captions" />
+				</audio>
 			</div>
 		);
 	}
@@ -213,7 +217,7 @@ export function SegmentPlayer({
 					className="size-10 shrink-0"
 					onClick={togglePlay}
 				>
-					{isPlaying ? <Pause size={18} /> : <Play size={18} />}
+					{isPlaying ? <RiPauseLine size={18} /> : <RiPlayLine size={18} />}
 				</Button>
 
 				<Button
@@ -222,7 +226,7 @@ export function SegmentPlayer({
 					className="size-8 shrink-0"
 					onClick={resetToStart}
 				>
-					<RotateCcw size={14} />
+					<RiRestartLine size={14} />
 				</Button>
 
 				{/* Progress bar */}
@@ -275,12 +279,14 @@ export function SegmentPlayer({
 							: "text-muted-foreground hover:text-foreground",
 					)}
 				>
-					<RotateCcw size={12} />
+					<RiRestartLine size={12} />
 					Loop
 				</button>
 			</div>
 
-			<audio ref={audioRef} src={src} preload="metadata" className="hidden" />
+			<audio ref={audioRef} src={src} preload="metadata" className="hidden">
+				<track kind="captions" />
+			</audio>
 		</div>
 	);
 }
@@ -310,11 +316,14 @@ export function ErrorSegmentPlayer({
 		return null;
 	}
 
+	const startMs = error.timestampStartMs;
+	const endMs = error.timestampEndMs;
+
 	return (
 		<SegmentPlayer
 			src={src}
-			startMs={error.timestampStartMs!}
-			endMs={error.timestampEndMs!}
+			startMs={startMs}
+			endMs={endMs}
 			errorType={
 				error.errorType as "substitute" | "insert" | "delete" | undefined
 			}

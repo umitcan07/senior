@@ -230,7 +230,9 @@ export const LiveWaveform = ({
 	useEffect(() => {
 		if (!active) {
 			if (streamRef.current) {
-				streamRef.current.getTracks().forEach((track) => track.stop());
+				streamRef.current.getTracks().forEach((track) => {
+					track.stop();
+				});
 				streamRef.current = null;
 				onStreamEnd?.();
 			}
@@ -293,7 +295,9 @@ export const LiveWaveform = ({
 
 		return () => {
 			if (streamRef.current) {
-				streamRef.current.getTracks().forEach((track) => track.stop());
+				streamRef.current.getTracks().forEach((track) => {
+					track.stop();
+				});
 				streamRef.current = null;
 				onStreamEnd?.();
 			}
@@ -548,11 +552,7 @@ export const LiveWaveform = ({
 			{!active && !processing && (
 				<div className="-translate-y-1/2 absolute top-1/2 right-0 left-0 border-muted-foreground/20 border-t-2 border-dotted" />
 			)}
-			<canvas
-				className="block h-full w-full"
-				ref={canvasRef}
-				aria-hidden="true"
-			/>
+			<canvas className="block h-full w-full" ref={canvasRef} />
 		</div>
 	);
 };

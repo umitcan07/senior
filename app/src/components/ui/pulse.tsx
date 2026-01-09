@@ -7,8 +7,6 @@ export const Pulse = ({
 	return (
 		<span
 			data-slot="pulse"
-			aria-label="Pulse"
-			aria-roledescription="pulse"
 			className={cn("inline-block h-4 w-4 text-foreground", className)}
 			{...props}
 		>
@@ -19,6 +17,7 @@ export const Pulse = ({
 				xmlns="http://www.w3.org/2000/svg"
 				stroke="currentColor"
 			>
+				<title>Pulse</title>
 				<circle cx="12" cy="12" r="0">
 					<animate
 						id="pulse_lNK6"

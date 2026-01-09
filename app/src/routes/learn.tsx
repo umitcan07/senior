@@ -1,7 +1,7 @@
+import { RiRefreshLine, RiVolumeUpLine } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
@@ -374,7 +374,7 @@ function IPAItem({
 				{isLoading ? (
 					<Spinner className="size-3" />
 				) : (
-					<Volume2
+					<RiVolumeUpLine
 						className={cn(
 							"size-3 text-muted-foreground transition-opacity",
 							"opacity-0 group-hover:opacity-100",
@@ -527,7 +527,9 @@ function AdminAudioSection() {
 								</>
 							) : (
 								<>
-									<RefreshCw className="size-4" />
+									<RiRefreshLine
+										className={cn("size-4", isGenerating && "animate-spin")}
+									/>
 									Generate Missing Audio ({status.missing.length})
 								</>
 							)}
@@ -862,7 +864,6 @@ function LearningPage() {
 									<h2 className="font-semibold text-2xl tracking-tight">
 										International Phonetic Alphabet
 									</h2>
-									<div className="mt-2 mb-2 h-1 w-12 rounded-full bg-primary/20" />
 									<p className="max-w-2xl text-base text-muted-foreground leading-relaxed">
 										Click any symbol to hear it pronounced. Highlighted letters
 										show which part of the word makes each sound.
@@ -951,7 +952,7 @@ function LearningPage() {
 							<div className="grid gap-4 sm:grid-cols-2">
 								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
 									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-										<Volume2 size={20} />
+										<RiVolumeUpLine size={16} />
 									</div>
 									<h4 className="font-medium">Improve Pronunciation</h4>
 									<p className="text-muted-foreground text-sm leading-relaxed">
@@ -969,6 +970,7 @@ function LearningPage() {
 											stroke="currentColor"
 											strokeWidth={2}
 										>
+											<title>Common Pronunciation Guide</title>
 											<path
 												strokeLinecap="round"
 												strokeLinejoin="round"
@@ -992,6 +994,7 @@ function LearningPage() {
 											stroke="currentColor"
 											strokeWidth={2}
 										>
+											<title>Global Recognition</title>
 											<path
 												strokeLinecap="round"
 												strokeLinejoin="round"
@@ -1015,6 +1018,7 @@ function LearningPage() {
 											stroke="currentColor"
 											strokeWidth={2}
 										>
+											<title>Fast Learning System</title>
 											<path
 												strokeLinecap="round"
 												strokeLinejoin="round"

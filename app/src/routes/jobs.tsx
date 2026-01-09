@@ -1,14 +1,14 @@
+import {
+	RiArrowLeftLine,
+	RiCheckboxCircleLine,
+	RiCloseCircleLine,
+	RiLoader2Line,
+	RiPlayLine,
+	RiRefreshLine,
+	RiTimeLine,
+} from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-	ArrowLeftIcon,
-	CheckCircle2Icon,
-	ClockIcon,
-	Loader2Icon,
-	PlayIcon,
-	RefreshCwIcon,
-	XCircleIcon,
-} from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { z } from "zod";
@@ -59,22 +59,22 @@ export const Route = createFileRoute("/jobs")({
 function StatusBadge({ status }: { status: Job["status"] }) {
 	const config = {
 		in_queue: {
-			icon: <ClockIcon className="size-3" />,
+			icon: <RiTimeLine className="size-3" />,
 			label: "In Queue",
 			className: "bg-yellow-500/10 text-yellow-600 ring-yellow-500/20",
 		},
 		in_progress: {
-			icon: <Loader2Icon className="size-3 animate-spin" />,
+			icon: <RiLoader2Line className="size-3 animate-spin" />,
 			label: "Processing",
 			className: "bg-blue-500/10 text-blue-600 ring-blue-500/20",
 		},
 		completed: {
-			icon: <CheckCircle2Icon className="size-3" />,
+			icon: <RiCheckboxCircleLine className="size-3" />,
 			label: "Completed",
 			className: "bg-green-500/10 text-green-600 ring-green-500/20",
 		},
 		failed: {
-			icon: <XCircleIcon className="size-3" />,
+			icon: <RiCloseCircleLine className="size-3" />,
 			label: "Failed",
 			className: "bg-red-500/10 text-red-600 ring-red-500/20",
 		},
@@ -159,7 +159,7 @@ function JobsPage() {
 						<div className="flex items-center gap-4">
 							<Button variant="ghost" size="icon" asChild>
 								<Link to="/">
-									<ArrowLeftIcon className="size-4" />
+									<RiArrowLeftLine className="size-4" />
 								</Link>
 							</Button>
 							<div className="flex-1">
@@ -177,9 +177,9 @@ function JobsPage() {
 								disabled={submitMutation.isPending}
 							>
 								{submitMutation.isPending ? (
-									<Loader2Icon className="mr-2 size-4 animate-spin" />
+									<RiLoader2Line className="mr-2 size-4 animate-spin" />
 								) : (
-									<PlayIcon className="mr-2 size-4" />
+									<RiPlayLine className="mr-2 size-4" />
 								)}
 								Submit New Job
 							</Button>
@@ -188,7 +188,7 @@ function JobsPage() {
 								onClick={() => jobsQuery.refetch()}
 								disabled={jobsQuery.isFetching}
 							>
-								<RefreshCwIcon
+								<RiRefreshLine
 									className={`mr-2 size-4 ${jobsQuery.isFetching ? "animate-spin" : ""}`}
 								/>
 								Refresh All
@@ -237,7 +237,7 @@ function JobsPage() {
 										{jobsQuery.isLoading && (
 											<tr>
 												<td colSpan={5} className="px-4 py-8 text-center">
-													<Loader2Icon className="mx-auto size-6 animate-spin text-muted-foreground" />
+													<RiLoader2Line className="mx-auto size-6 animate-spin text-muted-foreground" />
 												</td>
 											</tr>
 										)}
@@ -301,7 +301,7 @@ function JobsPage() {
 															job.status === "failed"
 														}
 													>
-														<RefreshCwIcon
+														<RiRefreshLine
 															className={`size-3 ${refreshMutation.isPending ? "animate-spin" : ""}`}
 														/>
 													</Button>

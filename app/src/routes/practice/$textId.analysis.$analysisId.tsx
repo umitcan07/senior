@@ -1,5 +1,11 @@
+import {
+	RiArrowLeftLine,
+	RiPauseLine,
+	RiPlayLine,
+	RiTimeLine,
+	RiVolumeUpLine,
+} from "@remixicon/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Clock, Pause, Play, Volume2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { DiffViewer } from "@/components/diff-viewer";
@@ -52,11 +58,44 @@ type AnalysisLoaderData = {
 export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 	component: AnalysisPage,
 	loader: async ({ params }): Promise<AnalysisLoaderData> => {
-		const response = await serverGetAnalysisDetails({
-			data: { analysisId: params.analysisId },
-		});
+		try {
+			const response = await serverGetAnalysisDetails({
+				data: { analysisId: params.analysisId },
+			});
 
-		if (!response.success || !response.data) {
+			if (!response.success || !response.data) {
+				return {
+					analysis: null,
+					userRecording: null,
+					reference: null,
+					text: null,
+					author: null,
+					phonemeErrors: [],
+					wordErrors: [],
+					previousAttempts: [],
+					textId: params.textId,
+				};
+			}
+
+			const { analysis, userRecording, phonemeErrors, wordErrors } =
+				response.data;
+
+			const mockPreviousAttempts: PreviousAttempt[] = [];
+
+			return {
+				analysis,
+				userRecording,
+				reference: null,
+				text: null,
+				author: null,
+				phonemeErrors,
+				wordErrors,
+				previousAttempts: mockPreviousAttempts,
+				textId: params.textId,
+			};
+		} catch (error) {
+			console.error("Loader error in analysis route:", error);
+			// Return safe fallback to prevent SSR stream from closing
 			return {
 				analysis: null,
 				userRecording: null,
@@ -69,23 +108,6 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				textId: params.textId,
 			};
 		}
-
-		const { analysis, userRecording, phonemeErrors, wordErrors } =
-			response.data;
-
-		const mockPreviousAttempts: PreviousAttempt[] = [];
-
-		return {
-			analysis,
-			userRecording,
-			reference: null,
-			text: null,
-			author: null,
-			phonemeErrors,
-			wordErrors,
-			previousAttempts: mockPreviousAttempts,
-			textId: params.textId,
-		};
 	},
 	pendingComponent: AnalysisSkeleton,
 });
@@ -122,6 +144,7 @@ function ScoreRing({
 		<div className="flex flex-col items-center gap-2">
 			<div className={cn("relative", config.ring)}>
 				<svg className="-rotate-90 size-full" viewBox="0 0 100 100">
+					<title>Score Percentage</title>
 					{/* Background ring */}
 					<circle
 						cx="50"
@@ -231,7 +254,7 @@ function RecordingPlayer({
 			transition={{ duration: 0.4 }}
 		>
 			<div className="flex items-center gap-3">
-				<Volume2 size={18} className="text-primary" />
+				<RiVolumeUpLine size={18} className="text-primary" />
 				<span className="font-medium">Your Recording</span>
 			</div>
 
@@ -243,9 +266,9 @@ function RecordingPlayer({
 					onClick={togglePlay}
 				>
 					{isPlaying ? (
-						<Pause size={20} />
+						<RiPauseLine size={20} />
 					) : (
-						<Play size={20} className="ml-0.5" />
+						<RiPlayLine size={20} className="ml-0.5" />
 					)}
 				</Button>
 
@@ -327,7 +350,9 @@ function RecordingPlayer({
 				onEnded={() => setIsPlaying(false)}
 				onPlay={() => setIsPlaying(true)}
 				onPause={() => setIsPlaying(false)}
-			/>
+			>
+				<track kind="captions" />
+			</audio>
 		</motion.div>
 	);
 }
@@ -367,12 +392,12 @@ function ScoreOverview({
 						variant="secondary"
 						className={cn(
 							"font-medium",
-							scoreColorVariants({ level })
+							`${scoreColorVariants({ level })
 								.replace("text-", "bg-")
 								.replace("dark:text-", "dark:bg-")
 								.replace("600", "500/15")
 								.replace("500", "500/15")
-								.replace("400", "500/25") + "text-foreground", // Hacky color mapping, ideally use separate variants
+								.replace("400", "500/25")}text-foreground`, // Hacky color mapping, ideally use separate variants
 							level === "high" &&
 								"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
 							level === "medium" &&
@@ -488,39 +513,45 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 			</div>
 
 			{/* Timestamp badge */}
-			{hasTimestamps && (
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Badge
-								variant="secondary"
-								className="shrink-0 gap-1 font-mono text-xs"
-							>
-								<Clock size={10} />
-								{formatTimestamp(error.timestampStartMs!)}
-							</Badge>
-						</TooltipTrigger>
-						<TooltipContent>
-							{formatTimestamp(error.timestampStartMs!)} -{" "}
-							{formatTimestamp(error.timestampEndMs!)}
-						</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			)}
+			{hasTimestamps &&
+				error.timestampStartMs != null &&
+				error.timestampEndMs != null && (
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Badge
+									variant="secondary"
+									className="shrink-0 gap-1 font-mono text-xs"
+								>
+									<RiTimeLine size={10} />
+									{formatTimestamp(error.timestampStartMs)}
+								</Badge>
+							</TooltipTrigger>
+							<TooltipContent>
+								{formatTimestamp(error.timestampStartMs)} -{" "}
+								{formatTimestamp(error.timestampEndMs)}
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				)}
 
 			{/* Play button */}
-			{audioSrc && hasTimestamps && onPlaySegment && (
-				<Button
-					variant="ghost"
-					size="icon"
-					className="size-8 shrink-0"
-					onClick={() =>
-						onPlaySegment(error.timestampStartMs!, error.timestampEndMs!)
-					}
-				>
-					<Play size={14} />
-				</Button>
-			)}
+			{audioSrc &&
+				hasTimestamps &&
+				onPlaySegment &&
+				error.timestampStartMs != null &&
+				error.timestampEndMs != null && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="size-8 shrink-0"
+						onClick={() =>
+							onPlaySegment(error.timestampStartMs, error.timestampEndMs)
+						}
+					>
+						<RiPlayLine size={14} />
+					</Button>
+				)}
 		</motion.div>
 	);
 }
@@ -712,7 +743,7 @@ function AnalysisPage() {
 					>
 						<Button variant="ghost" size="icon" asChild>
 							<Link to="/practice/$textId" params={{ textId }}>
-								<ArrowLeft size={18} />
+								<RiArrowLeftLine size={18} />
 							</Link>
 						</Button>
 						<div className="space-y-1">

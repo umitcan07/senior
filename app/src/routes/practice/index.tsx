@@ -1,5 +1,16 @@
+import {
+	RiArrowDownSLine,
+	RiBookOpenLine,
+	RiBriefcaseLine,
+	RiChatQuoteLine,
+	RiFireLine,
+	RiLeafLine,
+	RiMicLine,
+	RiSearchLine,
+	RiStackLine,
+	RiThunderstormsLine,
+} from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronDown, Flame, Layers, Leaf, Search, Zap } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import {
@@ -46,18 +57,33 @@ const categoryTypes: Array<TextType | "all"> = [
 const difficultyConfig: Array<{
 	value: TextDifficulty | "all";
 	label: string;
-	icon: typeof Layers;
+	icon: typeof RiStackLine;
 	color: string;
 }> = [
-	{ value: "all", label: "All", icon: Layers, color: "text-muted-foreground" },
-	{ value: "beginner", label: "Beginner", icon: Leaf, color: "text-green-500" },
+	{
+		value: "all",
+		label: "All",
+		icon: RiStackLine,
+		color: "text-muted-foreground",
+	},
+	{
+		value: "beginner",
+		label: "Beginner",
+		icon: RiLeafLine,
+		color: "text-green-500",
+	},
 	{
 		value: "intermediate",
 		label: "Intermediate",
-		icon: Zap,
+		icon: RiThunderstormsLine,
 		color: "text-amber-500",
 	},
-	{ value: "advanced", label: "Advanced", icon: Flame, color: "text-red-500" },
+	{
+		value: "advanced",
+		label: "Advanced",
+		icon: RiFireLine,
+		color: "text-red-500",
+	},
 ];
 
 interface CategoryCardProps {
@@ -67,16 +93,16 @@ interface CategoryCardProps {
 }
 
 function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
-	// Map types to Lucide icons
+	// Map types to Remixicon icons
 	const Icon =
 		{
-			all: Layers,
-			daily: Leaf,
-			professional: Zap,
-			academic: Flame,
-			phonetic_challenge: Search, // Using Search as a placeholder for phonetic
-			common_phrase: ChevronDown, // Placeholder
-		}[type] || Layers;
+			all: RiStackLine,
+			daily: RiLeafLine,
+			professional: RiBriefcaseLine,
+			academic: RiBookOpenLine,
+			phonetic_challenge: RiMicLine,
+			common_phrase: RiChatQuoteLine,
+		}[type] || RiStackLine;
 
 	return (
 		<button
@@ -84,15 +110,15 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 			onClick={onClick}
 			aria-pressed={isSelected}
 			className={cn(
-				"group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-xl p-3 transition-colors",
+				"group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-xl p-3 transition-all duration-200",
 				categoryGradientVariants({ type }),
 				isSelected
-					? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-					: "opacity-80 hover:opacity-100",
+					? "ring ring-white/30"
+					: "opacity-80 hover:scale-[1.02] hover:opacity-100 active:scale-[0.98]",
 			)}
 		>
 			<Icon
-				className="-right-4 -top-4 absolute size-24 rotate-12 text-white/20 transition-transform"
+				className="-top-4 -right-4 absolute size-24 rotate-12 text-white/20 transition-transform duration-200 group-hover:scale-110"
 				strokeWidth={1.5}
 			/>
 
@@ -275,7 +301,7 @@ function PracticePage() {
 								<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
 									<div className="flex flex-1 items-end gap-4">
 										<div className="relative max-w-md flex-1">
-											<Search className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
+											<RiSearchLine className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 											<Input
 												type="search"
 												placeholder="Search texts..."
@@ -376,7 +402,7 @@ function PracticePage() {
 								{hasMore && (
 									<div className="flex justify-center pt-4 pb-4">
 										<Button variant="outline" onClick={handleLoadMore}>
-											<ChevronDown size={16} />
+											<RiArrowDownSLine size={16} />
 											Load More
 										</Button>
 									</div>
@@ -386,7 +412,7 @@ function PracticePage() {
 							<EmptyState
 								title="No texts match your filters"
 								description="Try adjusting your difficulty, type filters, or search query to see more texts."
-								icon={<Search className="size-full" />}
+								icon={<RiSearchLine className="size-full" />}
 								variant="minimal"
 								primaryAction={{
 									label: "Clear Filters",
