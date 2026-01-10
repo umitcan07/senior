@@ -4,6 +4,16 @@ RunPod handler for IPA generation endpoint.
 import runpod
 import sys
 import os
+import subprocess
+
+print(f"DEBUG: sys.path: {sys.path}")
+try:
+    print("DEBUG: pip freeze:")
+    subprocess.run([sys.executable, "-m", "pip", "freeze"], check=False)
+except Exception as e:
+    print(f"DEBUG: Failed to run pip freeze: {e}")
+
+from typing import Any, Dict, List
 
 # Add parent directory to path to import shared modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -44,6 +54,9 @@ def handler(job):
     except ValueError as e:
         return {"error": f"Invalid input: {str(e)}"}
     except Exception as e:
+        print(f"ERROR: Unexpected exception in handler: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return {"error": f"IPA generation failed: {str(e)}"}
 
 

@@ -1,4 +1,4 @@
-# Nonce Project Poster Specification
+# Nounce Project Poster Specification
 
 **Poster Size:** A0 (Horizontal Orientation)
 **Estimated Word Count:** ~500 words
@@ -8,11 +8,11 @@
 
 ## 1. Header Section (Top Full Width)
 
-*   **Title:** Nonce: Pronunciation Assessment System for English Language Learners
+*   **Title:** Nounce: Pronunciation Assessment System for English Language Learners
 *   **Author:** Ümit Can Evleksiz
 *   **Advisors:** Prof. Lale Akarun, Prof. Murat Saraçlar
 *   **Affiliation:** Boğaziçi University, Department of Computer Engineering
-*   **Logos:** [Boğaziçi University Logo] (Left), [Nonce App Logo] (Right)
+*   **Logos:** [Boğaziçi University Logo] (Left), [Nounce App Logo] (Right)
 
 ---
 

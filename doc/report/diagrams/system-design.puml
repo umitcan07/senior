@@ -2,7 +2,7 @@
 !theme plain
 skinparam componentStyle rectangle
 
-package "Nonce Application" {
+package "Nounce Application" {
   component "Web Client\n(React Frontend\nTanStack Start)" as Client
   
   component "Application Server\n(API Endpoints\nBusiness Logic\nTanStack Start Server)" as Server

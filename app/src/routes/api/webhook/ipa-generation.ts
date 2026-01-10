@@ -43,11 +43,25 @@ export const Route = createFileRoute("/api/webhook/ipa-generation")({
 					}
 
 					// Update job status
-					const dbStatus = mapRunPodStatusToDb(status);
+// Update job status
+					let dbStatus = mapRunPodStatusToDb(status);
+					const jobError = error ?? null;
+
+					// Check if output contains error or status info
+					if (output && typeof output === "object") {
+						const outputObj = output as Record<string, unknown>;
+						
+						// If output explicitly says FAILED, update status
+						// This allows us to mark the job as failed even if RunPod thinks it completed successfully
+						if (outputObj.status === "FAILED") {
+							dbStatus = "failed";
+						}
+					}
+
 					await updateIpaGenerationJob(id, {
 						status: dbStatus,
 						result: output ? (output as Record<string, unknown>) : undefined,
-						error: error ?? null,
+						error: jobError,
 						executionTimeMs: executionTime ?? null,
 						delayTimeMs: delayTime ?? null,
 					});

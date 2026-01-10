@@ -1,4 +1,4 @@
-# Nonce: Pronunciation Assessment System for English Language Learners
+# Nounce: Pronunciation Assessment System for English Language Learners
 
 ## Presentation Scripts
 
@@ -8,9 +8,9 @@
 
 ### Opening (30 seconds)
 
-"Have you ever struggled with English pronunciation? Maybe you've wondered if you're saying a word correctly, but had no one to ask? That's the problem Nonce solves.
+"Have you ever struggled with English pronunciation? Maybe you've wondered if you're saying a word correctly, but had no one to ask? That's the problem Nounce solves.
 
-Nonce is a web-based pronunciation assessment platform that helps English language learners improve their pronunciation through automated speech analysis and personalized, phonetic-level feedback."
+Nounce is a web-based pronunciation assessment platform that helps English language learners improve their pronunciation through automated speech analysis and personalized, phonetic-level feedback."
 
 ### The Problem (30 seconds)
 
@@ -20,11 +20,11 @@ Nonce is a web-based pronunciation assessment platform that helps English langua
 2. **Fear of judgment** – learners often feel embarrassed practicing pronunciation
 3. **Lack of specific feedback** – generic apps say 'try again' but don't explain *what* is wrong
 
-Nonce addresses all three by providing a private, judgment-free environment with detailed, actionable feedback."
+Nounce addresses all three by providing a private, judgment-free environment with detailed, actionable feedback."
 
 ### How It Works (45 seconds)
 
-"Here's how Nonce works:
+"Here's how Nounce works:
 
 1. **Select a practice text** – choose from various difficulty levels and categories
 2. **Record your speech** – directly in the browser with real-time audio visualization
@@ -35,7 +35,7 @@ The system uses the International Phonetic Alphabet (IPA) to give you precise fe
 
 ### Technology Overview (30 seconds)
 
-"Under the hood, Nonce combines:
+"Under the hood, Nounce combines:
 
 - **Modern web technologies**: React with TanStack Start for a responsive UI
 - **Serverless ML infrastructure**: Python services on RunPod for GPU-powered inference
@@ -45,7 +45,7 @@ Everything is containerized with Docker for reliable deployment."
 
 ### Impact and Closing (45 seconds)
 
-"Who benefits from Nonce?
+"Who benefits from Nounce?
 
 - **Self-directed learners** who want to practice independently
 - **Non-native speakers** preparing for speaking tests or professional settings
@@ -53,7 +53,7 @@ Everything is containerized with Docker for reliable deployment."
 
 Our focus is on US English, initially targeting Turkish-native speakers, with plans to expand.
 
-Importantly, Nonce doesn't judge accents – all dialects are valid. We focus on **comprehensibility**, helping you communicate clearly while respecting linguistic diversity.
+Importantly, Nounce doesn't judge accents – all dialects are valid. We focus on **comprehensibility**, helping you communicate clearly while respecting linguistic diversity.
 
 Thank you. I'd be happy to demonstrate the platform or answer questions."
 
@@ -63,13 +63,13 @@ Thank you. I'd be happy to demonstrate the platform or answer questions."
 
 ### Opening and Motivation (1 minute)
 
-"Good [morning/afternoon]. I'm Ümit Can Evleksiz, and today I'm presenting Nonce – a pronunciation assessment system for English language learners.
+"Good [morning/afternoon]. I'm Ümit Can Evleksiz, and today I'm presenting Nounce – a pronunciation assessment system for English language learners.
 
 Let me start with a question: How do you know if you're pronouncing English correctly?
 
 For most learners, the answer involves human feedback – a teacher, a friend, or just hoping for the best. But what if you don't have access to these resources? What if you want to practice at 2 AM? What if you're embarrassed to make mistakes in front of others?
 
-That's why I built Nonce – to democratize access to detailed pronunciation feedback using modern speech technology."
+That's why I built Nounce – to democratize access to detailed pronunciation feedback using modern speech technology."
 
 ### Problem Statement (1 minute 30 seconds)
 
@@ -83,7 +83,7 @@ That's why I built Nonce – to democratize access to detailed pronunciation fee
 
 **Linguistic misconceptions**: Many people believe there's one 'correct' way to speak English. This prescriptive approach discourages learners and ignores the reality that all accents are valid.
 
-Nonce addresses these issues by providing:
+Nounce addresses these issues by providing:
 - 24/7 accessible practice
 - A private, judgment-free environment
 - Phoneme-level feedback using IPA
@@ -95,7 +95,7 @@ Nonce addresses these issues by providing:
 
 **The Frontend (app/)**
 
-Nonce uses a modern React application built with TanStack Start, which provides:
+Nounce uses a modern React application built with TanStack Start, which provides:
 - Server-side rendering for fast initial loads
 - File-based routing with TanStack Router
 - Efficient data fetching with TanStack Query
@@ -131,7 +131,7 @@ Both services are containerized with Docker, enabling:
 
 ### The POWSM Model Deep Dive (2 minutes)
 
-"At the heart of Nonce is POWSM – the Phonetic Open Whisper-Style Speech Model.
+"At the heart of Nounce is POWSM – the Phonetic Open Whisper-Style Speech Model.
 
 **What makes POWSM special?**
 
@@ -141,7 +141,7 @@ POWSM is the first unified framework capable of jointly performing multiple phon
 - **Grapheme-to-Phoneme (G2P)**: Text → IPA (with optional audio context)
 - **Phoneme-to-Grapheme (P2G)**: IPA → text
 
-**Why POWSM for Nonce?**
+**Why POWSM for Nounce?**
 
 1. **Audio-guided transcription**: Unlike dictionary-based G2P, POWSM listens to actual audio, capturing variations in pronunciation, accents, and even errors.
 
@@ -215,13 +215,13 @@ The entire system emphasizes:
 
 **Linguistic Diversity**
 
-Nonce focuses on US English pronunciation, but I want to be clear: this is not about accent elimination. All dialects and accents are linguistically valid. We chose US English because it's widely demanded, particularly in professional contexts.
+Nounce focuses on US English pronunciation, but I want to be clear: this is not about accent elimination. All dialects and accents are linguistically valid. We chose US English because it's widely demanded, particularly in professional contexts.
 
 The goal is **comprehensibility** – helping learners communicate clearly, not conforming to a single 'correct' pronunciation.
 
 **Data Privacy**
 
-User speech is sensitive data. Nonce implements:
+User speech is sensitive data. Nounce implements:
 - Clear consent mechanisms for recording
 - Explicit opt-in for any use beyond immediate analysis
 - Secure storage with encryption
@@ -244,7 +244,7 @@ Users consistently report that the phoneme-level feedback helps them understand 
 
 ### Conclusion and Future Work (30 seconds)
 
-"To summarize, Nonce provides:
+"To summarize, Nounce provides:
 - Accessible, 24/7 pronunciation practice
 - State-of-the-art phonetic analysis using POWSM
 - Detailed, actionable feedback at the phoneme level
@@ -265,7 +265,7 @@ Thank you. I'm happy to take questions and demonstrate any feature in detail."
 ### Anticipated Questions
 
 **Q: Why not use commercial solutions like ELSA Speak?**
-A: Nonce is open-source, academically grounded, and allows full customization. We also provide phonetic-level (IPA) feedback rather than just word-level scoring.
+A: Nounce is open-source, academically grounded, and allows full customization. We also provide phonetic-level (IPA) feedback rather than just word-level scoring.
 
 **Q: How accurate is the phonetic transcription?**
 A: POWSM achieves state-of-the-art performance on standard benchmarks. For English, phonetic feature error rates are around 2.85 PFER, comparable to or better than specialized models.

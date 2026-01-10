@@ -6,7 +6,7 @@ import {
 } from "@clerk/tanstack-react-start";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { NonceLogo } from "@/components/ui/nonce";
+import { NounceLogo } from "@/components/ui/nounce";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function HeaderUser() {
@@ -15,7 +15,7 @@ export default function HeaderUser() {
 			<div className="container mx-auto max-w-7xl px-6 py-5 md:px-10">
 				<div className="flex items-center justify-between gap-2">
 					<Link to="/">
-						<NonceLogo height={24} />
+						<NounceLogo height={24} />
 					</Link>
 					<div className="flex items-center gap-2">
 						<ThemeToggle />

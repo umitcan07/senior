@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+import { THEME_STORAGE_KEY } from "@/lib/constants";
 
-const THEME_STORAGE_KEY = "nonce-theme-preference";
+type Theme = "light" | "dark" | "system";
 
 function getSystemTheme(): "light" | "dark" {
 	if (typeof window === "undefined") return "light";

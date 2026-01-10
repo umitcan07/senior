@@ -12,7 +12,7 @@ soundfile
 numpy
 
 # ESPnet / POWSM (G2P)
-espnet==202308
+espnet
 espnet_model_zoo==0.1.7
 
 # HTTP client for downloading audio files (if audio_uri provided)

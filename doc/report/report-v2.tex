@@ -19,7 +19,7 @@
 \begin{document}
 
 % Title Page
-\title{CMPE 492 \\ Nonce: Pronunciation Assessment System for English Language Learners}
+\title{CMPE 492 \\ Nounce: Pronunciation Assessment System for English Language Learners}
 \author{
 Ümit Can Evleksiz \\
  \\ \\
@@ -39,7 +39,7 @@ Murat Saraçlar
 
 \subsection{Learning Impact}
 
-Nonce is a web-based pronunciation assessment application that provides learners with practical how-to knowledge for speaking standard English, focusing on pronunciation accuracy and clarity. By introducing users to the International Phonetic Alphabet (IPA) and phonetic concepts, the system builds domain familiarity, enabling learners to discuss and understand sound units systematically. The platform incorporates gamification elements and provides fast, friendly feedback to create a safe learning environment where users can practice without fear of judgment.
+Nounce is a web-based pronunciation assessment application that provides learners with practical how-to knowledge for speaking standard English, focusing on pronunciation accuracy and clarity. By introducing users to the International Phonetic Alphabet (IPA) and phonetic concepts, the system builds domain familiarity, enabling learners to discuss and understand sound units systematically. The platform incorporates gamification elements and provides fast, friendly feedback to create a safe learning environment where users can practice without fear of judgment.
 
 It is important to note that the objective is not to replace human-to-human interactions in language learning, but rather to provide accessible tools for individuals who may lack access to human tutors, native speaker friends, or formal language education resources. The system serves as a supplementary tool that empowers self-directed learning while acknowledging the irreplaceable value of human interaction in language acquisition.
 
@@ -63,7 +63,7 @@ Commercialization of educational technology raises concerns about potentially ga
 
 \chapter{PROJECT DEFINITION AND PLANNING}
 \section{Project Definition}
-This project develops Nonce, a web-based application to assist English language learners in improving pronunciation through automated speech analysis and personalized feedback. The system enables users to record speech, receive detailed pronunciation assessments, and gain insights into English phonology.
+This project develops Nounce, a web-based application to assist English language learners in improving pronunciation through automated speech analysis and personalized feedback. The system enables users to record speech, receive detailed pronunciation assessments, and gain insights into English phonology.
 
 Core functionality includes: (i) capturing and processing user speech recordings, (ii) analyzing pronunciation accuracy at the phonetic level using machine learning models, (iii) comparing actual pronunciation against target acoustic patterns, and (iv) providing educational guidance on English phonology.
 
@@ -171,7 +171,7 @@ Commercial pronunciation assessment platforms demonstrate practical applications
 
 \section{Application Architecture}
 
-Nonce is built as an industry-standard web-based application with a focus on user experience. The full-stack architecture is dockerized for consistent deployment and development environments. The frontend utilizes React with TanStack Start for server-side rendering and routing, providing a modern, responsive user interface. The backend leverages TanStack Start's server functions for API endpoints and business logic.
+Nounce is built as an industry-standard web-based application with a focus on user experience. The full-stack architecture is dockerized for consistent deployment and development environments. The frontend utilizes React with TanStack Start for server-side rendering and routing, providing a modern, responsive user interface. The backend leverages TanStack Start's server functions for API endpoints and business logic.
 
 Data persistence is handled through Neon, a serverless PostgreSQL database, providing scalable and reliable storage for user recordings and metadata. Audio file storage will be implemented using Cloudflare R2 or a similar object storage solution. The entire stack is containerized using Docker, enabling reproducible deployments across development, staging, and production environments.
 
@@ -276,12 +276,12 @@ The development process emphasizes modularity and separation of concerns, with c
 
 \subsection{Entity-Relationship Diagram}
 
-The entity-relationship diagram represents the planned database schema for Nonce. Currently, the \texttt{recordings} and \texttt{texts} tables are implemented. The \texttt{User}, \texttt{Analysis}, and \texttt{Alignment Data} entities will be implemented as the ML pipeline and assessment features are developed.
+The entity-relationship diagram represents the planned database schema for Nounce. Currently, the \texttt{recordings} and \texttt{texts} tables are implemented. The \texttt{User}, \texttt{Analysis}, and \texttt{Alignment Data} entities will be implemented as the ML pipeline and assessment features are developed.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/er-diagram.png}
-\caption{Entity-Relationship Diagram for Nonce (Planned Schema)}
+\caption{Entity-Relationship Diagram for Nounce (Planned Schema)}
 \label{fig:er-diagram}
 \end{figure}
 
@@ -303,7 +303,7 @@ The entity-relationship diagram represents the planned database schema for Nonce
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{images/system-design.png}
-\caption{System Architecture Diagram for Nonce}
+\caption{System Architecture Diagram for Nounce}
 \label{fig:system-design}
 \end{figure}
 
@@ -314,8 +314,8 @@ The entity-relationship diagram represents the planned database schema for Nonce
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{images/frame.png}
-\caption{Nonce Application Logo}
-\label{fig:nonce-logo}
+\caption{Nounce Application Logo}
+\label{fig:nounce-logo}
 \end{figure}
 
 
@@ -323,7 +323,7 @@ The entity-relationship diagram represents the planned database schema for Nonce
 
 \section{Implementation}
 
-The implementation of Nonce follows the architecture and methodology outlined in previous chapters. The source code is organized in a structured repository \cite{github2024senior} with clear separation between the full-stack application, documentation, and experimental work.
+The implementation of Nounce follows the architecture and methodology outlined in previous chapters. The source code is organized in a structured repository \cite{github2024senior} with clear separation between the full-stack application, documentation, and experimental work.
 
 The main application codebase is located in the \texttt{app/} directory \cite{github2024app}, containing the React frontend, TanStack Start backend, database schemas, and API endpoints. The application structure follows modern web development practices with TypeScript for type safety, component-based architecture, and modular design patterns.
 
@@ -333,7 +333,7 @@ The repository includes comprehensive documentation in the \texttt{doc/} directo
 
 \section{Deployment}
 
-Nonce is containerized using Docker, ensuring consistency across development, staging, and production environments. The deployment process is automated through GitHub Actions CI/CD pipelines \cite{github2024actions}, which handle building Docker images, running linting, and running tests.
+Nounce is containerized using Docker, ensuring consistency across development, staging, and production environments. The deployment process is automated through GitHub Actions CI/CD pipelines \cite{github2024actions}, which handle building Docker images, running linting, and running tests.
 
 Production deployment will be hosted on Railway \cite{railway2024} or Fly.io \cite{flyio2024}, both of which provide seamless Docker container orchestration, automatic scaling based on traffic, and integrated monitoring capabilities.
 

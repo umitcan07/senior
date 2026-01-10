@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { withoutTransition } from "@/lib/without-transition";
+import { THEME_STORAGE_KEY } from "@/lib/constants";
 
 type Theme = "light" | "dark" | "system";
-
-const THEME_STORAGE_KEY = "nonce-theme-preference";
 
 interface ThemeContextValue {
 	theme: Theme;

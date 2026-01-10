@@ -1,4 +1,4 @@
-# Nonce Poster Design Specification
+# Nounce Poster Design Specification
 
 ## CMPE 492 Senior Project
 
@@ -14,7 +14,7 @@ The poster follows a 4-column horizontal layout with clear visual hierarchy.
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              HEADER SECTION                                  │
-│  [BOUN Logo]    TITLE: Nonce - Pronunciation Assessment System    [QR Code] │
+│  [BOUN Logo]    TITLE: Nounce - Pronunciation Assessment System    [QR Code] │
 │                 Author, Advisors, Institution                               │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ COLUMN 1       │ COLUMN 2        │ COLUMN 3          │ COLUMN 4            │
@@ -28,7 +28,7 @@ The poster follows a 4-column horizontal layout with clear visual hierarchy.
 ## Section 1: Header
 
 ### Title
-**Nonce: Pronunciation Assessment System for English Language Learners**
+**Nounce: Pronunciation Assessment System for English Language Learners**
 
 Font: Sans-serif (e.g., Inter, Roboto), 85pt minimum  
 Style: Bold, high contrast against background
@@ -60,7 +60,7 @@ English pronunciation learning faces significant barriers:
 • **Generic feedback** – "try again" without specifics  
 • **No phonetic-level analysis** – learners don't know which sounds are wrong
 
-**Nonce** addresses these challenges by providing automated, phoneme-level pronunciation feedback using state-of-the-art speech recognition models.
+**Nounce** addresses these challenges by providing automated, phoneme-level pronunciation feedback using state-of-the-art speech recognition models.
 
 ### Visual Placeholder
 [GRAPHIC: Problem visual – icon set showing three pain points]
@@ -73,13 +73,13 @@ English pronunciation learning faces significant barriers:
 ## Section 3: Methodology & Architecture (Column 2)
 
 ### Heading
-**How Nonce Works** (36pt, bold)
+**How Nounce Works** (36pt, bold)
 
 ### Subheading
 **Technology Stack**
 
 ### Content (~150 words)
-Nonce combines modern web development with cutting-edge speech ML:
+Nounce combines modern web development with cutting-edge speech ML:
 
 **Frontend**
 - React with TanStack Start (SSR)
@@ -167,7 +167,7 @@ Caption: "POWSM outperforms specialized phone recognition models (PFER↓)"
 • Scalable serverless architecture  
 
 **Impact**
-Nonce democratizes pronunciation learning by providing:
+Nounce democratizes pronunciation learning by providing:
 - Accessible 24/7 practice without human tutors
 - Detailed, actionable feedback at the phonetic level
 - Respectful approach that values linguistic diversity
@@ -179,7 +179,7 @@ Nonce democratizes pronunciation learning by providing:
 - Mobile application  
 
 ### Conclusion Callout Box
-> **Nonce empowers English learners with precise, phonetic-level feedback – making quality pronunciation instruction accessible to everyone.**
+> **Nounce empowers English learners with precise, phonetic-level feedback – making quality pronunciation instruction accessible to everyone.**
 
 ---
 
@@ -241,7 +241,7 @@ Font: 18pt for all footer text
 | Asset                               | Source/Action                        |
 |-------------------------------------|--------------------------------------|
 | Boğaziçi University Logo            | Download from institutional site     |
-| Nonce Application Logo              | `app/public/og-image.png`            |
+| Nounce Application Logo              | `app/public/og-image.png`            |
 | Practice Text Selection Screenshot  | Capture from running app             |
 | Recording Interface Screenshot      | Capture from running app             |
 | Analysis Results Screenshot         | Capture from running app             |
@@ -271,7 +271,7 @@ Font: 18pt for all footer text
 ## Three Key Questions (Poster Preparation)
 
 ### 1. What is the most important/interesting/astounding finding?
-**POWSM enables phoneme-level pronunciation feedback without language-specific training**, outperforming specialized models while supporting four different tasks. This allows Nonce to provide precise "which sound is wrong" feedback instead of vague "try again" messages.
+**POWSM enables phoneme-level pronunciation feedback without language-specific training**, outperforming specialized models while supporting four different tasks. This allows Nounce to provide precise "which sound is wrong" feedback instead of vague "try again" messages.
 
 ### 2. How can I visually share my research with attendees?
 - **System architecture diagram**: Shows the clean flow from user recording to ML analysis
@@ -282,6 +282,6 @@ Font: 18pt for all footer text
 ### 3. What information can I convey during my talk that will complement my poster?
 - **Live demonstration**: Record speech and show real-time analysis
 - **POWSM deep dive**: Explain the model architecture for technical audiences
-- **User stories**: Describe specific scenarios where Nonce helps (test preparation, professional communication)
+- **User stories**: Describe specific scenarios where Nounce helps (test preparation, professional communication)
 - **Ethical nuances**: Elaborate on dialect respect, data privacy, and accessibility philosophy
 - **Future vision**: Voice cloning for personalized reference audio, L1-specific error patterns

@@ -1,4 +1,4 @@
-# Nonce Project Presentation Scripts
+# Nounce Project Presentation Scripts
 
 ## 3-Minute Short Pitch
 **Target Audience:** General Engineering / Customer / High-level Overview
@@ -7,24 +7,24 @@
 ---
 
 **(0:00 - 0:45) Introduction & Problem**
-"Hello everyone, I'm Ümit Can Evleksiz, and this is **Nonce**, a modern pronunciation assessment platform.
+"Hello everyone, I'm Ümit Can Evleksiz, and this is **Nounce**, a modern pronunciation assessment platform.
 Learning proper English pronunciation is challenging, especially for self-directed learners who lack constant access to native speakers or tutors. Existing tools effectively focus on *vocabulary* or *grammar*, but feedback on **phonetics**—the actual sounds of speech—is often missing or generic."
 
-**(0:45 - 1:30) The Solution: Nonce**
-"Nonce solves this by providing precise, phonetic-level feedback.
+**(0:45 - 1:30) The Solution: Nounce**
+"Nounce solves this by providing precise, phonetic-level feedback.
 The application allows users to verify their pronunciation against standard acoustic models.
 Here’s how it works: detailed **IPA (International Phonetic Alphabet)** mappings break down every word you speak.
 If you mispronounce a vowel or substitute a consonant, the system detects it and visually highlights the error. It's not just a 'Pass/Fail'; it shows you *exactly* which sound was incorrect and how to fix it."
 
 **(1:30 - 2:30) Technology & Architecture**
-"Under the hood, Nonce is a robust full-stack application.
+"Under the hood, Nounce is a robust full-stack application.
 On the **Frontend**, we use **React** with TanStack Start for a fast, responsive experience.
 The **Backend** leverages **Python** for machine learning services, deployed on **RunPod** serverless GPU infrastructure.
 We use open-source models like **POWSM** for phonetic transcription, enabling us to adapt specific models for different native language backgrounds, starting with Turkish speakers.
 This separation of concerns—fast UI vs. heavy ML processing—ensures the app remains responsive even during complex analysis."
 
 **(2:30 - 3:00) Conclusion**
-"In summary, Nonce bridges the gap between self-study and professional tutoring. By combining advanced signal processing with a user-friendly web interface, we empower learners to master English phonology confidently. Thank you."
+"In summary, Nounce bridges the gap between self-study and professional tutoring. By combining advanced signal processing with a user-friendly web interface, we empower learners to master English phonology confidently. Thank you."
 
 ---
 ---
@@ -37,9 +37,9 @@ This separation of concerns—fast UI vs. heavy ML processing—ensures the app 
 
 **(0:00 - 1:30) Detailed Introduction**
 "Good morning/afternoon. My name is Ümit Can Evleksiz.
-Today I will present **Nonce**, A web-based English pronunciation assessment tool.
+Today I will present **Nounce**, A web-based English pronunciation assessment tool.
 The core problem we address is the **'Feedback Loop'** in language learning. When you practice alone, you don't know if you're saying it right.
-Nonce provides that missing feedback loop using signal processing and deep learning. It’s designed specifically for the phonetic nuances of English, initially optimized for Turkish native speakers."
+Nounce provides that missing feedback loop using signal processing and deep learning. It’s designed specifically for the phonetic nuances of English, initially optimized for Turkish native speakers."
 
 **(1:30 - 3:30) Methodology: The ML Pipeline**
 "Let's dive into the core methodology.
@@ -72,6 +72,6 @@ The heart of our system is the **Signal Processing Pipeline**.
 3.  **Accent Bias**: Standard models are biased towards native speakers. By choosing open models like POWSM, we paved the way for fine-tuning on non-native datasets in the future."
 
 **(9:00 - 10:00) Conclusion & Future Work**
-"Nonce stands as a modern solution to an age-old problem. It combines the latest in web development patterns with specialized speech AI.
+"Nounce stands as a modern solution to an age-old problem. It combines the latest in web development patterns with specialized speech AI.
 Moving forward, we plan to implement fully real-time streaming feedback and expand support to other target languages.
 Thank you for listening. I'm happy to take any questions."

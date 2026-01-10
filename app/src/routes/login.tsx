@@ -1,6 +1,6 @@
 import { SignedIn, SignIn } from "@clerk/tanstack-react-start";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { NonceLogo } from "@/components/ui/nonce";
+import { NounceLogo } from "@/components/ui/nounce";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export const Route = createFileRoute("/login")({
@@ -16,7 +16,7 @@ function LoginPage() {
 			<div className="flex min-h-screen flex-col bg-linear-to-b from-background to-muted/20">
 				{/* Minimal Header */}
 				<header className="flex items-center justify-between px-6 py-4">
-					<NonceLogo height={22} />
+					<NounceLogo height={22} />
 					<ThemeToggle />
 				</header>
 

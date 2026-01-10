@@ -7,6 +7,9 @@ import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
 
 
 const config = defineConfig({
+  server: {
+    allowedHosts: ["host.docker.internal"],
+  },
   plugins: [
     viteTsConfigPaths({
       projects: ["./tsconfig.json"],

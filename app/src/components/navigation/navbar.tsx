@@ -8,7 +8,7 @@ import { RiCloseLine, RiMenuLine, RiSettings3Line } from "@remixicon/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { NonceLogo } from "@/components/ui/nonce";
+import { NounceLogo } from "@/components/ui/nounce";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
@@ -128,7 +128,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 						to="/"
 						className="flex min-w-32 items-center transition-opacity hover:opacity-80"
 					>
-						<NonceLogo height={22} />
+						<NounceLogo height={22} />
 					</Link>
 
 					{/* Desktop Navigation */}

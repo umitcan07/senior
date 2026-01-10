@@ -9,6 +9,7 @@ import { NotFound } from "@/components/not-found";
 import { ThemeInitializer } from "@/components/theme-initializer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { THEME_STORAGE_KEY } from "@/lib/constants";
 import ClerkProvider from "../integrations/clerk/provider";
 import appCss from "../styles.css?url";
 import "remixicon/fonts/remixicon.css";
@@ -17,9 +18,9 @@ interface MyRouterContext {
 	queryClient: QueryClient;
 }
 
-const appTitle = "Nonce: Improve Your English Pronunciation";
+const appTitle = "Nounce: Improve Your English Pronunciation";
 const appDescription =
-	"Nonce is an advanced, free-to-use English pronunciation assessment tool powered by signal processing and machine learning.";
+	"Nounce is an advanced, free-to-use phonetic-analysis & pronunciation assessment platform developed for English language learners.";
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	notFoundComponent: NotFound,
@@ -59,7 +60,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			},
 			{
 				property: "og:site_name",
-				content: "Nonce",
+				content: "Nounce",
 			},
 			// Twitter Card meta tags
 			{
@@ -93,7 +94,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			},
 			{
 				name: "author",
-				content: "Nonce",
+				content: "Nounce",
 			},
 		],
 		links: [
@@ -134,7 +135,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					dangerouslySetInnerHTML={{
 						__html: `
 							(function() {
-								const theme = localStorage.getItem('nonce-theme-preference') || 'system';
+								const theme = localStorage.getItem('${THEME_STORAGE_KEY}') || 'system';
 								const isDark = theme === 'dark' || 
 									(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 								if (isDark) {

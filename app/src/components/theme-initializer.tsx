@@ -1,6 +1,5 @@
 import { useLayoutEffect } from "react";
-
-const THEME_STORAGE_KEY = "nonce-theme-preference";
+import { THEME_STORAGE_KEY } from "@/lib/constants";
 
 function initializeTheme() {
 	const theme = localStorage.getItem(THEME_STORAGE_KEY) || "system";
