@@ -162,25 +162,27 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 								<RiSettings3Line size={20} />
 							</Link>
 						</Button>
-						<SignedIn>
-							<div className="flex w-32 items-center gap-7">
-								<div className="h-3 w-px bg-border" />
-								<UserButton
-									appearance={{
-										elements: {
-											avatarBox: "size-8",
-										},
-									}}
-								/>
-							</div>
-						</SignedIn>
-						<SignedOut>
-							<div className="w-32">
-								<Button variant="default" size="sm" asChild>
-									<SignInButton />
-								</Button>
-							</div>
-						</SignedOut>
+						<div className="min-w-32">
+							<SignedIn>
+								<div className="flex w-32 items-center gap-7">
+									<div className="h-3 w-px bg-border" />
+									<UserButton
+										appearance={{
+											elements: {
+												avatarBox: "size-8",
+											},
+										}}
+									/>
+								</div>
+							</SignedIn>
+							<SignedOut>
+								<div className="w-32">
+									<Button variant="default" size="sm" asChild>
+										<SignInButton />
+									</Button>
+								</div>
+							</SignedOut>
+						</div>
 
 						<Button
 							variant="ghost"

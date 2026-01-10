@@ -6,8 +6,6 @@ primary_region = "fra"
 
 [build]
   dockerfile = "Dockerfile"
-  [build.args]
-    VITE_CLERK_PUBLISHABLE_KEY = "pk_test_ZXZpZGVudC1qYXktODcuY2xlcmsuYWNjb3VudHMuZGV2JA"
 
 [deploy]
   release_command = "pnpm exec tsx scripts/migrate.ts"

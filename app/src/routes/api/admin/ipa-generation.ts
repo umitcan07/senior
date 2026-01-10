@@ -89,22 +89,8 @@ export const Route = createFileRoute("/api/admin/ipa-generation")({
 					console.log(`Debug: Webhook URL set to: ${webhookUrl}`);
 
 					// Get audio URL
-					// Strategy:
-					// 1. In production, use R2 public URL (efficient)
-					// 2. In local dev (RunPod proxy), use the backend's own API as a proxy
-					//    This avoids R2 public access issues (CORS, SSL, blocked domains)
-					//    and leverages the backend's authenticated R2 access.
-					let audioUri: string;
-					
-					if (config.apiUrl.includes("localhost") || config.apiUrl.includes("127.0.0.1")) {
-						// Local/Docker environment: Use local backend proxy
-						// webhookBaseUrl is already set to host.docker.internal if needed
-						audioUri = new URL(`/api/audio/${reference.id}`, webhookBaseUrl).toString();
-						console.log("Debug: Using local backend audio proxy instead of R2 direct link");
-					} else {
-						// Production: Use direct R2 link
-						audioUri = getPublicUrl(reference.storageKey);
-					}
+					// Using public R2 URL (custom domain) as configured in R2_PUBLIC_URL
+					const audioUri = getPublicUrl(reference.storageKey);
 					
 					console.log(`Debug: Generated audio URI: ${audioUri}`);
 
