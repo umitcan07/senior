@@ -1,27 +1,27 @@
 name: Deploy to Fly.io
 
 on:
-    push:
-        branches:
-            - main
-    workflow_dispatch: # Allow manual triggers
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual triggers
 
 jobs:
-    deploy:
-        name: Deploy app
-        runs-on: ubuntu-latest
-        concurrency: deploy-group # Ensure only one deployment runs at a time
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    concurrency: deploy-group # Ensure only one deployment runs at a time
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Install Fly.io CLI
-              uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Install Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-            - name: Deploy to Fly.io
-              env:
-                  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-              run: |
-                  flyctl deploy --remote-only \
-                    --build-secret VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl deploy --remote-only \
+            --build-secret VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
