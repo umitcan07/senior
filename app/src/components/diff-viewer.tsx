@@ -20,6 +20,7 @@ interface DiffViewerProps {
 	type: "phoneme" | "word";
 	audioSrc?: string;
 	onSegmentClick?: (startMs: number, endMs: number) => void;
+	showLegend?: boolean;
 }
 
 function formatTimestamp(ms: number): string {
@@ -131,6 +132,7 @@ export function DiffViewer({
 	type,
 	audioSrc,
 	onSegmentClick,
+	showLegend = false,
 }: DiffViewerProps) {
 	const targetSegments =
 		type === "word"
@@ -183,19 +185,19 @@ export function DiffViewer({
 				)}
 			</div>
 
-			{/* Legend - minimal inline */}
-			{hasErrors && (
-				<div className="flex gap-4 text-muted-foreground text-xs">
+			{/* Legend - only show if showLegend is true */}
+			{showLegend && hasErrors && (
+				<div className="flex flex-wrap gap-3 text-muted-foreground text-[10px]">
 					<span className="flex items-center gap-1">
-						<span className="size-2 rounded-full bg-destructive/60" />
+						<span className="size-1.5 rounded-full bg-destructive/60" />
 						Substitution
 					</span>
 					<span className="flex items-center gap-1">
-						<span className="size-2 rounded-full bg-amber-500/60" />
+						<span className="size-1.5 rounded-full bg-amber-500/60" />
 						Insertion
 					</span>
 					<span className="flex items-center gap-1">
-						<span className="size-2 rounded-full bg-blue-500/60" />
+						<span className="size-1.5 rounded-full bg-amber-500/60" />
 						Deletion
 					</span>
 				</div>

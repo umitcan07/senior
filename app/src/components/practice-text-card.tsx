@@ -241,12 +241,16 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 								<TableCell className="text-right">
 									<Button
 										asChild
-										size="sm"
-										className="opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100"
+										size="default"
+										className="h-9 w-9 px-0 opacity-100 transition-opacity duration-300 sm:h-9 sm:w-auto sm:px-3 sm:opacity-0 sm:group-hover:opacity-100"
 									>
-										<Link to="/practice/$textId" params={{ textId: text.id }}>
+										<Link
+											to="/practice/$textId"
+											params={{ textId: text.id }}
+											className="flex items-center gap-2"
+										>
 											<span className="hidden sm:inline">Practice</span>
-											<RiArrowRightLine size={14} />
+											<RiArrowRightLine size={16} />
 										</Link>
 									</Button>
 								</TableCell>

@@ -110,7 +110,7 @@ function AuthorSelector({
 			onValueChange={onSelect}
 			disabled={disabled}
 		>
-			<SelectTrigger className="w-full max-w-xs">
+			<SelectTrigger className="w-full sm:max-w-xs">
 				<SelectValue placeholder="Select a voice">
 					{selectedAuthorId
 						? authors.find((a) => a.id === selectedAuthorId)?.name
@@ -161,7 +161,7 @@ function GuestSettings() {
 					<PageHeader title="Settings" description="Manage your preferences" />
 
 					<Card className="bg-muted/30">
-						<CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+						<CardContent className="flex flex-col items-center gap-4 py-8 text-center md:py-12">
 							<div className="flex flex-col gap-2">
 								<h2 className="font-medium text-lg">
 									Sign in to access settings
@@ -274,7 +274,7 @@ function SettingsPage() {
 										description="Choose your default reference voice for practice sessions. This voice will be pre-selected when you start a new practice."
 										icon={<RiMicLine className="size-5" />}
 									>
-										<div className="flex gap-4">
+										<div className="flex flex-col gap-4 sm:flex-row">
 											<AuthorSelector
 												authors={authors}
 												selectedAuthorId={pendingAuthorId}
@@ -282,11 +282,11 @@ function SettingsPage() {
 												disabled={isSaving}
 											/>
 											{hasChanges && (
-												<div className="ml-auto flex items-center gap-2">
+												<div className="flex gap-2">
 													<Button
 														onClick={handleSave}
 														disabled={isSaving}
-														size="sm"
+														className="flex-1"
 													>
 														{isSaving && (
 															<Spinner className="size-4 text-primary-foreground" />
@@ -297,7 +297,7 @@ function SettingsPage() {
 														onClick={handleCancel}
 														disabled={isSaving}
 														variant="outline"
-														size="sm"
+														className="flex-1"
 													>
 														Cancel
 													</Button>

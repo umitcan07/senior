@@ -80,15 +80,15 @@ function HeroSection() {
 					personalized feedback, and track your progress over time with detailed
 					insights.
 				</p>
-				<div className="flex flex-col justify-center gap-3 py-6 sm:flex-row">
-					<Button size="lg" asChild>
+				<div className="flex w-full flex-col justify-center gap-3 py-6 sm:w-auto sm:flex-row">
+					<Button size="lg" className="w-full sm:w-auto" asChild>
 						<Link to="/practice">Start Practicing</Link>
 					</Button>
-					<Button variant="outline" size="lg" asChild>
-						<Link to="/learn">Learn More</Link>
+					<Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
+						<a href="https://github.com/umitcan07/senior" target="_blank" rel="noopener noreferrer">Learn More</a>
 					</Button>
 				</div>
-				<p className="mt-6 rounded-sm px-2 py-1 text-muted-foreground text-xs ring-1 ring-muted">
+				<p className="mt-6 rounded-sm px-2 py-1 text-balance text-center text-muted-foreground text-xs sm:ring-1 sm:ring-muted">
 					Powered by{" "}
 					<a
 						href="https://huggingface.co/espnet/powsm"
@@ -115,7 +115,7 @@ function HomePage() {
 				exit="exit"
 			>
 				<PageContainer>
-					<div className="flex flex-col gap-12">
+					<div className="flex flex-col gap-16">
 						<section className="py-4 md:py-12">
 							<HeroSection />
 						</section>
@@ -124,7 +124,7 @@ function HomePage() {
 
 						<section className="flex flex-col gap-6">
 							<h2 className="font-semibold text-lg">Features</h2>
-							<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 								{features.map((feature) => (
 									<FeatureCard key={feature.title} {...feature} />
 								))}

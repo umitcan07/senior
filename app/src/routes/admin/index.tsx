@@ -54,7 +54,7 @@ function AdminDashboard() {
 						description="Manage your application content and settings"
 					/>
 
-					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 						{adminSections.map((section) => {
 							const Icon = section.icon;
 							return (

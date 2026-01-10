@@ -7,10 +7,9 @@ import { useCallback, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { SectionTitle } from "@/components/ui/section-title";
 import { Spinner } from "@/components/ui/spinner";
-import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useRequireAdmin } from "@/lib/auth";
 import {
@@ -761,7 +760,7 @@ function AccentCategorySection({ category }: { category: AccentCategory }) {
 
 function AccentDifferencesSection() {
 	return (
-		<section className="flex flex-col gap-10">
+		<section className="flex flex-col gap-16">
 			<SectionTitle
 				title="American vs British English"
 				variant="playful"
@@ -856,7 +855,7 @@ function LearningPage() {
 				exit="exit"
 			>
 				<PageContainer>
-					<div className="flex flex-col gap-20">
+					<div className="flex flex-col gap-16">
 						{/* IPA Section Header with Controls */}
 						<section className="flex flex-col gap-12">
 							<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -871,41 +870,24 @@ function LearningPage() {
 								</div>
 
 								{/* Playback Mode Toggle */}
-								<div className="flex items-center gap-3 rounded-full bg-muted/30 px-5 py-2">
-									<Label
-										htmlFor="playback-mode"
-										className={cn(
-											"cursor-pointer text-sm transition-colors",
-											playbackMode === "sound"
-												? "font-medium text-foreground"
-												: "text-muted-foreground",
-										)}
-									>
-										Sound
-									</Label>
-									<Switch
-										id="playback-mode"
-										checked={playbackMode === "word"}
-										onCheckedChange={(checked) =>
-											setPlaybackMode(checked ? "word" : "sound")
-										}
-									/>
-									<Label
-										htmlFor="playback-mode"
-										className={cn(
-											"cursor-pointer text-sm transition-colors",
-											playbackMode === "word"
-												? "font-medium text-foreground"
-												: "text-muted-foreground",
-										)}
-									>
-										Word
-									</Label>
-								</div>
+								<Tabs
+									value={playbackMode}
+									onValueChange={(v) => setPlaybackMode(v as PlaybackMode)}
+									className="w-full sm:w-auto"
+								>
+									<TabsList className="w-full sm:w-auto">
+										<TabsTrigger value="sound" className="flex-1 sm:flex-initial">
+											Sound
+										</TabsTrigger>
+										<TabsTrigger value="word" className="flex-1 sm:flex-initial">
+											Word
+										</TabsTrigger>
+									</TabsList>
+								</Tabs>
 							</div>
 
 							{/* IPA Charts */}
-							<div className="flex flex-col gap-20">
+							<div className="flex flex-col gap-12">
 								<IPASection
 									title="Vowels"
 									description="Pure vowel sounds (monophthongs)"

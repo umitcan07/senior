@@ -439,7 +439,6 @@ function ReferenceVoice({
 											</div>
 											{selectedReference.durationMs && (
 												<span className="text-muted-foreground text-xs">
-													Reference •{" "}
 													{formatDuration(selectedReference.durationMs)}
 												</span>
 											)}
@@ -618,15 +617,15 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 				</Link>
 			</div>
 
-			<div className="flex flex-col">
+			<div className="grid grid-cols-2 gap-2 sm:flex sm:flex-col">
 				{attempts.map((attempt) => (
 					<Link
 						key={attempt.id}
 						to="/practice/$textId/analysis/$analysisId"
 						params={{ textId, analysisId: attempt.analysisId }}
-						className="group -mx-4 flex items-center justify-between rounded-md border-border/40 border-b px-4 py-4 transition-colors last:border-0 hover:bg-muted/20"
+						className="group flex flex-col gap-1 rounded-lg border border-border/40 p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between sm:rounded-md sm:border-0 sm:border-b sm:p-4 sm:last:border-0"
 					>
-						<div className="flex items-center gap-4">
+						<div className="flex items-center gap-3 sm:gap-4">
 							<span
 								className={cn(
 									"flex size-8 items-center justify-center rounded-md font-medium text-xs tabular-nums",
@@ -644,7 +643,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 								{formatRelativeTime(attempt.date)}
 							</span>
 						</div>
-						<span className="text-muted-foreground text-xs opacity-0 transition-opacity group-hover:opacity-100">
+						<span className="hidden text-muted-foreground text-xs opacity-0 transition-opacity group-hover:opacity-100 sm:inline">
 							View →
 						</span>
 					</Link>
@@ -831,12 +830,12 @@ function PracticeTextPage() {
 
 										{/* Idle state */}
 										{isIdle && !recording.error && (
-											<div className="flex w-full items-center justify-center gap-3">
+											<div className="flex w-full max-w-md gap-3">
 												<Button
 													size="lg"
 													onClick={recording.startRecording}
 													disabled={!selectedReferenceId}
-													className="gap-2"
+													className="flex-1 gap-2"
 												>
 													<RiMicLine size={18} />
 													{selectedReferenceId
@@ -844,7 +843,7 @@ function PracticeTextPage() {
 														: "Select voice first"}
 												</Button>
 
-												<div className="relative">
+												<div className="relative flex-1">
 													<input
 														type="file"
 														accept="audio/*"
@@ -855,7 +854,7 @@ function PracticeTextPage() {
 													<Button
 														variant="outline"
 														size="lg"
-														className="gap-2"
+														className="w-full gap-2"
 														disabled={!selectedReferenceId}
 													>
 														<RiUploadLine size={18} />

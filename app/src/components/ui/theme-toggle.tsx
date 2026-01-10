@@ -14,9 +14,9 @@ export function ThemeToggle() {
 			className="size-9"
 		>
 			{effectiveTheme === "dark" ? (
-				<RiSunLine className="size-4" />
+				<RiSunLine size={20} />
 			) : (
-				<RiMoonLine className="size-4" />
+				<RiMoonLine size={20} />
 			)}
 		</Button>
 	);

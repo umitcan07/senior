@@ -45,7 +45,7 @@ export function PageContainer({
 	return (
 		<div
 			className={cn(
-				"container mx-auto px-6 py-12 md:px-10 md:py-16",
+				"container mx-auto px-6 py-8 md:py-12 lg:py-16",
 				maxWidthClasses[maxWidth],
 				className,
 			)}
@@ -63,7 +63,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, children }: PageHeaderProps) {
 	return (
-		<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 			<div className="space-y-1">
 				<h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-2xl text-transparent tracking-tight md:text-3xl">
 					{title}

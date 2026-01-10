@@ -176,25 +176,25 @@ interface StatsSummaryProps {
 
 function StatsSummary({ stats }: StatsSummaryProps) {
 	return (
-		<div className="grid gap-4 sm:grid-cols-3">
+		<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
 			<Card className="bg-card/50">
-				<CardContent className="flex flex-col gap-2 p-6">
+				<CardContent className="flex flex-col gap-1 p-4">
 					<p className="text-muted-foreground text-xs uppercase tracking-wide">
 						Total Attempts
 					</p>
-					<span className="font-medium text-3xl tabular-nums">
+					<span className="font-medium text-2xl tabular-nums">
 						{stats.totalAttempts}
 					</span>
 				</CardContent>
 			</Card>
 
 			<Card className="bg-card/50">
-				<CardContent className="flex flex-col gap-2 p-6">
+				<CardContent className="flex flex-col gap-1 p-4">
 					<p className="text-muted-foreground text-xs uppercase tracking-wide">
 						This Week
 					</p>
 					<div className="flex items-baseline gap-2">
-						<span className="font-medium text-3xl tabular-nums">
+						<span className="font-medium text-2xl tabular-nums">
 							{stats.weeklyAttempts}
 						</span>
 						{stats.weeklyProgress !== 0 && (
@@ -215,11 +215,11 @@ function StatsSummary({ stats }: StatsSummaryProps) {
 			</Card>
 
 			<Card className="bg-card/50">
-				<CardContent className="flex flex-col gap-2 p-6">
+				<CardContent className="flex flex-col gap-1 p-4">
 					<p className="text-muted-foreground text-xs uppercase tracking-wide">
 						Average Score
 					</p>
-					<span className="font-medium text-3xl tabular-nums">
+					<span className="font-medium text-2xl tabular-nums">
 						{stats.averageScore}%
 					</span>
 				</CardContent>
@@ -349,7 +349,7 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 			params={{ textId: attempt.textId, analysisId: attempt.analysisId }}
 			className="group block"
 		>
-			<div className="flex items-center gap-6 border-border/40 border-b px-6 py-4 transition-colors group-last:border-0 group-hover:bg-muted/10">
+			<div className="flex items-center gap-6 border-border/40 border-b px-4 py-4 transition-colors group-last:border-0 group-hover:bg-muted/10">
 				<div
 					className={cn(
 						"flex size-12 shrink-0 items-center justify-center rounded-lg font-medium text-lg",

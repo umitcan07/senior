@@ -3,6 +3,7 @@ import {
 	RiBookOpenLine,
 	RiBriefcaseLine,
 	RiChatQuoteLine,
+	RiFilter3Line,
 	RiLeafLine,
 	RiMicLine,
 	RiSearch2Line,
@@ -17,6 +18,15 @@ import {
 	PracticeTextTable,
 } from "@/components/practice-text-card";
 import { Button } from "@/components/ui/button";
+import {
+	Drawer,
+	DrawerClose,
+	DrawerContent,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
+} from "@/components/ui/drawer";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InlineLink } from "@/components/ui/inline-link";
 import { Input } from "@/components/ui/input";
@@ -103,23 +113,20 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 			onClick={onClick}
 			aria-pressed={isSelected}
 			className={cn(
-				"group relative flex aspect-square w-full flex-col justify-end overflow-hidden rounded-xl p-3 transition-all duration-200",
+				"group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-3 transition-all duration-200",
 				categoryGradientVariants({ type }),
 				isSelected
-					? "ring ring-white/30"
-					: "opacity-80 hover:scale-[1.02] hover:opacity-100 active:scale-[0.98]",
+					? "ring-2 ring-white/50 ring-offset-2 ring-offset-background"
+					: "opacity-70 hover:scale-[1.02] hover:opacity-100 active:scale-[0.98]",
 			)}
 		>
 			<Icon
-				className="-top-4 -right-4 absolute size-24 rotate-12 text-white/20 transition-transform duration-200 group-hover:scale-110"
+				className="size-5 shrink-0 text-white/80"
 				strokeWidth={1.5}
 			/>
-
-			<div className="relative z-10 flex flex-col items-start gap-1">
-				<span className="font-semibold text-sm text-white leading-tight tracking-tight sm:text-base">
-					{categoryLabels[type]}
-				</span>
-			</div>
+			<span className="truncate font-medium text-sm text-white leading-tight tracking-tight">
+				{categoryLabels[type]}
+			</span>
 		</button>
 	);
 }
@@ -155,7 +162,7 @@ function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
 				{difficultyConfig.map((item) => {
 					const isActive = value === item.value;
 					return (
-						<TabsTrigger key={item.value} value={item.value} className="flex-1">
+						<TabsTrigger key={item.value} value={item.value} className="flex-1 text-xs sm:text-sm">
 							<span className={isActive ? item.color : undefined}>
 								{item.label}
 							</span>
@@ -282,13 +289,15 @@ function PracticePage() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-12">
+				<div className="flex flex-col gap-10">
 					{allTexts.length > 0 && (
 						<>
 							{/* Filters Section */}
 							<section className="flex flex-col gap-10">
-								<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-									<div className="flex flex-1 items-end gap-4">
+
+								{/* Desktop: Inline filters */}
+								<div className="hidden md:flex md:flex-row md:items-end md:justify-between">
+									<div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end md:flex-1">
 										<div className="relative max-w-md flex-1">
 											<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 											<Input
@@ -325,7 +334,7 @@ function PracticePage() {
 									<h3 className="font-medium text-muted-foreground text-sm">
 										Category
 									</h3>
-									<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+									<div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
 										{categoryTypes.map((type) => (
 											<CategoryCard
 												key={type}
@@ -346,12 +355,76 @@ function PracticePage() {
 										onChange={handleDifficultyFilterChange}
 									/>
 								</div>
+
+								{/* Mobile: Filter button + drawer */}
+								<div className="md:hidden">
+									<Drawer>
+										<DrawerTrigger asChild>
+											<Button variant="outline" className="w-full gap-2">
+												<RiFilter3Line size={16} />
+												Filters
+												{(searchQuery || wordCountFilter !== "all") && (
+													<span className="ml-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+														{(searchQuery ? 1 : 0) + (wordCountFilter !== "all" ? 1 : 0)}
+													</span>
+												)}
+											</Button>
+										</DrawerTrigger>
+										<DrawerContent aria-describedby={undefined}>
+											<DrawerHeader>
+												<DrawerTitle>Filters</DrawerTitle>
+											</DrawerHeader>
+											<div className="flex flex-col gap-4 px-4 pb-6">
+												<div className="flex flex-col gap-2">
+													<label className="font-medium text-muted-foreground text-sm">Search</label>
+													<div className="relative">
+														<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
+														<Input
+															type="search"
+															placeholder="Search texts..."
+															className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
+															value={searchQuery}
+															onChange={(e) => {
+																setSearchQuery(e.target.value);
+																setVisibleCount(ITEMS_PER_PAGE);
+															}}
+														/>
+													</div>
+												</div>
+												<div className="flex flex-col gap-2">
+													<label className="font-medium text-muted-foreground text-sm">Length</label>
+													<Select
+														value={wordCountFilter}
+														onValueChange={(v) =>
+															setWordCountFilter(v as WordCountCategory)
+														}
+													>
+														<SelectTrigger className="w-full border-border/40 bg-muted/40">
+															<SelectValue placeholder="Length" />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectItem value="all">Any Length</SelectItem>
+															<SelectItem value="short">Short (&lt;15)</SelectItem>
+															<SelectItem value="medium">Medium (15-30)</SelectItem>
+															<SelectItem value="long">Long (30+)</SelectItem>
+														</SelectContent>
+													</Select>
+												</div>
+											</div>
+											<DrawerFooter>
+												<DrawerClose asChild>
+													<Button>Apply Filters</Button>
+												</DrawerClose>
+											</DrawerFooter>
+										</DrawerContent>
+									</Drawer>
+								</div>
 							</section>
 						</>
 					)}
 
 					{/* Results Section */}
-					<section className="flex flex-col gap-12">
+					<section className="flex flex-col gap-10">
 						{searchedTexts.length > 0 ? (
 							<>
 								{/* Previously Attempted Texts */}
@@ -389,7 +462,7 @@ function PracticePage() {
 								)}
 
 								{hasMore && (
-									<div className="flex justify-center pt-4 pb-4">
+									<div className="flex justify-center py-2">
 										<Button variant="outline" onClick={handleLoadMore}>
 											<RiArrowDownLine size={16} />
 											Load More

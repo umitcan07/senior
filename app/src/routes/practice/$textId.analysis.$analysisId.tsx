@@ -408,15 +408,15 @@ function ScoreOverview({
 						{getScoreLabel(percentage)}
 					</Badge>
 				</CardHeader>
-				<CardContent>
-					<div className="flex flex-col items-center gap-8 py-6">
-						<ScoreRing score={overallScore} size="xl" label="Overall" />
-						<div className="flex w-full justify-center gap-16 border-border/40 border-t pt-8">
+				<CardContent className="px-4 py-4">
+					<div className="flex flex-col items-center gap-4">
+						<ScoreRing score={overallScore} size="lg" label="Overall" />
+						<div className="flex w-full items-center justify-center gap-8 border-border/40 border-t pt-4">
 							{phonemeScore !== null && (
-								<ScoreRing score={phonemeScore} size="md" label="Phonemes" />
+								<ScoreRing score={phonemeScore} size="sm" label="Phonemes" />
 							)}
 							{wordScore !== null && (
-								<ScoreRing score={wordScore} size="md" label="Words" />
+								<ScoreRing score={wordScore} size="sm" label="Words" />
 							)}
 						</div>
 					</div>
@@ -733,7 +733,7 @@ function AnalysisPage() {
 	return (
 		<MainLayout>
 			<PageContainer maxWidth="xl">
-				<div className="space-y-8">
+				<div className="flex flex-col gap-6">
 					{/* Header */}
 					<motion.div
 						className="flex items-center gap-4"
@@ -798,11 +798,25 @@ function AnalysisPage() {
 
 					{/* Comparisons - stacked vertically for better readability */}
 					<motion.div
-						className="flex flex-col gap-8"
+						className="flex flex-col gap-6"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.4, delay: 0.15 }}
 					>
+						{/* Shared Legend */}
+						{(wordErrors?.length > 0 || phonemeErrors?.length > 0) && (
+							<div className="flex flex-wrap items-center gap-3 text-muted-foreground text-[10px]">
+								<span className="text-muted-foreground/70">Legend:</span>
+								<span className="flex items-center gap-1">
+									<span className="size-1.5 rounded-full bg-destructive/60" />
+									Substitution
+								</span>
+								<span className="flex items-center gap-1">
+									<span className="size-1.5 rounded-full bg-amber-500/60" />
+									Insertion/Deletion
+								</span>
+							</div>
+						)}
 						{analysis.targetWords && analysis.recognizedWords && (
 							<DiffViewer
 								target={analysis.targetWords}
