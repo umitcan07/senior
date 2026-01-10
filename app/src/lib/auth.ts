@@ -5,14 +5,11 @@ import { createErrorResponse, ErrorCode } from "./errors";
 /**
  * Get Clerk secret key from environment
  */
-function getClerkSecretKey(): string {
-	const secretKey =
-		process.env.CLERK_SECRET_KEY || process.env.VITE_CLERK_SECRET_KEY;
+export function getClerkSecretKey(): string {
+	const secretKey = process.env.CLERK_SECRET_KEY;
 
 	if (!secretKey) {
-		throw new Error(
-			"CLERK_SECRET_KEY or VITE_CLERK_SECRET_KEY environment variable is not set",
-		);
+		throw new Error("CLERK_SECRET_KEY environment variable is not set");
 	}
 
 	return secretKey;

@@ -8,6 +8,7 @@ import {
 	type UserPreferences,
 	upsertUserPreferences,
 } from "@/db/user-preferences";
+import { getClerkSecretKey } from "./auth";
 import {
 	type ApiResponse,
 	createErrorResponse,
@@ -25,19 +26,6 @@ const UpdateUserPreferencesSchema = z.object({
 	userId: z.string().min(1, "User ID is required"),
 	preferredAuthorId: z.string().uuid().nullable().optional(),
 });
-
-function getClerkSecretKey(): string {
-	const secretKey =
-		process.env.CLERK_SECRET_KEY || process.env.VITE_CLERK_SECRET_KEY;
-
-	if (!secretKey) {
-		throw new Error(
-			"CLERK_SECRET_KEY or VITE_CLERK_SECRET_KEY environment variable is not set",
-		);
-	}
-
-	return secretKey;
-}
 
 async function validateUserId(userId: string): Promise<boolean> {
 	try {

@@ -16,12 +16,14 @@ COPY . .
 
 # Build-time environment variables (for Vite - must be available during build)
 # Priority: Docker secret (from fly deploy --build-secret) > .env.local > .env
-# For Fly.io: Set secret with: fly secrets set VITE_CLERK_PUBLISHABLE_KEY=pk_live_...
-# Then deploy with: fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+# For Fly.io production: Pass via --build-secret during deploy
 # For local dev: Use .env.local file
-# The secret is optional (2>/dev/null) to allow local builds without it
 RUN --mount=type=secret,id=VITE_CLERK_PUBLISHABLE_KEY \
     export VITE_CLERK_PUBLISHABLE_KEY="$(cat /run/secrets/VITE_CLERK_PUBLISHABLE_KEY 2>/dev/null || echo '')" && \
+    if [ -z "$VITE_CLERK_PUBLISHABLE_KEY" ] && [ -z "$(cat /run/secrets/VITE_CLERK_PUBLISHABLE_KEY 2>/dev/null)" ]; then \
+      echo "Warning: VITE_CLERK_PUBLISHABLE_KEY not found in build secret, checking .env files..."; \
+    fi && \
+    echo "VITE_CLERK_PUBLISHABLE_KEY is set: $([ -n "$VITE_CLERK_PUBLISHABLE_KEY" ] && echo 'yes' || echo 'no')" && \
     pnpm run build
 
 FROM node:20-alpine AS runner
