@@ -41,7 +41,6 @@ const INFO_CONTENT = {
 interface SegmentProps {
 	segment: string;
 	error?: PhonemeError | WordError;
-	isPhoneme: boolean;
 	audioSrc?: string;
 	onSegmentClick?: (startMs: number, endMs: number) => void;
 }
@@ -49,7 +48,6 @@ interface SegmentProps {
 function Segment({
 	segment,
 	error,
-	isPhoneme,
 	audioSrc,
 	onSegmentClick,
 }: SegmentProps) {
@@ -86,15 +84,16 @@ function Segment({
 						errorTextVariants({ errorType: error.errorType }),
 						"border font-medium",
 					),
+				!hasError &&
+					"bg-green-950/10 dark:bg-green-900/20 text-green-800 dark:text-green-300 font-medium border border-green-800/20 dark:border-green-700/30",
 				canPlay &&
 					"cursor-pointer hover:scale-105 hover:ring-2 hover:ring-primary/20",
 				!canPlay && "cursor-default",
-				!hasError && "text-foreground/70",
 			)}
 			onClick={handleClick}
 			disabled={!canPlay}
 		>
-			{isPhoneme ? `/${segment}/` : segment}
+			{segment}
 			{canPlay && <RiPlayLine size={10} className="opacity-50" />}
 		</button>
 	);
@@ -226,7 +225,6 @@ export function DiffViewer({
 								key={`target-${index}-${segment}`}
 								segment={segment}
 								error={relevantError}
-								isPhoneme={type === "phoneme"}
 								audioSrc={audioSrc}
 								onSegmentClick={onSegmentClick}
 							/>
@@ -258,7 +256,6 @@ export function DiffViewer({
 								key={`recognized-${index}-${segment}`}
 								segment={segment}
 								error={relevantError}
-								isPhoneme={type === "phoneme"}
 								audioSrc={audioSrc}
 								onSegmentClick={onSegmentClick}
 							/>

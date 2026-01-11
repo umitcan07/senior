@@ -12,9 +12,10 @@ export type UserAttempt = {
 	id: string;
 	textId: string;
 	textPreview: string;
-	score: number;
+	score: number | null; // null for pending/processing/failed
 	date: Date;
 	analysisId: string;
+	status: "pending" | "processing" | "completed" | "failed";
 };
 
 export type AttemptStats = {
@@ -43,10 +44,7 @@ export async function getUserAttempts(
 ): Promise<UserAttempt[]> {
 	const { textId, limit, offset } = options || {};
 
-	const conditions = [
-		eq(userRecordings.userId, userId),
-		eq(analyses.status, "completed"), // Only show completed analyses
-	];
+	const conditions = [eq(userRecordings.userId, userId)];
 	if (textId) {
 		conditions.push(eq(practiceTexts.id, textId));
 	}
@@ -56,9 +54,10 @@ export async function getUserAttempts(
 			id: analyses.id,
 			textId: practiceTexts.id,
 			textPreview: practiceTexts.content,
-			score: sql<number>`COALESCE((${analyses.overallScore} * 100)::int, 0)`,
+			score: sql<number | null>`CASE WHEN ${analyses.status} = 'completed' AND ${analyses.overallScore} IS NOT NULL THEN (${analyses.overallScore} * 100)::int ELSE NULL END`,
 			date: analyses.createdAt,
 			analysisId: analyses.id,
+			status: analyses.status,
 		})
 		.from(analyses)
 		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
@@ -90,6 +89,7 @@ export async function getUserAttempts(
 		score: row.score,
 		date: row.date,
 		analysisId: row.analysisId,
+		status: row.status,
 	}));
 }
 

@@ -582,15 +582,44 @@ interface RecentAttemptsProps {
 		id: string;
 		textId: string;
 		textPreview: string;
-		score: number;
+		score: number | null;
 		date: Date;
 		analysisId: string;
+		status: "pending" | "processing" | "completed" | "failed";
 	}>;
 	textId: string;
 }
 
 function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 	if (attempts.length === 0) return null;
+
+	const getStatusBadge = (status: string, score: number | null) => {
+		if (status === "completed" && score !== null) {
+			return null; // Show score instead
+		}
+		if (status === "pending") {
+			return (
+				<Badge variant="secondary" className="h-5 bg-blue-500/10 text-blue-600 text-[10px] dark:text-blue-400">
+					Pending
+				</Badge>
+			);
+		}
+		if (status === "processing") {
+			return (
+				<Badge variant="secondary" className="h-5 bg-amber-500/10 text-amber-600 text-[10px] dark:text-amber-400">
+					Processing
+				</Badge>
+			);
+		}
+		if (status === "failed") {
+			return (
+				<Badge variant="secondary" className="h-5 bg-red-500/10 text-red-600 text-[10px] dark:text-red-400">
+					Failed
+				</Badge>
+			);
+		}
+		return null;
+	};
 
 	return (
 		<div className="flex flex-col gap-4 pt-20">
@@ -607,36 +636,47 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 			</div>
 
 			<div className="grid grid-cols-2 gap-2 sm:flex sm:flex-col">
-				{attempts.map((attempt) => (
-					<Link
-						key={attempt.id}
-						to="/practice/$textId/analysis/$analysisId"
-						params={{ textId, analysisId: attempt.analysisId }}
-						className="group flex flex-col gap-1 rounded-lg border border-border/40 p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between sm:rounded-md sm:border-0 sm:border-b sm:p-4 sm:last:border-0"
-					>
-						<div className="flex items-center gap-3 sm:gap-4">
-							<span
-								className={cn(
-									"flex size-8 items-center justify-center rounded-md font-medium text-xs tabular-nums",
-									getScoreLevel(attempt.score) === "high" &&
-										"bg-emerald-500/10 text-emerald-600",
-									getScoreLevel(attempt.score) === "medium" &&
-										"bg-amber-500/10 text-amber-600",
-									getScoreLevel(attempt.score) === "low" &&
-										"bg-red-500/10 text-red-600",
+				{attempts.map((attempt) => {
+					const statusBadge = getStatusBadge(attempt.status, attempt.score);
+					const showScore = attempt.status === "completed" && attempt.score !== null;
+
+					return (
+						<Link
+							key={attempt.id}
+							to="/practice/$textId/analysis/$analysisId"
+							params={{ textId, analysisId: attempt.analysisId }}
+							className="group flex flex-col gap-1 rounded-lg border border-border/40 p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between sm:rounded-md sm:border-0 sm:border-b sm:p-4 sm:last:border-0"
+						>
+							<div className="flex items-center gap-3 sm:gap-4">
+								{showScore ? (
+									<span
+										className={cn(
+											"flex size-8 items-center justify-center rounded-md font-medium text-xs tabular-nums",
+											getScoreLevel(attempt.score!) === "high" &&
+												"bg-emerald-500/10 text-emerald-600",
+											getScoreLevel(attempt.score!) === "medium" &&
+												"bg-amber-500/10 text-amber-600",
+											getScoreLevel(attempt.score!) === "low" &&
+												"bg-red-500/10 text-red-600",
+										)}
+									>
+										{attempt.score}
+									</span>
+								) : (
+									<div className="flex size-8 items-center justify-center">
+										{statusBadge}
+									</div>
 								)}
-							>
-								{attempt.score}
+								<span className="text-muted-foreground text-xs">
+									{formatRelativeTime(attempt.date)}
+								</span>
+							</div>
+							<span className="hidden text-muted-foreground text-xs opacity-0 transition-opacity group-hover:opacity-100 sm:inline">
+								View →
 							</span>
-							<span className="text-muted-foreground text-xs">
-								{formatRelativeTime(attempt.date)}
-							</span>
-						</div>
-						<span className="hidden text-muted-foreground text-xs opacity-0 transition-opacity group-hover:opacity-100 sm:inline">
-							View →
-						</span>
-					</Link>
-				))}
+						</Link>
+					);
+				})}
 			</div>
 		</div>
 	);

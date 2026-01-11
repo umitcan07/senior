@@ -26,6 +26,27 @@ export async function getAnalysisById(id: string): Promise<Analysis | null> {
 	return result || null;
 }
 
+export async function getAnalysisByJobId(jobId: string): Promise<Analysis | null> {
+	const [result] = await db
+		.select()
+		.from(analyses)
+		.where(eq(analyses.jobId, jobId))
+		.limit(1);
+	return result || null;
+}
+
+export async function updateAnalysis(
+	id: string,
+	updates: Partial<Omit<Analysis, "id" | "createdAt">>,
+): Promise<Analysis | null> {
+	const [result] = await db
+		.update(analyses)
+		.set(updates)
+		.where(eq(analyses.id, id))
+		.returning();
+	return result || null;
+}
+
 export async function insertPhonemeErrors(
 	errors: Omit<NewPhonemeError, "id" | "createdAt">[],
 ): Promise<PhonemeError[]> {

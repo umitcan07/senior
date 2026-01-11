@@ -351,7 +351,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 							{type === "phoneme" ? (
 								<>
 									<span className="font-medium font-mono text-sm">
-										/{error.expected ?? "∅"}/
+										{error.expected ?? "∅"}
 									</span>
 									<span className="text-muted-foreground">→</span>
 									<span
@@ -362,7 +362,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 												"text-amber-600 dark:text-amber-400",
 										)}
 									>
-										/{error.actual ?? "∅"}/
+										{error.actual ?? "∅"}
 									</span>
 								</>
 							) : (
