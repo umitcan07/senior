@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import {
@@ -6,6 +7,7 @@ import {
 	getLatestIpaGenerationJob,
 } from "@/db/ipa-generation-job";
 import { getReferenceSpeechWithText } from "@/db/reference";
+import { requireAdmin } from "@/lib/auth";
 import { getPublicUrl } from "@/lib/r2";
 import {
 	getRunPodConfig,
@@ -25,6 +27,18 @@ export const Route = createFileRoute("/api/admin/ipa-generation")({
 			// POST /api/admin/ipa-generation - Submit a new IPA generation job
 			POST: async ({ request }) => {
 				try {
+					// Require admin access
+					const adminError = await requireAdmin(request);
+					if (adminError) {
+						return Response.json(
+							{
+								success: false,
+								error: adminError.error.message,
+							},
+							{ status: adminError.error.statusCode ?? 403 },
+						);
+					}
+
 					const body = await request.json();
 					const parseResult = SubmitIpaGenerationRequestSchema.safeParse(body);
 
@@ -161,6 +175,18 @@ export const Route = createFileRoute("/api/admin/ipa-generation")({
 			// GET /api/admin/ipa-generation?id=<job_id> - Get job status
 			GET: async ({ request }) => {
 				try {
+					// Require admin access
+					const adminError = await requireAdmin(request);
+					if (adminError) {
+						return Response.json(
+							{
+								success: false,
+								error: adminError.error.message,
+							},
+							{ status: adminError.error.statusCode ?? 403 },
+						);
+					}
+
 					const url = new URL(request.url);
 					const externalJobId = url.searchParams.get("id");
 

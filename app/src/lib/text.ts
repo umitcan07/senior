@@ -164,16 +164,17 @@ export const serverGetPracticeTextsWithAttemptStats = createServerFn({
 }).handler(async (): Promise<ApiResponse<PracticeTextWithAttemptStats[]>> => {
 	try {
 
+		// Get authenticated userId from Clerk (optional for this endpoint)
 		let userId: string | null = null;
-
-		// Try to get authenticated userId from Clerk
 		try {
-			const authObj = await auth();
-			if (authObj.userId) {
-				userId = authObj.userId;
+			const authResult = await auth();
+			const isAuthenticated = authResult.isAuthenticated ?? false;
+			const authUserId = authResult.userId ?? null;
+			if (isAuthenticated && authUserId) {
+				userId = authUserId;
 			}
 		} catch {
-			// Auth not available, keep as null
+			// Auth not available, keep as null (this endpoint allows unauthenticated access)
 		}
 
 		const result = await getPracticeTextsWithAttemptStats(userId);

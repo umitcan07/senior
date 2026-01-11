@@ -32,15 +32,30 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 
 			const buffer = Buffer.from(data.audioBase64, "base64");
 
-			// Get authenticated user ID or fallback to guest
-			let userId = "guest";
+			// Get authenticated user ID - require authentication
+			let isAuthenticated = false;
+			let userId: string | null = null;
 			try {
-				const authObj = await auth();
-				if (authObj.userId) {
-					userId = authObj.userId;
-				}
-			} catch {
-				// Auth not available, keep as guest
+				const authResult = await auth();
+				isAuthenticated = authResult.isAuthenticated ?? false;
+				userId = authResult.userId ?? null;
+			} catch (authError) {
+				// Auth context not available
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
+
+			if (!isAuthenticated || !userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
 			}
 
 			console.log(`[Server] attribution recording to user: ${userId}`);

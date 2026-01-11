@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -53,6 +54,33 @@ type SummaryLoaderData = {
 export const Route = createFileRoute("/summary")({
 	component: FeedPage,
 	loader: async (): Promise<SummaryLoaderData> => {
+		// Check authentication before calling server function
+		let isAuthenticated = false;
+		let userId: string | null = null;
+		try {
+			const authResult = await auth();
+			isAuthenticated = authResult.isAuthenticated ?? false;
+			userId = authResult.userId ?? null;
+		} catch (error) {
+			// Auth context not available - treat as unauthenticated
+			console.warn("Auth not available in summary loader:", error);
+		}
+
+		if (!isAuthenticated || !userId) {
+			// Return empty data if not authenticated
+			return {
+				attempts: [],
+				stats: {
+					totalAttempts: 0,
+					weeklyAttempts: 0,
+					averageScore: 0,
+					weeklyProgress: 0,
+				},
+				commonErrors: [],
+				texts: [],
+			};
+		}
+
 		const response = await serverGetSummary();
 
 		if (!response.success || !response.data) {
@@ -267,14 +295,14 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 						"flex size-12 shrink-0 items-center justify-center rounded-lg font-medium text-lg",
 						// Using minimal text color instead of heavy background
 						attempt.score !== null &&
-							getScoreLevel(attempt.score) === "high" &&
-							"bg-emerald-500/10 text-emerald-600",
+						getScoreLevel(attempt.score) === "high" &&
+						"bg-emerald-500/10 text-emerald-600",
 						attempt.score !== null &&
-							getScoreLevel(attempt.score) === "medium" &&
-							"bg-amber-500/10 text-amber-600",
+						getScoreLevel(attempt.score) === "medium" &&
+						"bg-amber-500/10 text-amber-600",
 						attempt.score !== null &&
-							getScoreLevel(attempt.score) === "low" &&
-							"bg-red-500/10 text-red-600",
+						getScoreLevel(attempt.score) === "low" &&
+						"bg-red-500/10 text-red-600",
 						attempt.score === null && "bg-muted text-muted-foreground",
 					)}
 				>

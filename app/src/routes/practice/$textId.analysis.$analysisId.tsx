@@ -74,6 +74,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 	component: AnalysisPage,
 	loader: async ({ params }): Promise<AnalysisLoaderData> => {
 		try {
+			// serverGetAnalysisDetails now handles auth and ownership verification
 			const response = (await serverGetAnalysisDetails({
 				data: { analysisId: params.analysisId },
 			})) as ApiResponse<{
@@ -85,6 +86,25 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				wordErrors: WordError[];
 				assessmentJob: { id: string; status: string } | null;
 			} | null>;
+
+			// If auth failed or access denied, return empty data
+			if (!response.success) {
+				if (response.error.statusCode === 401 || response.error.statusCode === 403) {
+					return {
+						analysis: null,
+						userRecording: null,
+						audioQualityMetrics: null,
+						reference: null,
+						text: null,
+						author: null,
+						phonemeErrors: [],
+						wordErrors: [],
+						previousAttempts: [],
+						textId: params.textId,
+						jobSubmitted: false,
+					};
+				}
+			}
 
 			if (!response.success || !response.data) {
 				return {
@@ -283,7 +303,7 @@ function ScoreOverview({
 				<CardContent className="px-4 py-6">
 					<div className="flex flex-col items-center gap-8">
 						<ScoreRing score={overallScore} size="xl" label="Overall Score" />
-						
+
 						<div className="grid w-full grid-cols-2 gap-4 border-border/40 border-t pt-6">
 							<div className="flex flex-col items-center border-border/40 border-r">
 								{phonemeScore !== null ? (
@@ -991,7 +1011,7 @@ function AnalysisPage() {
 										{Number(qualityMetrics.snrDb) < 15 && (
 											<li>High background noise: {qualityMetrics.snrDb}dB</li>
 										)}
-										{Number(qualityMetrics.silenceRatio) > 0.7 && (
+										{Number(qualityMetrics.silenceRatio) > 0.75 && (
 											<li>Too much silence: {Number(qualityMetrics.silenceRatio) * 100}% of the recording.</li>
 										)}
 										{Number(qualityMetrics.clippingRatio) > 0.01 && (
@@ -1076,20 +1096,20 @@ function AnalysisPage() {
 							</div>
 						)}
 
-						{analysis.targetPhonemes && analysis.recognizedPhonemes && (
+						{analysis.targetPhonemes && (
 							<DiffViewer
 								target={analysis.targetPhonemes}
-								recognized={analysis.recognizedPhonemes}
+								recognized={analysis.recognizedPhonemes || ""}
 								errors={phonemeErrors ?? []}
 								type="phoneme"
 								audioSrc={audioSrc}
 								onSegmentClick={handlePlaySegment}
 							/>
 						)}
-						{analysis.targetWords && analysis.recognizedWords && (
+						{analysis.targetWords && (
 							<DiffViewer
 								target={analysis.targetWords}
-								recognized={analysis.recognizedWords}
+								recognized={analysis.recognizedWords || ""}
 								errors={wordErrors ?? []}
 								type="word"
 								audioSrc={audioSrc}

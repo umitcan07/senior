@@ -41,23 +41,26 @@ async function validateUserId(userId: string): Promise<boolean> {
 
 /**
  * Server function to get preferred author ID.
- * Uses getAuth from @clerk/tanstack-react-start/server for SSR auth context.
- * Falls back to "guest" if user is not authenticated.
+ * Requires authentication - returns null if user is not authenticated.
  */
 export const serverGetPreferredAuthorId = createServerFn({
 	method: "GET",
 }).handler(async (): Promise<string | null> => {
 	try {
-		let userId = "guest";
-
-		// Try to get authenticated userId from Clerk
+		// Get authenticated userId from Clerk
+		let isAuthenticated = false;
+		let userId: string | null = null;
 		try {
-			const authObj = await auth();
-			if (authObj.userId) {
-				userId = authObj.userId;
-			}
-		} catch {
-			// Auth not available in this context, use guest
+			const authResult = await auth();
+			isAuthenticated = authResult.isAuthenticated ?? false;
+			userId = authResult.userId ?? null;
+		} catch (authError) {
+			// Auth context not available
+			return null;
+		}
+
+		if (!isAuthenticated || !userId) {
+			return null;
 		}
 
 		const prefs = await getUserPreferences(userId);

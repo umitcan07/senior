@@ -30,21 +30,35 @@ export type SummaryData = {
 
 /**
  * Get summary data for the current user
+ * Requires authentication - returns error if user is not authenticated.
  */
 export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ApiResponse<SummaryData>> => {
 		try {
-			// Get userId from auth, fallback to guest
-			let userId = "guest";
-
-			// Try to get authenticated userId from Clerk
+			// Get authenticated userId from Clerk
+			let isAuthenticated = false;
+			let userId: string | null = null;
 			try {
-				const authObj = await auth();
-				if (authObj.userId) {
-					userId = authObj.userId;
-				}
-			} catch {
-				// Auth not available, use guest
+				const authResult = await auth();
+				isAuthenticated = authResult.isAuthenticated ?? false;
+				userId = authResult.userId ?? null;
+			} catch (authError) {
+				// Auth context not available
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
+
+			if (!isAuthenticated || !userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
 			}
 
 			const [attempts, stats, commonErrors, texts] = await Promise.all([
@@ -86,6 +100,7 @@ const GetRecentAttemptsSchema = z.object({
 
 /**
  * Get recent attempts for a specific text
+ * Requires authentication - returns error if user is not authenticated.
  */
 export const serverGetRecentAttemptsForText = createServerFn({
 	method: "GET",
@@ -96,17 +111,30 @@ export const serverGetRecentAttemptsForText = createServerFn({
 			data,
 		}): Promise<ApiResponse<UserAttempt[]>> => {
 			try {
-				// Get userId from auth, fallback to guest
-				let userId = "guest";
-
-				// Try to get authenticated userId from Clerk
+				// Get authenticated userId from Clerk
+				let isAuthenticated = false;
+				let userId: string | null = null;
 				try {
-					const authObj = await auth();
-					if (authObj.userId) {
-						userId = authObj.userId;
-					}
-				} catch {
-					// Auth not available, use guest
+					const authResult = await auth();
+					isAuthenticated = authResult.isAuthenticated ?? false;
+					userId = authResult.userId ?? null;
+				} catch (authError) {
+					// Auth context not available
+					return createErrorResponse(
+						ErrorCode.AUTH_ERROR,
+						"User is not authenticated",
+						undefined,
+						401,
+					);
+				}
+
+				if (!isAuthenticated || !userId) {
+					return createErrorResponse(
+						ErrorCode.AUTH_ERROR,
+						"User is not authenticated",
+						undefined,
+						401,
+					);
 				}
 
 				const attempts = await getUserAttempts(userId, {

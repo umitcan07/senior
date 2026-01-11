@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { getAnalysisWithDetails, updateAnalysis } from "@/db/analysis";
@@ -40,6 +41,28 @@ export const Route = createFileRoute("/api/assessment")({
 
 					const { analysisId } = parseResult.data;
 
+					// Verify user is authenticated
+					let isAuthenticated = false;
+					let userId: string | null = null;
+					try {
+						const authResult = await auth();
+						isAuthenticated = authResult.isAuthenticated ?? false;
+						userId = authResult.userId ?? null;
+					} catch (authError) {
+						// Auth context not available
+						return Response.json(
+							{ success: false, error: "Unauthorized" },
+							{ status: 401 },
+						);
+					}
+
+					if (!isAuthenticated || !userId) {
+						return Response.json(
+							{ success: false, error: "Unauthorized" },
+							{ status: 401 },
+						);
+					}
+
 					// Get analysis with related data
 					const data = await getAnalysisWithDetails(analysisId);
 					if (!data) {
@@ -50,6 +73,14 @@ export const Route = createFileRoute("/api/assessment")({
 					}
 
 					const { analysis, userRecording, referenceSpeech } = data;
+
+					// Verify the recording belongs to the authenticated user
+					if (userRecording.userId !== userId) {
+						return Response.json(
+							{ success: false, error: "Forbidden" },
+							{ status: 403 },
+						);
+					}
 
 					// Check if there's already a pending job
 					const existingJob = await getLatestAssessmentJob(analysisId);

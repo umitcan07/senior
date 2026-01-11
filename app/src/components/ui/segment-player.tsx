@@ -146,9 +146,9 @@ export function SegmentPlayer({
 	// Calculate segment progress
 	const segmentProgress = endSec
 		? Math.max(
-				0,
-				Math.min(100, ((currentTime - startSec) / segmentDuration) * 100),
-			)
+			0,
+			Math.min(100, ((currentTime - startSec) / segmentDuration) * 100),
+		)
 		: 0;
 	const segmentCurrentTime = Math.max(0, currentTime - startSec);
 
@@ -199,7 +199,7 @@ export function SegmentPlayer({
 	return (
 		<div
 			className={cn(
-				"rounded-xl border bg-linear-to-br from-primary/10 via-background to-primary/5 p-4",
+				"rounded-xl border",
 				className,
 			)}
 		>

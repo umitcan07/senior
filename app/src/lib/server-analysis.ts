@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
@@ -56,10 +57,51 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 				return createSuccessResponse(null);
 			}
 
-			const [phonemeErrors, wordErrors, userRecording, assessmentJob, reference] = await Promise.all([
+			// Get user recording to verify ownership
+			const userRecording = await getUserRecordingById(analysis.userRecordingId);
+			if (!userRecording) {
+				return createSuccessResponse(null);
+			}
+
+			// Verify user owns this analysis - require authentication
+			let isAuthenticated = false;
+			let userId: string | null = null;
+			try {
+				const authResult = await auth();
+				isAuthenticated = authResult.isAuthenticated ?? false;
+				userId = authResult.userId ?? null;
+			} catch (authError) {
+				// Auth context not available
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
+
+			if (!isAuthenticated || !userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
+
+			// Verify the recording belongs to the authenticated user
+			if (userRecording.userId !== userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"Access denied",
+					undefined,
+					403,
+				);
+			}
+
+			const [phonemeErrors, wordErrors, assessmentJob, reference] = await Promise.all([
 				getPhonemeErrorsByAnalysisId(analysis.id),
 				getWordErrorsByAnalysisId(analysis.id),
-				getUserRecordingById(analysis.userRecordingId),
 				getLatestAssessmentJob(analysis.id),
 				getReferenceSpeechById(analysis.referenceSpeechId),
 			]);

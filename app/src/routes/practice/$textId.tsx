@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
+import { auth } from "@clerk/tanstack-react-start/server";
 import {
 	RiAlertLine,
 	RiArrowDownSLine,
@@ -36,6 +37,7 @@ import {
 	WaveformPlayerInline,
 } from "@/components/ui/waveform-player";
 import type { Author, ReferenceSpeech } from "@/db/types";
+import type { ApiResponse } from "@/lib/errors";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
@@ -48,11 +50,22 @@ import { cn, formatRelativeTime } from "@/lib/utils";
 export const Route = createFileRoute("/practice/$textId")({
 	component: PracticeTextLayout,
 	loader: async ({ params }) => {
-		const [textResult, preferredAuthorId] = await Promise.all([
+		// Check authentication before calling user-specific server functions
+		let isAuthenticated = false;
+		try {
+			const authResult = await auth();
+			isAuthenticated = authResult.isAuthenticated ?? false;
+		} catch (error) {
+			// Auth context not available - treat as unauthenticated
+			console.warn("Auth not available in practice loader:", error);
+		}
+
+		const [textResult, preferredAuthorIdResult] = await Promise.all([
 			serverGetPracticeTextById({
 				data: { id: params.textId },
-			}),
-			serverGetPreferredAuthorId(),
+			}) as Promise<ApiResponse<any>>,
+			// Only call if authenticated
+			isAuthenticated ? serverGetPreferredAuthorId() : Promise.resolve(null),
 		]);
 
 		if (!textResult.success || !textResult.data) {
@@ -64,32 +77,34 @@ export const Route = createFileRoute("/practice/$textId")({
 			};
 		}
 
-		const referencesResult = await serverGetReferencesForText({
+		const referencesResult = (await serverGetReferencesForText({
 			data: { textId: params.textId },
-		});
+		})) as ApiResponse<any>;
 
 		const references =
 			referencesResult.success && referencesResult.data
-				? referencesResult.data.map((ref) => ({
-						...ref,
-						author: ref.author,
-					}))
+				? referencesResult.data.map((ref: any) => ({
+					...ref,
+					author: ref.author,
+				}))
 				: [];
 
-		// Get recent attempts for this text
-		const recentAttemptsResult = await serverGetRecentAttemptsForText({
-			data: { textId: params.textId },
-		});
-
-		const recentAttempts = recentAttemptsResult.success && recentAttemptsResult.data
-			? recentAttemptsResult.data
-			: [];
+		// Get recent attempts for this text - only if authenticated
+		let recentAttempts: any[] = [];
+		if (isAuthenticated) {
+			const recentAttemptsResult = (await serverGetRecentAttemptsForText({
+				data: { textId: params.textId },
+			})) as ApiResponse<any>;
+			recentAttempts = recentAttemptsResult.success && recentAttemptsResult.data
+				? recentAttemptsResult.data
+				: [];
+		}
 
 		return {
 			text: textResult.data,
 			references,
 			recentAttempts,
-			preferredAuthorId,
+			preferredAuthorId: preferredAuthorIdResult,
 		};
 	},
 	pendingComponent: TextDetailSkeleton,
@@ -182,11 +197,29 @@ function useRecording(textId: string) {
 		}, 600);
 	}, [audioRecorder]);
 
-	// Start recording with countdown
+	// Start recording with countdown - only start countdown after mic permission is granted
 	const startRecording = useCallback(async () => {
 		setUiState("requesting");
-		// Start countdown, which will call audioRecorder.startRecording when done
-		runCountdown();
+
+		try {
+			// Request microphone permission first
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: {
+					echoCancellation: true,
+					noiseSuppression: true,
+					autoGainControl: true,
+				},
+			});
+
+			// Permission granted - stop the stream (we'll get a new one when recording starts)
+			stream.getTracks().forEach((track) => track.stop());
+
+			// Now start countdown, which will call audioRecorder.startRecording when done
+			runCountdown();
+		} catch (err) {
+			// Permission denied or error - reset to idle state
+			setUiState("idle");
+		}
 	}, [runCountdown]);
 
 	// Stop recording
@@ -446,7 +479,7 @@ function ReferenceVoice({
 								</button>
 							</CollapsibleTrigger>
 
-							<CollapsibleContent className="fade-in zoom-in-95 data-[state=closed]:fade-out data-[state=closed]:zoom-out-95 absolute z-10 mt-2 w-full origin-top animate-in rounded-xl border bg-popover p-1 shadow-lg data-[state=closed]:animate-out">
+							<CollapsibleContent className="fade-in zoom-in-95 data-[state=closed]:fade-out data-[state=closed]:zoom-out-95 absolute z-10 mt-2 w-full origin-top rounded-xl border bg-popover p-1 shadow-lg data-[state=closed]:animate-out">
 								<div className="flex flex-col gap-1">
 									{references.map((ref) => {
 										const isSelected = selectedId === ref.id;
@@ -646,11 +679,11 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 										className={cn(
 											"flex size-8 items-center justify-center rounded-md font-medium text-xs tabular-nums",
 											getScoreLevel(attempt.score!) === "high" &&
-												"bg-emerald-500/10 text-emerald-600",
+											"bg-emerald-500/10 text-emerald-600",
 											getScoreLevel(attempt.score!) === "medium" &&
-												"bg-amber-500/10 text-amber-600",
+											"bg-amber-500/10 text-amber-600",
 											getScoreLevel(attempt.score!) === "low" &&
-												"bg-red-500/10 text-red-600",
+											"bg-red-500/10 text-red-600",
 										)}
 									>
 										{attempt.score}
@@ -989,7 +1022,7 @@ function PracticeTextPage() {
 																	42 *
 																	(1 -
 																		recording.recordingTime /
-																			MAX_RECORDING_TIME),
+																		MAX_RECORDING_TIME),
 															}}
 															transition={{
 																strokeDashoffset: {
@@ -1008,7 +1041,7 @@ function PracticeTextPage() {
 														<span className="mt-1 font-mono text-sm font-semibold tabular-nums">
 															{Math.round(
 																(recording.recordingTime / MAX_RECORDING_TIME) *
-																	100,
+																100,
 															)}
 															%
 														</span>

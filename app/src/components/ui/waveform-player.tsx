@@ -133,7 +133,7 @@ function WaveformPlayerContent({
 			regions.addRegion({
 				id: regionId,
 				start: region.start, // Convert ms to seconds
-				end: region.end ,
+				end: region.end,
 				color: ERROR_COLORS[region.type],
 				content: region.label,
 				drag: false,
@@ -214,7 +214,7 @@ function WaveformPlayerContent({
 	return (
 		<div
 			className={cn(
-				"rounded-xl border bg-gradient-to-br from-primary/10 via-background to-primary/5",
+				"rounded-xl border bg-gradient-to-br from-primary/0 via-background to-primary/5",
 				compact ? "p-3" : "p-4",
 				className,
 			)}
@@ -319,7 +319,7 @@ function LoadingSkeleton({
 	return (
 		<div
 			className={cn(
-				"rounded-xl border bg-gradient-to-br from-primary/10 via-background to-primary/5",
+				"rounded-xl border bg-gradient-to-br from-primary/0 via-background to-primary/5",
 				compact ? "p-3" : "p-4",
 				className,
 			)}

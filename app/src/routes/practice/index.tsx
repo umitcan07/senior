@@ -10,6 +10,8 @@ import {
 	RiStackLine,
 } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import {
@@ -38,7 +40,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { ShimmeringText } from "@/components/ui/shimmering-text";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TextDifficulty, TextType } from "@/db/types";
 import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
@@ -67,27 +69,27 @@ const difficultyConfig: Array<{
 	label: string;
 	color: string;
 }> = [
-	{
-		value: "all",
-		label: "All",
-		color: "text-muted-foreground",
-	},
-	{
-		value: "beginner",
-		label: "Beginner",
-		color: "text-green-500",
-	},
-	{
-		value: "intermediate",
-		label: "Intermediate",
-		color: "text-amber-500",
-	},
-	{
-		value: "advanced",
-		label: "Advanced",
-		color: "text-red-500",
-	},
-];
+		{
+			value: "all",
+			label: "All",
+			color: "text-muted-foreground",
+		},
+		{
+			value: "beginner",
+			label: "Beginner",
+			color: "text-green-500",
+		},
+		{
+			value: "intermediate",
+			label: "Intermediate",
+			color: "text-amber-500",
+		},
+		{
+			value: "advanced",
+			label: "Advanced",
+			color: "text-red-500",
+		},
+	];
 
 interface CategoryCardProps {
 	type: TextType | "all";
@@ -176,37 +178,45 @@ function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
 
 export const Route = createFileRoute("/practice/")({
 	component: PracticePage,
-	loader: async () => {
-		const result = await serverGetPracticeTextsWithAttemptStats();
-
-		if (result.success) {
-			return {
-				texts: result.data.map((text) => ({
-					...text,
-					referenceCount: text.referenceCount ?? 0,
-					wordCount: text.wordCount ?? text.content.split(/\s+/).length,
-				})),
-			};
-		}
-
-		return {
-			texts: [],
-		};
-	},
-	pendingComponent: PracticePageSkeleton,
 });
 
 function PracticePageSkeleton() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-12">
-					<div className="flex min-h-64 flex-col items-center justify-center">
-						<ShimmeringText
-							text="Loading practice texts..."
-							className="text-lg"
-							duration={1.5}
-						/>
+				<div className="flex flex-col gap-10">
+					{/* Filters Skeleton */}
+					<div className="flex flex-col gap-10">
+						<div className="hidden md:flex md:flex-row md:items-end md:justify-between">
+							<div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end md:flex-1">
+								<Skeleton className="h-10 max-w-md flex-1" />
+								<Skeleton className="h-10 w-[140px]" />
+							</div>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Skeleton className="h-4 w-20" />
+							<div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
+								{Array.from({ length: 6 }).map((_, i) => (
+									<Skeleton key={i} className="h-12 w-full" />
+								))}
+							</div>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Skeleton className="h-4 w-20" />
+							<Skeleton className="h-10 w-full" />
+						</div>
+					</div>
+
+					{/* Content Skeleton */}
+					<div className="flex flex-col gap-10">
+						<div className="flex flex-col gap-4">
+							<Skeleton className="h-6 w-48" />
+							<div className="flex flex-col gap-2">
+								{Array.from({ length: 5 }).map((_, i) => (
+									<Skeleton key={i} className="h-16 w-full" />
+								))}
+							</div>
+						</div>
 					</div>
 				</div>
 			</PageContainer>
@@ -217,7 +227,28 @@ function PracticePageSkeleton() {
 // MAIN PAGE
 
 function PracticePage() {
-	const { texts: allTexts } = Route.useLoaderData();
+	const getTextsFn = useServerFn(serverGetPracticeTextsWithAttemptStats);
+	const {
+		data: textsData,
+		isLoading,
+		isError,
+		error,
+	} = useQuery({
+		queryKey: ["practice-texts"],
+		queryFn: async () => {
+			const result = await getTextsFn();
+			if (!result.success) {
+				throw new Error(result.error.message);
+			}
+			return result.data.map((text) => ({
+				...text,
+				referenceCount: text.referenceCount ?? 0,
+				wordCount: text.wordCount ?? text.content.split(/\s+/).length,
+			}));
+		},
+	});
+
+	const allTexts = textsData ?? [];
 	const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 	const [searchQuery, setSearchQuery] = useState("");
 	const {
@@ -285,6 +316,29 @@ function PracticePage() {
 	const handleLoadMore = useCallback(() => {
 		setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
 	}, []);
+
+	// Show skeleton while loading
+	if (isLoading) {
+		return <PracticePageSkeleton />;
+	}
+
+	// Show error state
+	if (isError) {
+		return (
+			<MainLayout>
+				<PageContainer>
+					<EmptyState
+						title="Failed to load practice texts"
+						description={error?.message ?? "An error occurred while loading practice texts."}
+						primaryAction={{
+							label: "Try Again",
+							onClick: () => window.location.reload(),
+						}}
+					/>
+				</PageContainer>
+			</MainLayout>
+		);
+	}
 
 	return (
 		<MainLayout>
@@ -429,7 +483,7 @@ function PracticePage() {
 							<>
 								{/* Previously Attempted Texts */}
 								{attemptedTexts.length > 0 && (
-									<div className="fade-in slide-in-from-bottom-4 flex animate-in flex-col gap-4 duration-500">
+									<div className="fade-in slide-in-from-bottom-4 flex flex-col gap-4 duration-500">
 										<SectionTitle
 											title="Ready to try again?"
 											variant="playful"
@@ -443,7 +497,7 @@ function PracticePage() {
 
 								{/* New Texts */}
 								{newTexts.length > 0 && (
-									<div className="fade-in slide-in-from-bottom-4 flex animate-in flex-col gap-4 delay-100 duration-500">
+									<div className="fade-in slide-in-from-bottom-4 flex flex-col gap-4 delay-100 duration-500">
 										<SectionTitle
 											title={
 												attemptedTexts.length > 0

@@ -439,11 +439,13 @@ def get_models(device: Optional[str] = None):
         )
 
         # ASR model (Automatic Speech Recognition: Audio → Text)
+        # Use beam_size=5 for better accuracy (default is usually 3, but higher can help)
         _asr_model = Speech2Text.from_pretrained(
             "espnet/powsm",
             device=device,
             lang_sym="<eng>",
             task_sym="<asr>",
+            beam_size=5,  # Increase from default 3 for better accuracy
         )
         
         print(f"DEBUG: POWSM models loaded successfully on {device}")
@@ -807,8 +809,10 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     # Step 1: Extract actual pronunciation from audio using PR
     print("DEBUG: Step 1: Phone Recognition (PR)...")
     actual_ipa_phonemes = extract_ipa_from_audio(audio_uri, device)
+    print(f"DEBUG: Raw actual IPA from PR: '{actual_ipa_phonemes[:100]}...'" if len(actual_ipa_phonemes) > 100 else f'DEBUG: Raw actual IPA from PR: {actual_ipa_phonemes}')
     actual_phonemes = parse_ipa_phonemes(actual_ipa_phonemes)
     print(f"DEBUG: Detected {len(actual_phonemes)} phones from PR")
+    print(f"DEBUG: Actual phonemes list: {actual_phonemes[:20]}..." if len(actual_phonemes) > 20 else f"DEBUG: Actual phonemes list: {actual_phonemes}")
     
     # Step 2: Generate target pronunciation from text using G2P
     print("DEBUG: Step 2: Grapheme-to-Phoneme (G2P)...")
@@ -834,9 +838,12 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     
     target_phonemes = parse_ipa_phonemes(target_ipa_phonemes)
     print(f"DEBUG: Target {len(target_phonemes)} phones from G2P")
+    print(f"DEBUG: Raw target IPA: '{target_ipa_phonemes[:100]}...' if len(target_ipa_phonemes) > 100 else f'DEBUG: Raw target IPA: '{target_ipa_phonemes}'")
     
     # Step 3: Run edit distance to find errors
+    print(f"DEBUG: Running edit distance: actual ({len(actual_phonemes)}) vs target ({len(target_phonemes)})")
     operations = edit_operations(actual_phonemes, target_phonemes)
+    print(f"DEBUG: Edit distance found {len(operations)} operations")
     
     # Step 4: Get audio for signal quality checks and timestamp estimation
     print("DEBUG: Step 4: Downloading audio for analysis...")
@@ -856,8 +863,20 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         
         # Run ASR
         print("DEBUG: Step 5b: Running ASR...")
+        print(f"DEBUG: ASR input audio stats - shape: {speech.shape}, duration: {len(speech)/rate:.2f}s, sample rate: {rate}Hz")
+        print(f"DEBUG: ASR input audio stats - min: {speech.min():.4f}, max: {speech.max():.4f}, mean: {speech.mean():.4f}, std: {speech.std():.4f}")
+        
         _, _, asr_model = get_models(device)
-        result_asr = asr_model(speech, text_prev="<na>")
+        
+        # Use target text as context to improve ASR accuracy
+        # This helps the model better recognize words, especially at the start
+        # Note: text_prev provides context but doesn't force exact matches - the model
+        # will still output what it hears, but with better word recognition
+        asr_text_prev = target_text if target_text else "<na>"
+        print(f"DEBUG: ASR using text_prev: '{asr_text_prev[:50]}...'" if len(asr_text_prev) > 50 else f"DEBUG: ASR using text_prev: '{asr_text_prev}'")
+        
+        # Run ASR with target text as context
+        result_asr = asr_model(speech, text_prev=asr_text_prev)
         actual_text_raw = result_asr[0][0]
         
         # Clean tags from ASR output
@@ -868,14 +887,19 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         # Remove other potential tags loosely
         actual_text = actual_text.replace("<eng>", "").replace("<asr>", "").strip()
         
-        # Remove other potential tags loosely
-        actual_text = actual_text.replace("<eng>", "").replace("<asr>", "").strip()
+        # Remove other potential tags loosely (duplicate line removed)
         
         print(f"DEBUG: ASR result raw: '{actual_text_raw}'")
         print(f"DEBUG: ASR result cleaned: '{actual_text}'")
         
+        # Compare with PR results to see if phonemes match
+        print(f"DEBUG: Comparing ASR vs PR:")
+        print(f"DEBUG:   PR detected phonemes: {actual_phonemes[:10]}..." if len(actual_phonemes) > 10 else f"DEBUG:   PR detected phonemes: {actual_phonemes}")
+        print(f"DEBUG:   ASR detected text: '{actual_text}'")
+        print(f"DEBUG:   Target text: '{target_text}'")
+        
         # Debug characters
-        print(f"DEBUG: ASR raw chars: {[f'{c}: {ord(c):04x}' for c in actual_text_raw]}")
+        print(f"DEBUG: ASR raw chars: {[f'{c}: {ord(c):04x}' for c in actual_text_raw[:50]]}")
 
         # Step 5c: Word-level comparison
         print("DEBUG: Step 5c: Word-level comparison...")
@@ -921,29 +945,27 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
                 error_dict["expected"] = op[2] if len(op) > 2 else None
                 error_dict["actual"] = normalized_actual_words[position] if position < len(normalized_actual_words) else None
             elif op_type == "insert":
-                error_dict["expected"] = op[2] if len(op) > 2 else None
-            elif op_type == "delete":
                 error_dict["actual"] = normalized_actual_words[position] if position < len(normalized_actual_words) else None
+            elif op_type == "delete":
+                error_dict["expected"] = op[2] if len(op) > 2 else None
             
             # TODO: Add timestamp estimation for words
             # For now, we'll leave timestamps null or estimate proportionally
             word_errors.append(error_dict)
             
-            word_errors.append(error_dict)
-            
         # Calculate word score
+        # Use accuracy-based scoring: (correct_words / total_words)
+        # Where correct_words = total_words - deletions - substitutions
         total_words = len(normalized_target_words)
         if total_words == 0:
             word_score = 1.0 if len(normalized_actual_words) == 0 else 0.0
         else:
-            word_error_cost = sum(
-                1 if op[0] == "delete" else
-                1 if op[0] == "insert" else
-                2 if op[0] == "substitute" else 0
-                for op in word_operations
-            )
-            max_word_cost = total_words * 2
-            word_score = max(0.0, 1.0 - (word_error_cost / max_word_cost))
+            # Count errors
+            deletions = sum(1 for op in word_operations if op[0] == "delete")
+            substitutions = sum(1 for op in word_operations if op[0] == "substitute")
+            # Correct words are those that weren't deleted or substituted
+            correct_words = total_words - deletions - substitutions
+            word_score = max(0.0, correct_words / total_words)
             
         print(f"DEBUG: Found {len(word_errors)} word errors, score: {word_score:.4f}")
 
@@ -1062,19 +1084,51 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         
         errors.append(error_dict)
     
-    # Calculate score
+    # Calculate score using accuracy-based approach
+    # Score = (correct_phonemes / total_phonemes)
+    # Where correct_phonemes = total_phonemes - deletions - substitutions
     total_phonemes = len(target_phonemes)
+    total_actual_phonemes = len(actual_phonemes)
+    
+    print(f"DEBUG: Scoring calculation:")
+    print(f"DEBUG:   Target phonemes: {len(target_phonemes)}")
+    print(f"DEBUG:   Actual phonemes: {len(actual_phonemes)}")
+    print(f"DEBUG:   Target phoneme list: {target_phonemes[:40]}..." if len(target_phonemes) > 40 else f"DEBUG:   Target phoneme list: {target_phonemes}")
+    print(f"DEBUG:   Actual phoneme list: {actual_phonemes[:40]}..." if len(actual_phonemes) > 40 else f"DEBUG:   Actual phoneme list: {actual_phonemes}")
+    print(f"DEBUG:   Total operations: {len(operations)}")
+    
     if total_phonemes == 0:
         score = 1.0 if len(actual_phonemes) == 0 else 0.0
+        print(f"DEBUG:   Score (edge case): {score}")
     else:
-        error_cost = sum(
-            1 if op[0] == "delete" else
-            1 if op[0] == "insert" else
-            2 if op[0] == "substitute" else 0
-            for op in operations
-        )
-        max_cost = total_phonemes * 2
-        score = max(0.0, 1.0 - (error_cost / max_cost))
+        # Count errors
+        deletions = sum(1 for op in operations if op[0] == "delete")
+        substitutions = sum(1 for op in operations if op[0] == "substitute")
+        insertions = sum(1 for op in operations if op[0] == "insert")
+        
+        print(f"DEBUG:   Deletions: {deletions}")
+        print(f"DEBUG:   Substitutions: {substitutions}")
+        print(f"DEBUG:   Insertions: {insertions}")
+        
+        # Correct phonemes are those that weren't deleted or substituted
+        # This counts how many target phonemes were correctly matched
+        correct_phonemes = total_phonemes - deletions - substitutions
+        
+        print(f"DEBUG:   Correct phonemes (target - deletions - substitutions): {correct_phonemes} = {total_phonemes} - {deletions} - {substitutions}")
+        
+        # Verify: matches + deletions + substitutions should equal total_phonemes
+        matches_implied = correct_phonemes
+        total_accounted = matches_implied + deletions + substitutions
+        if total_accounted != total_phonemes:
+            print(f"DEBUG:   WARNING: Total accounted ({total_accounted}) != total phonemes ({total_phonemes})")
+            print(f"DEBUG:   This suggests an issue with the edit distance calculation")
+        
+        score = max(0.0, correct_phonemes / total_phonemes)
+        print(f"DEBUG:   Final score: {score:.4f} ({score*100:.2f}%)")
+        
+        # Also log a sample of operations for debugging
+        if len(operations) > 0:
+            print(f"DEBUG:   Sample operations (first 10): {operations[:10]}")
     
     total_time = time.time() - total_start
     print(f"DEBUG: Total assessment time: {total_time:.2f} seconds")

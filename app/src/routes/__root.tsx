@@ -141,12 +141,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<head>
-				<HeadContent />
-				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: Theme initialization script is safe and necessary for SSR
-					dangerouslySetInnerHTML={{
-						__html: `
+			<ClerkProvider>
+				<head>
+					<HeadContent />
+					<script
+						// biome-ignore lint/security/noDangerouslySetInnerHtml: Theme initialization script is safe and necessary for SSR
+						dangerouslySetInnerHTML={{
+							__html: `
 							(function() {
 								const theme = localStorage.getItem('${THEME_STORAGE_KEY}') || 'system';
 								const isDark = theme === 'dark' || 
@@ -156,19 +157,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								}
 							})();
 						`,
-					}}
-				/>
-			</head>
-			<body>
-				<ThemeInitializer />
-				<ThemeProvider>
-					<ClerkProvider>
+						}}
+					/>
+				</head>
+				<body>
+					<ThemeInitializer />
+					<ThemeProvider>
+
 						{children}
 						<Toaster />
-					</ClerkProvider>
-				</ThemeProvider>
-				<Scripts />
-			</body>
+
+					</ThemeProvider>
+					<Scripts />
+				</body>
+			</ClerkProvider>
 		</html>
 	);
 }

@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { getUserRecordingById } from "@/db/recording";
 import { getFromR2 } from "@/lib/r2";
@@ -13,6 +14,27 @@ export const Route = createFileRoute("/api/audio/user/$id")({
 					const recording = await getUserRecordingById(id);
 					if (!recording) {
 						return new Response("Recording not found", { status: 404 });
+					}
+
+					// Verify user owns this recording - require authentication
+					let isAuthenticated = false;
+					let userId: string | null = null;
+					try {
+						const authResult = await auth();
+						isAuthenticated = authResult.isAuthenticated ?? false;
+						userId = authResult.userId ?? null;
+					} catch (authError) {
+						// Auth context not available
+						return new Response("Unauthorized", { status: 401 });
+					}
+
+					if (!isAuthenticated || !userId) {
+						return new Response("Unauthorized", { status: 401 });
+					}
+
+					// Verify the recording belongs to the authenticated user
+					if (recording.userId !== userId) {
+						return new Response("Forbidden", { status: 403 });
 					}
 
 					// Get audio file from R2

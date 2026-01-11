@@ -78,16 +78,16 @@ function Segment({
 			className={cn(
 				"relative inline-flex items-center gap-1 text-lg rounded-sm px-2 py-1 font-ipa outline-hidden transition-all font-ipa! text-xl focus-visible:ring-2 focus-visible:ring-primary/8",
 				hasError &&
-					cn(
-						errorBgVariants({ errorType: error.errorType }),
-						errorBorderVariants({ errorType: error.errorType }),
-						errorTextVariants({ errorType: error.errorType }),
-						"font-bold",
-					),
+				cn(
+					errorBgVariants({ errorType: error.errorType }),
+					errorBorderVariants({ errorType: error.errorType }),
+					errorTextVariants({ errorType: error.errorType }),
+					"font-bold",
+				),
 				!hasError &&
-					"bg-green-950/10 dark:bg-green-900/20 text-green-800 dark:text-green-300 font-medium border border-green-800/20 dark:border-green-700/30",
+				"bg-green-950/10 dark:bg-green-900/20 text-green-800 dark:text-green-300 font-medium border border-green-800/20 dark:border-green-700/30",
 				canPlay &&
-					"cursor-pointer hover:scale-105 hover:ring-2 hover:ring-primary/20",
+				"cursor-pointer hover:scale-105 hover:ring-2 hover:ring-primary/20",
 				!canPlay && "cursor-default",
 			)}
 			onClick={handleClick}
@@ -146,10 +146,86 @@ export function DiffViewer({
 	const targetLabel = type === "word" ? "Expected" : "Target";
 	const recognizedLabel = type === "word" ? "Recognized" : "Detected";
 
-	const errorMap = new Map<number, PhonemeError | WordError>();
-	errors.forEach((error) => {
-		errorMap.set(error.position, error);
-	});
+	// Build error maps for target and recognized segments separately
+	// Edit distance positions are:
+	// - delete: position in target sequence (marks missing target element)
+	// - insert: position in actual/recognized sequence (marks extra recognized element)
+	// - substitute: position in actual/recognized sequence (marks changed element)
+
+	const targetErrorMap = new Map<number, PhonemeError | WordError>();
+	const recognizedErrorMap = new Map<number, PhonemeError | WordError>();
+
+	// Reconstruct alignment by simulating edit operations
+	// We need to map substitute positions (which are in recognized sequence) to target positions
+
+	// Separate errors by type
+	const deletes = errors.filter(e => e.errorType === "delete").sort((a, b) => a.position - b.position);
+	const inserts = errors.filter(e => e.errorType === "insert").sort((a, b) => a.position - b.position);
+	const substitutes = errors.filter(e => e.errorType === "substitute").sort((a, b) => a.position - b.position);
+
+	// Map delete errors directly to target positions
+	for (const error of deletes) {
+		if (error.position < targetSegments.length) {
+			targetErrorMap.set(error.position, error);
+		}
+	}
+
+	// Map insert errors directly to recognized positions
+	for (const error of inserts) {
+		if (error.position < recognizedSegments.length) {
+			recognizedErrorMap.set(error.position, error);
+		}
+	}
+
+	// For substitutes, we need to reconstruct which target position each corresponds to
+	// We do this by simulating the alignment, accounting for inserts and deletes
+	// The key insight: we walk through both sequences, and when positions align,
+	// a substitute at recognized position i corresponds to target position j (accounting for deletes)
+
+	// Create sets for quick lookup
+	const deletePositions = new Set(deletes.map(e => e.position));
+	const insertPositions = new Set(inserts.map(e => e.position));
+
+	// Map substitutes to recognized positions first
+	for (const substitute of substitutes) {
+		if (substitute.position < recognizedSegments.length) {
+			recognizedErrorMap.set(substitute.position, substitute);
+		}
+	}
+
+	// Now reconstruct alignment to map substitutes to target positions
+	// We simulate walking through both sequences simultaneously
+	let targetIdx = 0;
+	let recognizedIdx = 0;
+
+	// Process until we've covered all substitutes or exhausted sequences
+	while (targetIdx < targetSegments.length || recognizedIdx < recognizedSegments.length) {
+		// Skip deleted target positions
+		while (targetIdx < targetSegments.length && deletePositions.has(targetIdx)) {
+			targetIdx++;
+		}
+
+		// Skip inserted recognized positions
+		while (recognizedIdx < recognizedSegments.length && insertPositions.has(recognizedIdx)) {
+			recognizedIdx++;
+		}
+
+		// Check if current recognized position has a substitute
+		const substitute = substitutes.find(s => s.position === recognizedIdx);
+		if (substitute && targetIdx < targetSegments.length) {
+			// This substitute corresponds to current target position
+			targetErrorMap.set(targetIdx, substitute);
+		}
+
+		// Advance both indices (they align at this point)
+		if (targetIdx < targetSegments.length) targetIdx++;
+		if (recognizedIdx < recognizedSegments.length) recognizedIdx++;
+
+		// Stop if we've processed all segments
+		if (targetIdx >= targetSegments.length && recognizedIdx >= recognizedSegments.length) {
+			break;
+		}
+	}
 
 	const hasErrors = errors.length > 0;
 
@@ -214,7 +290,7 @@ export function DiffViewer({
 					)}
 				>
 					{targetSegments.map((segment, index) => {
-						const error = errorMap.get(index);
+						const error = targetErrorMap.get(index);
 						const isSubstitute = error?.errorType === "substitute";
 						const isDelete = error?.errorType === "delete";
 						const relevantError = isSubstitute || isDelete ? error : undefined;
@@ -242,24 +318,31 @@ export function DiffViewer({
 						"flex flex-wrap gap-1 rounded-lg border border-border/50 border-dashed bg-muted/20 p-4 leading-relaxed",
 						type === "phoneme" && "font-ipa text-sm",
 						type === "word" && "text-base",
+						recognizedSegments.length === 0 && "items-center justify-center min-h-[3rem]",
 					)}
 				>
-					{recognizedSegments.map((segment, index) => {
-						const error = errorMap.get(index);
-						const isSubstitute = error?.errorType === "substitute";
-						const isInsert = error?.errorType === "insert";
-						const relevantError = isSubstitute || isInsert ? error : undefined;
+					{recognizedSegments.length > 0 ? (
+						recognizedSegments.map((segment, index) => {
+							const error = recognizedErrorMap.get(index);
+							const isSubstitute = error?.errorType === "substitute";
+							const isInsert = error?.errorType === "insert";
+							const relevantError = isSubstitute || isInsert ? error : undefined;
 
-						return (
-							<Segment
-								key={`recognized-${index}-${segment}`}
-								segment={segment}
-								error={relevantError}
-								audioSrc={audioSrc}
-								onSegmentClick={onSegmentClick}
-							/>
-						);
-					})}
+							return (
+								<Segment
+									key={`recognized-${index}-${segment}`}
+									segment={segment}
+									error={relevantError}
+									audioSrc={audioSrc}
+									onSegmentClick={onSegmentClick}
+								/>
+							);
+						})
+					) : (
+						<span className="text-muted-foreground text-sm italic">
+							No {type === "word" ? "words" : "phonemes"} detected
+						</span>
+					)}
 				</div>
 			</div>
 		</div>
