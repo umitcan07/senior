@@ -367,7 +367,7 @@ function IPAMarkerCard({
 		<details className="group overflow-hidden rounded-xl border border-border/40 bg-card transition-colors hover:border-border/60 hover:bg-muted/5">
 			<summary className="flex cursor-pointer items-center justify-between list-none p-5 transition-colors hover:bg-muted/10">
 				<div className="flex items-center gap-3">
-					<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 font-mono text-lg text-primary">
+					<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 font-ipa text-lg text-primary">
 						{icon}
 					</div>
 					<div className="flex flex-col">
@@ -435,7 +435,7 @@ function IPAItem({
 
 			{/* Top section - IPA symbol */}
 			<div className="flex flex-1 items-center justify-center px-4 pt-6 pb-3">
-				<span className="font-mono text-foreground/80 text-xl tracking-wide transition-colors group-hover:text-foreground">
+				<span className="font-ipa text-foreground/80 text-2xl tracking-wide transition-colors group-hover:text-foreground">
 					{item.symbol}
 				</span>
 			</div>

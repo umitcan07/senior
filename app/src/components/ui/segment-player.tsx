@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	RiCloseLine,
 	RiPauseLine,
 	RiPlayLine,
 	RiRestartLine,
@@ -26,6 +27,7 @@ interface SegmentPlayerProps {
 	variant?: "default" | "compact" | "inline";
 	showTimestamps?: boolean;
 	defaultSpeed?: number;
+	onClose?: () => void;
 }
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
@@ -53,6 +55,7 @@ export function SegmentPlayer({
 	variant = "default",
 	showTimestamps = true,
 	defaultSpeed = 1,
+	onClose,
 }: SegmentPlayerProps) {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
@@ -196,21 +199,33 @@ export function SegmentPlayer({
 	return (
 		<div
 			className={cn(
-				"rounded-xl border border-l-4 border-l-primary/60 bg-linear-to-br from-primary/10 via-background to-primary/5 p-4",
+				"rounded-xl border bg-linear-to-br from-primary/10 via-background to-primary/5 p-4",
 				className,
 			)}
 		>
-			{label && (
-				<div className="mb-3 flex items-center gap-2 text-muted-foreground text-sm">
-					<span className="size-1.5 rounded-full bg-primary/60" />
-					{label}
-					{showTimestamps && startMs !== undefined && endMs !== undefined && (
-						<span className="ml-auto font-mono text-xs tabular-nums">
-							{formatTimestamp(startMs)} - {formatTimestamp(endMs)}
-						</span>
-					)}
-				</div>
-			)}
+			<div className="flex items-start justify-between gap-4">
+				{label && (
+					<div className="mb-3 flex items-center gap-2 text-muted-foreground text-sm">
+						<span className="size-1.5 rounded-full bg-primary/60" />
+						{label}
+						{showTimestamps && startMs !== undefined && endMs !== undefined && (
+							<span className="ml-auto font-mono text-xs tabular-nums">
+								{formatTimestamp(startMs)} - {formatTimestamp(endMs)}
+							</span>
+						)}
+					</div>
+				)}
+				{onClose && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="-mr-1 -mt-1 h-6 w-6 text-muted-foreground hover:text-foreground"
+						onClick={onClose}
+					>
+						<RiCloseLine size={16} />
+					</Button>
+				)}
+			</div>
 
 			{/* Segment progress bar - visual indicator */}
 			<div className="relative mb-4 h-1.5 overflow-hidden rounded-full bg-primary/10">

@@ -1,20 +1,9 @@
-# RunPod serverless worker
+# Core requirements matching working environment:
+# - torch: 2.4.0+cu118 (installed separately in Dockerfile)
+# - espnet: 202412
+espnet==202412
+espnet-model-zoo==0.1.7
+# torch and torchaudio installed separately in Dockerfile with CUDA support
 runpod>=1.0.0
-
-# Core dependencies for acoustic model inference
-# Upgrading to modern PyTorch for compatibility with espnet 202511
-torch>=2.0.0
-torchaudio
-
-# Audio processing (optional, for audio-guided G2P)
-librosa
 soundfile
-numpy
-
-# ESPnet / POWSM (G2P)
-# Using latest version (202511) with modern PyTorch
-espnet==202511
-espnet_model_zoo==0.1.7
-
-# HTTP client for downloading audio files (if audio_uri provided)
-requests>=2.31.0
+requests

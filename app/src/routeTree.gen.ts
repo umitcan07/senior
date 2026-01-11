@@ -22,11 +22,13 @@ import { Route as PracticeIndexRouteImport } from './routes/practice/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PracticeTextIdRouteImport } from './routes/practice/$textId'
 import { Route as ApiJobsRouteImport } from './routes/api/jobs'
+import { Route as ApiAssessmentRouteImport } from './routes/api/assessment'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
 import { Route as AdminReferencesRouteImport } from './routes/admin/references'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
 import { Route as ApiWebhookJobsRouteImport } from './routes/api/webhook.jobs'
 import { Route as ApiWebhookIpaGenerationRouteImport } from './routes/api/webhook/ipa-generation'
+import { Route as ApiWebhookAssessmentRouteImport } from './routes/api/webhook/assessment'
 import { Route as ApiJobsIdRouteImport } from './routes/api/jobs.$id'
 import { Route as ApiAudioIdRouteImport } from './routes/api/audio.$id'
 import { Route as ApiAdminIpaGenerationRouteImport } from './routes/api/admin/ipa-generation'
@@ -99,6 +101,11 @@ const ApiJobsRoute = ApiJobsRouteImport.update({
   path: '/api/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAssessmentRoute = ApiAssessmentRouteImport.update({
+  id: '/api/assessment',
+  path: '/api/assessment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTextRoute = AdminTextRouteImport.update({
   id: '/admin/text',
   path: '/admin/text',
@@ -122,6 +129,11 @@ const ApiWebhookJobsRoute = ApiWebhookJobsRouteImport.update({
 const ApiWebhookIpaGenerationRoute = ApiWebhookIpaGenerationRouteImport.update({
   id: '/api/webhook/ipa-generation',
   path: '/api/webhook/ipa-generation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhookAssessmentRoute = ApiWebhookAssessmentRouteImport.update({
+  id: '/api/webhook/assessment',
+  path: '/api/webhook/assessment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiJobsIdRoute = ApiJobsIdRouteImport.update({
@@ -169,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/api/assessment': typeof ApiAssessmentRoute
   '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin': typeof AdminIndexRoute
@@ -176,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/ipa-generation': typeof ApiAdminIpaGenerationRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
   '/api/jobs/$id': typeof ApiJobsIdRoute
+  '/api/webhook/assessment': typeof ApiWebhookAssessmentRoute
   '/api/webhook/ipa-generation': typeof ApiWebhookIpaGenerationRoute
   '/api/webhook/jobs': typeof ApiWebhookJobsRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
@@ -194,6 +208,7 @@ export interface FileRoutesByTo {
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/api/assessment': typeof ApiAssessmentRoute
   '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin': typeof AdminIndexRoute
@@ -201,6 +216,7 @@ export interface FileRoutesByTo {
   '/api/admin/ipa-generation': typeof ApiAdminIpaGenerationRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
   '/api/jobs/$id': typeof ApiJobsIdRoute
+  '/api/webhook/assessment': typeof ApiWebhookAssessmentRoute
   '/api/webhook/ipa-generation': typeof ApiWebhookIpaGenerationRoute
   '/api/webhook/jobs': typeof ApiWebhookJobsRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
@@ -221,6 +237,7 @@ export interface FileRoutesById {
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/api/assessment': typeof ApiAssessmentRoute
   '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
@@ -228,6 +245,7 @@ export interface FileRoutesById {
   '/api/admin/ipa-generation': typeof ApiAdminIpaGenerationRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
   '/api/jobs/$id': typeof ApiJobsIdRoute
+  '/api/webhook/assessment': typeof ApiWebhookAssessmentRoute
   '/api/webhook/ipa-generation': typeof ApiWebhookIpaGenerationRoute
   '/api/webhook/jobs': typeof ApiWebhookJobsRoute
   '/api/audio/learn/$key': typeof ApiAudioLearnKeyRoute
@@ -249,6 +267,7 @@ export interface FileRouteTypes {
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
+    | '/api/assessment'
     | '/api/jobs'
     | '/practice/$textId'
     | '/admin'
@@ -256,6 +275,7 @@ export interface FileRouteTypes {
     | '/api/admin/ipa-generation'
     | '/api/audio/$id'
     | '/api/jobs/$id'
+    | '/api/webhook/assessment'
     | '/api/webhook/ipa-generation'
     | '/api/webhook/jobs'
     | '/api/audio/learn/$key'
@@ -274,6 +294,7 @@ export interface FileRouteTypes {
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
+    | '/api/assessment'
     | '/api/jobs'
     | '/practice/$textId'
     | '/admin'
@@ -281,6 +302,7 @@ export interface FileRouteTypes {
     | '/api/admin/ipa-generation'
     | '/api/audio/$id'
     | '/api/jobs/$id'
+    | '/api/webhook/assessment'
     | '/api/webhook/ipa-generation'
     | '/api/webhook/jobs'
     | '/api/audio/learn/$key'
@@ -300,6 +322,7 @@ export interface FileRouteTypes {
     | '/admin/authors'
     | '/admin/references'
     | '/admin/text'
+    | '/api/assessment'
     | '/api/jobs'
     | '/practice/$textId'
     | '/admin/'
@@ -307,6 +330,7 @@ export interface FileRouteTypes {
     | '/api/admin/ipa-generation'
     | '/api/audio/$id'
     | '/api/jobs/$id'
+    | '/api/webhook/assessment'
     | '/api/webhook/ipa-generation'
     | '/api/webhook/jobs'
     | '/api/audio/learn/$key'
@@ -327,10 +351,12 @@ export interface RootRouteChildren {
   AdminAuthorsRoute: typeof AdminAuthorsRoute
   AdminReferencesRoute: typeof AdminReferencesRoute
   AdminTextRoute: typeof AdminTextRoute
+  ApiAssessmentRoute: typeof ApiAssessmentRoute
   ApiJobsRoute: typeof ApiJobsRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   ApiAdminIpaGenerationRoute: typeof ApiAdminIpaGenerationRoute
   ApiAudioIdRoute: typeof ApiAudioIdRoute
+  ApiWebhookAssessmentRoute: typeof ApiWebhookAssessmentRoute
   ApiWebhookIpaGenerationRoute: typeof ApiWebhookIpaGenerationRoute
   ApiWebhookJobsRoute: typeof ApiWebhookJobsRoute
   ApiAudioLearnKeyRoute: typeof ApiAudioLearnKeyRoute
@@ -430,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiJobsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/assessment': {
+      id: '/api/assessment'
+      path: '/api/assessment'
+      fullPath: '/api/assessment'
+      preLoaderRoute: typeof ApiAssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/text': {
       id: '/admin/text'
       path: '/admin/text'
@@ -463,6 +496,13 @@ declare module '@tanstack/react-router' {
       path: '/api/webhook/ipa-generation'
       fullPath: '/api/webhook/ipa-generation'
       preLoaderRoute: typeof ApiWebhookIpaGenerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhook/assessment': {
+      id: '/api/webhook/assessment'
+      path: '/api/webhook/assessment'
+      fullPath: '/api/webhook/assessment'
+      preLoaderRoute: typeof ApiWebhookAssessmentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/jobs/$id': {
@@ -560,10 +600,12 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAuthorsRoute: AdminAuthorsRoute,
   AdminReferencesRoute: AdminReferencesRoute,
   AdminTextRoute: AdminTextRoute,
+  ApiAssessmentRoute: ApiAssessmentRoute,
   ApiJobsRoute: ApiJobsRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   ApiAdminIpaGenerationRoute: ApiAdminIpaGenerationRoute,
   ApiAudioIdRoute: ApiAudioIdRoute,
+  ApiWebhookAssessmentRoute: ApiWebhookAssessmentRoute,
   ApiWebhookIpaGenerationRoute: ApiWebhookIpaGenerationRoute,
   ApiWebhookJobsRoute: ApiWebhookJobsRoute,
   ApiAudioLearnKeyRoute: ApiAudioLearnKeyRoute,

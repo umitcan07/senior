@@ -31,7 +31,6 @@ RUN python3 -m pip install --no-cache-dir \
 # Copy files
 COPY shared/ /worker/shared/
 COPY ipa_generation/ /worker/ipa_generation/
-COPY requirements-pinned.txt /worker/ipa_generation/requirements.txt
 
 # Install dependencies
 RUN python3 -m pip install --no-cache-dir -r ipa_generation/requirements.txt

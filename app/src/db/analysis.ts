@@ -1,9 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "./index";
-import { analyses, phonemeErrors, wordErrors } from "./schema";
+import { analyses,  audioQualityMetrics, phonemeErrors, wordErrors } from "./schema";
 import type {
 	Analysis,
+	AudioQualityMetrics,
 	NewAnalysis,
+	NewAudioQualityMetrics,
 	NewPhonemeError,
 	NewWordError,
 	PhonemeError,
@@ -77,4 +79,94 @@ export async function getWordErrorsByAnalysisId(
 		.select()
 		.from(wordErrors)
 		.where(eq(wordErrors.analysisId, analysisId));
+}
+
+export async function insertAudioQualityMetrics(
+	metrics: Omit<NewAudioQualityMetrics, "id" | "createdAt">,
+): Promise<AudioQualityMetrics> {
+	const [result] = await db.insert(audioQualityMetrics).values(metrics).returning();
+	return result;
+}
+
+export async function getAudioQualityMetricsByUserRecordingId(
+	userRecordingId: string,
+): Promise<AudioQualityMetrics | null> {
+	const [result] = await db
+		.select()
+		.from(audioQualityMetrics)
+		.where(eq(audioQualityMetrics.userRecordingId, userRecordingId))
+		.limit(1);
+	return result || null;
+}
+
+/**
+ * Get analysis with user recording and reference speech for job submission
+ */
+export async function getAnalysisWithDetails(analysisId: string): Promise<{
+	analysis: Analysis;
+	userRecording: {
+		id: string;
+		storageKey: string;
+	};
+	referenceSpeech: {
+		id: string;
+		ipaTranscription: string | null;
+		textContent: string;
+	};
+} | null> {
+	const { referenceSpeeches, userRecordings, practiceTexts } = await import(
+		"./schema"
+	);
+
+	const [result] = await db
+		.select({
+			analysis: analyses,
+			userRecording: {
+				id: userRecordings.id,
+				storageKey: userRecordings.storageKey,
+			},
+			reference: {
+				id: referenceSpeeches.id,
+				ipaTranscription: referenceSpeeches.ipaTranscription,
+			},
+			text: {
+				content: practiceTexts.content,
+			},
+		})
+		.from(analyses)
+		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
+		.innerJoin(
+			referenceSpeeches,
+			eq(analyses.referenceSpeechId, referenceSpeeches.id),
+		)
+		.innerJoin(practiceTexts, eq(referenceSpeeches.textId, practiceTexts.id))
+		.where(eq(analyses.id, analysisId))
+		.limit(1);
+
+	if (!result) return null;
+
+	return {
+		analysis: result.analysis,
+		userRecording: result.userRecording,
+		referenceSpeech: {
+			id: result.reference.id,
+			ipaTranscription: result.reference.ipaTranscription,
+			textContent: result.text.content,
+		},
+	};
+}
+
+/**
+ * Update analysis by job ID (for webhook processing)
+ */
+export async function updateAnalysisByJobId(
+	jobId: string,
+	updates: Partial<Omit<Analysis, "id" | "createdAt">>,
+): Promise<Analysis | null> {
+	const [result] = await db
+		.update(analyses)
+		.set(updates)
+		.where(eq(analyses.jobId, jobId))
+		.returning();
+	return result || null;
 }

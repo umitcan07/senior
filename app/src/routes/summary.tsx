@@ -32,9 +32,10 @@ type Attempt = {
 	id: string;
 	textId: string;
 	textPreview: string;
-	score: number;
+	score: number | null;
 	date: Date;
 	analysisId: string;
+	status: "pending" | "processing" | "completed" | "failed";
 };
 
 type SummaryLoaderData = {
@@ -158,7 +159,7 @@ function CommonErrors({ errors }: CommonErrorsProps) {
 						key={error.phoneme}
 						className="flex items-center gap-2 rounded-full border border-border/40 bg-muted/20 px-3 py-1.5 transition-colors hover:bg-muted/40"
 					>
-						<span className="font-mono text-base">{error.phoneme}</span>
+						<span className="font-ipa text-lg">{error.phoneme}</span>
 						<span className="text-muted-foreground text-xs">{error.count}</span>
 					</div>
 				))}
@@ -246,9 +247,10 @@ interface AttemptItemProps {
 		id: string;
 		textId: string;
 		textPreview: string;
-		score: number;
+		score: number | null;
 		date: Date;
 		analysisId: string;
+		status: "pending" | "processing" | "completed" | "failed";
 	};
 }
 
@@ -264,15 +266,19 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 					className={cn(
 						"flex size-12 shrink-0 items-center justify-center rounded-lg font-medium text-lg",
 						// Using minimal text color instead of heavy background
-						getScoreLevel(attempt.score) === "high" &&
+						attempt.score !== null &&
+							getScoreLevel(attempt.score) === "high" &&
 							"bg-emerald-500/10 text-emerald-600",
-						getScoreLevel(attempt.score) === "medium" &&
+						attempt.score !== null &&
+							getScoreLevel(attempt.score) === "medium" &&
 							"bg-amber-500/10 text-amber-600",
-						getScoreLevel(attempt.score) === "low" &&
+						attempt.score !== null &&
+							getScoreLevel(attempt.score) === "low" &&
 							"bg-red-500/10 text-red-600",
+						attempt.score === null && "bg-muted text-muted-foreground",
 					)}
 				>
-					{attempt.score}
+					{attempt.score ?? "—"}
 				</div>
 				<div className="min-w-0 flex-1 space-y-1">
 					<p className="truncate font-medium text-base text-foreground/90 transition-colors group-hover:text-primary">
@@ -484,7 +490,7 @@ function FeedPage() {
 					if (sortBy === "date") {
 						return b.date.getTime() - a.date.getTime();
 					}
-					return b.score - a.score;
+					return (b.score ?? -1) - (a.score ?? -1);
 				}),
 		[attempts, selectedTextId, sortBy],
 	);

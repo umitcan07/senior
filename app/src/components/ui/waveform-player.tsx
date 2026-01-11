@@ -110,7 +110,12 @@ function WaveformPlayerContent({
 					);
 					if (regionIndex >= 0) {
 						const regionData = currentRegions[regionIndex];
-						onRegionClick(regionData.start, regionData.end, regionData.type);
+						// Convert seconds to ms for the callback
+						onRegionClick(
+							regionData.start * 1000,
+							regionData.end * 1000,
+							regionData.type,
+						);
 					}
 					e.stopPropagation();
 				});
@@ -127,8 +132,8 @@ function WaveformPlayerContent({
 			const regionId = region.id || `error-${index}`;
 			regions.addRegion({
 				id: regionId,
-				start: region.start / 1000, // Convert ms to seconds
-				end: region.end / 1000,
+				start: region.start, // Convert ms to seconds
+				end: region.end ,
 				color: ERROR_COLORS[region.type],
 				content: region.label,
 				drag: false,

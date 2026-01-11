@@ -34,6 +34,7 @@ export type SummaryData = {
 export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ApiResponse<SummaryData>> => {
 		try {
+			// Get userId from auth, fallback to guest
 			let userId = "guest";
 
 			// Try to get authenticated userId from Clerk
@@ -44,21 +45,6 @@ export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 				}
 			} catch {
 				// Auth not available, use guest
-			}
-
-			// If guest, return empty data
-			if (userId === "guest") {
-				return createSuccessResponse({
-					attempts: [],
-					stats: {
-						totalAttempts: 0,
-						weeklyAttempts: 0,
-						averageScore: 0,
-						weeklyProgress: 0,
-					},
-					commonErrors: [],
-					texts: [],
-				});
 			}
 
 			const [attempts, stats, commonErrors, texts] = await Promise.all([
@@ -110,6 +96,7 @@ export const serverGetRecentAttemptsForText = createServerFn({
 			data,
 		}): Promise<ApiResponse<UserAttempt[]>> => {
 			try {
+				// Get userId from auth, fallback to guest
 				let userId = "guest";
 
 				// Try to get authenticated userId from Clerk
@@ -120,11 +107,6 @@ export const serverGetRecentAttemptsForText = createServerFn({
 					}
 				} catch {
 					// Auth not available, use guest
-				}
-
-				// If guest, return empty array
-				if (userId === "guest") {
-					return createSuccessResponse([]);
 				}
 
 				const attempts = await getUserAttempts(userId, {

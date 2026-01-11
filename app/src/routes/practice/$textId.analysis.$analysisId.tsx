@@ -7,12 +7,18 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DiffViewer } from "@/components/diff-viewer";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import { RiAlertLine } from "@remixicon/react";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -29,6 +35,7 @@ import {
 } from "@/components/ui/waveform-player";
 import type {
 	Analysis,
+	AudioQualityMetrics,
 	Author,
 	PhonemeError,
 	PracticeText,
@@ -41,6 +48,7 @@ import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetAnalysisDetails } from "@/lib/server-analysis";
 import { cn } from "@/lib/utils";
 
+
 type PreviousAttempt = {
 	id: string;
 	analysisId: string;
@@ -51,6 +59,7 @@ type PreviousAttempt = {
 type AnalysisLoaderData = {
 	analysis: Analysis | null;
 	userRecording: UserRecording | null;
+	audioQualityMetrics: AudioQualityMetrics | null;
 	reference: ReferenceSpeech | null;
 	text: PracticeText | null;
 	author: Author | null;
@@ -58,6 +67,7 @@ type AnalysisLoaderData = {
 	wordErrors: WordError[];
 	previousAttempts: PreviousAttempt[];
 	textId: string;
+	jobSubmitted: boolean;
 };
 
 export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
@@ -69,14 +79,18 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 			})) as ApiResponse<{
 				analysis: Analysis;
 				userRecording: UserRecording | null;
+				audioQualityMetrics: AudioQualityMetrics | null;
+				reference: ReferenceSpeech | null;
 				phonemeErrors: PhonemeError[];
 				wordErrors: WordError[];
+				assessmentJob: { id: string; status: string } | null;
 			} | null>;
 
 			if (!response.success || !response.data) {
 				return {
 					analysis: null,
 					userRecording: null,
+					audioQualityMetrics: null,
 					reference: null,
 					text: null,
 					author: null,
@@ -84,10 +98,11 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 					wordErrors: [],
 					previousAttempts: [],
 					textId: params.textId,
+					jobSubmitted: false,
 				};
 			}
 
-			const { analysis, userRecording, phonemeErrors, wordErrors } =
+			const { analysis, userRecording, audioQualityMetrics, reference, phonemeErrors, wordErrors, assessmentJob } =
 				response.data;
 
 			const mockPreviousAttempts: PreviousAttempt[] = [];
@@ -95,13 +110,15 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 			return {
 				analysis,
 				userRecording,
-				reference: null,
+				audioQualityMetrics,
+				reference,
 				text: null,
 				author: null,
 				phonemeErrors,
 				wordErrors,
 				previousAttempts: mockPreviousAttempts,
 				textId: params.textId,
+				jobSubmitted: assessmentJob !== null,
 			};
 		} catch (error) {
 			console.error("Loader error in analysis route:", error);
@@ -109,6 +126,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 			return {
 				analysis: null,
 				userRecording: null,
+				audioQualityMetrics: null,
 				reference: null,
 				text: null,
 				author: null,
@@ -116,6 +134,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				wordErrors: [],
 				previousAttempts: [],
 				textId: params.textId,
+				jobSubmitted: false,
 			};
 		}
 	},
@@ -350,13 +369,13 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 						<div className="flex flex-1 items-center gap-2">
 							{type === "phoneme" ? (
 								<>
-									<span className="font-medium font-mono text-sm">
-										{error.expected ?? "∅"}
+									<span className="font-medium font-ipa text-sm">
+										{error.expected ?? " "}
 									</span>
 									<span className="text-muted-foreground">→</span>
 									<span
 										className={cn(
-											"font-mono text-sm",
+											"font-ipa text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
 												"text-amber-600 dark:text-amber-400",
@@ -459,8 +478,8 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 							<div className="flex items-center gap-2">
 								<span className="text-muted-foreground text-xs">Expected:</span>
 								{type === "phoneme" ? (
-									<span className="font-mono text-xs">
-										/{error.expected ?? "∅"}/
+									<span className="font-ipa text-lg">
+										{error.expected ?? "∅"}
 									</span>
 								) : (
 									<span className="text-xs">"{error.expected ?? "—"}"</span>
@@ -471,13 +490,13 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 								{type === "phoneme" ? (
 									<span
 										className={cn(
-											"font-mono text-xs",
+											"font-ipa text-lg",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
 												"text-amber-600 dark:text-amber-400",
 										)}
 									>
-										/{error.actual ?? "∅"}/
+										{error.actual ?? "∅"}
 									</span>
 								) : (
 									<span
@@ -645,6 +664,9 @@ function AnalysisPage() {
 		phonemeErrors,
 		wordErrors,
 		textId,
+		reference,
+		audioQualityMetrics: initialQualityMetrics,
+		jobSubmitted: initialJobSubmitted,
 	} = Route.useLoaderData();
 	const navigate = useNavigate();
 	const [activeSegment, setActiveSegment] = useState<{
@@ -659,6 +681,18 @@ function AnalysisPage() {
 		(initialAnalysis.status === "pending" ||
 			initialAnalysis.status === "processing");
 
+	const [isPollingTimedOut, setIsPollingTimedOut] = useState(false);
+
+	// Timeout polling after 1 minute
+	useEffect(() => {
+		if (shouldPoll && !isPollingTimedOut) {
+			const timer = setTimeout(() => {
+				setIsPollingTimedOut(true);
+			}, 60000); // 1 minute
+			return () => clearTimeout(timer);
+		}
+	}, [shouldPoll, isPollingTimedOut]);
+
 	const { data: polledData } = useQuery({
 		queryKey: ["analysis", analysisId],
 		queryFn: async () => {
@@ -668,17 +702,19 @@ function AnalysisPage() {
 			})) as ApiResponse<{
 				analysis: Analysis;
 				userRecording: UserRecording | null;
+				audioQualityMetrics: AudioQualityMetrics | null;
 				phonemeErrors: PhonemeError[];
 				wordErrors: WordError[];
 			} | null>;
 			return response.success && response.data ? response.data : null;
 		},
-		enabled: shouldPoll ?? false,
-		refetchInterval: shouldPoll ? 3000 : false, // Poll every 3 seconds if pending/processing
+		enabled: (shouldPoll && !isPollingTimedOut) ?? false,
+		refetchInterval: shouldPoll && !isPollingTimedOut ? 5000 : false, // Poll every 5 seconds
 	});
 
 	// Use polled data if available, otherwise use initial loader data
 	const analysis = polledData?.analysis ?? initialAnalysis;
+	const qualityMetrics = polledData?.audioQualityMetrics ?? initialQualityMetrics;
 
 	const audioSrc = userRecording
 		? `/api/audio/user/${userRecording.id}`
@@ -727,6 +763,10 @@ function AnalysisPage() {
 
 	// Show loading state if analysis is pending or processing
 	if (analysis.status === "pending" || analysis.status === "processing") {
+		// Check if job was actually submitted to RunPod
+		const jobSubmitted = initialJobSubmitted;
+		const isPending = analysis.status === "pending";
+		
 		return (
 			<MainLayout>
 				<PageContainer maxWidth="xl">
@@ -745,10 +785,14 @@ function AnalysisPage() {
 							</Button>
 							<div className="space-y-1">
 								<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
-									Analysis in Progress
+									{isPending && !jobSubmitted
+										? "Waiting for Processing"
+										: "Analysis in Progress"}
 								</h1>
 								<p className="text-muted-foreground text-sm">
-									Your recording is being analyzed...
+									{isPending && !jobSubmitted
+										? "Your recording is saved and waiting"
+										: "Your recording is being analyzed..."}
 								</p>
 							</div>
 						</motion.div>
@@ -759,19 +803,29 @@ function AnalysisPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.4 }}
 						>
-							<Card>
+							<Card className={isPending && !jobSubmitted ? "border-amber-500/20" : undefined}>
 								<CardContent className="flex flex-col items-center justify-center gap-4 py-12">
-									<Spinner className="size-8" />
+									{jobSubmitted ? (
+										<Spinner className="size-8" />
+									) : (
+										<div className="flex size-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-500">
+											<RiTimeLine size={24} />
+										</div>
+									)}
 									<div className="flex flex-col items-center gap-2 text-center">
 										<h3 className="font-semibold text-lg">
-											{analysis.status === "pending"
-												? "Queued for Processing"
-												: "Processing Your Recording"}
+											{isPending && !jobSubmitted
+												? "Waiting to Start"
+												: isPending
+													? "Queued for Processing"
+													: "Processing Your Recording"}
 										</h3>
 										<p className="max-w-md text-muted-foreground text-sm">
-											{analysis.status === "pending"
-												? "Your recording is in the queue and will be processed shortly."
-												: "Our AI is analyzing your pronunciation. This usually takes 10-30 seconds."}
+											{isPending && !jobSubmitted
+												? "The AI service is not currently available. Your recording is saved and will be analyzed when the service comes online."
+												: isPending
+													? "Your recording is in the queue and will be processed shortly."
+													: "Analyzing your pronunciation. This usually takes 10-30 seconds."}
 										</p>
 									</div>
 								</CardContent>
@@ -779,18 +833,33 @@ function AnalysisPage() {
 						</motion.div>
 
 						{/* Show recording while processing */}
-						{userRecording && (
-							<motion.div
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.4, delay: 0.2 }}
-							>
-								<WaveformPlayer
-									src={`/api/audio/user/${userRecording.id}`}
-									label="Your Recording"
-								/>
-							</motion.div>
-						)}
+						{/* Audio Players (Reference + User) */}
+						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+							{reference && (
+								<motion.div
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.4, delay: 0.1 }}
+								>
+									<WaveformPlayer
+										src={`/api/audio/${reference.id}`}
+										label="Reference Audio"
+									/>
+								</motion.div>
+							)}
+							{userRecording && (
+								<motion.div
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.4, delay: 0.2 }}
+								>
+									<WaveformPlayer
+										src={`/api/audio/user/${userRecording.id}`}
+										label="Your Recording"
+									/>
+								</motion.div>
+							)}
+						</div>
 					</div>
 				</PageContainer>
 			</MainLayout>
@@ -892,11 +961,51 @@ function AnalysisPage() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.4 }}
 					>
-						<WaveformPlayer
-							src={`/api/audio/user/${userRecording?.id ?? ""}`}
-							label="Your Recording"
-							errorRegions={errorRegions}
-						/>
+						{qualityMetrics && qualityMetrics.qualityStatus !== "accept" && (
+							<Alert variant={"default"} className="mb-6">
+
+								<RiAlertLine size={16} className="text-muted" />
+								<AlertTitle>Recording quality issues detected</AlertTitle>
+								<AlertDescription>
+									<ul className="">
+										{
+											<li>
+												Results might not be accurate.
+											</li>
+										}
+										{Number(qualityMetrics.snrDb) < 15 && (
+											<li>High background noise: {qualityMetrics.snrDb}dB</li>
+										)}
+										{Number(qualityMetrics.silenceRatio) > 0.7 && (
+											<li>Too much silence: {Number(qualityMetrics.silenceRatio)*100}% of the recording.</li>
+										)}
+										{Number(qualityMetrics.clippingRatio) > 0.01 && (
+											<li>Audio distortion (clipping) detected: {qualityMetrics.clippingRatio} clipping ratio</li>
+										)}
+										{(qualityMetrics.qualityStatus) === "reject" && (
+											<li className="text-sm">
+												Recording quality is too low for an accurate analysis
+							 				</li>
+							 			)}
+							 		</ul>
+								</AlertDescription>
+								
+							</Alert>
+						)}
+
+						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+							{reference && (
+								<WaveformPlayer
+									src={`/api/audio/${reference.id}`}
+									label="Reference Audio"
+								/>
+							)}
+							<WaveformPlayer
+								src={`/api/audio/user/${userRecording?.id ?? ""}`}
+								label="Your Recording"
+								errorRegions={errorRegions}
+							/>
+						</div>
 					</motion.div>
 
 					{/* Active Segment Player */}
@@ -912,6 +1021,7 @@ function AnalysisPage() {
 								endMs={activeSegment.end}
 								label="Playing selected segment"
 								defaultSpeed={0.75}
+								onClose={() => setActiveSegment(null)}
 							/>
 						</motion.div>
 					)}

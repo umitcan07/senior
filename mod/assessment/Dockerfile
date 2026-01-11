@@ -1,5 +1,9 @@
 # Assessment endpoint Dockerfile
 # Build from mod/ directory: cd mod/ && docker build --platform linux/amd64 -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
+#
+# NOTE: MFA (Montreal Forced Aligner) is optional for local dev.
+# On Apple Silicon, build without MFA for faster iteration.
+# For production (RunPod), MFA will be installed separately or use network volume.
 
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
@@ -23,7 +27,7 @@ WORKDIR /worker
 # Upgrade pip first
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install PyTorch with CUDA 11.8 (latest available)
+# Install PyTorch with CUDA 11.8 (same as ipa_generation)
 RUN python3 -m pip install --no-cache-dir \
     torch torchaudio \
     --index-url https://download.pytorch.org/whl/cu118
@@ -31,10 +35,12 @@ RUN python3 -m pip install --no-cache-dir \
 # Copy files
 COPY shared/ /worker/shared/
 COPY assessment/ /worker/assessment/
-COPY requirements-pinned.txt /worker/assessment/requirements.txt
 
 # Install dependencies
 RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt
+
+# Add textgrid for parsing MFA output (even if MFA not installed)
+RUN python3 -m pip install --no-cache-dir textgrid librosa numpy
 
 ENV PYTHONPATH=/worker
 # Set HuggingFace cache to network volume (if attached, otherwise uses default)

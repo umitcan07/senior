@@ -76,13 +76,13 @@ function Segment({
 		<button
 			type="button"
 			className={cn(
-				"relative inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-left outline-hidden transition-all focus-visible:ring-2 focus-visible:ring-primary/50",
+				"relative inline-flex items-center gap-1 text-lg rounded-sm px-2 py-1 font-ipa outline-hidden transition-all font-ipa! text-xl focus-visible:ring-2 focus-visible:ring-primary/8",
 				hasError &&
 					cn(
 						errorBgVariants({ errorType: error.errorType }),
 						errorBorderVariants({ errorType: error.errorType }),
 						errorTextVariants({ errorType: error.errorType }),
-						"border font-medium",
+						"font-bold",
 					),
 				!hasError &&
 					"bg-green-950/10 dark:bg-green-900/20 text-green-800 dark:text-green-300 font-medium border border-green-800/20 dark:border-green-700/30",
@@ -94,7 +94,6 @@ function Segment({
 			disabled={!canPlay}
 		>
 			{segment}
-			{canPlay && <RiPlayLine size={10} className="opacity-50" />}
 		</button>
 	);
 
@@ -210,7 +209,7 @@ export function DiffViewer({
 				<div
 					className={cn(
 						"flex flex-wrap gap-1 rounded-lg border border-border/50 border-dashed bg-muted/20 p-4 leading-relaxed",
-						type === "phoneme" && "font-mono text-sm",
+						type === "phoneme" && "font-ipa text-sm",
 						type === "word" && "text-base",
 					)}
 				>
@@ -241,7 +240,7 @@ export function DiffViewer({
 				<div
 					className={cn(
 						"flex flex-wrap gap-1 rounded-lg border border-border/50 border-dashed bg-muted/20 p-4 leading-relaxed",
-						type === "phoneme" && "font-mono text-sm",
+						type === "phoneme" && "font-ipa text-sm",
 						type === "word" && "text-base",
 					)}
 				>

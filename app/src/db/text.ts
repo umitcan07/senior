@@ -162,10 +162,22 @@ export async function deletePracticeText(id: string): Promise<void> {
  * This function fetches texts and enriches them with the user's attempt history
  */
 export async function getPracticeTextsWithAttemptStats(
-	userId: string,
+	userId: string | null,
 ): Promise<PracticeTextWithAttemptStats[]> {
 	// First, get texts with reference counts
 	const textsWithRefs = await getPracticeTextsWithReferenceCounts();
+
+	// If no user, return texts without attempt stats
+	if (!userId) {
+		return textsWithRefs.map((text) => ({
+			...text,
+			attemptCount: 0,
+			bestScore: null,
+			lastAttemptDate: null,
+			usCount: text.usCount,
+			ukCount: text.ukCount,
+		}));
+	}
 
 	// Then, get attempt stats for this user
 	const attemptStats = await db

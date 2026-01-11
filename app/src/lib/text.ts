@@ -163,7 +163,8 @@ export const serverGetPracticeTextsWithAttemptStats = createServerFn({
 	method: "GET",
 }).handler(async (): Promise<ApiResponse<PracticeTextWithAttemptStats[]>> => {
 	try {
-		let userId = "guest";
+
+		let userId: string | null = null;
 
 		// Try to get authenticated userId from Clerk
 		try {
@@ -172,7 +173,7 @@ export const serverGetPracticeTextsWithAttemptStats = createServerFn({
 				userId = authObj.userId;
 			}
 		} catch {
-			// Auth not available, use guest
+			// Auth not available, keep as null
 		}
 
 		const result = await getPracticeTextsWithAttemptStats(userId);

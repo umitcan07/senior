@@ -60,6 +60,10 @@ export type NewIpaGenerationJob = InferInsertModel<
 	typeof schema.ipaGenerationJobs
 >;
 
+// Assessment job types
+export type AssessmentJob = InferSelectModel<typeof schema.assessmentJobs>;
+export type NewAssessmentJob = InferInsertModel<typeof schema.assessmentJobs>;
+
 // Enum types
 export type GenerationMethod =
 	(typeof schema.generationMethodEnum.enumValues)[number];

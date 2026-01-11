@@ -118,7 +118,7 @@ export async function getUserAttemptStats(
 			),
 		);
 
-	// Get weekly attempts (all statuses for count, but only completed for score)
+	// Get weekly completed attempts (only completed for consistency with totalAttempts)
 	const weeklyAttemptsResult = await db
 		.select({
 			count: sql<number>`COUNT(*)::int`,
@@ -128,11 +128,12 @@ export async function getUserAttemptStats(
 		.where(
 			and(
 				eq(userRecordings.userId, userId),
+				eq(analyses.status, "completed"),
 				gte(analyses.createdAt, oneWeekAgo),
 			),
 		);
 
-	// Get previous week attempts for progress calculation (all statuses)
+	// Get previous week completed attempts for progress calculation
 	const previousWeekAttemptsResult = await db
 		.select({
 			count: sql<number>`COUNT(*)::int`,
@@ -142,6 +143,7 @@ export async function getUserAttemptStats(
 		.where(
 			and(
 				eq(userRecordings.userId, userId),
+				eq(analyses.status, "completed"),
 				gte(analyses.createdAt, twoWeeksAgo),
 				lt(analyses.createdAt, oneWeekAgo),
 			),
@@ -205,7 +207,7 @@ export async function getCommonPhonemeErrors(
 	return results
 		.filter((r) => r.phoneme !== null)
 		.map((r) => ({
-			phoneme: `/${r.phoneme}/`,
+			phoneme: r.phoneme!,
 			count: r.count,
 		}));
 }

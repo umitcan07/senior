@@ -560,7 +560,7 @@ function ReferenceVoice({
 								: "Dictionary"}
 						</Badge>
 					</div>
-					<p className="font-mono text-lg leading-relaxed tracking-wide text-foreground/80">
+					<p className="font-ipa text-xl leading-relaxed tracking-wide text-foreground/80">
 						{formatIpaForDisplay(selectedReference.ipaTranscription)}
 					</p>
 				</div>
@@ -815,13 +815,41 @@ function PracticeTextPage() {
 									isActiveRecording && "opacity-80",
 								)}
 							>
-								<p className="font-serif text-2xl text-foreground/90 leading-relaxed md:text-3xl md:leading-relaxed">
+								<p className="font-ipa text-2xl text-foreground/90 leading-relaxed md:text-3xl md:leading-relaxed">
 									{text.content}
 								</p>
 							</div>
 
 							{/* Recording section - fixed heights */}
-							<div className="flex flex-col gap-4">
+							<div className="relative flex flex-col gap-4">
+								{/* Overlay for uploading/analyzing */}
+								{(isUploading || isAnalyzing) && (
+									<div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 rounded-xl bg-black/80 text-white backdrop-blur-[2px] transition-all duration-300">
+										{isUploading && (
+											<div className="flex w-full max-w-xs flex-col gap-4 p-6">
+												<div className="flex items-center justify-between text-sm">
+													<span className="font-medium">Uploading recording...</span>
+													<span className="font-mono tabular-nums">{recording.uploadProgress}%</span>
+												</div>
+												<Progress
+													value={recording.uploadProgress}
+													className="h-2 border border-white/20 bg-white/10"
+													indicatorClassName="bg-white"
+												/>
+											</div>
+										)}
+										{isAnalyzing && (
+											<div className="flex flex-col items-center gap-3 p-6">
+												<div className="h-2 w-2 animate-ping rounded-full bg-white" />
+												<ShimmeringText
+													text="Analyzing pronunciation..."
+													className="text-white text-lg font-medium"
+													shimmerWidth={200}
+												/>
+											</div>
+										)}
+									</div>
+								)}
 								{/* Waveform - fixed height */}
 								<div
 									className={cn(
@@ -1059,29 +1087,7 @@ function PracticeTextPage() {
 											</div>
 										)}
 
-										{/* Uploading state */}
-										{isUploading && (
-											<div className="flex w-full max-w-md flex-col gap-3">
-												<Progress
-													value={recording.uploadProgress}
-													className="h-2"
-												/>
-												<ShimmeringText
-													text={`Uploading ${recording.uploadProgress}%`}
-													className="text-center text-muted-foreground text-sm"
-													duration={1.5}
-												/>
-											</div>
-										)}
 
-										{/* Analyzing state */}
-										{isAnalyzing && (
-											<ShimmeringText
-												text="Analyzing..."
-												className="text-muted-foreground text-sm"
-												duration={1.5}
-											/>
-										)}
 									</SignedIn>
 
 									<SignedOut>

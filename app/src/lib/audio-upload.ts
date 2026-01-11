@@ -1,10 +1,7 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import {
-	insertAnalysis,
-	insertPhonemeErrors,
-	insertWordErrors,
-} from "@/db/analysis";
+import { insertAnalysis } from "@/db/analysis";
 import { insertUserRecording } from "@/db/recording";
 import {
 	type ApiResponse,
@@ -34,7 +31,20 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 			});
 
 			const buffer = Buffer.from(data.audioBase64, "base64");
-			const userId = "guest";
+
+			// Get authenticated user ID or fallback to guest
+			let userId = "guest";
+			try {
+				const authObj = await auth();
+				if (authObj.userId) {
+					userId = authObj.userId;
+				}
+			} catch {
+				// Auth not available, keep as guest
+			}
+
+			console.log(`[Server] attribution recording to user: ${userId}`);
+			
 			const fileExtension = data.mimeType.split("/")[1] || "webm";
 			const storageKey = `users/${userId}/recordings/${crypto.randomUUID()}.${fileExtension}`;
 
@@ -66,81 +76,48 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 				throw new Error("Failed to create recording record");
 			}
 
-			// Mock Analysis
-			const mockScore = 0.7 + Math.random() * 0.3;
-
+			// Create analysis with pending status (will be processed by RunPod)
 			const analysis = await insertAnalysis({
 				userRecordingId: recording.id,
 				referenceSpeechId: data.referenceId,
-				processingDurationMs: 500,
-				overallScore: mockScore.toFixed(4),
-				confidence: "0.95",
-				targetPhonemes: "ð ə k w ɪ k b r aʊ n f ɒ k s",
-				recognizedPhonemes: "ð ə k w ɪ k b r aʊ n f ɒ k s",
-				phonemeScore: mockScore.toFixed(4),
-				targetWords: "the quick brown fox",
-				recognizedWords: "the quick brown fox",
-				wordScore: mockScore.toFixed(4),
+				status: "pending",
 			});
 
 			if (!analysis) {
 				throw new Error("Failed to create analysis record");
 			}
 
-			if (mockScore < 0.9) {
-				await insertPhonemeErrors([
-					{
-						analysisId: analysis.id,
-						errorType: "substitute",
-						position: 5,
-						expected: "ɪ",
-						actual: "i",
-						timestampStartMs: 1200,
-						timestampEndMs: 1300,
-					},
-					{
-						analysisId: analysis.id,
-						errorType: "delete",
-						position: 8,
-						expected: "k",
-						actual: null,
-						timestampStartMs: 1800,
-						timestampEndMs: 1900,
-					},
-					{
-						analysisId: analysis.id,
-						errorType: "insert",
-						position: 12,
-						expected: null,
-						actual: "ə",
-						timestampStartMs: 2400,
-						timestampEndMs: 2500,
-					},
-				]);
+			console.log(
+				`[Server] Analysis ${analysis.id} created with status=pending`,
+			);
 
-				await insertWordErrors([
+			// Submit assessment job to RunPod
+			try {
+				const assessmentResponse = await fetch(
+					new URL("/api/assessment", process.env.WEBHOOK_BASE_URL || "http://localhost:3000").toString(),
 					{
-						analysisId: analysis.id,
-						errorType: "substitute",
-						position: 1,
-						expected: "quick",
-						actual: "kwick",
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ analysisId: analysis.id }),
 					},
-					{
-						analysisId: analysis.id,
-						errorType: "delete",
-						position: 3,
-						expected: "fox",
-						actual: null,
-					},
-					{
-						analysisId: analysis.id,
-						errorType: "insert",
-						position: 5,
-						expected: null,
-						actual: "um",
-					},
-				]);
+				);
+
+				if (!assessmentResponse.ok) {
+					const errorText = await assessmentResponse.text();
+					console.error(
+						`[Server] Failed to submit assessment job: ${errorText}`,
+					);
+					// Don't fail the upload - the analysis is created and can be retried
+					// The UI will show "pending" status
+				} else {
+					const jobResult = await assessmentResponse.json();
+					console.log(
+						`[Server] Assessment job submitted: ${jobResult?.data?.externalJobId}`,
+					);
+				}
+			} catch (assessmentError) {
+				// Log but don't fail - analysis record exists and can be retried
+				console.error("[Server] Assessment submission error:", assessmentError);
 			}
 
 			return createSuccessResponse({ analysisId: analysis.id });
@@ -162,3 +139,4 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 			);
 		}
 	});
+

@@ -57,6 +57,13 @@
       "when": 1767993639442,
       "tag": "0007_organic_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1768154135395,
+      "tag": "0008_elite_photon",
+      "breakpoints": true
     }
   ]
 }

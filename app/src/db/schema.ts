@@ -357,3 +357,32 @@ export const ipaGenerationJobs = pgTable(
 	],
 );
 
+/**
+ * Assessment job tracking for user recordings
+ */
+export const assessmentJobs = pgTable(
+	"assessment_jobs",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		analysisId: uuid("analysis_id")
+			.notNull()
+			.references(() => analyses.id, { onDelete: "cascade" }),
+		externalJobId: varchar("external_job_id", { length: 255 })
+			.notNull()
+			.unique(),
+		status: jobStatusEnum("status").default("in_queue").notNull(),
+		result: jsonb("result"),
+		error: text("error"),
+		executionTimeMs: integer("execution_time_ms"),
+		delayTimeMs: integer("delay_time_ms"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	},
+	(table) => [
+		index("idx_assessment_jobs_analysis_id").on(table.analysisId),
+		index("idx_assessment_jobs_external_job_id").on(table.externalJobId),
+		index("idx_assessment_jobs_status").on(table.status),
+	],
+);
+
+

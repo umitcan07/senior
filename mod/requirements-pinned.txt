@@ -1,9 +1,0 @@
-# Core requirements matching working environment:
-# - torch: 2.4.0+cu118 (installed separately in Dockerfile)
-# - espnet: 202412
-espnet==202412
-espnet-model-zoo==0.1.7
-# torch and torchaudio installed separately in Dockerfile with CUDA support
-runpod>=1.0.0
-soundfile
-requests

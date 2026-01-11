@@ -2,13 +2,18 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
 	getAnalysisById,
+	getAudioQualityMetricsByUserRecordingId,
 	getPhonemeErrorsByAnalysisId,
 	getWordErrorsByAnalysisId,
 } from "@/db/analysis";
+import { getLatestAssessmentJob, type AssessmentJob } from "@/db/assessment-job";
 import { getUserRecordingById } from "@/db/recording";
+import { getReferenceSpeechById } from "@/db/reference";
 import type {
 	Analysis,
+	AudioQualityMetrics,
 	PhonemeError,
+	ReferenceSpeech,
 	UserRecording,
 	WordError,
 } from "@/db/types";
@@ -26,8 +31,11 @@ const GetAnalysisSchema = z.object({
 type AnalysisDetails = {
 	analysis: Analysis;
 	userRecording: UserRecording | null;
+	audioQualityMetrics: AudioQualityMetrics | null;
+	reference: ReferenceSpeech | null;
 	phonemeErrors: PhonemeError[];
 	wordErrors: WordError[];
+	assessmentJob: AssessmentJob | null;
 };
 
 export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
@@ -48,17 +56,26 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 				return createSuccessResponse(null);
 			}
 
-			const [phonemeErrors, wordErrors, userRecording] = await Promise.all([
+			const [phonemeErrors, wordErrors, userRecording, assessmentJob, reference] = await Promise.all([
 				getPhonemeErrorsByAnalysisId(analysis.id),
 				getWordErrorsByAnalysisId(analysis.id),
 				getUserRecordingById(analysis.userRecordingId),
+				getLatestAssessmentJob(analysis.id),
+				getReferenceSpeechById(analysis.referenceSpeechId),
 			]);
+
+			const qualityMetrics = userRecording
+				? await getAudioQualityMetricsByUserRecordingId(userRecording.id)
+				: null;
 
 			return createSuccessResponse({
 				analysis,
 				userRecording,
+				audioQualityMetrics: qualityMetrics,
+				reference,
 				phonemeErrors,
 				wordErrors,
+				assessmentJob,
 			});
 		} catch (error) {
 			console.error("Get analysis details error:", error);
@@ -78,3 +95,4 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 			);
 		}
 	});
+
