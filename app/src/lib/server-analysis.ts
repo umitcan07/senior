@@ -43,6 +43,7 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 
 			const analysis = await getAnalysisById(data.analysisId);
 
+			// Return null if analysis doesn't exist
 			if (!analysis) {
 				return createSuccessResponse(null);
 			}

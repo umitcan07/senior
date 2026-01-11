@@ -8,7 +8,7 @@ export const errorBgVariants = cva("", {
 		errorType: {
 			substitute: "bg-destructive/20",
 			insert: "bg-amber-500/20",
-			delete: "bg-blue-500/20",
+			delete: "bg-amber-500/20", // Orange for deletion
 		},
 	},
 });
@@ -21,7 +21,7 @@ export const errorBorderVariants = cva("", {
 		errorType: {
 			substitute: "border-destructive/50",
 			insert: "border-amber-500/50",
-			delete: "border-blue-500/50",
+			delete: "border-amber-500/50", // Orange for deletion
 		},
 	},
 });
@@ -34,7 +34,7 @@ export const errorTextVariants = cva("", {
 		errorType: {
 			substitute: "text-destructive",
 			insert: "text-amber-700 dark:text-amber-400",
-			delete: "text-blue-700 dark:text-blue-400",
+			delete: "text-amber-700 dark:text-amber-400", // Orange for deletion
 		},
 	},
 });
