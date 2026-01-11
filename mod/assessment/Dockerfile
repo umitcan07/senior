@@ -19,6 +19,7 @@ COPY shared/ /worker/shared/
 
 # Copy assessment-specific files
 COPY assessment/ /worker/assessment/
+COPY requirements-pinned.txt /worker/assessment/requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r assessment/requirements.txt

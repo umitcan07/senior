@@ -20,6 +20,7 @@ COPY shared/ /worker/shared/
 
 # Copy IPA generation-specific files
 COPY ipa_generation/ /worker/ipa_generation/
+COPY requirements-pinned.txt /worker/ipa_generation/requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r ipa_generation/requirements.txt

@@ -2,18 +2,17 @@
 runpod>=1.0.0
 
 # Core dependencies for acoustic model inference
-# GPU support via CUDA (install appropriate PyTorch version for your CUDA version)
-# For RunPod: PyTorch with CUDA support is typically pre-installed
-# Avoid upgrading torch to save bandwidth (2GB+)
-torch==2.0.1
+# Upgrading to modern PyTorch for compatibility with espnet 202511
+torch>=2.0.0
+torchaudio
 
 # Audio processing (optional, for audio-guided G2P)
 librosa
 soundfile
-numpy<2
+numpy
 
 # ESPnet / POWSM (G2P)
-# Using 202511 to match notebook environment (has s2t_inference module)
+# Using latest version (202511) with modern PyTorch
 espnet==202511
 espnet_model_zoo==0.1.7
 
