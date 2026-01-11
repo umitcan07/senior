@@ -19,13 +19,13 @@
 \begin{document}
 
 % Title Page
-\title{CMPE 492 \\ Nounce: Pronunciation Assessment System for English Language Learners}
+\title{CMPE 491 \\ Nounce: Language Platform for Phonetic Analysis \& Pronunciation Assessment}
 \author{
 Ümit Can Evleksiz \\
  \\ \\
 Advisor: \\ 
-Lale Akarun \\
-Murat Saraçlar
+Prof. Lale Akarun \\
+Prof. Murat Saraçlar
 }
 \date{}
 \maketitle{}
@@ -157,7 +157,7 @@ This project is being developed as an individual effort. All aspects including r
 
 \section{Speech Foundation Models and Phonetic Transcription}
 
-Several open-source deep learning models are available for phonetic transcription. Wav2Vec 2.0 \cite{baevski2020wav2vec} and WavLM \cite{chen2022wavlm} provide self-supervised speech representations that can be fine-tuned for phonetic recognition, though they require significant adaptation. For this application, POWSM (Phonetic Open Whisper-Style Speech Model) \cite{peng2024owsm} is best suited, as it is specifically engineered for phonetic transcription with textual transcription context. The model is open to fine-tuning, which is valuable for adapting to Turkish-native English speakers. Connectionist Temporal Classification (CTC) \cite{graves2006connectionist} is commonly used for sequence alignment in phonetic transcription tasks.
+Several open-source deep learning models are available for phonetic transcription. Wav2Vec 2.0 \cite{baevski2020wav2vec} and WavLM \cite{chen2022wavlm} provide self-supervised speech representations that can be fine-tuned for phonetic recognition, though they require significant adaptation. For this application, POWSM (Phonetic Open Whisper-Style Speech Model) \cite{powsm} is best suited, as it is specifically engineered for phonetic transcription with textual transcription context. The model is open to fine-tuning, which is valuable for adapting to Turkish-native English speakers. Connectionist Temporal Classification (CTC) \cite{graves2006connectionist} is commonly used for sequence alignment in phonetic transcription tasks.
 
 \section{Forced Alignment and Assessment}
 
@@ -171,27 +171,65 @@ Commercial pronunciation assessment platforms demonstrate practical applications
 
 \section{Application Architecture}
 
-Nounce is built as an industry-standard web-based application with a focus on user experience. The full-stack architecture is dockerized for consistent deployment and development environments. The frontend utilizes React with TanStack Start for server-side rendering and routing, providing a modern, responsive user interface. The backend leverages TanStack Start's server functions for API endpoints and business logic.
+Nounce is built as an industry-standard web-based application with a focus on user experience. The full-stack architecture is dockerized for consistent deployment and development environments. The frontend utilizes React with TanStack Start for server-side rendering and routing, providing a modern, responsive user interface built with Shadcn UI components for a sleek, accessible design. The backend leverages TanStack Start's server functions for API endpoints and business logic.
 
-Data persistence is handled through Neon, a serverless PostgreSQL database, providing scalable and reliable storage for user recordings and metadata. Audio file storage will be implemented using Cloudflare R2 or a similar object storage solution. The entire stack is containerized using Docker, enabling reproducible deployments across development, staging, and production environments.
+Authentication is handled through Clerk (free tier), supporting email/password and social sign-in options (Google, GitHub). Authorization is implemented using user metadata stored in Clerk, enabling role-based access control for administrative features.
+
+Data persistence is handled through Neon, a serverless PostgreSQL database, providing scalable and reliable storage for user recordings and metadata with automatic scaling and backups. Audio file storage is implemented using Cloudflare R2 object storage solution. The entire stack is containerized using Docker, enabling reproducible deployments across development, staging, and production environments.
 
 Modern server state management and caching are implemented using TanStack Query, which provides efficient data fetching, automatic background refetching, and intelligent caching mechanisms. This ensures optimal performance and user experience by minimizing unnecessary network requests and maintaining responsive UI updates.
 
-Deployment is automated through GitHub Actions CI/CD pipelines, which handle building Docker images, running tests, and linting. Production deployment will be hosted on platforms such as Railway or Fly.io, which provide seamless Docker container orchestration, automatic scaling, and integrated monitoring capabilities.
+\subsection{Production Deployment Architecture}
+
+The production deployment follows a serverless, cloud-native architecture:
+
+\textbf{Domain and DNS:} The application is served at \texttt{https://nounce.pro}, with the domain purchased and configured for production use. DNS management is handled through Cloudflare, which provides reliable DNS resolution and domain management capabilities.
+
+\textbf{Application Hosting:} The TanStack Start application is deployed on Fly.io, providing global edge deployment with automatic scaling based on traffic. The application is containerized using Docker and deployed through automated CI/CD pipelines. The application is accessible via the \texttt{nounce.pro} domain, with Cloudflare's global network providing DDoS protection and enhanced security.
+
+\textbf{Security and Protection:} Cloudflare's global network provides comprehensive DDoS protection, protecting the application from distributed denial-of-service attacks. The Cloudflare infrastructure also offers additional security features including SSL/TLS termination, rate limiting, and web application firewall capabilities.
+
+\textbf{Database:} Neon serverless PostgreSQL provides the database layer with automatic scaling, point-in-time recovery, and branching capabilities for development and testing.
+
+\textbf{ML Services:} Machine learning inference is handled by RunPod serverless GPU endpoints, which provide on-demand GPU resources for model inference. Two separate endpoints are deployed:
+\begin{itemize}
+    \item \textbf{Assessment Endpoint:} Handles pronunciation assessment with POWSM \cite{powsm} PR and G2P models, MFA alignment, and error detection
+    \item \textbf{IPA Generation Endpoint:} Generates IPA transcriptions for reference speeches using POWSM \cite{powsm} G2P model
+\end{itemize}
+
+\textbf{Model Caching:} RunPod network volumes are used to cache large model files (POWSM \cite{powsm} models, MFA dictionaries and acoustic models), significantly reducing cold-start times. The maximum observed cold-start time is 30 seconds, while average task execution times are 3 seconds for Phone Recognition (PR) and 2 seconds for Grapheme-to-Phoneme (G2P) tasks.
+
+\textbf{Reference Speech Generation:} ElevenLabs API is integrated for generating reference speech audio files. Currently, the system uses US English with two different speaker configurations to provide variety in target pronunciations.
+
+\textbf{Deployment Automation:} GitHub Actions CI/CD pipelines handle building Docker images, running tests, linting, and automated deployment to Fly.io. The build process includes diagram generation from PlantUML source files, ensuring documentation stays synchronized with code changes.
 
 \section{Machine Learning Approach}
 
-The machine learning pipeline follows an experimental and iterative approach. Multiple open-source phonetic transcription models, including Wav2Vec 2.0, WavLM, and POWSM, are being evaluated to identify the best-performing solution for the specific use case. Performance will be assessed based on accuracy, inference speed, and compatibility with the target user population (Turkish-native English speakers).
+The machine learning pipeline follows an experimental and iterative approach. After evaluating multiple open-source phonetic transcription models, including Wav2Vec 2.0, WavLM, and POWSM \cite{powsm}, POWSM was selected as the best-performing solution for the specific use case. The selection was based on accuracy, inference speed, and compatibility with the target user population (Turkish-native English speakers).
 
-Once a model is selected, fine-tuning will be performed when necessary to improve performance on domain-specific data. This process will involve collecting and curating training data from target users, adapting the model architecture, and iteratively improving accuracy. A significant challenge encountered is the lack of comprehensive documentation and standardized inference providers for many open-source phonetic transcription models, requiring extensive experimentation and custom implementation.
+POWSM \cite{powsm} is integrated for both Phone Recognition (PR) and Grapheme-to-Phoneme (G2P) tasks, providing accurate phonetic transcriptions. The implementation required extensive experimentation and custom implementation due to the lack of comprehensive documentation and standardized inference providers for many open-source phonetic transcription models. Fine-tuning on domain-specific data remains a future enhancement opportunity to further improve performance for Turkish-native English speakers.
 
 \section{Development Methodology}
 
-The project employs parallel development tracks, leveraging prior professional software development expertise while building new knowledge in signal processing and deep learning domains. Signal processing components, including audio preprocessing, quality assessment, and feature extraction, are being developed alongside deep learning model integration and fine-tuning pipelines.
+The project employed parallel development tracks, leveraging prior professional software development expertise while building new knowledge in signal processing and deep learning domains. Signal processing components, including audio preprocessing, quality assessment, and feature extraction, were developed alongside deep learning model integration and assessment pipelines.
 
-Experimentation and prototyping are conducted using Python notebooks (Jupyter/IPython), enabling rapid iteration on digital signal processing (DSP) techniques, visualization of audio features, and deep learning model evaluation. These notebooks serve as both development tools and documentation of the experimentation process, capturing insights and learnings that inform the final implementation.
+Experimentation and prototyping were conducted using Python notebooks (Jupyter/IPython), enabling rapid iteration on digital signal processing (DSP) techniques, visualization of audio features, and deep learning model evaluation. These notebooks served as both development tools and documentation of the experimentation process, capturing insights and learnings that informed the final implementation.
 
 The development process emphasizes modularity and separation of concerns, with clear boundaries between frontend, backend, database, and machine learning components. This architecture facilitates independent development and testing of each component while maintaining system integration.
+
+\subsection{Local Development and RunPod Simulation}
+
+For local development, a custom RunPod serverless simulator was implemented to replicate the production RunPod API behavior without requiring cloud GPU resources. The simulator architecture consists of:
+
+\textbf{Proxy Server:} A FastAPI-based proxy server (\texttt{mod/dev/runpod\_proxy.py}) that mimics the RunPod Cloud API, providing endpoints for job submission (\texttt{POST /v2/\{endpoint\_id\}/run}) and status polling (\texttt{GET /v2/\{endpoint\_id\}/status/\{job\_id\}}). The proxy maintains in-memory job state and manages worker queues per endpoint.
+
+\textbf{Worker Containers:} Docker containers for assessment and IPA generation workers, running the same code as production endpoints but accessible locally via Docker Compose networking.
+
+\textbf{Job Processing:} Background async worker loops pull jobs from per-endpoint queues, ensuring sequential processing that mimics single GPU pod behavior. The simulator handles retries, timeouts, and webhook delivery, providing a faithful representation of RunPod's serverless architecture.
+
+\textbf{Configuration:} Worker endpoints are mapped via \texttt{WORKER\_MAP} environment variable, allowing flexible configuration of endpoint-to-worker mappings. The simulator is orchestrated using Docker Compose (\texttt{docker-compose.dev.yml}) and can be started using the \texttt{scripts/runpod.py} utility script.
+
+This local simulation environment enables rapid development and testing of ML pipeline integration without incurring cloud GPU costs or dealing with cold-start delays during development iterations.
 
 \chapter{REQUIREMENTS SPECIFICATION}
 
@@ -276,7 +314,21 @@ The development process emphasizes modularity and separation of concerns, with c
 
 \subsection{Entity-Relationship Diagram}
 
-The entity-relationship diagram represents the planned database schema for Nounce. Currently, the \texttt{recordings} and \texttt{texts} tables are implemented. The \texttt{User}, \texttt{Analysis}, and \texttt{Alignment Data} entities will be implemented as the ML pipeline and assessment features are developed.
+The entity-relationship diagram represents the complete database schema for Nounce. All tables and relationships shown in the diagram are fully implemented and operational, including:
+\begin{itemize}
+    \item \texttt{practice\_texts} - Practice materials with difficulty and category classification
+    \item \texttt{authors} - Reference voice/author management
+    \item \texttt{reference\_speeches} - Target pronunciation audio files
+    \item \texttt{user\_recordings} - User-submitted audio recordings
+    \item \texttt{audio\_quality\_metrics} - Quality assessment results
+    \item \texttt{analyses} - Pronunciation assessment results
+    \item \texttt{alignments} - Phone-level time alignment data
+    \item \texttt{phoneme\_errors} and \texttt{word\_errors} - Error tracking
+    \item \texttt{jobs} and \texttt{ipa\_generation\_jobs} - Asynchronous job tracking
+    \item \texttt{user\_preferences} - User settings
+\end{itemize}
+
+The schema supports the complete ML pipeline and assessment workflow, with proper indexing for efficient queries and relationships ensuring data integrity.
 
 \begin{figure}[H]
 \centering
@@ -307,6 +359,24 @@ The entity-relationship diagram represents the planned database schema for Nounc
 \label{fig:system-design}
 \end{figure}
 
+\subsection{Deployment Architecture Diagram}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth,angle=0]{images/deployment-architecture.png}
+\caption{Production Deployment Architecture}
+\label{fig:deployment-architecture}
+\end{figure}
+
+\subsection{RunPod Simulator Architecture Diagram}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/runpod-simulator.png}
+\caption{Local RunPod Serverless Simulator Architecture}
+\label{fig:runpod-simulator}
+\end{figure}
+
 \section{User Interface Design}
 
 \subsection{Application Logo}
@@ -318,30 +388,398 @@ The entity-relationship diagram represents the planned database schema for Nounc
 \label{fig:nounce-logo}
 \end{figure}
 
+\subsection{User Interface Screenshots}
+
+The Nounce application provides a modern, intuitive user interface built with Shadcn UI and ElevenLabs UI components. The following screenshots demonstrate key features and workflows of the application. All screenshots are captured in dark mode.
+
+\subsubsection{Home Page}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-home.png}
+\caption{Home Page - Main landing page with feature overview and navigation}
+\label{fig:ui-home}
+\end{figure}
+
+\subsubsection{Practice Text Selection}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-practice.png}
+\caption{Practice Text Selection - Browse and filter practice texts by difficulty and category}
+\label{fig:ui-practice-selection}
+\end{figure}
+
+\subsubsection{Recording Interface}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-recording.png}
+\caption{Recording Interface - Browser-based audio recording with real-time waveform visualization (dark mode)}
+\label{fig:ui-recording}
+\end{figure}
+
+\subsubsection{Analysis Results}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-analysis.png}
+\caption{Analysis Results - Detailed pronunciation feedback with phoneme and word-level error visualization}
+\label{fig:ui-analysis}
+\end{figure}
+
+\subsubsection{Progress Dashboard}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-summary.png}
+\caption{Progress Dashboard - User statistics and error analysis over time}
+\label{fig:ui-summary}
+\end{figure}
+
+\subsubsection{Educational Content}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-learn.png}
+\caption{Educational Content - IPA and English phonology learning materials}
+\label{fig:ui-learn}
+\end{figure}
+
+\subsubsection{Admin Interface}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/nounce-ss-admin.png}
+\caption{Admin Interface - Content management for practice texts and reference speeches}
+\label{fig:ui-admin}
+\end{figure}
+
+\subsubsection{Mobile View}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{images/screen/nounce-ss-mobile-view-practice.png}
+\caption{Mobile View - Practice text selection on mobile devices}
+\label{fig:ui-mobile}
+\end{figure}
+
 
 \chapter{IMPLEMENTATION AND TESTING}
 
 \section{Implementation}
 
-The implementation of Nounce follows the architecture and methodology outlined in previous chapters. The source code is organized in a structured repository \cite{github2024senior} with clear separation between the full-stack application, documentation, and experimental work.
+The implementation of Nounce follows the architecture and methodology outlined in previous chapters. The source code is organized in a structured repository \cite{github2024senior} with clear separation between the full-stack application, machine learning services, documentation, and experimental work.
 
-The main application codebase is located in the \texttt{app/} directory \cite{github2024app}, containing the React frontend, TanStack Start backend, database schemas, and API endpoints. The application structure follows modern web development practices with TypeScript for type safety, component-based architecture, and modular design patterns.
+\subsection{Full-Stack Application}
 
-Signal processing experiments and deep learning model evaluations are conducted in the \texttt{sig/exp/} directory \cite{github2024sig}, which contains Jupyter notebooks for audio preprocessing, feature extraction, model training, and visualization. These notebooks document the experimentation process and serve as reference implementations for the production pipeline.
+The main application codebase is located in the \texttt{app/} directory \cite{github2024app}, built with modern web technologies:
 
-The repository includes comprehensive documentation in the \texttt{doc/} directory, with learning materials, technical notes, and project reports. The main README file \cite{github2024readme} provides an overview of the project structure, setup instructions, and development guidelines. Environment variables and configuration are documented to ensure reproducible deployments across different environments \cite{github2024env}.
+\textbf{Frontend:} The React-based user interface is implemented using TanStack Start for server-side rendering and routing. The UI follows modern design principles with Tailwind CSS, Shadcn UI, and ElevenLabs UI components, providing a sleek, responsive, and accessible experience across desktop and mobile devices. Key user-facing features include:
+\begin{itemize}
+    \item Practice text selection with filtering by difficulty (beginner, intermediate, advanced) and category (daily, professional, academic, phonetic challenge, common phrase)
+    \item Browser-based audio recording with real-time waveform visualization
+    \item Audio upload functionality with format conversion
+    \item Pronunciation analysis results visualization with phoneme-level error highlighting
+    \item Progress tracking and summary dashboard with statistics and error analysis
+    \item Educational content pages for IPA and English phonology
+\end{itemize}
+
+\textbf{Backend:} The TanStack Start backend provides server functions for API endpoints and business logic. Authentication is handled through Clerk (free tier), supporting email/password and social sign-in options (Google, GitHub). Authorization is implemented using user metadata stored in Clerk, enabling role-based access control. The application uses TanStack Query for efficient data fetching, caching, and state management.
+
+\textbf{Database:} The complete database schema is implemented using Drizzle ORM with Neon serverless PostgreSQL. All planned tables are operational, including:
+\begin{itemize}
+    \item \texttt{practice\_texts} - Practice materials with difficulty and category classification
+    \item \texttt{authors} - Reference voice/author management with ElevenLabs integration
+    \item \texttt{reference\_speeches} - Target pronunciation audio files with IPA transcriptions
+    \item \texttt{user\_recordings} - User-submitted audio recordings with metadata
+    \item \texttt{audio\_quality\_metrics} - Quality assessment results (SNR, silence ratio, clipping ratio)
+    \item \texttt{analyses} - Pronunciation assessment results with phoneme and word-level scores
+    \item \texttt{alignments} - Phone-level time alignment data (TextGrid files)
+    \item \texttt{phoneme\_errors} and \texttt{word\_errors} - Normalized error data for aggregation
+    \item \texttt{jobs} and \texttt{ipa\_generation\_jobs} - Asynchronous job tracking for RunPod endpoints
+    \item \texttt{user\_preferences} - User settings and preferences
+\end{itemize}
+
+\textbf{Storage:} Audio files are stored in Cloudflare R2 object storage, with processed audio files (16-bit, 16kHz, mono WAV) maintained for long-term access. Metadata is stored in the PostgreSQL database with proper indexing for efficient queries.
+
+\textbf{Admin Features:} Administrative interfaces are implemented for content management:
+\begin{itemize}
+    \item Practice text CRUD operations with bulk import capabilities
+    \item Reference speech management with audio upload and IPA generation
+    \item Author/voice management with ElevenLabs API integration for TTS generation
+    \item IPA generation job monitoring and management
+\end{itemize}
+
+Reference speech generation currently supports US English with two different speaker configurations via ElevenLabs API, providing variety in target pronunciations for practice materials.
+
+\subsection{Machine Learning Services}
+
+The machine learning pipeline is implemented as separate RunPod serverless endpoints in the \texttt{mod/} directory:
+
+\textbf{Assessment Endpoint:} The pronunciation assessment service (\texttt{mod/assessment/}) integrates POWSM \cite{powsm} models for phonetic transcription:
+\begin{itemize}
+    \item Phone Recognition (PR): Extracts IPA phonemes from user audio using POWSM PR model (average execution time: 3 seconds)
+    \item Grapheme-to-Phoneme (G2P): Generates target IPA from text using POWSM G2P model with audio-guided transcription (average execution time: 2 seconds)
+    \item Edit Distance Calculation: Compares actual vs. target phonemes to identify substitution, insertion, and deletion errors
+    \item MFA Alignment: Integrates Montreal Forced Aligner for phone-level timestamp generation
+    \item Score Calculation: Computes pronunciation accuracy scores based on error rates
+\end{itemize}
+
+The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays. Maximum observed cold-start time is 30 seconds, with subsequent requests benefiting from cached models.
+
+\textbf{IPA Generation Endpoint:} The IPA generation service (\texttt{mod/ipa\_generation/}) provides phonetic transcription for reference speeches, supporting both text-only and audio-guided G2P modes.
+
+Both endpoints are containerized with Docker and deployed on RunPod, utilizing GPU resources for efficient model inference. The services handle audio download, preprocessing, model inference, and result formatting.
+
+\subsection{Signal Processing and Experiments}
+
+Signal processing experiments and deep learning model evaluations are conducted in the \texttt{sig/exp/} directory \cite{github2024sig}, which contains Jupyter notebooks for:
+\begin{itemize}
+    \item Audio preprocessing and quality assessment (SNR, silence detection, clipping detection)
+    \item POWSM \cite{powsm} model evaluation and fine-tuning experiments
+    \item MFA alignment testing and TextGrid parsing
+    \item G2P accuracy evaluation and comparison
+    \item Visualization of phonetic features and alignment results
+\end{itemize}
+
+These notebooks document the experimentation process and serve as reference implementations for the production pipeline.
+
+\subsection{Documentation and Deployment}
+
+The repository includes comprehensive documentation in the \texttt{doc/} directory, with learning materials, technical notes, database schema documentation, and project reports. The main README file \cite{github2024readme} provides an overview of the project structure, setup instructions, and development guidelines. Environment variables and configuration are documented to ensure reproducible deployments across different environments \cite{github2024env}.
+
+The report build process is automated through \texttt{doc/report/build.sh}, which handles LaTeX compilation, bibliography processing, and diagram generation from PlantUML source files. The script integrates with \texttt{generate-diagrams.sh} to automatically generate all architecture and design diagrams before PDF compilation, ensuring documentation stays synchronized with code changes.
 
 \section{Deployment}
 
-Nounce is containerized using Docker, ensuring consistency across development, staging, and production environments. The deployment process is automated through GitHub Actions CI/CD pipelines \cite{github2024actions}, which handle building Docker images, running linting, and running tests.
+Nounce is containerized using Docker, ensuring consistency across development, staging, and production environments. The deployment process is automated through GitHub Actions CI/CD pipelines \cite{github2024actions}, which handle building Docker images, running linting, running tests, and generating PlantUML diagrams from source files.
 
-Production deployment will be hosted on Railway \cite{railway2024} or Fly.io \cite{flyio2024}, both of which provide seamless Docker container orchestration, automatic scaling based on traffic, and integrated monitoring capabilities.
+\subsection{Production Deployment}
 
-The Docker configuration includes environment variable management and health checks for container monitoring. Building instructions, environment setup, and deployment procedures are documented in the repository README \cite{github2024readme}, providing clear guidance for developers and system administrators.
+The production application is deployed on Fly.io and served at \texttt{https://nounce.pro}. DNS management is handled through Cloudflare, which also provides DDoS protection via its global network infrastructure. The database is hosted on Neon serverless PostgreSQL, offering automatic scaling, point-in-time recovery, and branching capabilities. Audio files are stored in Cloudflare R2 object storage.
+
+Machine learning services are deployed as RunPod serverless GPU endpoints, utilizing network volumes for model caching to reduce cold-start times. The deployment architecture is illustrated in Figure~\ref{fig:deployment-architecture}.
+
+\subsection{Local Development}
+
+For local development, a custom RunPod serverless simulator replicates the production API behavior without requiring cloud GPU resources. The simulator architecture, illustrated in Figure~\ref{fig:runpod-simulator}, consists of a FastAPI proxy server that mimics RunPod's job queue API, worker containers running locally via Docker Compose, and background async loops for job processing. The simulator is orchestrated using \texttt{docker-compose.dev.yml} and can be started using the \texttt{scripts/runpod.py} utility script.
+
+The Docker configuration includes environment variable management and health checks for container monitoring. Building instructions, environment setup, and deployment procedures are documented in the repository README \cite{github2024readme}, with the build process automated through \texttt{doc/report/build.sh} script that handles LaTeX compilation and diagram generation.
 
 \chapter{RESULTS}
 
+This chapter presents the results achieved in the development of Nounce, including technical achievements, system capabilities, and implementation status.
+
+\section{System Implementation Status}
+
+The Nounce pronunciation assessment system has been successfully implemented with the following components operational:
+
+\subsection{Full-Stack Web Application}
+
+The complete web application is functional and deployed, providing users with a comprehensive pronunciation assessment platform. The system successfully implements:
+
+\begin{itemize}
+    \item \textbf{User Authentication:} Secure authentication through Clerk with support for email/password and social sign-in (Google, GitHub)
+    \item \textbf{Practice Text Management:} Full CRUD operations for practice texts with filtering by difficulty and category
+    \item \textbf{Audio Recording:} Browser-based recording with real-time waveform visualization and audio upload support
+    \item \textbf{Reference Speech System:} Management of target pronunciations with TTS integration (ElevenLabs) and native speaker uploads
+    \item \textbf{Pronunciation Assessment:} End-to-end workflow from recording to detailed analysis results
+    \item \textbf{Progress Tracking:} User history, statistics, and error analysis with aggregation capabilities
+    \item \textbf{Admin Interface:} Complete administrative tools for content and system management
+\end{itemize}
+
+\subsection{Database Schema}
+
+The complete database schema is implemented and operational, with all planned tables, relationships, and indexes in place. The schema supports:
+\begin{itemize}
+    \item User recordings with metadata and quality metrics
+    \item Pronunciation analyses with phoneme and word-level scoring
+    \item Error tracking with normalized data for aggregation
+    \item Asynchronous job processing with status tracking
+    \item Reference speech management with IPA transcriptions
+    \item User preferences and progress data
+\end{itemize}
+
+\subsection{Machine Learning Pipeline}
+
+The machine learning assessment pipeline is fully integrated:
+
+\begin{itemize}
+    \item \textbf{POWSM Integration:} Successfully integrated POWSM \cite{powsm} models for Phone Recognition (PR) and Grapheme-to-Phoneme (G2P) tasks
+    \item \textbf{Phonetic Transcription:} Accurate IPA transcription from audio using state-of-the-art models
+    \item \textbf{Error Detection:} Phoneme-level error classification (substitution, insertion, deletion) with edit distance algorithms
+    \item \textbf{Time Alignment:} MFA integration for phone-level timestamp generation
+    \item \textbf{Score Calculation:} Pronunciation accuracy scoring based on error rates
+\end{itemize}
+
+The assessment endpoint processes audio recordings and returns detailed analysis including:
+\begin{itemize}
+    \item Actual IPA transcription from user speech
+    \item Target IPA transcription from reference text
+    \item Overall pronunciation score (0.0-1.0)
+    \item Phoneme-level error list with timestamps
+    \item Word-level error analysis
+\end{itemize}
+
+\subsection{Audio Quality Assessment}
+
+Audio quality metrics are calculated and stored for each user recording:
+\begin{itemize}
+    \item Signal-to-Noise Ratio (SNR) in decibels
+    \item Silence ratio (percentage of quiet segments)
+    \item Clipping ratio (percentage of clipped samples)
+    \item Noise ratio (percentage of noise segments)
+    \item Quality status classification (accept, warning, reject)
+\end{itemize}
+
+Quality thresholds are applied at the application layer, allowing flexible adjustment without database migrations.
+
+\subsection{Deployment Infrastructure}
+
+The system is deployed using modern cloud infrastructure:
+\begin{itemize}
+    \item \textbf{Domain:} The application is served at \texttt{https://nounce.pro}, with the domain purchased and configured for production use
+    \item \textbf{DNS and Security:} DNS management and DDoS protection are handled through Cloudflare's global network infrastructure
+    \item \textbf{Application Hosting:} Docker containerized application deployed on Fly.io with global edge deployment
+    \item \textbf{Database:} Neon serverless PostgreSQL with automatic scaling and backups
+    \item \textbf{Object Storage:} Cloudflare R2 for audio file storage
+    \item \textbf{ML Services:} RunPod serverless endpoints for GPU-powered inference
+    \item \textbf{CI/CD:} GitHub Actions pipelines for automated testing and deployment
+\end{itemize}
+
+\section{Technical Achievements}
+
+\subsection{Architecture and Design}
+
+The system demonstrates a well-architected full-stack application with:
+\begin{itemize}
+    \item Clear separation of concerns between frontend, backend, database, and ML services
+    \item Type-safe database operations using Drizzle ORM with TypeScript
+    \item Modern React patterns with server-side rendering and efficient data fetching
+    \item Scalable serverless architecture supporting concurrent users
+    \item Comprehensive error handling and user feedback mechanisms
+\end{itemize}
+
+\subsection{User Experience}
+
+The application provides an intuitive and responsive user experience:
+\begin{itemize}
+    \item Modern, accessible UI following web standards and best practices
+    \item Real-time feedback during recording and processing
+    \item Clear visualization of pronunciation errors with IPA highlighting
+    \item Progress tracking with historical data and statistics
+    \item Mobile-responsive design supporting multiple devices
+\end{itemize}
+
+\subsection{Integration Challenges and Solutions}
+
+Several technical challenges were successfully addressed during implementation:
+
+\textbf{Model Integration:} Integrating POWSM \cite{powsm} models required extensive experimentation due to limited documentation. The solution involved custom implementation of model loading, inference pipelines, and output parsing.
+
+\textbf{Audio Processing:} Handling various audio formats and quality levels required robust preprocessing pipelines. The system implements format conversion, quality assessment, and normalization to ensure consistent input for ML models.
+
+\textbf{Asynchronous Processing:} Managing long-running ML inference tasks required a job queue system. The implementation uses RunPod's serverless architecture with status tracking and webhook callbacks for result delivery.
+
+\textbf{Time Alignment:} Integrating MFA for phone-level timestamps required careful handling of transcription formats and TextGrid parsing. The system supports both MFA-based alignment and fallback timestamp estimation.
+
+\section{Performance and Scalability}
+
+The system architecture supports scalability and demonstrates good performance characteristics:
+\begin{itemize}
+    \item Serverless database (Neon) with automatic scaling
+    \item Object storage (Cloudflare R2) for efficient audio file management
+    \item RunPod GPU endpoints for parallel ML inference with network volume caching
+    \item Job queue system for handling concurrent assessment requests
+    \item Efficient database indexing for fast queries
+\end{itemize}
+
+\textbf{Performance Metrics:}
+\begin{itemize}
+    \item Average Phone Recognition (PR) task execution time: 3 seconds
+    \item Average Grapheme-to-Phoneme (G2P) task execution time: 2 seconds
+    \item Maximum observed cold-start time: 30 seconds (first request after inactivity)
+    \item Subsequent requests benefit from cached models in network volumes, eliminating cold-start delays
+\end{itemize}
+
+These performance characteristics enable responsive user experience while maintaining cost efficiency through serverless GPU infrastructure that scales to zero when not in use.
+
 \chapter{CONCLUSION}
+
+This project successfully developed Nounce, a comprehensive web-based pronunciation assessment system for English language learners. The system integrates state-of-the-art machine learning models, modern web technologies, and pedagogical principles to provide detailed, actionable feedback on pronunciation accuracy.
+
+\section{Project Summary}
+
+Nounce addresses the critical need for accessible pronunciation learning tools by providing:
+\begin{itemize}
+    \item \textbf{Phonetic-Level Analysis:} Detailed pronunciation assessment at the phoneme level using the International Phonetic Alphabet (IPA)
+    \item \textbf{Automated Feedback:} Instant, judgment-free feedback on pronunciation errors with clear visualization
+    \item \textbf{Educational Integration:} Guidance on English phonology concepts to help learners understand and improve
+    \item \textbf{Progress Tracking:} Historical analysis and statistics to monitor improvement over time
+    \item \textbf{Accessible Design:} Web-based platform accessible from any device without requiring native speaker tutors
+\end{itemize}
+
+\section{Technical Contributions}
+
+The project demonstrates several technical achievements:
+
+\textbf{Model Integration:} Successfully integrated POWSM \cite{powsm} (Phonetic Open Whisper-Style Speech Model), a state-of-the-art phonetic transcription model, for accurate phone recognition and grapheme-to-phoneme conversion. The integration required custom implementation due to limited documentation, contributing to the open-source community's understanding of these models.
+
+\textbf{Full-Stack Architecture:} Developed a production-ready full-stack application using modern technologies (TanStack Start, React, TypeScript, Drizzle ORM) with a focus on type safety, scalability, and maintainability. The architecture demonstrates best practices in separation of concerns, error handling, and user experience design.
+
+\textbf{ML Pipeline:} Implemented a complete machine learning pipeline combining phonetic transcription, forced alignment (MFA), and error detection algorithms. The pipeline processes audio recordings asynchronously and provides detailed analysis results with phone-level timestamps.
+
+\textbf{Database Design:} Designed and implemented a comprehensive database schema supporting user recordings, analyses, error tracking, and progress data. The schema enables efficient querying and aggregation for analytics and reporting.
+
+\section{Educational Impact}
+
+Nounce contributes to language learning by:
+\begin{itemize}
+    \item Providing 24/7 access to pronunciation assessment without requiring human tutors
+    \item Offering detailed, phonetic-level feedback that helps learners understand specific sound production issues
+    \item Creating a safe, judgment-free environment for practice
+    \item Supporting self-directed learning with progress tracking and historical analysis
+    \item Introducing learners to IPA and phonetic concepts, building domain knowledge
+\end{itemize}
+
+The system acknowledges that it does not replace human-to-human interaction in language learning, but rather serves as a supplementary tool for learners who may lack access to native speakers or formal language education resources.
+
+\section{Conclusion and Future Work}
+
+\subsection{State of the Platform}
+
+All core features are functional, and the application is deployed. The system provides a complete pronunciation assessment workflow from recording to detailed feedback, with administrative tools for content management. Additional content management and data curation is still needed for future expansion.
+
+\subsection{Limitations}
+
+All core features are functional, and the application is deployed. Additional content management and data curation is still needed for future expansion to support a broader range of practice materials and user populations.
+
+The POWSM \cite{powsm} model operates in a hybrid space between phonemic and phonetic representation, which can introduce occasional inaccuracies. The model's output may not always perfectly align with canonical IPA transcriptions, particularly for non-standard pronunciations or regional variations.
+
+Nounce is designed exclusively for English to streamline initial development and ensure high-quality pronunciation assessment. Future development can expand support to additional languages, but this requires significant model adaptation, dictionary resources, and acoustic model training for each target language.
+
+\subsection{Future Directions}
+
+\textbf{Future Directions for Turkish-Native Speakers:} Fine-tuning the model to capture the nuances of people who use Turkish as their native language would improve accuracy for the target user population. This would involve collecting and curating training data from Turkish L1 speakers and adapting the model to better recognize common pronunciation patterns and errors specific to this population.
+
+\textbf{Language Expansion:} Nounce is designed exclusively for English to streamline initial development and ensure high-quality pronunciation assessment. Future development can expand support to additional languages, but this requires significant model adaptation, dictionary resources, and acoustic model training for each target language.
+
+\textbf{Voice Cloning:} Leverage voice cloning technology to generate target pronunciations with the user's voice for personalized feedback. This would allow learners to hear correct pronunciations in their own voice, potentially improving comprehension and retention.
+
+\textbf{LLM Analysis:} Integrate a Large Language Model (LLM) to analyze performance data and provide user-specific, targeted feedback on each attempt, aggregated over time. The LLM could identify patterns in errors, suggest personalized practice strategies, and provide contextual explanations for pronunciation challenges.
+
+\subsection{Ethical Considerations}
+
+\textbf{Accent Variations \& Linguistic Diversity:} All dialects, accents, and language variants are linguistically valid. The system focuses on US English pronunciation as a widely recognized standard, but this choice does not minimize or devalue other accents. The primary goal is comprehensibility and effective communication rather than accent elimination. Users are encouraged to understand that accent reduction is optional and that clear communication is the objective.
+
+\textbf{User Autonomy \& Privacy:} Users control their learning process. Recordings are processed securely, and the platform prioritizes privacy in data handling and storage. Users must explicitly opt-in for any potential use of their data in model fine-tuning, voice cloning, or pronunciation generation features. Clear consent mechanisms and transparent data usage policies protect user privacy and maintain trust.
+
+\section{Conclusion}
+
+Nounce successfully demonstrates the practical application of state-of-the-art speech recognition models in an educational context. The system provides a functional, scalable platform for pronunciation assessment that combines technical excellence with pedagogical considerations. The project contributes to both the academic community through its reference implementation and to language learners through its accessible, detailed feedback system.
+
+The development process highlighted the importance of iterative experimentation, careful architecture design, and user-centered development. The resulting system serves as a foundation for future enhancements and research in automated pronunciation assessment and language learning technology.
 
 \bibliographystyle{plain}
 \bibliography{references}

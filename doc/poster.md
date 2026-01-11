@@ -1,6 +1,6 @@
 # Nounce Poster Design Specification
 
-## CMPE 492 Senior Project
+## CMPE 491 Senior Project
 
 **Format**: A0 Horizontal (1189mm × 841mm)  
 **Word Count Target**: 300-800 words
@@ -203,23 +203,23 @@ Font: 18pt for all footer text
 ## Design Guidelines
 
 ### Color Palette
-| Element           | Color                          |
-|-------------------|--------------------------------|
-| Background        | White (#FFFFFF) or Light Gray  |
-| Primary Accent    | Deep Blue (#1E3A8A)            |
-| Secondary Accent  | Teal (#0D9488)                 |
-| Highlight/CTA     | Orange (#F97316)               |
-| Text (primary)    | Dark Gray (#1F2937)            |
-| Text (secondary)  | Medium Gray (#6B7280)          |
+| Element          | Color                         |
+| ---------------- | ----------------------------- |
+| Background       | White (#FFFFFF) or Light Gray |
+| Primary Accent   | Deep Blue (#1E3A8A)           |
+| Secondary Accent | Teal (#0D9488)                |
+| Highlight/CTA    | Orange (#F97316)              |
+| Text (primary)   | Dark Gray (#1F2937)           |
+| Text (secondary) | Medium Gray (#6B7280)         |
 
 ### Typography
-| Element           | Font              | Size     |
-|-------------------|-------------------|----------|
-| Title             | Inter Bold        | 85pt+    |
-| Section Headers   | Inter SemiBold    | 36pt     |
-| Body Text         | Inter Regular     | 24pt     |
-| Captions          | Inter Italic      | 18pt     |
-| References        | Inter Light       | 18pt     |
+| Element         | Font           | Size  |
+| --------------- | -------------- | ----- |
+| Title           | Inter Bold     | 85pt+ |
+| Section Headers | Inter SemiBold | 36pt  |
+| Body Text       | Inter Regular  | 24pt  |
+| Captions        | Inter Italic   | 18pt  |
+| References      | Inter Light    | 18pt  |
 
 ### Visual Elements
 - **Grid lines**: Use invisible alignment guides for clean layout
@@ -238,31 +238,31 @@ Font: 18pt for all footer text
 
 ## Visual Asset Checklist
 
-| Asset                               | Source/Action                        |
-|-------------------------------------|--------------------------------------|
-| Boğaziçi University Logo            | Download from institutional site     |
-| Nounce Application Logo              | `app/public/og-image.png`            |
-| Practice Text Selection Screenshot  | Capture from running app             |
-| Recording Interface Screenshot      | Capture from running app             |
-| Analysis Results Screenshot         | Capture from running app             |
-| System Architecture Diagram         | Create (Figma/Draw.io)               |
-| POWSM Performance Bar Chart         | Create from paper data               |
-| Problem Icons                       | Use icon library (Lucide/Heroicons)  |
-| QR Code (Demo/Repo Link)            | Generate via qr-code-generator.com   |
+| Asset                              | Source/Action                       |
+| ---------------------------------- | ----------------------------------- |
+| Boğaziçi University Logo           | Download from institutional site    |
+| Nounce Application Logo            | `app/public/og-image.png`           |
+| Practice Text Selection Screenshot | Capture from running app            |
+| Recording Interface Screenshot     | Capture from running app            |
+| Analysis Results Screenshot        | Capture from running app            |
+| System Architecture Diagram        | Create (Figma/Draw.io)              |
+| POWSM Performance Bar Chart        | Create from paper data              |
+| Problem Icons                      | Use icon library (Lucide/Heroicons) |
+| QR Code (Demo/Repo Link)           | Generate via qr-code-generator.com  |
 
 ---
 
 ## Word Count Estimate
 
-| Section                    | Words  |
-|----------------------------|--------|
-| Title + Author             | 25     |
-| Introduction & Problem     | 100    |
-| Methodology & Architecture | 150    |
-| System Demo & Features     | 80     |
-| Results & Conclusion       | 100    |
-| Footer & References        | 45     |
-| **Total**                  | ~500   |
+| Section                    | Words |
+| -------------------------- | ----- |
+| Title + Author             | 25    |
+| Introduction & Problem     | 100   |
+| Methodology & Architecture | 150   |
+| System Demo & Features     | 80    |
+| Results & Conclusion       | 100   |
+| Footer & References        | 45    |
+| **Total**                  | ~500  |
 
 ✓ Within 300-800 word guideline
 

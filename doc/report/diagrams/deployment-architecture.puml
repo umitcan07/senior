@@ -1,0 +1,70 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam dpi 300
+skinparam maxMessageSize 60
+
+left to right direction
+
+package "User Layer" {
+  actor User
+}
+
+package "Application Layer" {
+  component "Web App\n(Fly.io)" as App {
+    component "Frontend\n(React)" as Frontend
+    component "Backend\n(TanStack)" as Backend
+  }
+  component "Auth\n(Clerk)" as Clerk
+}
+
+package "Data Layer" {
+  database "Database\n(Neon)" as DB
+  component "Storage\n(Cloudflare R2)" as Storage
+}
+
+package "ML Services\n(RunPod)" {
+  component "Assessment\nEndpoint" as Assessment
+  component "IPA Gen\nEndpoint" as IPA
+  component "Network\nVolume" as NetworkVol
+}
+
+package "External" {
+  component "ElevenLabs\nAPI" as ElevenLabs
+}
+
+' User interactions
+User --> Frontend : HTTPS
+User --> Clerk : Auth
+
+' Application flow
+Frontend --> Backend : Server Functions
+Backend --> Clerk : Verify
+Backend --> DB : SQL
+Backend --> Storage : Files
+Backend --> Assessment : Jobs
+Backend --> IPA : Jobs
+
+' ML Services
+Assessment --> NetworkVol : Cache
+IPA --> NetworkVol : Cache
+Assessment --> Storage : Audio
+IPA --> Storage : Audio
+Assessment --> DB : Results
+IPA --> DB : Results
+
+' External services
+Backend --> ElevenLabs : TTS
+
+note bottom of NetworkVol
+  Model caches (POWSM, MFA)
+  Reduces cold-start
+end note
+
+note bottom of Assessment
+  PR: 3s avg, G2P: 2s avg
+  Cold-start: 30s max
+end note
+
+@enduml
+
