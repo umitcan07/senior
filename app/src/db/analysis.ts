@@ -107,6 +107,7 @@ export async function getAnalysisWithDetails(analysisId: string): Promise<{
 	userRecording: {
 		id: string;
 		storageKey: string;
+		userId: string;
 	};
 	referenceSpeech: {
 		id: string;
@@ -124,6 +125,7 @@ export async function getAnalysisWithDetails(analysisId: string): Promise<{
 			userRecording: {
 				id: userRecordings.id,
 				storageKey: userRecordings.storageKey,
+				userId: userRecordings.userId,
 			},
 			reference: {
 				id: referenceSpeeches.id,

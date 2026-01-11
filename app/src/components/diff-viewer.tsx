@@ -316,9 +316,7 @@ export function DiffViewer({
 				<div
 					className={cn(
 						"flex flex-wrap gap-1 rounded-lg border border-border/50 border-dashed bg-muted/20 p-4 leading-relaxed",
-						type === "phoneme" && "font-ipa text-sm",
-						type === "word" && "text-base",
-						recognizedSegments.length === 0 && "items-center justify-center min-h-[3rem]",
+						recognizedSegments.length === 0 && "items-center justify-center min-h-12",
 					)}
 				>
 					{recognizedSegments.length > 0 ? (

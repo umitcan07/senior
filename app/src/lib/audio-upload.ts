@@ -9,6 +9,7 @@ import {
 	createSuccessResponse,
 	ErrorCode,
 } from "./errors";
+import { submitAssessmentJob } from "./assessment-submission";
 import { uploadToR2 } from "./r2";
 
 const UploadAudioSchema = z.object({
@@ -106,28 +107,22 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 				`[Server] Analysis ${analysis.id} created with status=pending`,
 			);
 
-			// Submit assessment job to RunPod
+			// Submit assessment job to RunPod directly (no HTTP call needed)
 			try {
-				const assessmentResponse = await fetch(
-					new URL("/api/assessment", process.env.WEBHOOK_BASE_URL || "http://localhost:3000").toString(),
-					{
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ analysisId: analysis.id }),
-					},
+				const assessmentResult = await submitAssessmentJob(
+					analysis.id,
+					userId,
 				);
 
-				if (!assessmentResponse.ok) {
-					const errorText = await assessmentResponse.text();
+				if (!assessmentResult.success) {
 					console.error(
-						`[Server] Failed to submit assessment job: ${errorText}`,
+						`[Server] Failed to submit assessment job: ${assessmentResult.error}`,
 					);
 					// Don't fail the upload - the analysis is created and can be retried
 					// The UI will show "pending" status
 				} else {
-					const jobResult = await assessmentResponse.json();
 					console.log(
-						`[Server] Assessment job submitted: ${jobResult?.data?.externalJobId}`,
+						`[Server] Assessment job submitted: ${assessmentResult.data.externalJobId}`,
 					);
 				}
 			} catch (assessmentError) {

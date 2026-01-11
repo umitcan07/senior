@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getAuthorById } from "@/db/author";
@@ -337,6 +338,47 @@ export const serverGenerateSpeech = createServerFn({ method: "POST" })
 	.handler(
 		async ({ data }): Promise<ApiResponse<ReferenceSpeechWithRelations>> => {
 			try {
+				// Require admin authentication for ElevenLabs generation
+				let isAuthenticated = false;
+				let userId: string | null = null;
+				try {
+					const authResult = await auth();
+					isAuthenticated = authResult.isAuthenticated ?? false;
+					userId = authResult.userId ?? null;
+				} catch (authError) {
+					return createErrorResponse(
+						ErrorCode.AUTH_ERROR,
+						"User is not authenticated",
+						undefined,
+						401,
+					);
+				}
+
+				if (!isAuthenticated || !userId) {
+					return createErrorResponse(
+						ErrorCode.AUTH_ERROR,
+						"User is not authenticated",
+						undefined,
+						401,
+					);
+				}
+
+				// Check if user is admin using auth() result
+				const authResult = await auth();
+				const isAdmin =
+					authResult.publicMetadata &&
+					typeof authResult.publicMetadata.role === "string" &&
+					authResult.publicMetadata.role === "app_admin";
+
+				if (!isAdmin) {
+					return createErrorResponse(
+						ErrorCode.AUTH_ERROR,
+						"Admin access required",
+						undefined,
+						403,
+					);
+				}
+
 				const { textId, authorId, voiceSettings } = data;
 
 				// Fetch author and text

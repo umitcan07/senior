@@ -1,6 +1,12 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { generateSpeech } from "./elevenlabs";
-import { type ApiResponse, createSuccessResponse } from "./errors";
+import {
+	type ApiResponse,
+	createErrorResponse,
+	createSuccessResponse,
+	ErrorCode,
+} from "./errors";
 import { existsInR2, uploadToR2 } from "./r2";
 
 // Brian's ElevenLabs voice ID - clear male British accent
@@ -71,6 +77,29 @@ export interface GenerateIPAAudioResult {
 export const serverGenerateIPAAudio = createServerFn({
 	method: "POST",
 }).handler(async (): Promise<ApiResponse<GenerateIPAAudioResult>> => {
+	// Require authentication for IPA audio generation
+	let isAuthenticated = false;
+	try {
+		const authResult = await auth();
+		isAuthenticated = authResult.isAuthenticated ?? false;
+	} catch (authError) {
+		return createErrorResponse(
+			ErrorCode.AUTH_ERROR,
+			"User is not authenticated",
+			undefined,
+			401,
+		);
+	}
+
+	if (!isAuthenticated) {
+		return createErrorResponse(
+			ErrorCode.AUTH_ERROR,
+			"User is not authenticated",
+			undefined,
+			401,
+		);
+	}
+
 	const generated: string[] = [];
 	const skipped: string[] = [];
 	const failed: string[] = [];
