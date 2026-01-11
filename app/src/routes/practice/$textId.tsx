@@ -21,14 +21,6 @@ import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
-import {
-	AudioPlayerButton,
-	AudioPlayerDuration,
-	AudioPlayerProgress,
-	AudioPlayerProvider,
-	AudioPlayerSpeed,
-	AudioPlayerTime,
-} from "@/components/ui/audio-player";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +32,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import { Progress } from "@/components/ui/progress";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
+import {
+	WaveformPlayer,
+	WaveformPlayerInline,
+} from "@/components/ui/waveform-player";
 import type { Author, ReferenceSpeech } from "@/db/types";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { formatIpaForDisplay } from "@/lib/ipa";
@@ -130,20 +126,28 @@ export const Route = createFileRoute("/practice/$textId")({
 // Recording state and logic
 type RecordingState =
 	| "idle"
+	| "requesting" // Requesting microphone permission
+	| "countdown" // 3-2-1 countdown before recording
 	| "recording"
 	| "processing"
 	| "preview"
 	| "uploading"
 	| "analyzing";
 
+const MAX_RECORDING_TIME = 20; // seconds
+
 function useRecording(textId: string) {
 	const [state, setState] = useState<RecordingState>("idle");
 	const [recordingTime, setRecordingTime] = useState(0);
+	const [countdown, setCountdown] = useState(3);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 	const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+	// Refs for smooth animation and recording
+	const startTimeRef = useRef<number>(0);
+	const animationFrameRef = useRef<number>(0);
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const chunksRef = useRef<Blob[]>([]);
 	const navigate = useNavigate();
@@ -161,11 +165,29 @@ function useRecording(textId: string) {
 		};
 	}, [audioPreviewUrl]);
 
-	const stopRecording = useCallback(() => {
-		if (timerRef.current) {
-			clearInterval(timerRef.current);
-			timerRef.current = null;
+	// Smooth time update using requestAnimationFrame
+	const updateRecordingTime = useCallback(() => {
+		if (startTimeRef.current === 0) return;
+
+		const elapsed = (performance.now() - startTimeRef.current) / 1000;
+		const clampedTime = Math.min(elapsed, MAX_RECORDING_TIME);
+		setRecordingTime(clampedTime);
+
+		if (clampedTime >= MAX_RECORDING_TIME) {
+			// Auto-stop at max time
+			return;
 		}
+
+		animationFrameRef.current = requestAnimationFrame(updateRecordingTime);
+	}, []);
+
+	const stopRecording = useCallback(() => {
+		// Cancel animation frame
+		if (animationFrameRef.current) {
+			cancelAnimationFrame(animationFrameRef.current);
+			animationFrameRef.current = 0;
+		}
+		startTimeRef.current = 0;
 
 		if (
 			mediaRecorderRef.current &&
@@ -192,40 +214,116 @@ function useRecording(textId: string) {
 		}, 500);
 	}, [mediaStream]);
 
-	const startRecording = useCallback(async () => {
-		try {
-			setError(null);
-			chunksRef.current = [];
-			setAudioBlob(null);
-			setState("recording");
-			setRecordingTime(0);
-
-			timerRef.current = setInterval(() => {
-				setRecordingTime((t) => {
-					if (t >= 19) {
-						stopRecording();
-						return 20;
-					}
-					return t + 1;
-				});
-			}, 1000);
-		} catch (err) {
-			setError(
-				err instanceof Error ? err.message : "Failed to start recording",
-			);
-			setState("idle");
+	// Auto-stop when max time reached
+	useEffect(() => {
+		if (state === "recording" && recordingTime >= MAX_RECORDING_TIME) {
+			stopRecording();
 		}
-	}, [stopRecording]);
+	}, [state, recordingTime, stopRecording]);
+
+	// Run the countdown sequence
+	const runCountdown = useCallback(() => {
+		setCountdown(3);
+		setState("countdown");
+
+		let count = 3;
+		const countdownInterval = setInterval(() => {
+			count--;
+			if (count > 0) {
+				setCountdown(count);
+			} else {
+				clearInterval(countdownInterval);
+				// Start actual recording
+				setState("recording");
+				setRecordingTime(0);
+				startTimeRef.current = performance.now();
+				animationFrameRef.current = requestAnimationFrame(updateRecordingTime);
+			}
+		}, 600); // Slightly faster for snappy feel
+	}, [updateRecordingTime]);
+
+	// Handle stream ready - called from LiveWaveform if it requests permission
+	// This is a fallback in case LiveWaveform requests permission independently
+	const handleStreamReady = useCallback(
+		(stream: MediaStream) => {
+			// If we're already past "requesting" state, ignore this call
+			// (it means startRecording already handled everything)
+			if (state !== "requesting") {
+				return;
+			}
+
+			// Only set up MediaRecorder if not already set up
+			if (mediaRecorderRef.current?.state === "recording") {
+				return; // Already recording
+			}
+
+			try {
+				// Don't set mediaStream again if already set (from startRecording)
+				if (!mediaStream) {
+					setMediaStream(stream);
+				}
+
+				// Only create MediaRecorder if it doesn't exist
+				if (!mediaRecorderRef.current) {
+					const mediaRecorder = new MediaRecorder(stream, {
+						mimeType: "audio/webm",
+					});
+					mediaRecorder.ondataavailable = (event) => {
+						if (event.data.size > 0) {
+							chunksRef.current.push(event.data);
+						}
+					};
+					mediaRecorderRef.current = mediaRecorder;
+				}
+
+				// Start recording if not already started
+				if (mediaRecorderRef.current.state === "inactive") {
+					mediaRecorderRef.current.start(100);
+				}
+
+				// Start countdown after stream is ready
+				runCountdown();
+			} catch (err) {
+				setError(
+					err instanceof Error ? err.message : "Failed to start recording",
+				);
+				setState("idle");
+			}
+		},
+		[runCountdown, mediaStream, state],
+	);
 
 	const handleStreamError = useCallback((err: Error) => {
 		setError(err.message || "Microphone access denied");
 		setState("idle");
 	}, []);
 
-	const handleStreamReady = useCallback(
-		(stream: MediaStream) => {
+	const handleStreamEnd = useCallback(() => {
+		setMediaStream(null);
+	}, []);
+
+	// Start recording - first request permission
+	const startRecording = useCallback(async () => {
+		setError(null);
+		chunksRef.current = [];
+		setAudioBlob(null);
+		setState("requesting");
+
+		try {
+			// Request microphone permission first
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: {
+					echoCancellation: true,
+					noiseSuppression: true,
+					autoGainControl: true,
+				},
+			});
+
+			// Store stream for LiveWaveform
+			setMediaStream(stream);
+
+			// Permission granted - set up MediaRecorder immediately
 			try {
-				setMediaStream(stream);
 				const mediaRecorder = new MediaRecorder(stream, {
 					mimeType: "audio/webm",
 				});
@@ -236,18 +334,30 @@ function useRecording(textId: string) {
 				};
 				mediaRecorderRef.current = mediaRecorder;
 				mediaRecorder.start(100);
-			} catch (err) {
-				handleStreamError(
-					err instanceof Error ? err : new Error("Failed to start recording"),
-				);
-			}
-		},
-		[handleStreamError],
-	);
 
-	const handleStreamEnd = useCallback(() => {
-		setMediaStream(null);
-	}, []);
+				// Start countdown after stream is ready
+				runCountdown();
+			} catch (err) {
+				setError(
+					err instanceof Error ? err.message : "Failed to start recording",
+				);
+				setState("idle");
+				// Stop the stream if MediaRecorder setup failed
+				stream.getTracks().forEach((track) => {
+					track.stop();
+				});
+			}
+		} catch (err) {
+			// Permission denied or error
+			const errorMessage =
+				err instanceof Error
+					? err.message
+					: "Microphone access denied. Please allow microphone access to record.";
+			setError(errorMessage);
+			setState("idle");
+			handleStreamError(err instanceof Error ? err : new Error(errorMessage));
+		}
+	}, [runCountdown, handleStreamError]);
 
 	const submitRecording = useCallback(
 		async (referenceId: string) => {
@@ -370,6 +480,7 @@ function useRecording(textId: string) {
 	return {
 		state,
 		recordingTime,
+		countdown,
 		uploadProgress,
 		audioPreviewUrl,
 		error,
@@ -381,12 +492,13 @@ function useRecording(textId: string) {
 		handleStreamEnd,
 		handleStreamError,
 		handleFileUpload,
+		mediaStream,
 	};
 }
 
 function formatTime(seconds: number) {
 	const mins = Math.floor(seconds / 60);
-	const secs = seconds % 60;
+	const secs = Math.floor(seconds % 60);
 	return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
@@ -410,7 +522,7 @@ function ReferenceVoice({
 	}
 
 	return (
-		<div className="flex max-w-md flex-col gap-4">
+		<div className="flex flex-col gap-4 p-4 ring-muted ring-1 rounded-3xl max-w-2xl w-full self-center">
 			{/* Selection area */}
 			<div className="flex flex-col gap-2">
 				{selectedReference ? (
@@ -539,31 +651,14 @@ function ReferenceVoice({
 
 			{/* Audio player - minimalist inline */}
 			{selectedReference && (
-				<AudioPlayerProvider>
-					<div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-						<AudioPlayerButton
-							item={{
-								id: selectedReference.id,
-								src: `/api/audio/${selectedReference.id}`,
-							}}
-							variant="outline"
-							size="icon"
-							className="size-8 shrink-0 rounded-full border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
-						/>
-						<div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
-							<AudioPlayerProgress className="h-1" />
-							<div className="flex justify-between font-mono text-[10px] text-muted-foreground">
-								<AudioPlayerTime />
-								<AudioPlayerDuration />
-							</div>
-						</div>
-						<AudioPlayerSpeed className="h-6 shrink-0 text-[10px]" />
-					</div>
-				</AudioPlayerProvider>
+				<WaveformPlayerInline
+					src={`/api/audio/${selectedReference.id}`}
+					className="bg-card w-full border"
+				/>
 			)}
 
 			{/* IPA Transcription display */}
-			{selectedReference?.ipaTranscription && (
+			{selectedReference?.ipaTranscription ? (
 				<div className="rounded-lg bg-muted/30 p-4">
 					<div className="mb-2 flex items-center justify-between">
 						<h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
@@ -580,6 +675,13 @@ function ReferenceVoice({
 					</div>
 					<p className="font-mono text-lg leading-relaxed tracking-wide text-foreground/80">
 						{formatIpaForDisplay(selectedReference.ipaTranscription)}
+					</p>
+				</div>
+			) : (
+				<div className="rounded-lg bg-muted/30 p-4">
+					<p className="text-muted-foreground text-xs">
+						No IPA transcription available. Please choose a different reference
+						voice.
 					</p>
 				</div>
 			)}
@@ -604,7 +706,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 	if (attempts.length === 0) return null;
 
 	return (
-		<div className="flex flex-col gap-4 border-border/40 border-t pt-8">
+		<div className="flex flex-col gap-4 pt-20">
 			<div className="flex items-center justify-between">
 				<h3 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
 					Recent Attempts
@@ -735,12 +837,15 @@ function PracticeTextPage() {
 		);
 	}
 
+	const isRequesting = recording.state === "requesting";
+	const isCountdown = recording.state === "countdown";
 	const isRecording = recording.state === "recording";
 	const isProcessing = recording.state === "processing";
 	const isUploading = recording.state === "uploading";
 	const isAnalyzing = recording.state === "analyzing";
 	const hasPreview = recording.state === "preview" && recording.audioPreviewUrl;
 	const isIdle = recording.state === "idle";
+	const isActiveRecording = isRequesting || isCountdown || isRecording;
 
 	return (
 		<MainLayout>
@@ -751,7 +856,7 @@ function PracticeTextPage() {
 				exit="exit"
 			>
 				<PageContainer maxWidth="lg">
-					<div className="flex flex-col gap-8">
+					<div className="flex flex-col gap-0">
 						{/* Header with back button */}
 						<div className="flex items-center gap-3">
 							<Button variant="ghost" size="sm" asChild className="-ml-3">
@@ -766,7 +871,7 @@ function PracticeTextPage() {
 						</div>
 
 						{/* Main content */}
-						<div className="flex flex-col gap-10">
+						<div className="flex flex-col gap-12">
 							{/* Reference voice - clean selector */}
 							<ReferenceVoice
 								references={references}
@@ -777,8 +882,8 @@ function PracticeTextPage() {
 							{/* Practice text - clean typography, no box */}
 							<div
 								className={cn(
-									"relative transition-all",
-									isRecording && "opacity-80",
+									"relative transition-all max-w-2xl w-full self-center",
+									isActiveRecording && "opacity-80",
 								)}
 							>
 								<p className="font-serif text-2xl text-foreground/90 leading-relaxed md:text-3xl md:leading-relaxed">
@@ -789,10 +894,16 @@ function PracticeTextPage() {
 							{/* Recording section - fixed heights */}
 							<div className="flex flex-col gap-4">
 								{/* Waveform - fixed height */}
-								<div className="h-20 w-full overflow-hidden rounded-lg">
+								<div
+									className={cn(
+										"h-20 w-full overflow-hidden rounded-lg transition-opacity duration-300",
+										isRequesting || isCountdown ? "opacity-50" : "opacity-100",
+									)}
+								>
 									<LiveWaveform
-										active={isRecording}
+										active={isRecording || isCountdown}
 										processing={isProcessing}
+										stream={recording.mediaStream || undefined}
 										height={80}
 										barWidth={3}
 										barGap={2}
@@ -801,6 +912,7 @@ function PracticeTextPage() {
 										sensitivity={1.5}
 										onStreamReady={recording.handleStreamReady}
 										onStreamEnd={recording.handleStreamEnd}
+										onError={recording.handleStreamError}
 									/>
 								</div>
 
@@ -864,33 +976,100 @@ function PracticeTextPage() {
 											</div>
 										)}
 
-										{/* Recording state */}
+										{/* Requesting permission state */}
+										{isRequesting && (
+											<div className="flex w-full max-w-md flex-col items-center gap-4">
+												<ShimmeringText
+													text="Requesting microphone..."
+													className="text-muted-foreground text-sm"
+													duration={1.5}
+												/>
+											</div>
+										)}
+
+										{/* Countdown state - 3, 2, 1 */}
+										{isCountdown && (
+											<div className="flex w-full max-w-md flex-col items-center gap-4">
+												<motion.div
+													key={recording.countdown}
+													initial={{ scale: 0.5, opacity: 0 }}
+													animate={{ scale: 1, opacity: 1 }}
+													exit={{ scale: 1.5, opacity: 0 }}
+													transition={{ duration: 0.3 }}
+													className="flex size-16 items-center justify-center rounded-full bg-primary/10"
+												>
+													<span className="font-bold text-3xl text-primary tabular-nums">
+														{recording.countdown}
+													</span>
+												</motion.div>
+												<p className="text-muted-foreground text-sm">
+													Get ready...
+												</p>
+											</div>
+										)}
+
+										{/* Recording state - circular progress */}
 										{isRecording && (
 											<div className="flex w-full max-w-md flex-col items-center gap-4">
-												{/* Progress indicator */}
-												<div className="flex w-full flex-col gap-2">
-													<div className="flex items-center justify-between">
-														<div className="flex items-center gap-2">
-															<span className="relative flex size-2.5">
-																<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
-																<span className="relative inline-flex size-2.5 rounded-full bg-destructive" />
-															</span>
-															<span className="font-mono text-lg tabular-nums">
-																{formatTime(recording.recordingTime)}
-															</span>
-															<span className="text-muted-foreground text-sm">
-																/ 0:20
-															</span>
-														</div>
-														<span className="font-mono text-muted-foreground text-xs tabular-nums">
-															{Math.round((recording.recordingTime / 20) * 100)}
+												{/* Circular progress ring */}
+												<div className="relative size-20">
+													<svg
+														className="-rotate-90 size-full"
+														viewBox="0 0 100 100"
+													>
+														<title>Recording Progress</title>
+														{/* Background ring */}
+														<circle
+															cx="50"
+															cy="50"
+															r="42"
+															fill="none"
+															stroke="currentColor"
+															strokeWidth="6"
+															className="text-muted/20"
+														/>
+														{/* Progress ring */}
+														<motion.circle
+															cx="50"
+															cy="50"
+															r="42"
+															fill="none"
+															stroke="currentColor"
+															strokeWidth="6"
+															strokeLinecap="round"
+															className="text-destructive"
+															style={{
+																strokeDasharray: 2 * Math.PI * 42,
+																strokeDashoffset:
+																	2 *
+																	Math.PI *
+																	42 *
+																	(1 -
+																		recording.recordingTime /
+																			MAX_RECORDING_TIME),
+															}}
+															transition={{
+																strokeDashoffset: {
+																	duration: 0.1,
+																	ease: "linear",
+																},
+															}}
+														/>
+													</svg>
+													{/* Center content */}
+													<div className="absolute inset-0 flex flex-col items-center justify-center">
+														<span className="relative flex size-2.5">
+															<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+															<span className="relative inline-flex size-2.5 rounded-full bg-destructive" />
+														</span>
+														<span className="mt-1 font-mono text-sm font-semibold tabular-nums">
+															{Math.round(
+																(recording.recordingTime / MAX_RECORDING_TIME) *
+																	100,
+															)}
 															%
 														</span>
 													</div>
-													<Progress
-														value={(recording.recordingTime / 20) * 100}
-														className="h-2"
-													/>
 												</div>
 												<Button
 													variant="destructive"
@@ -920,24 +1099,14 @@ function PracticeTextPage() {
 
 										{/* Preview state */}
 										{hasPreview && recording.audioPreviewUrl && (
-											<div className="flex w-full max-w-md flex-col gap-4">
-												<AudioPlayerProvider>
-													<div className="flex items-center gap-3 rounded-lg border bg-card p-4">
-														<AudioPlayerButton
-															item={{
-																id: "preview",
-																src: recording.audioPreviewUrl,
-															}}
-															variant="default"
-															size="icon"
-															className="size-10"
-														/>
-														<AudioPlayerProgress className="flex-1" />
-														<span className="font-mono text-muted-foreground text-sm tabular-nums">
-															{formatTime(recording.recordingTime)}
-														</span>
-													</div>
-												</AudioPlayerProvider>
+											<div className="flex w-full max-w-2xl flex-col gap-4">
+												<WaveformPlayer
+													src={recording.audioPreviewUrl}
+													compact
+													showRestartButton
+													className="bg-card"
+													label={`Preview (${formatTime(recording.recordingTime)})`}
+												/>
 												<div className="flex gap-3">
 													<Button
 														variant="outline"

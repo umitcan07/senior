@@ -1,28 +1,32 @@
 import {
+	RiArrowDownSLine,
 	RiArrowLeftLine,
-	RiPauseLine,
 	RiPlayLine,
 	RiTimeLine,
-	RiVolumeUpLine,
 } from "@remixicon/react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DiffViewer } from "@/components/diff-viewer";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SegmentPlayer } from "@/components/ui/segment-player";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
+	type ErrorRegion,
+	WaveformPlayer,
+} from "@/components/ui/waveform-player";
 import type {
 	Analysis,
 	Author,
@@ -32,6 +36,7 @@ import type {
 	UserRecording,
 	WordError,
 } from "@/db/types";
+import type { ApiResponse } from "@/lib/errors";
 import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetAnalysisDetails } from "@/lib/server-analysis";
 import { cn } from "@/lib/utils";
@@ -59,9 +64,14 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 	component: AnalysisPage,
 	loader: async ({ params }): Promise<AnalysisLoaderData> => {
 		try {
-			const response = await serverGetAnalysisDetails({
+			const response = (await serverGetAnalysisDetails({
 				data: { analysisId: params.analysisId },
-			});
+			})) as ApiResponse<{
+				analysis: Analysis;
+				userRecording: UserRecording | null;
+				phonemeErrors: PhonemeError[];
+				wordErrors: WordError[];
+			} | null>;
 
 			if (!response.success || !response.data) {
 				return {
@@ -200,163 +210,6 @@ function ScoreRing({
 	);
 }
 
-// User Recording Player with error markers
-interface ErrorMarker {
-	startMs: number;
-	endMs: number;
-	type: "substitute" | "insert" | "delete";
-}
-
-interface RecordingPlayerProps {
-	recordingId: string;
-	durationMs?: number;
-	errorMarkers?: ErrorMarker[];
-	onSeekToError?: (startMs: number, endMs: number) => void;
-}
-
-function RecordingPlayer({
-	recordingId,
-	durationMs,
-	errorMarkers = [],
-	onSeekToError,
-}: RecordingPlayerProps) {
-	const audioRef = useRef<HTMLAudioElement>(null);
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [currentTime, setCurrentTime] = useState(0);
-	const [playbackSpeed, setPlaybackSpeed] = useState(1);
-
-	const audioSrc = `/api/audio/user/${recordingId}`;
-	const duration = durationMs ? durationMs / 1000 : 0;
-
-	const togglePlay = useCallback(() => {
-		const audio = audioRef.current;
-		if (!audio) return;
-
-		if (isPlaying) {
-			audio.pause();
-		} else {
-			audio.play();
-		}
-		setIsPlaying(!isPlaying);
-	}, [isPlaying]);
-
-	const formatTime = (seconds: number) => {
-		const mins = Math.floor(seconds / 60);
-		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, "0")}`;
-	};
-
-	return (
-		<motion.div
-			className="flex flex-col gap-4 rounded-2xl border bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6"
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.4 }}
-		>
-			<div className="flex items-center gap-3">
-				<RiVolumeUpLine size={18} className="text-primary" />
-				<span className="font-medium">Your Recording</span>
-			</div>
-
-			<div className="flex items-center gap-4">
-				<Button
-					variant="default"
-					size="icon"
-					className="size-12 rounded-full"
-					onClick={togglePlay}
-				>
-					{isPlaying ? (
-						<RiPauseLine size={20} />
-					) : (
-						<RiPlayLine size={20} className="ml-0.5" />
-					)}
-				</Button>
-
-				{/* Progress bar with error markers */}
-				<div className="flex flex-1 flex-col gap-1">
-					<div className="relative h-2 overflow-hidden rounded-full bg-muted">
-						{/* Error markers */}
-						{duration > 0 &&
-							errorMarkers.map((marker, idx) => {
-								const startPercent = (marker.startMs / 1000 / duration) * 100;
-								const widthPercent =
-									((marker.endMs - marker.startMs) / 1000 / duration) * 100;
-								return (
-									<button
-										key={`error-${idx}`}
-										type="button"
-										className={cn(
-											"absolute top-0 h-full cursor-pointer opacity-60 transition-opacity hover:opacity-100",
-											marker.type === "substitute" && "bg-destructive",
-											marker.type === "insert" && "bg-amber-500",
-											marker.type === "delete" && "bg-blue-500",
-										)}
-										style={{
-											left: `${startPercent}%`,
-											width: `${Math.max(widthPercent, 1)}%`,
-										}}
-										onClick={() =>
-											onSeekToError?.(marker.startMs, marker.endMs)
-										}
-										title={`${marker.type} error`}
-									/>
-								);
-							})}
-						{/* Progress indicator */}
-						<div
-							className="pointer-events-none absolute top-0 left-0 h-full bg-primary/80 transition-all"
-							style={{
-								width: duration ? `${(currentTime / duration) * 100}%` : "0%",
-							}}
-						/>
-					</div>
-					<div className="flex justify-between text-muted-foreground text-xs">
-						<span className="font-mono">{formatTime(currentTime)}</span>
-						<span className="font-mono">{formatTime(duration)}</span>
-					</div>
-				</div>
-
-				{/* Speed controls */}
-				<div className="flex gap-1">
-					{[0.5, 0.75, 1].map((speed) => (
-						<button
-							key={speed}
-							type="button"
-							onClick={() => {
-								setPlaybackSpeed(speed);
-								if (audioRef.current) {
-									audioRef.current.playbackRate = speed;
-								}
-							}}
-							className={cn(
-								"rounded-lg px-2.5 py-1 font-mono text-xs transition-colors",
-								playbackSpeed === speed
-									? "bg-primary text-primary-foreground"
-									: "bg-muted text-muted-foreground hover:text-foreground",
-							)}
-						>
-							{speed}x
-						</button>
-					))}
-				</div>
-			</div>
-
-			<audio
-				ref={audioRef}
-				src={audioSrc}
-				preload="metadata"
-				className="hidden"
-				onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
-				onEnded={() => setIsPlaying(false)}
-				onPlay={() => setIsPlaying(true)}
-				onPause={() => setIsPlaying(false)}
-			>
-				<track kind="captions" />
-			</audio>
-		</motion.div>
-	);
-}
-
 // Score Overview with animation
 interface ScoreOverviewProps {
 	overallScore: number;
@@ -426,7 +279,7 @@ function ScoreOverview({
 	);
 }
 
-// Enhanced Error Item
+// Enhanced Error Item with Collapsible Details
 interface ErrorItemProps {
 	error: PhonemeError | WordError;
 	type: "phoneme" | "word";
@@ -435,6 +288,7 @@ interface ErrorItemProps {
 }
 
 function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
+	const [isOpen, setIsOpen] = useState(false);
 	const hasTimestamps =
 		"timestampStartMs" in error &&
 		error.timestampStartMs != null &&
@@ -447,78 +301,94 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	};
 
+	const formatTimestampFull = (ms: number) => {
+		const seconds = Math.floor(ms / 1000);
+		const mins = Math.floor(seconds / 60);
+		const secs = seconds % 60;
+		const millis = Math.floor((ms % 1000) / 10);
+		return `${mins}:${secs.toString().padStart(2, "0")}.${millis.toString().padStart(2, "0")}`;
+	};
+
 	return (
-		<motion.div
-			className={cn(
-				"flex items-center gap-3 rounded-xl p-4 transition-colors",
-				error.errorType === "substitute" &&
-					"bg-destructive/5 hover:bg-destructive/10",
-				error.errorType === "insert" && "bg-amber-500/5 hover:bg-amber-500/10",
-				error.errorType === "delete" && "bg-blue-500/5 hover:bg-blue-500/10",
-			)}
-			initial={{ opacity: 0, x: -10 }}
-			animate={{ opacity: 1, x: 0 }}
-			transition={{ duration: 0.2 }}
-		>
-			{/* Error type badge */}
-			<Badge
-				variant="outline"
+		<Collapsible open={isOpen} onOpenChange={setIsOpen}>
+			<motion.div
 				className={cn(
-					"shrink-0 capitalize",
+					"rounded-xl border transition-colors",
 					error.errorType === "substitute" &&
-						"border-destructive/50 text-destructive",
+						"border-destructive/20 bg-destructive/5 hover:bg-destructive/10",
 					error.errorType === "insert" &&
-						"border-amber-500/50 text-amber-600 dark:text-amber-400",
+						"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
 					error.errorType === "delete" &&
-						"border-blue-500/50 text-blue-600 dark:text-blue-400",
+						"border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10",
 				)}
+				initial={{ opacity: 0, x: -10 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ duration: 0.2 }}
 			>
-				{error.errorType}
-			</Badge>
-
-			{/* Expected vs Actual */}
-			<div className="flex flex-1 items-center gap-2">
-				{type === "phoneme" ? (
-					<>
-						<span className="font-medium font-mono">
-							/{error.expected ?? "∅"}/
-						</span>
-						<span className="text-muted-foreground">→</span>
-						<span
+				<CollapsibleTrigger asChild>
+					<button
+						type="button"
+						className="flex w-full items-center gap-3 p-4 text-left"
+					>
+						{/* Error type badge */}
+						<Badge
+							variant="outline"
 							className={cn(
-								"font-mono",
-								error.errorType === "substitute" && "text-destructive",
+								"shrink-0 capitalize",
+								error.errorType === "substitute" &&
+									"border-destructive/50 text-destructive",
 								error.errorType === "insert" &&
-									"text-amber-600 dark:text-amber-400",
+									"border-amber-500/50 text-amber-600 dark:text-amber-400",
+								error.errorType === "delete" &&
+									"border-blue-500/50 text-blue-600 dark:text-blue-400",
 							)}
 						>
-							/{error.actual ?? "∅"}/
-						</span>
-					</>
-				) : (
-					<>
-						<span className="font-medium">"{error.expected ?? "—"}"</span>
-						<span className="text-muted-foreground">→</span>
-						<span
-							className={cn(
-								error.errorType === "substitute" && "text-destructive",
-								error.errorType === "insert" &&
-									"text-amber-600 dark:text-amber-400",
-							)}
-						>
-							"{error.actual ?? "—"}"
-						</span>
-					</>
-				)}
-			</div>
+							{error.errorType}
+						</Badge>
 
-			{/* Timestamp badge */}
-			{hasTimestamps &&
-				error.timestampStartMs != null &&
-				error.timestampEndMs != null && (
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
+						{/* Expected vs Actual */}
+						<div className="flex flex-1 items-center gap-2">
+							{type === "phoneme" ? (
+								<>
+									<span className="font-medium font-mono text-sm">
+										/{error.expected ?? "∅"}/
+									</span>
+									<span className="text-muted-foreground">→</span>
+									<span
+										className={cn(
+											"font-mono text-sm",
+											error.errorType === "substitute" && "text-destructive",
+											error.errorType === "insert" &&
+												"text-amber-600 dark:text-amber-400",
+										)}
+									>
+										/{error.actual ?? "∅"}/
+									</span>
+								</>
+							) : (
+								<>
+									<span className="font-medium text-sm">
+										"{error.expected ?? "—"}"
+									</span>
+									<span className="text-muted-foreground">→</span>
+									<span
+										className={cn(
+											"text-sm",
+											error.errorType === "substitute" && "text-destructive",
+											error.errorType === "insert" &&
+												"text-amber-600 dark:text-amber-400",
+										)}
+									>
+										"{error.actual ?? "—"}"
+									</span>
+								</>
+							)}
+						</div>
+
+						{/* Timestamp badge */}
+						{hasTimestamps &&
+							error.timestampStartMs != null &&
+							error.timestampEndMs != null && (
 								<Badge
 									variant="secondary"
 									className="shrink-0 gap-1 font-mono text-xs"
@@ -526,33 +396,107 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 									<RiTimeLine size={10} />
 									{formatTimestamp(error.timestampStartMs)}
 								</Badge>
-							</TooltipTrigger>
-							<TooltipContent>
-								{formatTimestamp(error.timestampStartMs)} -{" "}
-								{formatTimestamp(error.timestampEndMs)}
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				)}
+							)}
 
-			{/* Play button */}
-			{audioSrc &&
-				hasTimestamps &&
-				onPlaySegment &&
-				error.timestampStartMs != null &&
-				error.timestampEndMs != null && (
-					<Button
-						variant="ghost"
-						size="icon"
-						className="size-8 shrink-0"
-						onClick={() =>
-							onPlaySegment(error.timestampStartMs, error.timestampEndMs)
-						}
-					>
-						<RiPlayLine size={14} />
-					</Button>
-				)}
-		</motion.div>
+						{/* Play button */}
+						{audioSrc &&
+							hasTimestamps &&
+							onPlaySegment &&
+							error.timestampStartMs != null &&
+							error.timestampEndMs != null && (
+								<Button
+									variant="ghost"
+									size="icon"
+									className="size-8 shrink-0"
+									onClick={(e) => {
+										e.stopPropagation();
+										onPlaySegment(
+											error.timestampStartMs ?? 0,
+											error.timestampEndMs ?? 0,
+										);
+									}}
+								>
+									<RiPlayLine size={14} />
+								</Button>
+							)}
+
+						{/* Collapse icon */}
+						<RiArrowDownSLine
+							size={16}
+							className={cn(
+								"shrink-0 text-muted-foreground transition-transform",
+								isOpen && "rotate-180",
+							)}
+						/>
+					</button>
+				</CollapsibleTrigger>
+
+				<CollapsibleContent>
+					<div className="flex flex-col gap-3 border-t px-4 pt-3 pb-4">
+						{/* Detailed timestamp */}
+						{hasTimestamps &&
+							error.timestampStartMs != null &&
+							error.timestampEndMs != null && (
+								<div className="flex items-center gap-2">
+									<span className="text-muted-foreground text-xs">Time:</span>
+									<span className="font-mono text-xs tabular-nums">
+										{formatTimestampFull(error.timestampStartMs)} -{" "}
+										{formatTimestampFull(error.timestampEndMs)}
+									</span>
+									<span className="text-muted-foreground text-xs">
+										(
+										{(
+											(error.timestampEndMs - error.timestampStartMs) /
+											1000
+										).toFixed(2)}
+										s)
+									</span>
+								</div>
+							)}
+
+						{/* Additional details */}
+						<div className="flex flex-col gap-2">
+							<div className="flex items-center gap-2">
+								<span className="text-muted-foreground text-xs">Expected:</span>
+								{type === "phoneme" ? (
+									<span className="font-mono text-xs">
+										/{error.expected ?? "∅"}/
+									</span>
+								) : (
+									<span className="text-xs">"{error.expected ?? "—"}"</span>
+								)}
+							</div>
+							<div className="flex items-center gap-2">
+								<span className="text-muted-foreground text-xs">Actual:</span>
+								{type === "phoneme" ? (
+									<span
+										className={cn(
+											"font-mono text-xs",
+											error.errorType === "substitute" && "text-destructive",
+											error.errorType === "insert" &&
+												"text-amber-600 dark:text-amber-400",
+										)}
+									>
+										/{error.actual ?? "∅"}/
+									</span>
+								) : (
+									<span
+										className={cn(
+											"text-xs",
+											error.errorType === "substitute" && "text-destructive",
+											error.errorType === "insert" &&
+												"text-amber-600 dark:text-amber-400",
+										)}
+									>
+										"{error.actual ?? "—"}"
+									</span>
+								)}
+							</div>
+						</div>
+					</div>
+				</CollapsibleContent>
+			</motion.div>
+		</Collapsible>
 	);
 }
 
@@ -579,7 +523,7 @@ function ErrorList({
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.3, delay: 0.3 }}
 			>
-				<Card className="overflow-hidden bg-gradient-to-br from-emerald-500/5 via-background to-emerald-500/10">
+				<Card className="overflow-hidden bg-linear-to-br from-emerald-500/5 via-background to-emerald-500/10">
 					<CardContent className="py-12">
 						<div className="flex flex-col items-center gap-3 text-center">
 							<motion.div
@@ -609,27 +553,45 @@ function ErrorList({
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, delay: 0.2 }}
 		>
-			<Card>
+			<Card className="overflow-hidden">
 				<CardHeader className="pb-3">
 					<CardTitle className="flex items-center justify-between text-base">
 						<span>Error Details</span>
-						<Badge variant="secondary">{totalErrors} total</Badge>
+						<Badge variant="secondary" className="font-mono">
+							{totalErrors} {totalErrors === 1 ? "error" : "errors"}
+						</Badge>
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Tabs defaultValue={wordErrors.length > 0 ? "words" : "phonemes"}>
 						<TabsList className="mb-4 grid w-full grid-cols-2">
 							<TabsTrigger value="words" disabled={wordErrors.length === 0}>
-								Words ({wordErrors.length})
+								Words
+								{wordErrors.length > 0 && (
+									<Badge
+										variant="secondary"
+										className="ml-2 font-mono text-[10px]"
+									>
+										{wordErrors.length}
+									</Badge>
+								)}
 							</TabsTrigger>
 							<TabsTrigger
 								value="phonemes"
 								disabled={phonemeErrors.length === 0}
 							>
-								Phonemes ({phonemeErrors.length})
+								Phonemes
+								{phonemeErrors.length > 0 && (
+									<Badge
+										variant="secondary"
+										className="ml-2 font-mono text-[10px]"
+									>
+										{phonemeErrors.length}
+									</Badge>
+								)}
 							</TabsTrigger>
 						</TabsList>
-						<TabsContent value="words" className="space-y-2">
+						<TabsContent value="words" className="flex flex-col gap-2">
 							{wordErrors.map((error) => (
 								<ErrorItem
 									key={error.id}
@@ -640,7 +602,7 @@ function ErrorList({
 								/>
 							))}
 						</TabsContent>
-						<TabsContent value="phonemes" className="space-y-2">
+						<TabsContent value="phonemes" className="flex flex-col gap-2">
 							{phonemeErrors.map((error) => (
 								<ErrorItem
 									key={error.id}
@@ -677,13 +639,46 @@ function AnalysisSkeleton() {
 
 // Main Page
 function AnalysisPage() {
-	const { analysis, userRecording, phonemeErrors, wordErrors, textId } =
-		Route.useLoaderData();
+	const {
+		analysis: initialAnalysis,
+		userRecording,
+		phonemeErrors,
+		wordErrors,
+		textId,
+	} = Route.useLoaderData();
 	const navigate = useNavigate();
 	const [activeSegment, setActiveSegment] = useState<{
 		start: number;
 		end: number;
 	} | null>(null);
+
+	// Poll for analysis status updates if analysis is pending or processing
+	const analysisId = initialAnalysis?.id;
+	const shouldPoll =
+		initialAnalysis &&
+		(initialAnalysis.status === "pending" ||
+			initialAnalysis.status === "processing");
+
+	const { data: polledData } = useQuery({
+		queryKey: ["analysis", analysisId],
+		queryFn: async () => {
+			if (!analysisId) return null;
+			const response = (await serverGetAnalysisDetails({
+				data: { analysisId },
+			})) as ApiResponse<{
+				analysis: Analysis;
+				userRecording: UserRecording | null;
+				phonemeErrors: PhonemeError[];
+				wordErrors: WordError[];
+			} | null>;
+			return response.success && response.data ? response.data : null;
+		},
+		enabled: shouldPoll ?? false,
+		refetchInterval: shouldPoll ? 3000 : false, // Poll every 3 seconds if pending/processing
+	});
+
+	// Use polled data if available, otherwise use initial loader data
+	const analysis = polledData?.analysis ?? initialAnalysis;
 
 	const audioSrc = userRecording
 		? `/api/audio/user/${userRecording.id}`
@@ -693,23 +688,23 @@ function AnalysisPage() {
 		setActiveSegment({ start: startMs, end: endMs });
 	}, []);
 
-	// Compute error markers for the audio player timeline
-	// Only phoneme errors have timestamp fields in the schema
-	const errorMarkers: ErrorMarker[] = useMemo(() => {
-		const markers: ErrorMarker[] = [];
+	// Compute error regions for the waveform player (in seconds)
+	const errorRegions: ErrorRegion[] = useMemo(() => {
+		const regions: ErrorRegion[] = [];
 
 		phonemeErrors?.forEach((error) => {
 			if (error.timestampStartMs != null && error.timestampEndMs != null) {
-				markers.push({
-					startMs: error.timestampStartMs,
-					endMs: error.timestampEndMs,
+				regions.push({
+					start: error.timestampStartMs / 1000,
+					end: error.timestampEndMs / 1000,
 					type: error.errorType,
+					label: error.actual ?? undefined,
 				});
 			}
 		});
 
 		// Sort by start time
-		return markers.sort((a, b) => a.startMs - b.startMs);
+		return regions.sort((a, b) => a.start - b.start);
 	}, [phonemeErrors]);
 
 	if (!analysis) {
@@ -725,6 +720,142 @@ function AnalysisPage() {
 								navigate({ to: "/practice/$textId", params: { textId } }),
 						}}
 					/>
+				</PageContainer>
+			</MainLayout>
+		);
+	}
+
+	// Show loading state if analysis is pending or processing
+	if (analysis.status === "pending" || analysis.status === "processing") {
+		return (
+			<MainLayout>
+				<PageContainer maxWidth="xl">
+					<div className="flex flex-col gap-6">
+						{/* Header */}
+						<motion.div
+							className="flex items-center gap-4"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.3 }}
+						>
+							<Button variant="ghost" size="icon" asChild>
+								<Link to="/practice/$textId" params={{ textId }}>
+									<RiArrowLeftLine size={18} />
+								</Link>
+							</Button>
+							<div className="space-y-1">
+								<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
+									Analysis in Progress
+								</h1>
+								<p className="text-muted-foreground text-sm">
+									Your recording is being analyzed...
+								</p>
+							</div>
+						</motion.div>
+
+						{/* Loading Card */}
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.4 }}
+						>
+							<Card>
+								<CardContent className="flex flex-col items-center justify-center gap-4 py-12">
+									<Spinner className="size-8" />
+									<div className="flex flex-col items-center gap-2 text-center">
+										<h3 className="font-semibold text-lg">
+											{analysis.status === "pending"
+												? "Queued for Processing"
+												: "Processing Your Recording"}
+										</h3>
+										<p className="max-w-md text-muted-foreground text-sm">
+											{analysis.status === "pending"
+												? "Your recording is in the queue and will be processed shortly."
+												: "Our AI is analyzing your pronunciation. This usually takes 10-30 seconds."}
+										</p>
+									</div>
+								</CardContent>
+							</Card>
+						</motion.div>
+
+						{/* Show recording while processing */}
+						{userRecording && (
+							<motion.div
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.4, delay: 0.2 }}
+							>
+								<WaveformPlayer
+									src={`/api/audio/user/${userRecording.id}`}
+									label="Your Recording"
+								/>
+							</motion.div>
+						)}
+					</div>
+				</PageContainer>
+			</MainLayout>
+		);
+	}
+
+	// Show error state if analysis failed
+	if (analysis.status === "failed") {
+		return (
+			<MainLayout>
+				<PageContainer maxWidth="xl">
+					<div className="flex flex-col gap-6">
+						{/* Header */}
+						<motion.div
+							className="flex items-center gap-4"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.3 }}
+						>
+							<Button variant="ghost" size="icon" asChild>
+								<Link to="/practice/$textId" params={{ textId }}>
+									<RiArrowLeftLine size={18} />
+								</Link>
+							</Button>
+							<div className="space-y-1">
+								<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
+									Analysis Failed
+								</h1>
+								<p className="text-muted-foreground text-sm">
+									Unable to process your recording
+								</p>
+							</div>
+						</motion.div>
+
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.4 }}
+						>
+							<Card className="border-destructive/20 bg-destructive/5">
+								<CardContent className="flex flex-col items-center justify-center gap-4 py-12">
+									<div className="flex flex-col items-center gap-2 text-center">
+										<h3 className="font-semibold text-destructive text-lg">
+											Analysis Failed
+										</h3>
+										<p className="max-w-md text-muted-foreground text-sm">
+											We encountered an error while processing your recording.
+											Please try recording again.
+										</p>
+										<Button
+											onClick={() =>
+												navigate({
+													to: "/practice/$textId",
+													params: { textId },
+												})
+											}
+											className="mt-4"
+										>
+											Try Again
+										</Button>
+									</div>
+								</CardContent>
+							</Card>
+						</motion.div>
+					</div>
 				</PageContainer>
 			</MainLayout>
 		);
@@ -747,7 +878,7 @@ function AnalysisPage() {
 							</Link>
 						</Button>
 						<div className="space-y-1">
-							<h1 className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
+							<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
 								Analysis Results
 							</h1>
 							<p className="text-muted-foreground text-sm">
@@ -756,15 +887,17 @@ function AnalysisPage() {
 						</div>
 					</motion.div>
 
-					{/* User Recording Player */}
-					{userRecording && (
-						<RecordingPlayer
-							recordingId={userRecording.id}
-							durationMs={userRecording.durationMs ?? undefined}
-							errorMarkers={errorMarkers}
-							onSeekToError={handlePlaySegment}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.4 }}
+					>
+						<WaveformPlayer
+							src={`/api/audio/user/${userRecording?.id ?? ""}`}
+							label="Your Recording"
+							errorRegions={errorRegions}
 						/>
-					)}
+					</motion.div>
 
 					{/* Active Segment Player */}
 					{activeSegment && audioSrc && (
@@ -805,7 +938,7 @@ function AnalysisPage() {
 					>
 						{/* Shared Legend */}
 						{(wordErrors?.length > 0 || phonemeErrors?.length > 0) && (
-							<div className="flex flex-wrap items-center gap-3 text-muted-foreground text-[10px]">
+							<div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
 								<span className="text-muted-foreground/70">Legend:</span>
 								<span className="flex items-center gap-1">
 									<span className="size-1.5 rounded-full bg-destructive/60" />

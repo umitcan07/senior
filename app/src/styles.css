@@ -15,21 +15,16 @@
 }
 
 :root {
-	font-family: Inter, sans-serif;
+	font-family: "Geist", sans-serif;
+	font-optical-sizing: auto;
 	font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
-  }
-  @supports (font-variation-settings: normal) {
-	
-	:root { font-family: InterVariable, sans-serif; }
-  }
+}
 
 body {
 	@apply m-0;
 	@apply text-pretty;
-	font-family:
-		"Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-		sans-serif;
+	font-family: "Geist", sans-serif;
+	font-optical-sizing: auto;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -40,6 +35,10 @@ code {
 }
 
 h1, h2, h3, h4, h5, h6 {
+	font-family: "Innovator Grotesk", sans-serif;
+}
+
+button, [role="button"], a {
 	font-family: "Innovator Grotesk", sans-serif;
 }
 
@@ -77,7 +76,7 @@ h1, h2, h3, h4, h5, h6 {
 	--sidebar-border: oklch(0.9220 0 0);
 	--sidebar-ring: oklch(0.7080 0 0);
 	--font-display: "Innovator Grotesk", sans-serif;
-	--font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+	--font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 	--font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 	--radius: 0.625rem;
@@ -132,7 +131,8 @@ h1, h2, h3, h4, h5, h6 {
 	--sidebar-accent-foreground: oklch(0.9850 0 0);
 	--sidebar-border: oklch(0.2750 0 0);
 	--sidebar-ring: oklch(0.4390 0 0);
-	--font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+	--font-display: "Innovator Grotesk", sans-serif;
+	--font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 	--font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 	--radius: 0.625rem;

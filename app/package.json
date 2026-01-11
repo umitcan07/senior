@@ -69,6 +69,8 @@
 		"pg": "^8.11.0",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
+		"wavesurfer.js": "^7",
+		"@wavesurfer/react": "^1.0.0",
 		"remixicon": "^4.7.0",
 		"tailwind-merge": "^3.0.2",
 		"tailwindcss": "^4.0.6",

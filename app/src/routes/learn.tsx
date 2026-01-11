@@ -11,6 +11,7 @@ import { SectionTitle } from "@/components/ui/section-title";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
 import {
 	serverGenerateIPAAudio,
@@ -779,6 +780,7 @@ function AccentDifferencesSection() {
 // MAIN PAGE
 
 function LearningPage() {
+	const { toast } = useToast();
 	const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("word");
 	const [playingId, setPlayingId] = useState<string | null>(null);
 	const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -806,6 +808,10 @@ function LearningPage() {
 			const audioData = IPA_AUDIO_MAP[symbol];
 			if (!audioData) {
 				console.error(`No audio data found for symbol: ${symbol}`);
+				toast({
+					variant: "destructive",
+					description: "Audio not available for this symbol",
+				});
 				return;
 			}
 
@@ -829,6 +835,10 @@ function LearningPage() {
 					setPlayingId(null);
 					setLoadingId(null);
 					console.error("Audio playback error for:", audioKey);
+					toast({
+						variant: "destructive",
+						description: "Audio playback failed",
+					});
 				};
 
 				audio.oncanplaythrough = () => {
@@ -841,9 +851,13 @@ function LearningPage() {
 			} catch (error) {
 				console.error("Audio playback error:", error);
 				setLoadingId(null);
+				toast({
+					variant: "destructive",
+					description: "The audio for the selected phoneme is not available. Please check back soon",
+				});
 			}
 		},
-		[playingId],
+		[playingId, toast],
 	);
 
 	return (

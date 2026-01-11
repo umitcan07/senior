@@ -6,6 +6,7 @@ export type LiveWaveformProps = HTMLAttributes<HTMLDivElement> & {
 	active?: boolean;
 	processing?: boolean;
 	deviceId?: string;
+	stream?: MediaStream; // Optional stream - if provided, won't request permission
 	barWidth?: number;
 	barHeight?: number;
 	barGap?: number;
@@ -29,6 +30,7 @@ export const LiveWaveform = ({
 	active = false,
 	processing = false,
 	deviceId,
+	stream: providedStream,
 	barWidth = 3,
 	barGap = 1,
 	barRadius = 1.5,
@@ -252,20 +254,26 @@ export const LiveWaveform = ({
 
 		const setupMicrophone = async () => {
 			try {
-				const stream = await navigator.mediaDevices.getUserMedia({
-					audio: deviceId
-						? {
-								deviceId: { exact: deviceId },
-								echoCancellation: true,
-								noiseSuppression: true,
-								autoGainControl: true,
-							}
-						: {
-								echoCancellation: true,
-								noiseSuppression: true,
-								autoGainControl: true,
-							},
-				});
+				// Use provided stream if available, otherwise request permission
+				let stream: MediaStream;
+				if (providedStream) {
+					stream = providedStream;
+				} else {
+					stream = await navigator.mediaDevices.getUserMedia({
+						audio: deviceId
+							? {
+									deviceId: { exact: deviceId },
+									echoCancellation: true,
+									noiseSuppression: true,
+									autoGainControl: true,
+								}
+							: {
+									echoCancellation: true,
+									noiseSuppression: true,
+									autoGainControl: true,
+								},
+					});
+				}
 				streamRef.current = stream;
 				onStreamReady?.(stream);
 
@@ -316,6 +324,7 @@ export const LiveWaveform = ({
 	}, [
 		active,
 		deviceId,
+		providedStream,
 		fftSize,
 		smoothingTimeConstant,
 		onError,

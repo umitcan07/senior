@@ -1,9 +1,19 @@
 "use client";
 
-import { RiPauseLine, RiPlayLine, RiRestartLine } from "@remixicon/react";
+import {
+	RiPauseLine,
+	RiPlayLine,
+	RiRestartLine,
+	RiSpeedLine,
+} from "@remixicon/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 interface SegmentPlayerProps {
@@ -18,20 +28,13 @@ interface SegmentPlayerProps {
 	defaultSpeed?: number;
 }
 
-const errorTypeLabels: Record<string, { label: string; color: string }> = {
-	substitute: {
-		label: "Substitution",
-		color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-	},
-	insert: {
-		label: "Insertion",
-		color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-	},
-	delete: {
-		label: "Deletion",
-		color: "bg-red-500/10 text-red-600 border-red-500/20",
-	},
-};
+const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
+
+function formatTime(seconds: number) {
+	const mins = Math.floor(seconds / 60);
+	const secs = Math.floor(seconds % 60);
+	return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
 
 function formatTimestamp(ms: number): string {
 	const seconds = Math.floor(ms / 1000);
@@ -46,7 +49,6 @@ export function SegmentPlayer({
 	startMs = 0,
 	endMs,
 	label,
-	errorType,
 	className,
 	variant = "default",
 	showTimestamps = true,
@@ -54,13 +56,13 @@ export function SegmentPlayer({
 }: SegmentPlayerProps) {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
-	const [isLooping, setIsLooping] = useState(false);
 	const [playbackSpeed, setPlaybackSpeed] = useState(defaultSpeed);
 	const [currentTime, setCurrentTime] = useState(0);
 	const animationRef = useRef<number | null>(null);
 
 	const startSec = startMs / 1000;
 	const endSec = endMs ? endMs / 1000 : undefined;
+	const segmentDuration = endSec ? endSec - startSec : 0;
 
 	const playSegment = useCallback(() => {
 		const audio = audioRef.current;
@@ -88,13 +90,17 @@ export function SegmentPlayer({
 		}
 	}, [isPlaying, playSegment, pauseSegment]);
 
-	const resetToStart = useCallback(() => {
+	const handleRestart = useCallback(() => {
 		const audio = audioRef.current;
 		if (!audio) return;
 
 		audio.currentTime = startSec;
 		setCurrentTime(startSec);
 	}, [startSec]);
+
+	const handleSpeedChange = useCallback((speed: number) => {
+		setPlaybackSpeed(speed);
+	}, []);
 
 	// Handle time updates and segment end
 	useEffect(() => {
@@ -106,12 +112,8 @@ export function SegmentPlayer({
 
 			// Check if we've passed the end of the segment
 			if (endSec && audio.currentTime >= endSec) {
-				if (isLooping) {
-					audio.currentTime = startSec;
-				} else {
-					audio.pause();
-					setIsPlaying(false);
-				}
+				audio.pause();
+				setIsPlaying(false);
 			}
 
 			if (isPlaying) {
@@ -128,7 +130,7 @@ export function SegmentPlayer({
 				cancelAnimationFrame(animationRef.current);
 			}
 		};
-	}, [isPlaying, endSec, startSec, isLooping]);
+	}, [isPlaying, endSec]);
 
 	// Update playback rate when speed changes
 	useEffect(() => {
@@ -138,7 +140,14 @@ export function SegmentPlayer({
 		}
 	}, [playbackSpeed]);
 
-	const speeds = [0.5, 0.75, 1];
+	// Calculate segment progress
+	const segmentProgress = endSec
+		? Math.max(
+				0,
+				Math.min(100, ((currentTime - startSec) / segmentDuration) * 100),
+			)
+		: 0;
+	const segmentCurrentTime = Math.max(0, currentTime - startSec);
 
 	if (variant === "inline") {
 		return (
@@ -183,105 +192,95 @@ export function SegmentPlayer({
 		);
 	}
 
-	// Default variant
+	// Default variant - styled similar to WaveformPlayer but with visual differences
 	return (
 		<div
 			className={cn(
-				"flex flex-col gap-3 rounded-lg border bg-card p-4",
+				"rounded-xl border border-l-4 border-l-primary/60 bg-linear-to-br from-primary/10 via-background to-primary/5 p-4",
 				className,
 			)}
 		>
-			{(label || errorType) && (
-				<div className="flex items-center gap-2">
-					{errorType && (
-						<Badge
-							variant="outline"
-							className={cn("text-xs", errorTypeLabels[errorType]?.color)}
-						>
-							{errorTypeLabels[errorType]?.label}
-						</Badge>
-					)}
+			{label && (
+				<div className="mb-3 flex items-center gap-2 text-muted-foreground text-sm">
+					<span className="size-1.5 rounded-full bg-primary/60" />
+					{label}
 					{showTimestamps && startMs !== undefined && endMs !== undefined && (
-						<span className="font-mono text-muted-foreground text-xs">
+						<span className="ml-auto font-mono text-xs tabular-nums">
 							{formatTimestamp(startMs)} - {formatTimestamp(endMs)}
 						</span>
 					)}
-					{label && <span className="font-medium text-sm">{label}</span>}
 				</div>
 			)}
+
+			{/* Segment progress bar - visual indicator */}
+			<div className="relative mb-4 h-1.5 overflow-hidden rounded-full bg-primary/10">
+				<div
+					className="absolute top-0 left-0 h-full bg-primary/40 transition-all"
+					style={{
+						width: `${segmentProgress}%`,
+					}}
+				/>
+			</div>
 
 			<div className="flex items-center gap-3">
 				<Button
 					variant="default"
 					size="icon"
-					className="size-10 shrink-0"
+					className="size-10 shrink-0 rounded-full"
 					onClick={togglePlay}
 				>
-					{isPlaying ? <RiPauseLine size={18} /> : <RiPlayLine size={18} />}
+					{isPlaying ? (
+						<RiPauseLine size={18} />
+					) : (
+						<RiPlayLine size={18} className="ml-0.5" />
+					)}
 				</Button>
+
+				<div className="flex min-w-0 flex-1 items-center gap-2">
+					<span className="font-mono text-muted-foreground text-xs tabular-nums">
+						{formatTime(segmentCurrentTime)}
+					</span>
+					<div className="flex-1" />
+					<span className="font-mono text-muted-foreground text-xs tabular-nums">
+						{formatTime(segmentDuration)}
+					</span>
+				</div>
 
 				<Button
 					variant="ghost"
 					size="icon"
 					className="size-8 shrink-0"
-					onClick={resetToStart}
+					onClick={handleRestart}
 				>
 					<RiRestartLine size={14} />
 				</Button>
 
-				{/* Progress bar */}
-				<div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-					<div
-						className="absolute top-0 left-0 h-full bg-primary transition-all"
-						style={{
-							width: endSec
-								? `${((currentTime - startSec) / (endSec - startSec)) * 100}%`
-								: "0%",
-						}}
-					/>
-				</div>
-
-				{showTimestamps && (
-					<span className="shrink-0 font-mono text-muted-foreground text-xs">
-						{formatTimestamp(startMs)} -{" "}
-						{endMs ? formatTimestamp(endMs) : "end"}
-					</span>
-				)}
-			</div>
-
-			{/* Speed controls */}
-			<div className="flex items-center gap-2">
-				<span className="text-muted-foreground text-xs">Speed:</span>
-				<div className="flex gap-1">
-					{speeds.map((speed) => (
-						<button
-							key={speed}
-							type="button"
-							onClick={() => setPlaybackSpeed(speed)}
-							className={cn(
-								"rounded px-2 py-0.5 font-mono text-xs transition-colors",
-								playbackSpeed === speed
-									? "bg-primary text-primary-foreground"
-									: "bg-muted hover:bg-muted/80",
-							)}
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-8 shrink-0 gap-1 px-2 font-mono text-xs"
 						>
-							{speed}x
-						</button>
-					))}
-				</div>
-				<button
-					type="button"
-					onClick={() => setIsLooping(!isLooping)}
-					className={cn(
-						"ml-auto flex items-center gap-1 rounded px-2 py-0.5 text-xs transition-colors",
-						isLooping
-							? "bg-primary/10 text-primary"
-							: "text-muted-foreground hover:text-foreground",
-					)}
-				>
-					<RiRestartLine size={12} />
-					Loop
-				</button>
+							<RiSpeedLine size={14} />
+							{playbackSpeed}x
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" className="min-w-16">
+						{PLAYBACK_SPEEDS.map((speed) => (
+							<DropdownMenuItem
+								key={speed}
+								onClick={() => handleSpeedChange(speed)}
+								className={cn(
+									"font-mono text-xs",
+									playbackSpeed === speed && "bg-primary/10",
+								)}
+							>
+								{speed}x
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</div>
 
 			<audio ref={audioRef} src={src} preload="metadata" className="hidden">
@@ -322,11 +321,8 @@ export function ErrorSegmentPlayer({
 	return (
 		<SegmentPlayer
 			src={src}
-			startMs={startMs}
-			endMs={endMs}
-			errorType={
-				error.errorType as "substitute" | "insert" | "delete" | undefined
-			}
+			startMs={startMs ?? undefined}
+			endMs={endMs ?? undefined}
 			variant="default"
 			className={className}
 		/>
