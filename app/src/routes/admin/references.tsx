@@ -55,7 +55,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { TextCombobox } from "@/components/ui/text-combobox";
 import type { ReferenceSpeechWithRelations } from "@/db/reference";
 import type { PracticeText } from "@/db/text";
 import { useToast } from "@/hooks/use-toast";
@@ -68,7 +67,6 @@ import {
 } from "@/lib/reference";
 import { formatIpaClean } from "@/lib/ipa";
 import { serverGetPracticeTexts } from "@/lib/text";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/references")({
 	component: ReferencesPage,
@@ -81,7 +79,7 @@ function createColumns(
 	onDelete: (ref: ReferenceSpeechWithRelations) => void,
 	onGenerateIpa: (ref: ReferenceSpeechWithRelations) => void,
 	ipaGeneratingIds: Set<string>,
-	onCopyIpa: (text: string) => void,
+	onCopyIpa: () => void,
 ): ColumnDef<ReferenceSpeechWithRelations>[] {
 	return [
 		{
@@ -190,7 +188,23 @@ function createColumns(
 		{
 			id: "ipa",
 			size: 200,
-			header: "IPA",
+			header: ({ column }) => (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					className="h-8 px-2"
+				>
+					IPA
+					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
+				</Button>
+			),
+			accessorFn: (row) => {
+				// Sort: null/undefined first (non-generated), then by IPA text
+				if (!row.ipaTranscription) {
+					return ""; // Empty string sorts before any text
+				}
+				return formatIpaClean(row.ipaTranscription);
+			},
 			cell: ({ row }) => {
 				const ref = row.original;
 				const isGenerating = ipaGeneratingIds.has(ref.id);
@@ -237,7 +251,7 @@ function createColumns(
 										onClick={async () => {
 											try {
 												await navigator.clipboard.writeText(formattedIpa);
-												onCopyIpa(formattedIpa);
+												onCopyIpa();
 											} catch {
 												// Clipboard API not available
 											}
@@ -307,7 +321,7 @@ interface ReferencesDataTableProps {
 	textFilter: string | null;
 	onTextFilterChange: (textId: string | null) => void;
 	texts: PracticeText[];
-	onCopyIpa: (text: string) => void;
+	onCopyIpa: () => void;
 }
 
 function ReferencesDataTable({
@@ -321,10 +335,13 @@ function ReferencesDataTable({
 	texts,
 	onCopyIpa,
 }: ReferencesDataTableProps) {
-	const [sorting, setSorting] = useState<SortingState>([]);
+	const [sorting, setSorting] = useState<SortingState>([
+		{ id: "ipa", desc: false }, // Default sort by IPA ascending (non-generated first)
+	]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [rowSelection, setRowSelection] = useState({});
 	const [expanded, setExpanded] = useState<ExpandedState>({});
+	const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
 	const filteredData = textFilter
 		? data.filter((r) => r.textId === textFilter)
@@ -338,6 +355,7 @@ function ReferencesDataTable({
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
 		onExpandedChange: setExpanded,
+		onPaginationChange: setPagination,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -349,6 +367,7 @@ function ReferencesDataTable({
 			columnFilters,
 			rowSelection,
 			expanded,
+			pagination,
 		},
 	});
 
@@ -437,7 +456,7 @@ function ReferencesDataTable({
 																		try {
 																			const formattedIpa = formatIpaClean(row.original.ipaTranscription!);
 																			await navigator.clipboard.writeText(formattedIpa);
-																			onCopyIpa(formattedIpa);
+																			onCopyIpa();
 																		} catch {
 																			// Clipboard API not available
 																		}
@@ -575,9 +594,14 @@ function ReferencesPage() {
 		},
 	});
 
-	const { mutate: deleteReference } = useMutation({
+	const { mutate: deleteReference } = useMutation<
+		{ success: boolean; error?: { message: string } },
+		Error,
+		string
+	>({
 		mutationFn: async (id: string) => {
-			return deleteReferenceFn({ data: { id } });
+			const result = await deleteReferenceFn({ data: { id } });
+			return result as { success: boolean; error?: { message: string } };
 		},
 		onSuccess: async (result) => {
 			if (result.success) {
@@ -589,7 +613,7 @@ function ReferencesPage() {
 			} else {
 				toast({
 					title: "Error",
-					description: result.error.message,
+					description: result.error?.message || "Failed to delete reference",
 					variant: "destructive",
 				});
 			}
@@ -649,7 +673,7 @@ function ReferencesPage() {
 		deleteMultiple(refs.map((r) => r.id));
 	};
 
-	const handleCopyIpa = (text: string) => {
+	const handleCopyIpa = () => {
 		toast({
 			title: "Copied to clipboard",
 			description: "IPA transcription has been copied.",
