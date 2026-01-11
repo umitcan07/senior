@@ -868,8 +868,14 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         # Remove other potential tags loosely
         actual_text = actual_text.replace("<eng>", "").replace("<asr>", "").strip()
         
+        # Remove other potential tags loosely
+        actual_text = actual_text.replace("<eng>", "").replace("<asr>", "").strip()
+        
         print(f"DEBUG: ASR result raw: '{actual_text_raw}'")
         print(f"DEBUG: ASR result cleaned: '{actual_text}'")
+        
+        # Debug characters
+        print(f"DEBUG: ASR raw chars: {[f'{c}: {ord(c):04x}' for c in actual_text_raw]}")
 
         # Step 5c: Word-level comparison
         print("DEBUG: Step 5c: Word-level comparison...")
@@ -923,7 +929,23 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
             # For now, we'll leave timestamps null or estimate proportionally
             word_errors.append(error_dict)
             
-        print(f"DEBUG: Found {len(word_errors)} word errors")
+            word_errors.append(error_dict)
+            
+        # Calculate word score
+        total_words = len(normalized_target_words)
+        if total_words == 0:
+            word_score = 1.0 if len(normalized_actual_words) == 0 else 0.0
+        else:
+            word_error_cost = sum(
+                1 if op[0] == "delete" else
+                1 if op[0] == "insert" else
+                2 if op[0] == "substitute" else 0
+                for op in word_operations
+            )
+            max_word_cost = total_words * 2
+            word_score = max(0.0, 1.0 - (word_error_cost / max_word_cost))
+            
+        print(f"DEBUG: Found {len(word_errors)} word errors, score: {word_score:.4f}")
 
     finally:
         try:
@@ -1064,6 +1086,7 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         "actual_ipa": actual_ipa_phonemes,
         "target_ipa": target_ipa_phonemes,
         "score": score,
+        "word_score": word_score if 'word_score' in locals() else 0.0,
         "errors": errors,
         "word_errors": word_errors,
         "signal_quality": signal_quality,

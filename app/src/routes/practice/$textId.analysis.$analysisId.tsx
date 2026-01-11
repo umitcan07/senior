@@ -14,9 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
+	Alert,
+	AlertDescription,
+	AlertTitle,
 } from "@/components/ui/alert"
 import { RiAlertLine } from "@remixicon/react";
 import {
@@ -271,25 +271,40 @@ function ScoreOverview({
 								.replace("500", "500/15")
 								.replace("400", "500/25")}text-foreground`, // Hacky color mapping, ideally use separate variants
 							level === "high" &&
-								"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+							"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
 							level === "medium" &&
-								"bg-amber-500/15 text-amber-700 dark:text-amber-400",
+							"bg-amber-500/15 text-amber-700 dark:text-amber-400",
 							level === "low" && "bg-red-500/15 text-red-700 dark:text-red-400",
 						)}
 					>
 						{getScoreLabel(percentage)}
 					</Badge>
 				</CardHeader>
-				<CardContent className="px-4 py-4">
-					<div className="flex flex-col items-center gap-4">
-						<ScoreRing score={overallScore} size="lg" label="Overall" />
-						<div className="flex w-full items-center justify-center gap-8 border-border/40 border-t pt-4">
-							{phonemeScore !== null && (
-								<ScoreRing score={phonemeScore} size="sm" label="Phonemes" />
-							)}
-							{wordScore !== null && (
-								<ScoreRing score={wordScore} size="sm" label="Words" />
-							)}
+				<CardContent className="px-4 py-6">
+					<div className="flex flex-col items-center gap-8">
+						<ScoreRing score={overallScore} size="xl" label="Overall Score" />
+						
+						<div className="grid w-full grid-cols-2 gap-4 border-border/40 border-t pt-6">
+							<div className="flex flex-col items-center border-border/40 border-r">
+								{phonemeScore !== null ? (
+									<ScoreRing score={phonemeScore} size="md" label="Phoneme Accuracy" />
+								) : (
+									<div className="flex flex-col items-center gap-2 opacity-50">
+										<div className="size-16 rounded-full border-4 border-muted/20" />
+										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">Phonemes</span>
+									</div>
+								)}
+							</div>
+							<div className="flex flex-col items-center">
+								{wordScore !== null ? (
+									<ScoreRing score={wordScore} size="md" label="Word Accuracy" />
+								) : (
+									<div className="flex flex-col items-center gap-2 opacity-50">
+										<div className="size-16 rounded-full border-4 border-muted/20" />
+										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">Words</span>
+									</div>
+								)}
+							</div>
 						</div>
 					</div>
 				</CardContent>
@@ -334,11 +349,11 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 				className={cn(
 					"rounded-xl border transition-colors",
 					error.errorType === "substitute" &&
-						"border-destructive/20 bg-destructive/5 hover:bg-destructive/10",
+					"border-destructive/20 bg-destructive/5 hover:bg-destructive/10",
 					error.errorType === "insert" &&
-						"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
+					"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
 					error.errorType === "delete" &&
-						"border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10",
+					"border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10",
 				)}
 				initial={{ opacity: 0, x: -10 }}
 				animate={{ opacity: 1, x: 0 }}
@@ -355,11 +370,11 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 							className={cn(
 								"shrink-0 capitalize",
 								error.errorType === "substitute" &&
-									"border-destructive/50 text-destructive",
+								"border-destructive/50 text-destructive",
 								error.errorType === "insert" &&
-									"border-amber-500/50 text-amber-600 dark:text-amber-400",
+								"border-amber-500/50 text-amber-600 dark:text-amber-400",
 								error.errorType === "delete" &&
-									"border-blue-500/50 text-blue-600 dark:text-blue-400",
+								"border-blue-500/50 text-blue-600 dark:text-blue-400",
 							)}
 						>
 							{error.errorType}
@@ -378,7 +393,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"font-ipa text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-												"text-amber-600 dark:text-amber-400",
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -395,7 +410,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-												"text-amber-600 dark:text-amber-400",
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -493,7 +508,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"font-ipa text-lg",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-												"text-amber-600 dark:text-amber-400",
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -504,7 +519,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"text-xs",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-												"text-amber-600 dark:text-amber-400",
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -661,8 +676,8 @@ function AnalysisPage() {
 	const {
 		analysis: initialAnalysis,
 		userRecording,
-		phonemeErrors,
-		wordErrors,
+		phonemeErrors: initialLoaderPhonemeErrors,
+		wordErrors: initialLoaderWordErrors,
 		textId,
 		reference,
 		audioQualityMetrics: initialQualityMetrics,
@@ -715,6 +730,8 @@ function AnalysisPage() {
 	// Use polled data if available, otherwise use initial loader data
 	const analysis = polledData?.analysis ?? initialAnalysis;
 	const qualityMetrics = polledData?.audioQualityMetrics ?? initialQualityMetrics;
+	const phonemeErrors = polledData?.phonemeErrors ?? initialLoaderPhonemeErrors;
+	const wordErrors = polledData?.wordErrors ?? initialLoaderWordErrors;
 
 	const audioSrc = userRecording
 		? `/api/audio/user/${userRecording.id}`
@@ -766,7 +783,7 @@ function AnalysisPage() {
 		// Check if job was actually submitted to RunPod
 		const jobSubmitted = initialJobSubmitted;
 		const isPending = analysis.status === "pending";
-		
+
 		return (
 			<MainLayout>
 				<PageContainer maxWidth="xl">
@@ -786,13 +803,11 @@ function AnalysisPage() {
 							<div className="space-y-1">
 								<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
 									{isPending && !jobSubmitted
-										? "Waiting for Processing"
-										: "Analysis in Progress"}
+										? "We're analyzing your speech"
+										: "We're analyzing your speech"}
 								</h1>
 								<p className="text-muted-foreground text-sm">
-									{isPending && !jobSubmitted
-										? "Your recording is saved and waiting"
-										: "Your recording is being analyzed..."}
+									This usually takes 5-15 seconds.
 								</p>
 							</div>
 						</motion.div>
@@ -977,7 +992,7 @@ function AnalysisPage() {
 											<li>High background noise: {qualityMetrics.snrDb}dB</li>
 										)}
 										{Number(qualityMetrics.silenceRatio) > 0.7 && (
-											<li>Too much silence: {Number(qualityMetrics.silenceRatio)*100}% of the recording.</li>
+											<li>Too much silence: {Number(qualityMetrics.silenceRatio) * 100}% of the recording.</li>
 										)}
 										{Number(qualityMetrics.clippingRatio) > 0.01 && (
 											<li>Audio distortion (clipping) detected: {qualityMetrics.clippingRatio} clipping ratio</li>
@@ -985,11 +1000,11 @@ function AnalysisPage() {
 										{(qualityMetrics.qualityStatus) === "reject" && (
 											<li className="text-sm">
 												Recording quality is too low for an accurate analysis
-							 				</li>
-							 			)}
-							 		</ul>
+											</li>
+										)}
+									</ul>
 								</AlertDescription>
-								
+
 							</Alert>
 						)}
 
@@ -1060,22 +1075,23 @@ function AnalysisPage() {
 								</span>
 							</div>
 						)}
-						{analysis.targetWords && analysis.recognizedWords && (
-							<DiffViewer
-								target={analysis.targetWords}
-								recognized={analysis.recognizedWords}
-								errors={wordErrors ?? []}
-								type="word"
-								audioSrc={audioSrc}
-								onSegmentClick={handlePlaySegment}
-							/>
-						)}
+
 						{analysis.targetPhonemes && analysis.recognizedPhonemes && (
 							<DiffViewer
 								target={analysis.targetPhonemes}
 								recognized={analysis.recognizedPhonemes}
 								errors={phonemeErrors ?? []}
 								type="phoneme"
+								audioSrc={audioSrc}
+								onSegmentClick={handlePlaySegment}
+							/>
+						)}
+						{analysis.targetWords && analysis.recognizedWords && (
+							<DiffViewer
+								target={analysis.targetWords}
+								recognized={analysis.recognizedWords}
+								errors={wordErrors ?? []}
+								type="word"
 								audioSrc={audioSrc}
 								onSegmentClick={handlePlaySegment}
 							/>

@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/collapsible";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LiveWaveform } from "@/components/ui/live-waveform";
-import { Progress } from "@/components/ui/progress";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import {
 	WaveformPlayer,
@@ -114,7 +113,6 @@ const MAX_RECORDING_TIME = 20; // seconds
 function useRecording(textId: string) {
 	const [uiState, setUiState] = useState<RecordingState>("idle");
 	const [countdown, setCountdown] = useState(3);
-	const [uploadProgress, setUploadProgress] = useState(0);
 	const navigate = useNavigate();
 
 	// Store uploaded file separately from recorded audio
@@ -219,7 +217,6 @@ function useRecording(textId: string) {
 
 			try {
 				setUiState("uploading");
-				setUploadProgress(10);
 
 				// Convert blob to base64 using a Promise to ensure errors are caught
 				const base64Data = await new Promise<string>((resolve, reject) => {
@@ -237,7 +234,6 @@ function useRecording(textId: string) {
 					reader.onerror = () => reject(new Error("Failed to read audio file"));
 				});
 
-				setUploadProgress(40);
 				// Use uploaded file duration if available, otherwise use recording time
 				const durationMs = uploadedFileBlob
 					? Math.max(1, Math.round(uploadedFileDuration * 1000))
@@ -265,7 +261,6 @@ function useRecording(textId: string) {
 				});
 
 				if (response.success) {
-					setUploadProgress(100);
 					setUiState("analyzing");
 					// Small delay to show complete state
 					setTimeout(() => {
@@ -294,7 +289,6 @@ function useRecording(textId: string) {
 
 	const resetRecording = useCallback(() => {
 		setUiState("idle");
-		setUploadProgress(0);
 		setCountdown(3);
 		// Clean up uploaded file
 		if (uploadedFileUrl) {
@@ -368,7 +362,6 @@ function useRecording(textId: string) {
 			? uploadedFileDuration
 			: audioRecorder.recordingTime,
 		countdown,
-		uploadProgress,
 		audioPreviewUrl: uploadedFileUrl || audioRecorder.audioUrl,
 		error: audioRecorder.error,
 		startRecording,
@@ -826,23 +819,16 @@ function PracticeTextPage() {
 								{(isUploading || isAnalyzing) && (
 									<div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 rounded-xl bg-black/80 text-white backdrop-blur-[2px] transition-all duration-300">
 										{isUploading && (
-											<div className="flex w-full max-w-xs flex-col gap-4 p-6">
-												<div className="flex items-center justify-between text-sm">
-													<span className="font-medium">Uploading recording...</span>
-													<span className="font-mono tabular-nums">{recording.uploadProgress}%</span>
-												</div>
-												<Progress
-													value={recording.uploadProgress}
-													className="h-2 border border-white/20 bg-white/10"
-													indicatorClassName="bg-white"
-												/>
+											<div className="flex w-full max-w-xs flex-col items-center gap-4 p-6">
+												<div className="h-2 w-2 animate-ping rounded-full bg-white" />
+												<span className="font-medium">Uploading your speech...</span>
 											</div>
 										)}
 										{isAnalyzing && (
 											<div className="flex flex-col items-center gap-3 p-6">
 												<div className="h-2 w-2 animate-ping rounded-full bg-white" />
 												<ShimmeringText
-													text="Analyzing pronunciation..."
+													text="Hang on, we are bringing your analysis here."
 													className="text-white text-lg font-medium"
 													shimmerWidth={200}
 												/>

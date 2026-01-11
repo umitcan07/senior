@@ -23,6 +23,7 @@ interface AssessmentOutput {
 	target_text_normalized?: string;
 	target_ipa: string;
 	score: number;
+	word_score?: number;
 	errors: Array<{
 		type: "substitute" | "insert" | "delete";
 		position: number;
@@ -169,6 +170,7 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 							recognizedPhonemes: parsePowsmPhonemes(assessmentOutput.actual_ipa),
 							targetWords: assessmentOutput.target_text_normalized ?? null,
 							recognizedWords: assessmentOutput.actual_text_normalized ?? assessmentOutput.actual_text ?? null,
+							wordScore: assessmentOutput.word_score?.toFixed(4) ?? null,
 							phonemeDistance: assessmentOutput.errors.length,
 							processingDurationMs: executionTime ?? null,
 						});
