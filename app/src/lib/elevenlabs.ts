@@ -110,13 +110,13 @@ export async function generateSpeech(
 		};
 
 		// Include voice_settings if provided
-		// Default values match ElevenLabs dashboard defaults
+		// Default values: style 0.5, stability 0.5, similarity boost 0.5, enhance (use_speaker_boost) false
 		if (voiceSettings) {
 			requestBody.voice_settings = {
 				stability: voiceSettings.stability ?? 0.5,
-				similarity_boost: voiceSettings.similarityBoost ?? 0.75,
-				style: voiceSettings.style ?? 0.0,
-				use_speaker_boost: voiceSettings.useSpeakerBoost ?? true,
+				similarity_boost: voiceSettings.similarityBoost ?? 0.5,
+				style: voiceSettings.style ?? 0.5,
+				use_speaker_boost: voiceSettings.useSpeakerBoost ?? false,
 			};
 		}
 

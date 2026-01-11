@@ -72,14 +72,14 @@ function WaveformPlayerContent({
 		container: containerRef,
 		url: src,
 		height: compact ? 40 : 56,
-		waveColor: "rgba(255, 255, 255, 0.4)",
-		progressColor: "rgba(255, 255, 255, 0.9)",
-		cursorColor: "rgba(255, 255, 255, 0.8)",
-		cursorWidth: 1,
+		waveColor: "rgba(120, 120, 120)",
+		progressColor: "rgba(80, 80, 80, 0.5)",
+		cursorColor: "rgba(80, 80, 80, 0.8)",
+		cursorWidth: 2,
 		barWidth: 2,
 		barGap: 4,
 		barRadius: 4,
-		barHeight: 1,
+		barHeight: .75,
 		normalize: true,
 		interact: true, // Enable click-to-seek
 	});
@@ -221,7 +221,7 @@ function WaveformPlayerContent({
 			)}
 			<div
 				className={cn(
-					"relative overflow-hidden rounded-sm bg-primary/10 flex items-center justify-center",
+					"relative overflow-hidden rounded-sm bg-primary/4 flex items-center justify-center",
 					compact ? "min-h-16" : "min-h-24",
 				)}
 			>

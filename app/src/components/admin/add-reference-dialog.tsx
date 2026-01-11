@@ -86,13 +86,22 @@ export function AddReferenceDialog({
 			setTextId(preSelectedTextId ?? null);
 			setAuthorId("");
 			setFile(null);
-			setActiveTab("upload");
+			// Default to ElevenLabs if available, otherwise upload
+			// Will be set properly when author is selected
+			setActiveTab("eleven_labs");
 			setStability(0.5);
-			setSimilarityBoost(0.75);
-			setVoiceStyle(0.0);
-			setUseSpeakerBoost(true);
+			setSimilarityBoost(0.5);
+			setVoiceStyle(0.5);
+			setUseSpeakerBoost(false); // enhance: false
 		}
 	}, [open, preSelectedTextId]);
+
+	// Switch to upload tab if ElevenLabs becomes unavailable
+	useEffect(() => {
+		if (activeTab === "eleven_labs" && !canUseElevenLabs && authorId) {
+			setActiveTab("upload");
+		}
+	}, [activeTab, canUseElevenLabs, authorId]);
 
 	const { mutate: createReference, isPending } = useMutation({
 		mutationFn: async () => {

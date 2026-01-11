@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
@@ -162,8 +163,18 @@ export const serverGetPracticeTextsWithAttemptStats = createServerFn({
 	method: "GET",
 }).handler(async (): Promise<ApiResponse<PracticeTextWithAttemptStats[]>> => {
 	try {
-		// TODO: Replace with actual user ID from auth context
-		const userId = "guest";
+		let userId = "guest";
+
+		// Try to get authenticated userId from Clerk
+		try {
+			const authObj = await auth();
+			if (authObj.userId) {
+				userId = authObj.userId;
+			}
+		} catch {
+			// Auth not available, use guest
+		}
+
 		const result = await getPracticeTextsWithAttemptStats(userId);
 		return createSuccessResponse(result);
 	} catch (error) {

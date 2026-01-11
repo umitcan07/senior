@@ -37,5 +37,7 @@ COPY requirements-pinned.txt /worker/ipa_generation/requirements.txt
 RUN python3 -m pip install --no-cache-dir -r ipa_generation/requirements.txt
 
 ENV PYTHONPATH=/worker
+# Set HuggingFace cache to network volume (if attached, otherwise uses default)
+ENV HF_HOME=/runpod-volume/.cache/huggingface
 
 CMD ["python3", "ipa_generation/handler.py"]

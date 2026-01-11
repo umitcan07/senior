@@ -37,5 +37,7 @@ COPY requirements-pinned.txt /worker/assessment/requirements.txt
 RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt
 
 ENV PYTHONPATH=/worker
+# Set HuggingFace cache to network volume (if attached, otherwise uses default)
+ENV HF_HOME=/runpod-volume/.cache/huggingface
 
 CMD ["python3", "assessment/handler.py"]

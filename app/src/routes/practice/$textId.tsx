@@ -41,6 +41,7 @@ import { uploadAudioRecording } from "@/lib/audio-upload";
 import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel } from "@/lib/score";
+import { serverGetRecentAttemptsForText } from "@/lib/server-summary";
 import { serverGetPracticeTextById } from "@/lib/text";
 import { serverGetPreferredAuthorId } from "@/lib/user-preferences";
 import { cn, formatRelativeTime } from "@/lib/utils";
@@ -76,42 +77,14 @@ export const Route = createFileRoute("/practice/$textId")({
 					}))
 				: [];
 
-		// Mock attempts for this specific text
-		const now = new Date();
-		const recentAttempts = [
-			{
-				id: "attempt-1",
-				textId: params.textId,
-				textPreview: `${textResult.data.content.slice(0, 50)}...`,
-				score: 88,
-				date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-				analysisId: crypto.randomUUID(),
-			},
-			{
-				id: "attempt-2",
-				textId: params.textId,
-				textPreview: `${textResult.data.content.slice(0, 50)}...`,
-				score: 82,
-				date: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-				analysisId: crypto.randomUUID(),
-			},
-			{
-				id: "attempt-3",
-				textId: params.textId,
-				textPreview: `${textResult.data.content.slice(0, 50)}...`,
-				score: 79,
-				date: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-				analysisId: crypto.randomUUID(),
-			},
-			{
-				id: "attempt-4",
-				textId: params.textId,
-				textPreview: `${textResult.data.content.slice(0, 50)}...`,
-				score: 75,
-				date: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-				analysisId: crypto.randomUUID(),
-			},
-		];
+		// Get recent attempts for this text
+		const recentAttemptsResult = await serverGetRecentAttemptsForText({
+			data: { textId: params.textId },
+		});
+
+		const recentAttempts = recentAttemptsResult.success && recentAttemptsResult.data
+			? recentAttemptsResult.data
+			: [];
 
 		return {
 			text: textResult.data,
@@ -144,6 +117,11 @@ function useRecording(textId: string) {
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const navigate = useNavigate();
 
+	// Store uploaded file separately from recorded audio
+	const [uploadedFileBlob, setUploadedFileBlob] = useState<Blob | null>(null);
+	const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+	const [uploadedFileDuration, setUploadedFileDuration] = useState(0);
+
 	// Use the audio recorder hook for all MediaRecorder logic
 	const audioRecorder = useAudioRecorder({
 		onStart: () => {
@@ -162,11 +140,20 @@ function useRecording(textId: string) {
 		if (uiState === "recording" && audioRecorder.isRecording) {
 			return "recording";
 		}
-		if (uiState === "preview" && audioRecorder.audioBlob) {
+		if (uiState === "preview" && (audioRecorder.audioBlob || uploadedFileBlob)) {
 			return "preview";
 		}
 		return uiState;
-	}, [uiState, audioRecorder.isRecording, audioRecorder.audioBlob]);
+	}, [uiState, audioRecorder.isRecording, audioRecorder.audioBlob, uploadedFileBlob]);
+
+	// Cleanup uploaded file URL on unmount
+	useEffect(() => {
+		return () => {
+			if (uploadedFileUrl) {
+				URL.revokeObjectURL(uploadedFileUrl);
+			}
+		};
+	}, [uploadedFileUrl]);
 
 	// Auto-stop when max time reached
 	useEffect(() => {
@@ -226,7 +213,9 @@ function useRecording(textId: string) {
 
 	const submitRecording = useCallback(
 		async (referenceId: string) => {
-			if (!audioRecorder.audioBlob) return;
+			// Use uploaded file blob if available, otherwise use recorded audio blob
+			const audioBlob = uploadedFileBlob || audioRecorder.audioBlob;
+			if (!audioBlob) return;
 
 			try {
 				setUiState("uploading");
@@ -235,7 +224,7 @@ function useRecording(textId: string) {
 				// Convert blob to base64 using a Promise to ensure errors are caught
 				const base64Data = await new Promise<string>((resolve, reject) => {
 					const reader = new FileReader();
-					reader.readAsDataURL(audioRecorder.audioBlob!);
+					reader.readAsDataURL(audioBlob);
 					reader.onloadend = () => {
 						const base64String = reader.result as string;
 						const data = base64String.split(",")[1];
@@ -249,14 +238,20 @@ function useRecording(textId: string) {
 				});
 
 				setUploadProgress(40);
-				const durationMs = Number.isFinite(audioRecorder.recordingTime)
-					? Math.max(1, Math.round(audioRecorder.recordingTime * 1000))
-					: 1000;
+				// Use uploaded file duration if available, otherwise use recording time
+				const durationMs = uploadedFileBlob
+					? Math.max(1, Math.round(uploadedFileDuration * 1000))
+					: Number.isFinite(audioRecorder.recordingTime)
+						? Math.max(1, Math.round(audioRecorder.recordingTime * 1000))
+						: 1000;
 				console.log("Submitting recording:", {
 					textId,
 					referenceId,
 					durationMs,
-					recordingTime: audioRecorder.recordingTime,
+					recordingTime: uploadedFileBlob
+						? uploadedFileDuration
+						: audioRecorder.recordingTime,
+					source: uploadedFileBlob ? "upload" : "record",
 				});
 
 				const response = await uploadAudioRecording({
@@ -264,7 +259,7 @@ function useRecording(textId: string) {
 						textId,
 						referenceId,
 						audioBase64: base64Data,
-						mimeType: audioRecorder.audioBlob.type,
+						mimeType: audioBlob.type,
 						duration: durationMs,
 					},
 				});
@@ -287,14 +282,28 @@ function useRecording(textId: string) {
 				setUiState("idle");
 			}
 		},
-		[textId, navigate, audioRecorder.audioBlob, audioRecorder.recordingTime],
+		[
+			textId,
+			navigate,
+			audioRecorder.audioBlob,
+			audioRecorder.recordingTime,
+			uploadedFileBlob,
+			uploadedFileDuration,
+		],
 	);
 
 	const resetRecording = useCallback(() => {
 		setUiState("idle");
 		setUploadProgress(0);
 		setCountdown(3);
-	}, []);
+		// Clean up uploaded file
+		if (uploadedFileUrl) {
+			URL.revokeObjectURL(uploadedFileUrl);
+			setUploadedFileUrl(null);
+		}
+		setUploadedFileBlob(null);
+		setUploadedFileDuration(0);
+	}, [uploadedFileUrl]);
 
 	const handleFileUpload = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -315,36 +324,52 @@ function useRecording(textId: string) {
 
 			try {
 				setUiState("processing");
-				const url = URL.createObjectURL(file);
-				const audio = new Audio(url);
 
+				// Clean up previous uploaded file URL if exists
+				if (uploadedFileUrl) {
+					URL.revokeObjectURL(uploadedFileUrl);
+				}
+
+				// Store the file blob
+				setUploadedFileBlob(file);
+
+				// Create preview URL
+				const url = URL.createObjectURL(file);
+				setUploadedFileUrl(url);
+
+				// Get duration from audio metadata
+				const audio = new Audio(url);
 				audio.onloadedmetadata = () => {
-					// For file uploads, we'll need to handle this differently
-					// since the audio recorder expects a blob from recording
-					// For now, we'll set the state to preview and store the file
-					URL.revokeObjectURL(url);
+					const duration = audio.duration;
+					setUploadedFileDuration(duration);
 					setUiState("preview");
-					// Note: File uploads won't work with audioRecorder.audioBlob
-					// We'd need to extend the hook or handle this separately
 				};
 
 				audio.onerror = () => {
 					URL.revokeObjectURL(url);
+					setUploadedFileUrl(null);
+					setUploadedFileBlob(null);
+					setUploadedFileDuration(0);
 					setUiState("idle");
 				};
 			} catch {
 				setUiState("idle");
 			}
+
+			// Reset file input so the same file can be selected again
+			e.target.value = "";
 		},
-		[],
+		[uploadedFileUrl],
 	);
 
 	return {
 		state,
-		recordingTime: audioRecorder.recordingTime,
+		recordingTime: uploadedFileBlob
+			? uploadedFileDuration
+			: audioRecorder.recordingTime,
 		countdown,
 		uploadProgress,
-		audioPreviewUrl: audioRecorder.audioUrl,
+		audioPreviewUrl: uploadedFileUrl || audioRecorder.audioUrl,
 		error: audioRecorder.error,
 		startRecording,
 		stopRecording,

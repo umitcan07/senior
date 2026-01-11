@@ -3,6 +3,7 @@ import {
 	RiArrowDownSLine,
 	RiArrowRightSLine,
 	RiArrowUpDownLine,
+	RiClipboardLine,
 	RiDeleteBinLine,
 	RiLoader2Line,
 	RiMoreLine,
@@ -27,13 +28,7 @@ import {
 import { Fragment, useState } from "react";
 import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
 import { AdminLayout } from "@/components/layout/admin-layout";
-import {
-	AudioPlayerButton,
-	AudioPlayerDuration,
-	AudioPlayerProgress,
-	AudioPlayerProvider,
-	AudioPlayerTime,
-} from "@/components/ui/audio-player";
+import { WaveformPlayer } from "@/components/ui/waveform-player";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,6 +41,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import {
 	Table,
@@ -75,23 +75,13 @@ export const Route = createFileRoute("/admin/references")({
 	pendingComponent: ReferencesSkeleton,
 });
 
-// Helper
-function getMethodColor(method: string) {
-	switch (method) {
-		case "native":
-			return "text-green-600 dark:text-green-500";
-		case "tts":
-			return "text-blue-600 dark:text-blue-500";
-		default:
-			return "text-muted-foreground";
-	}
-}
 
 // Columns
 function createColumns(
 	onDelete: (ref: ReferenceSpeechWithRelations) => void,
 	onGenerateIpa: (ref: ReferenceSpeechWithRelations) => void,
 	ipaGeneratingIds: Set<string>,
+	onCopyIpa: (text: string) => void,
 ): ColumnDef<ReferenceSpeechWithRelations>[] {
 	return [
 		{
@@ -179,33 +169,6 @@ function createColumns(
 			},
 		},
 		{
-			accessorKey: "generationMethod",
-			size: 100,
-			header: ({ column }) => (
-				<Button
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					className="h-8 px-2"
-				>
-					Method
-					<RiArrowUpDownLine className="ml-2 h-4 w-4" />
-				</Button>
-			),
-			cell: ({ row }) => {
-				const method = row.getValue("generationMethod") as string;
-				return (
-					<span
-						className={cn(
-							"font-medium text-sm capitalize",
-							getMethodColor(method),
-						)}
-					>
-						{method}
-					</span>
-				);
-			},
-		},
-		{
 			accessorKey: "durationMs",
 			size: 100,
 			header: ({ column }) => (
@@ -226,7 +189,7 @@ function createColumns(
 		},
 		{
 			id: "ipa",
-			size: 120,
+			size: 200,
 			header: "IPA",
 			cell: ({ row }) => {
 				const ref = row.original;
@@ -249,25 +212,47 @@ function createColumns(
 					);
 				}
 
+				const formattedIpa = formatIpaClean(ref.ipaTranscription);
+
 				return (
-					<div className="flex flex-col gap-0.5">
-						<span
-							className={cn(
-								"text-xs",
-								ref.ipaMethod === "powsm"
-									? "text-green-600 dark:text-green-500"
-									: "text-blue-600 dark:text-blue-500",
-							)}
-						>
-							{ref.ipaMethod === "powsm" ? "POWSM" : "CMUDict"}
-						</span>
-						<span
-							className="max-w-24 truncate font-mono text-xs text-muted-foreground"
-							title={formatIpaClean(ref.ipaTranscription)}
-						>
-							{formatIpaClean(ref.ipaTranscription).slice(0, 15)}...
-						</span>
-					</div>
+					<Popover>
+						<PopoverTrigger asChild>
+							<button
+								type="button"
+								className="flex flex-col gap-0.5 text-left hover:opacity-80 transition-opacity"
+							>
+								<span className="max-w-48 truncate font-mono text-xs text-muted-foreground">
+									{formattedIpa}
+								</span>
+							</button>
+						</PopoverTrigger>
+						<PopoverContent className="w-96" align="start">
+							<div className="flex flex-col gap-3">
+								<div className="flex items-center justify-between">
+									<span className="text-sm font-semibold">IPA Transcription</span>
+									<Button
+										variant="ghost"
+										size="sm"
+										className="h-7 px-2"
+										onClick={async () => {
+											try {
+												await navigator.clipboard.writeText(formattedIpa);
+												onCopyIpa(formattedIpa);
+											} catch {
+												// Clipboard API not available
+											}
+										}}
+									>
+										<RiClipboardLine className="h-3.5 w-3.5" />
+										Copy
+									</Button>
+								</div>
+								<div className="rounded-md bg-muted p-3">
+									<p className="font-mono text-sm break-all">{formattedIpa}</p>
+								</div>
+							</div>
+						</PopoverContent>
+					</Popover>
 				);
 			},
 		},
@@ -322,6 +307,7 @@ interface ReferencesDataTableProps {
 	textFilter: string | null;
 	onTextFilterChange: (textId: string | null) => void;
 	texts: PracticeText[];
+	onCopyIpa: (text: string) => void;
 }
 
 function ReferencesDataTable({
@@ -333,6 +319,7 @@ function ReferencesDataTable({
 	textFilter,
 	onTextFilterChange,
 	texts,
+	onCopyIpa,
 }: ReferencesDataTableProps) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -343,7 +330,7 @@ function ReferencesDataTable({
 		? data.filter((r) => r.textId === textFilter)
 		: data;
 
-	const columns = createColumns(onDelete, onGenerateIpa, ipaGeneratingIds);
+	const columns = createColumns(onDelete, onGenerateIpa, ipaGeneratingIds, onCopyIpa);
 
 	const table = useReactTable({
 		data: filteredData,
@@ -432,24 +419,42 @@ function ReferencesDataTable({
 									{row.getIsExpanded() && (
 										<TableRow className="bg-muted/30">
 											<TableCell colSpan={columns.length} className="p-4">
-												<AudioPlayerProvider>
-													<div className="flex max-w-md items-center gap-3">
-														<AudioPlayerButton
-															item={{
-																id: row.original.id,
-																src: `/api/audio/${row.original.id}`,
-															}}
-															variant="outline"
-															size="icon"
-														/>
-														<AudioPlayerProgress className="flex-1" />
-														<div className="flex items-center gap-1 text-muted-foreground text-xs">
-															<AudioPlayerTime />
-															<span>/</span>
-															<AudioPlayerDuration />
+												<div className="flex flex-col gap-4">
+													<WaveformPlayer
+														src={`/api/audio/${row.original.id}`}
+														compact
+														label={`${row.original.author.name} - ${row.original.text.content.slice(0, 50)}...`}
+													/>
+													{row.original.ipaTranscription && (
+														<div className="flex flex-col gap-2">
+															<div className="flex items-center justify-between">
+																<span className="text-sm font-semibold">IPA Transcription</span>
+																<Button
+																	variant="ghost"
+																	size="sm"
+																	className="h-7 px-2"
+																	onClick={async () => {
+																		try {
+																			const formattedIpa = formatIpaClean(row.original.ipaTranscription!);
+																			await navigator.clipboard.writeText(formattedIpa);
+																			onCopyIpa(formattedIpa);
+																		} catch {
+																			// Clipboard API not available
+																		}
+																	}}
+																>
+																	<RiClipboardLine className="h-3.5 w-3.5" />
+																	Copy
+																</Button>
+															</div>
+															<div className="rounded-md bg-background border p-3">
+																<p className="font-mono text-sm break-all">
+																	{formatIpaClean(row.original.ipaTranscription)}
+																</p>
+															</div>
 														</div>
-													</div>
-												</AudioPlayerProvider>
+													)}
+												</div>
 											</TableCell>
 										</TableRow>
 									)}
@@ -644,6 +649,13 @@ function ReferencesPage() {
 		deleteMultiple(refs.map((r) => r.id));
 	};
 
+	const handleCopyIpa = (text: string) => {
+		toast({
+			title: "Copied to clipboard",
+			description: "IPA transcription has been copied.",
+		});
+	};
+
 	const handleGenerateIpa = async (ref: ReferenceSpeechWithRelations) => {
 		try {
 			setIpaGeneratingIds((prev) => new Set(prev).add(ref.id));
@@ -731,6 +743,7 @@ function ReferencesPage() {
 							textFilter={selectedTextId}
 							onTextFilterChange={setSelectedTextId}
 							texts={texts}
+							onCopyIpa={handleCopyIpa}
 						/>
 					)}
 				</CardContent>

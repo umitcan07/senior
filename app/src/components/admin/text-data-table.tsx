@@ -12,10 +12,7 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
-import {
-	AudioPlayerButton,
-	AudioPlayerProvider,
-} from "@/components/ui/audio-player";
+import { WaveformPlayerInline } from "@/components/ui/waveform-player";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -55,51 +52,40 @@ function ReferenceRow({
 	reference: ReferenceSpeechWithRelations;
 	onDelete?: (ref: ReferenceSpeechWithRelations) => void;
 }) {
-	const audioItem = {
-		id: reference.id,
-		src: `/api/audio/${reference.id}`,
-	};
-
 	return (
-		<div className="flex items-center justify-between gap-4 rounded-md bg-muted/50 p-3">
-			<div className="flex items-center gap-3">
-				<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-					<RiMicLine className="h-4 w-4 text-primary" />
-				</div>
-				<div className="flex flex-col gap-0.5">
-					<div className="flex items-center gap-2">
-						<span className="font-medium text-sm">{reference.author.name}</span>
-						{reference.author.accent && (
-							<span className="text-muted-foreground text-xs">
-								({reference.author.accent})
-							</span>
-						)}
+		<div className="flex flex-col gap-3 rounded-md bg-muted/50 p-3">
+			<div className="flex items-center justify-between gap-4">
+				<div className="flex items-center gap-3">
+					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+						<RiMicLine className="h-4 w-4 text-primary" />
 					</div>
-					<div className="flex items-center gap-2 text-muted-foreground text-xs">
-						<span
-							className={cn(
-								"capitalize",
-								reference.generationMethod === "native"
-									? "text-green-600 dark:text-green-500"
-									: "text-blue-600 dark:text-blue-500",
+					<div className="flex flex-col gap-0.5">
+						<div className="flex items-center gap-2">
+							<span className="font-medium text-sm">{reference.author.name}</span>
+							{reference.author.accent && (
+								<span className="text-muted-foreground text-xs">
+									({reference.author.accent})
+								</span>
 							)}
-						>
-							{reference.generationMethod}
-						</span>
-						<span>•</span>
-						<span className="tabular-nums">
-							{formatDuration(reference.durationMs)}
-						</span>
+						</div>
+						<div className="flex items-center gap-2 text-muted-foreground text-xs">
+							<span
+								className={cn(
+									"capitalize",
+									reference.generationMethod === "native"
+										? "text-green-600 dark:text-green-500"
+										: "text-blue-600 dark:text-blue-500",
+								)}
+							>
+								{reference.generationMethod}
+							</span>
+							<span>•</span>
+							<span className="tabular-nums">
+								{formatDuration(reference.durationMs)}
+							</span>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="flex items-center gap-1">
-				<AudioPlayerButton
-					item={audioItem}
-					variant="ghost"
-					size="sm"
-					title="Play reference"
-				/>
 				{onDelete && (
 					<Button
 						variant="ghost"
@@ -112,6 +98,10 @@ function ReferenceRow({
 					</Button>
 				)}
 			</div>
+			<WaveformPlayerInline
+				src={`/api/audio/${reference.id}`}
+				className="bg-card"
+			/>
 		</div>
 	);
 }
@@ -206,8 +196,7 @@ export function DataTable({
 	};
 
 	return (
-		<AudioPlayerProvider>
-			<div className="flex flex-col gap-4">
+		<div className="flex flex-col gap-4">
 				<div className="flex items-center justify-between gap-4">
 					<Input
 						placeholder="Filter by content..."
@@ -356,6 +345,5 @@ export function DataTable({
 					</div>
 				</div>
 			</div>
-		</AudioPlayerProvider>
 	);
 }
