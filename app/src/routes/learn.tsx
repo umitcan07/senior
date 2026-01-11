@@ -1,4 +1,8 @@
-import { RiRefreshLine, RiVolumeUpLine } from "@remixicon/react";
+import {
+	RiArrowDownSLine,
+	RiRefreshLine,
+	RiVolumeUpLine,
+} from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -339,6 +343,51 @@ function HighlightedWord({
 				</span>
 			))}
 		</span>
+	);
+}
+
+// IPA MARKER CARD
+
+interface IPAMarkerCardProps {
+	icon: string;
+	title: string;
+	subtitle: string;
+	description: string;
+	examples: React.ReactNode;
+}
+
+function IPAMarkerCard({
+	icon,
+	title,
+	subtitle,
+	description,
+	examples,
+}: IPAMarkerCardProps) {
+	return (
+		<details className="group overflow-hidden rounded-xl border border-border/40 bg-card transition-colors hover:border-border/60 hover:bg-muted/5">
+			<summary className="flex cursor-pointer items-center justify-between list-none p-5 transition-colors hover:bg-muted/10">
+				<div className="flex items-center gap-3">
+					<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 font-mono text-lg text-primary">
+						{icon}
+					</div>
+					<div className="flex flex-col">
+						<h4 className="font-semibold text-sm">{title}</h4>
+						<span className="font-mono text-muted-foreground text-sm">
+							{subtitle}
+						</span>
+					</div>
+				</div>
+				<RiArrowDownSLine className="size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+			</summary>
+			<div className="flex flex-col gap-3 px-5 pb-5 transition-all duration-200 ease-in-out">
+				<p className="text-muted-foreground text-sm leading-relaxed">
+					{description}
+				</p>
+				<div className="mt-2 rounded bg-muted/20 p-2">
+					<p className="font-mono text-sm">{examples}</p>
+				</div>
+			</div>
+		</details>
 	);
 }
 
@@ -938,6 +987,154 @@ function LearningPage() {
 							</div>
 						</section>
 
+						{/* Advanced IPA Markers Section */}
+						<section className="flex flex-col gap-8">
+							<SectionTitle
+								title="IPA Markers & Diacritics"
+								variant="default"
+								description="Beyond basic phonemes, IPA uses diacritics and additional markers to capture precise pronunciation details. These appear in detailed transcriptions and help you understand subtle sound variations."
+							/>
+
+							<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+								<IPAMarkerCard
+									icon="ə˞"
+									title="R-coloring"
+									subtitle="Rhotic hook (˞)"
+									description="Indicates a vowel is pronounced with r-coloring, common in American English. The vowel sound is modified by the presence of /r/."
+									examples={
+										<>
+											Examples: <span className="text-primary">ə˞</span> (her),
+											<span className="text-primary"> ɜ˞</span> (bird),
+											<span className="text-primary"> o˞</span> (or)
+										</>
+									}
+								/>
+
+								<IPAMarkerCard
+									icon="ɪ̃"
+									title="Nasalization"
+									subtitle="Tilde (̃)"
+									description="Shows that air flows through the nose while pronouncing the vowel, often occurring before nasal consonants like /m/, /n/, or /ŋ/."
+									examples={
+										<>
+											Examples: <span className="text-primary">ɪ̃</span> (in),
+											<span className="text-primary"> ẽ</span> (end),
+											<span className="text-primary"> ɑ̃</span> (on)
+										</>
+									}
+								/>
+
+								<IPAMarkerCard
+									icon="pʰ"
+									title="Aspiration"
+									subtitle="Superscript h (ʰ)"
+									description="Indicates a puff of air follows the consonant, especially noticeable in voiceless stops (/p/, /t/, /k/) at the beginning of stressed syllables."
+									examples={
+										<>
+											Examples: <span className="text-primary">pʰ</span> (pin),
+											<span className="text-primary"> tʰ</span> (tin),
+											<span className="text-primary"> kʰ</span> (kin)
+										</>
+									}
+								/>
+
+								<IPAMarkerCard
+									icon="iː"
+									title="Length"
+									subtitle="Colon (ː)"
+									description="Shows a long vowel sound. The colon indicates the vowel is held longer than its short counterpart."
+									examples={
+										<>
+											Examples: <span className="text-primary">iː</span> (see) vs{" "}
+											<span className="text-primary">ɪ</span> (sit),
+											<span className="text-primary"> uː</span> (too) vs{" "}
+											<span className="text-primary">ʊ</span> (put)
+										</>
+									}
+								/>
+
+								<IPAMarkerCard
+									icon="ˈ"
+									title="Primary Stress"
+									subtitle="High vertical line (ˈ)"
+									description="Marks the primary stressed syllable in a word. Placed before the stressed syllable."
+									examples={
+										<>
+											Example: <span className="text-primary">ˈfɑðər</span> (father),{" "}
+											<span className="text-primary">ˈhæpi</span> (happy)
+										</>
+									}
+								/>
+
+								<IPAMarkerCard
+									icon="ˌ"
+									title="Secondary Stress"
+									subtitle="Low vertical line (ˌ)"
+									description="Marks a syllable with secondary stress, less prominent than primary stress but more than unstressed syllables."
+									examples={
+										<>
+											Example: <span className="text-primary">ˌɪntərˈnæʃənəl</span>{" "}
+											(international)
+										</>
+									}
+								/>
+
+								<IPAMarkerCard
+									icon="tʃ"
+									title="Affricates"
+									subtitle="Stop + Fricative"
+									description="Consonant sounds that begin as a stop (complete closure) and release as a fricative (partial closure). They function as single phonemes despite being written with two symbols."
+									examples={
+										<>
+											Examples: <span className="text-primary">tʃ</span> (church,
+											chair), <span className="text-primary">dʒ</span> (judge, joy)
+										</>
+									}
+								/>
+							</div>
+
+							{/* Example Transcription */}
+							<div className="mt-4 rounded-xl border border-border/40 bg-muted/10 p-6">
+								<h4 className="mb-3 font-semibold text-sm">Example: Detailed Transcription</h4>
+								<p className="mb-3 text-muted-foreground text-sm leading-relaxed">
+									Here's how these markers appear together in a detailed IPA
+									transcription:
+								</p>
+								<div className="rounded bg-background p-4">
+									<p className="mb-2 font-mono text-sm">
+										<span className="text-muted-foreground">Text:</span> She regularly exercises at the gym, follows a healthy diet, maintains good sleeping habits, and practices meditation consistently to improve her overall well-being and mental health.
+									</p>
+									<p className="font-mono text-sm leading-relaxed">
+										<span className="text-muted-foreground">IPA:</span>{" "}
+										<span className="text-foreground">
+											ʃ i ɹ ɛ ɡ j ə˞ l ə˞ l i ɛ k s ə˞ s a ɪ z ə z æ t ð ə t
+											ʃ ɪ̃ m f ɑ l o ʊ z ə h ɛ l θ i t a ɪ ə t m e ɪ̃ n t e ɪ̃ n z
+											k ʊ d s l i p ɪ̃ ŋ h æ b ə t s ə n d pʰ ɹ æ k t ə s ə z m
+											ɛ d ə t e ɪ ʃ ə n kʰ ə n s ɪ s t ə n t l i tʰ u ɪ̃ m p ɹ
+											u v h ə˞ o ʊ v ə˞ ɔ l w ɛ l p i ɪ̃ ŋ ə n d m ɛ̃ n t ə l h ɛ
+											l θ
+										</span>
+									</p>
+									<div className="mt-3 flex flex-wrap gap-2 text-sm">
+										<span className="rounded bg-primary/10 px-2 py-1 font-mono text-primary">
+											ə˞
+										</span>
+										<span className="text-muted-foreground">= r-colored schwa</span>
+										<span className="rounded bg-primary/10 px-2 py-1 font-mono text-primary">
+											ɪ̃
+										</span>
+										<span className="text-muted-foreground">= nasalized i</span>
+										<span className="rounded bg-primary/10 px-2 py-1 font-mono text-primary">
+											pʰ
+										</span>
+										<span className="text-muted-foreground">= aspirated p</span>
+									</div>
+								</div>
+							</div>
+						</section>
+
+						<div className="h-px bg-border/40" />
+
 						{/* Why Learn IPA Section */}
 						<section className="flex flex-col gap-8">
 							<SectionTitle
@@ -998,11 +1195,11 @@ function LearningPage() {
 											/>
 										</svg>
 									</div>
-									<h4 className="font-medium">Reduce Your Accent</h4>
+									<h4 className="font-medium">Master New Sounds</h4>
 									<p className="text-muted-foreground text-sm leading-relaxed">
-										Understanding phonemes helps you identify sounds that don't
-										exist in your native language, making it easier to correct
-										them.
+										IPA helps you identify and practice sounds that may not exist in
+										your native language, improving your pronunciation clarity and
+										communication skills.
 									</p>
 								</div>
 								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">

@@ -5,6 +5,7 @@ import runpod
 import sys
 import os
 import subprocess
+import time
 
 print(f"DEBUG: sys.path: {sys.path}")
 try:
@@ -18,7 +19,14 @@ from typing import Any, Dict, List
 # Add parent directory to path to import shared modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from generate import generate_ipa
+from generate import generate_ipa, get_models
+
+# Pre-load model on worker startup (not on first request)
+print("DEBUG: Pre-loading G2P model on worker startup...")
+start_time = time.time()
+get_models()  # This will load and cache the model
+load_time = time.time() - start_time
+print(f"DEBUG: Model pre-loaded in {load_time:.2f} seconds")
 
 
 def handler(job):

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # -----------------------------------------------------
   # 1. The Gateway (Mimics RunPod Cloud API)
@@ -33,7 +31,7 @@ services:
       - RUNPOD_PORT=8000
       - RUNPOD_API_HOST=0.0.0.0
 
-    command: python assessment/handler.py --rp_serve_api --rp_api_host 0.0.0.0
+    command: python3 assessment/handler.py --rp_serve_api --rp_api_host 0.0.0.0
     volumes:
       # Optional: Mount code for hot-reloading if your handler supports it (RunPod SDK might not auto-reload)
       - ./mod/assessment:/worker/assessment
@@ -41,7 +39,7 @@ services:
       - ./mod/alignment:/worker/alignment
     networks:
       - runpod-net
-    # No ports exposed to host needed, only proxy talks to it. 
+    # No ports exposed to host needed, only proxy talks to it.
     # But exposing 8001 for debugging might be useful.
     ports:
       - "8001:8000"
@@ -57,9 +55,10 @@ services:
       - RUNPOD_DEBUG=true
       - RUNPOD_PORT=8000
       - RUNPOD_API_HOST=0.0.0.0
-    command: python ipa_generation/handler.py --rp_serve_api --rp_api_host 0.0.0.0
+    command: python3 ipa_generation/handler.py --rp_serve_api --rp_api_host 0.0.0.0
     volumes:
       - ./mod/ipa_generation:/worker/ipa_generation
+      - ./mod/shared:/worker/shared
     networks:
       - runpod-net
     ports:

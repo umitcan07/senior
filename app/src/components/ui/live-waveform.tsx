@@ -2,7 +2,7 @@ import { type HTMLAttributes, useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type LiveWaveformProps = HTMLAttributes<HTMLDivElement> & {
+export type LiveWaveformProps = Omit<HTMLAttributes<HTMLDivElement>, "onError"> & {
 	active?: boolean;
 	processing?: boolean;
 	deviceId?: string;

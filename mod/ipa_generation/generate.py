@@ -83,37 +83,57 @@ def download_audio(audio_uri: str) -> Tuple[str, str]:
         raise e
 
 
-# Singleton model instances (loaded once on worker startup)
+# Singleton model instance (loaded once on worker startup)
 _g2p_model = None
-_asr_model = None
+_device = None
 
 
-def get_models(device: str = "cuda"):
+def get_device():
     """
-    Load and cache POWSM models for G2P and ASR tasks.
+    Detect available device (CUDA if available, otherwise CPU).
+    
+    Returns:
+        "cuda" if CUDA is available, "cpu" otherwise
+    """
+    global _device
+    if _device is None:
+        try:
+            import torch
+            if torch.cuda.is_available():
+                _device = "cuda"
+                print("DEBUG: CUDA available, using GPU")
+            else:
+                _device = "cpu"
+                print("DEBUG: CUDA not available, using CPU")
+        except Exception as e:
+            _device = "cpu"
+            print(f"DEBUG: Error checking CUDA availability: {e}, using CPU")
+    return _device
+
+
+def get_models(device: Optional[str] = None):
+    """
+    Load and cache POWSM G2P model.
     
     Args:
-        device: Device to load models on ("cuda" or "cpu")
+        device: Device to load models on ("cuda" or "cpu"). If None, auto-detect.
         
     Returns:
-        Tuple of (asr_model, g2p_model)
+        Tuple of (None, g2p_model) - ASR model not needed when using ground truth text
     """
-    global _asr_model, _g2p_model
+    global _g2p_model
     
-    if _asr_model is None or _g2p_model is None:
+    # Auto-detect device if not specified
+    if device is None:
+        device = get_device()
+    
+    if _g2p_model is None:
         from espnet2.bin.s2t_inference import Speech2Text
         
-        print("DEBUG: Loading POWSM models...")
-        
-        # ASR model (needed to get transcript for audio-guided G2P)
-        _asr_model = Speech2Text.from_pretrained(
-            "espnet/powsm",
-            device=device,
-            lang_sym="<eng>",
-            task_sym="<asr>",
-        )
+        print(f"DEBUG: Loading POWSM G2P model on device: {device}")
         
         # G2P model (audio-guided grapheme-to-phoneme)
+        # Uses audio as primary signal, ground truth text as context
         _g2p_model = Speech2Text.from_pretrained(
             "espnet/powsm",
             device=device,
@@ -121,12 +141,12 @@ def get_models(device: str = "cuda"):
             task_sym="<g2p>",
         )
         
-        print("DEBUG: POWSM models loaded successfully")
+        print(f"DEBUG: POWSM G2P model loaded successfully on {device}")
     
-    return _asr_model, _g2p_model
+    return None, _g2p_model
 
 
-def generate_ipa_audio_guided(text: str, audio_uri: str, device: str = "cuda") -> str:
+def generate_ipa_audio_guided(text: str, audio_uri: str, device: Optional[str] = None) -> str:
     """
     Generate IPA from text and audio using POWSM audio-guided G2P.
     
@@ -136,45 +156,51 @@ def generate_ipa_audio_guided(text: str, audio_uri: str, device: str = "cuda") -
     Args:
         text: English text string (ground truth transcript)
         audio_uri: URI to audio file
-        device: Device to run inference on ("cuda" or "cpu")
+        device: Device to run inference on ("cuda" or "cpu"). If None, auto-detect.
     
     Returns:
         IPA phonemes string in POWSM format (e.g., "/h//ɛ//l//o//ʊ/")
     """
     import soundfile as sf
+    import time
     
-    print(f"DEBUG: Starting audio-guided G2P for text: '{text}'")
+    total_start = time.time()
+    
+    # Auto-detect device if not specified
+    if device is None:
+        device = get_device()
+    
+    print(f"DEBUG: Starting audio-guided G2P for text: '{text}' on device: {device}")
     
     # Download audio from URI
+    download_start = time.time()
     temp_path, _ = download_audio(audio_uri)
+    download_time = time.time() - download_start
+    print(f"DEBUG: Audio download took {download_time:.2f} seconds")
     
     try:
         # Load audio
+        load_start = time.time()
         print(f"DEBUG: Reading audio file: {temp_path}")
         speech, rate = sf.read(temp_path)
-        print(f"DEBUG: Audio read successfully. Sample rate: {rate}, Shape: {speech.shape}")
+        load_time = time.time() - load_start
+        print(f"DEBUG: Audio read successfully. Sample rate: {rate}, Shape: {speech.shape} (took {load_time:.2f}s)")
         
-        # Get models
-        asr_model, g2p_model = get_models(device)
+        # Get G2P model (audio-guided G2P uses audio as primary signal, text as context)
+        model_start = time.time()
+        _, g2p_model = get_models(device)
+        model_time = time.time() - model_start
+        print(f"DEBUG: Model retrieval took {model_time:.2f} seconds")
         
-        # Step 1: Get ASR transcript (needed as prompt for G2P)
-        # We use the ASR output instead of the ground truth text because
-        # the G2P needs to match what was actually spoken in the audio
-        print("DEBUG: Running ASR step...")
-        result_asr = asr_model(speech, text_prev="<na>")
-        asr_transcript = result_asr[0][0]
-        print(f"DEBUG: ASR transcript: '{asr_transcript}'")
-        
-        # Post-process ASR output
-        if "<notimestamps>" in asr_transcript:
-            asr_transcript = asr_transcript.split("<notimestamps>")[1].strip()
-        else:
-            asr_transcript = asr_transcript.strip()
-        
-        # Step 2: Audio-guided G2P
-        # The text_prev parameter provides context for G2P
-        print("DEBUG: Running G2P step...")
-        result_g2p = g2p_model(speech, text_prev=asr_transcript)
+        # Audio-guided G2P
+        # The audio signal is the primary input for pronunciation
+        # The ground truth text provides context/prompt for the G2P model
+        # This is faster and more reliable than using ASR output
+        inference_start = time.time()
+        print("DEBUG: Running audio-guided G2P with ground truth text...")
+        result_g2p = g2p_model(speech, text_prev=text)
+        inference_time = time.time() - inference_start
+        print(f"DEBUG: G2P inference took {inference_time:.2f} seconds")
         ipa_result = result_g2p[0][0]
         print(f"DEBUG: G2P result raw: '{ipa_result}'")
         
@@ -185,6 +211,8 @@ def generate_ipa_audio_guided(text: str, audio_uri: str, device: str = "cuda") -
             ipa_result = ipa_result.strip()
             
         print(f"DEBUG: Final IPA result: '{ipa_result}'")
+        total_time = time.time() - total_start
+        print(f"DEBUG: Total generation time: {total_time:.2f} seconds")
         return ipa_result
         
     finally:
@@ -195,7 +223,7 @@ def generate_ipa_audio_guided(text: str, audio_uri: str, device: str = "cuda") -
             pass
 
 
-def generate_ipa(text: str, audio_uri: Optional[str] = None, device: str = "cuda") -> Dict:
+def generate_ipa(text: str, audio_uri: Optional[str] = None, device: Optional[str] = None) -> Dict:
     """
     Generate IPA transcription from text and audio.
     

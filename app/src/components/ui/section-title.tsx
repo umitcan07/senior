@@ -41,7 +41,7 @@ export function SectionTitle({
 						</span>
 					</h2>
 					{description && (
-						<p className="text-muted-foreground text-xs">{description}</p>
+						<p className="text-muted-foreground text-sm">{description}</p>
 					)}
 				</div>
 			) : variant === "accent" ? (
@@ -51,16 +51,16 @@ export function SectionTitle({
 						<span className="-bottom-1 absolute left-0 h-0.5 w-1/4 rounded-full bg-primary/30" />
 					</h2>
 					{description && (
-						<p className="text-muted-foreground text-xs">{description}</p>
+						<p className="text-muted-foreground text-sm">{description}</p>
 					)}
 				</div>
 			) : (
-				<>
+				<div className="flex flex-col gap-1">
 					<h3 className="font-semibold text-lg tracking-tight">{title}</h3>
 					{description && (
-						<p className="text-muted-foreground text-xs">{description}</p>
+						<p className="text-muted-foreground text-sm">{description}</p>
 					)}
-				</>
+				</div>
 			)}
 		</div>
 	);
