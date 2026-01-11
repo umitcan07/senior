@@ -1,5 +1,4 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
-import { auth } from "@clerk/tanstack-react-start/server";
 import {
 	RiAlertLine,
 	RiArrowDownSLine,
@@ -50,22 +49,14 @@ import { cn, formatRelativeTime } from "@/lib/utils";
 export const Route = createFileRoute("/practice/$textId")({
 	component: PracticeTextLayout,
 	loader: async ({ params }) => {
-		// Check authentication before calling user-specific server functions
-		let isAuthenticated = false;
-		try {
-			const authResult = await auth();
-			isAuthenticated = authResult.isAuthenticated ?? false;
-		} catch (error) {
-			// Auth context not available - treat as unauthenticated
-			console.warn("Auth not available in practice loader:", error);
-		}
-
+		// Call server functions directly - they handle auth internally
+		// serverGetPreferredAuthorId() returns null if not authenticated
+		// serverGetRecentAttemptsForText() returns error if not authenticated
 		const [textResult, preferredAuthorIdResult] = await Promise.all([
 			serverGetPracticeTextById({
 				data: { id: params.textId },
 			}) as Promise<ApiResponse<any>>,
-			// Only call if authenticated
-			isAuthenticated ? serverGetPreferredAuthorId() : Promise.resolve(null),
+			serverGetPreferredAuthorId(),
 		]);
 
 		if (!textResult.success || !textResult.data) {
@@ -89,15 +80,19 @@ export const Route = createFileRoute("/practice/$textId")({
 				}))
 				: [];
 
-		// Get recent attempts for this text - only if authenticated
+		// Get recent attempts for this text - server function handles auth
 		let recentAttempts: any[] = [];
-		if (isAuthenticated) {
+		try {
 			const recentAttemptsResult = (await serverGetRecentAttemptsForText({
 				data: { textId: params.textId },
 			})) as ApiResponse<any>;
-			recentAttempts = recentAttemptsResult.success && recentAttemptsResult.data
-				? recentAttemptsResult.data
-				: [];
+			// If auth error, just use empty array (user not authenticated)
+			if (recentAttemptsResult.success && recentAttemptsResult.data) {
+				recentAttempts = recentAttemptsResult.data;
+			}
+		} catch (error) {
+			// Server function handles auth errors, just use empty array
+			recentAttempts = [];
 		}
 
 		return {
@@ -435,7 +430,7 @@ function ReferenceVoice({
 	}
 
 	return (
-		<div className="flex flex-col gap-4 p-4 ring-muted ring-1 rounded-3xl max-w-2xl w-full self-center">
+		<div className="flex flex-col gap-4 p-4 ring-muted ring-1 rounded-3xl max-w-3xl w-full self-center">
 			{/* Selection area */}
 			<div className="flex flex-col gap-2">
 				{selectedReference ? (
@@ -837,7 +832,7 @@ function PracticeTextPage() {
 							{/* Practice text - clean typography, no box */}
 							<div
 								className={cn(
-									"relative transition-all max-w-2xl w-full self-center",
+									"relative transition-all max-w-3xl w-full self-center",
 									isActiveRecording && "opacity-80",
 								)}
 							>
@@ -1075,7 +1070,7 @@ function PracticeTextPage() {
 
 										{/* Preview state */}
 										{hasPreview && recording.audioPreviewUrl && (
-											<div className="flex w-full max-w-2xl flex-col gap-4">
+											<div className="flex w-full max-w-3xl flex-col gap-4">
 												<WaveformPlayer
 													src={recording.audioPreviewUrl}
 													compact

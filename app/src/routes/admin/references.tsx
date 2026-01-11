@@ -235,7 +235,7 @@ function createColumns(
 								type="button"
 								className="flex flex-col gap-0.5 text-left hover:opacity-80 transition-opacity"
 							>
-								<span className="max-w-48 truncate font-ipa text-xs text-muted-foreground">
+								<span className="max-w-48 truncate font-ipa text-xl text-muted-foreground">
 									{formattedIpa}
 								</span>
 							</button>
@@ -262,7 +262,7 @@ function createColumns(
 									</Button>
 								</div>
 								<div className="rounded-md bg-muted p-3">
-									<p className="font-ipa text-sm break-all">{formattedIpa}</p>
+									<p className="font-ipa text-xl break-all">{formattedIpa}</p>
 								</div>
 							</div>
 						</PopoverContent>
@@ -413,9 +413,9 @@ function ReferencesDataTable({
 										{header.isPlaceholder
 											? null
 											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-												)}
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
 									</TableHead>
 								))}
 							</TableRow>

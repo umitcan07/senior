@@ -4,7 +4,6 @@ import {
 	SignInButton,
 	useUser,
 } from "@clerk/tanstack-react-start";
-import { auth } from "@clerk/tanstack-react-start/server";
 import { RiComputerLine, RiMicLine, RiUserLine } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
@@ -37,28 +36,8 @@ import {
 export const Route = createFileRoute("/settings")({
 	component: SettingsPage,
 	loader: async () => {
-		// Check authentication before calling server functions
-		let isAuthenticated = false;
-		let userId: string | null = null;
-		try {
-			const authResult = await auth();
-			isAuthenticated = authResult.isAuthenticated ?? false;
-			userId = authResult.userId ?? null;
-		} catch (error) {
-			// Auth context not available - treat as unauthenticated
-			console.warn("Auth not available in settings loader:", error);
-		}
-
-		if (!isAuthenticated || !userId) {
-			// Return default values if not authenticated
-			const authorsResult = await serverGetAuthors();
-			const authors = authorsResult.success ? authorsResult.data : [];
-			return {
-				authors,
-				currentPreferredAuthorId: null,
-			};
-		}
-
+		// Call server functions directly - they handle auth internally
+		// serverGetPreferredAuthorId() returns null if not authenticated
 		const [authorsResult, preferredAuthorIdResult] = await Promise.all([
 			serverGetAuthors(),
 			serverGetPreferredAuthorId(),

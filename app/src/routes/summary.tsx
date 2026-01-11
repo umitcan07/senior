@@ -1,5 +1,4 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
-import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -54,36 +53,31 @@ type SummaryLoaderData = {
 export const Route = createFileRoute("/summary")({
 	component: FeedPage,
 	loader: async (): Promise<SummaryLoaderData> => {
-		// Check authentication before calling server function
-		let isAuthenticated = false;
-		let userId: string | null = null;
-		try {
-			const authResult = await auth();
-			isAuthenticated = authResult.isAuthenticated ?? false;
-			userId = authResult.userId ?? null;
-		} catch (error) {
-			// Auth context not available - treat as unauthenticated
-			console.warn("Auth not available in summary loader:", error);
-		}
-
-		if (!isAuthenticated || !userId) {
-			// Return empty data if not authenticated
-			return {
-				attempts: [],
-				stats: {
-					totalAttempts: 0,
-					weeklyAttempts: 0,
-					averageScore: 0,
-					weeklyProgress: 0,
-				},
-				commonErrors: [],
-				texts: [],
-			};
-		}
-
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'summary.tsx:56', message: 'Loader called', data: { timestamp: Date.now() }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'route-transition', hypothesisId: 'A' }) }).catch(() => { });
+		// #endregion
+		// Call server function directly - it handles auth internally
+		// During client-side navigation, auth() in loader may not be available,
+		// but serverGetSummary() will handle auth properly via server function context
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'summary.tsx:62', message: 'Calling serverGetSummary', data: {}, timestamp: Date.now(), sessionId: 'debug-session', runId: 'route-transition', hypothesisId: 'A' }) }).catch(() => { });
+		// #endregion
 		const response = await serverGetSummary();
+		// #region agent log
+		const logData = response.success
+			? { success: true, hasData: !!response.data, attemptsCount: response.data?.attempts?.length || 0 }
+			: { success: false, errorCode: response.error.code, errorMessage: response.error.message };
+		fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'summary.tsx:65', message: 'serverGetSummary response', data: logData, timestamp: Date.now(), sessionId: 'debug-session', runId: 'route-transition', hypothesisId: 'A' }) }).catch(() => { });
+		// #endregion
 
 		if (!response.success || !response.data) {
+			// #region agent log
+			const errorLogData = response.success
+				? { success: true, hasData: false }
+				: { success: false, error: response.error.message, statusCode: response.error.statusCode };
+			fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'summary.tsx:70', message: 'Response failed or no data', data: errorLogData, timestamp: Date.now(), sessionId: 'debug-session', runId: 'route-transition', hypothesisId: 'A' }) }).catch(() => { });
+			// #endregion
+			// Return empty data if not authenticated or error occurred
 			return {
 				attempts: [],
 				stats: {
@@ -97,6 +91,9 @@ export const Route = createFileRoute("/summary")({
 			};
 		}
 
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'summary.tsx:83', message: 'Returning data', data: { attemptsCount: response.data.attempts.length }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'route-transition', hypothesisId: 'A' }) }).catch(() => { });
+		// #endregion
 		return response.data;
 	},
 	pendingComponent: FeedSkeleton,

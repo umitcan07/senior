@@ -826,9 +826,7 @@ function AnalysisPage() {
 										? "We're analyzing your speech"
 										: "We're analyzing your speech"}
 								</h1>
-								<p className="text-muted-foreground text-sm">
-									This usually takes 5-15 seconds.
-								</p>
+
 							</div>
 						</motion.div>
 
