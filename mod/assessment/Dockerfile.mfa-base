@@ -1,0 +1,40 @@
+# MFA Base Image - Build this separately and push to registry
+# This image contains only conda + MFA, and can be reused as a base
+# Build: docker build -f Dockerfile.mfa-base -t ghcr.io/umitcan07/mfa-base:latest .
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install minimal dependencies for conda
+RUN apt-get update && apt-get install -y \
+    wget \
+    bzip2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Miniconda3
+ENV CONDA_DIR=/opt/conda
+ENV PATH=$CONDA_DIR/bin:$PATH
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -b -p $CONDA_DIR && \
+    rm /tmp/miniconda.sh && \
+    conda clean -afy && \
+    find $CONDA_DIR -follow -type f -name '*.a' -delete && \
+    find $CONDA_DIR -follow -type f -name '*.pyc' -delete && \
+    rm -rf $CONDA_DIR/pkgs/cache
+
+# Initialize conda and configure to use only conda-forge
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    conda config --remove channels defaults && \
+    conda config --add channels conda-forge && \
+    conda config --set channel_priority strict
+
+# Create conda environment for MFA
+RUN conda create -n mfa-env -y --override-channels -c conda-forge montreal-forced-aligner && \
+    conda clean -afy && \
+    rm -rf $CONDA_DIR/pkgs && \
+    find $CONDA_DIR -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+
+# Set PATH to include MFA environment
+ENV PATH=/opt/conda/bin:/opt/conda/envs/mfa-env/bin:$PATH
