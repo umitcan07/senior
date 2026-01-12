@@ -1,24 +1,21 @@
 # Assessment endpoint Dockerfile
 # Build from mod/ directory: cd mod/ && docker build --platform linux/amd64 -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
 #
-# MFA (Montreal Forced Aligner) is installed via conda using recommended approach.
-# Installation order: MFA first (via conda), then CUDA/PyTorch.
+# Multi-stage build to reduce disk usage:
+# Stage 1: Install conda and MFA
+# Stage 2: Install PyTorch and Python dependencies
+# Stage 3: Final image with only necessary components
 
-FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+# ============================================================================
+# Stage 1: MFA Builder - Install conda and MFA
+# ============================================================================
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 AS mfa-builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
+# Install system dependencies needed for conda
 RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-dev \
-    git \
-    build-essential \
-    libsndfile1 \
-    libsndfile1-dev \
-    ffmpeg \
     wget \
     bzip2 \
     && rm -rf /var/lib/apt/lists/*
@@ -34,53 +31,107 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     find $CONDA_DIR -follow -type f -name '*.pyc' -delete && \
     rm -rf $CONDA_DIR/pkgs/cache
 
-# Initialize conda and configure to use only conda-forge (MFA recommended approach)
-# Accept ToS for default channels (required for newer conda versions) and configure conda-forge
+# Initialize conda and configure to use only conda-forge
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
     conda config --remove channels defaults && \
     conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
-WORKDIR /worker
-
-# Create conda environment for MFA (recommended approach: use conda-forge channel only)
+# Create conda environment for MFA
 RUN conda create -n mfa-env -y --override-channels -c conda-forge montreal-forced-aligner && \
     conda clean -afy && \
     rm -rf $CONDA_DIR/pkgs && \
     find $CONDA_DIR -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
-# Add conda MFA environment to PATH
-ENV PATH=/opt/conda/envs/mfa-env/bin:$PATH
+# ============================================================================
+# Stage 2: PyTorch Builder - Install PyTorch and Python dependencies
+# ============================================================================
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 AS pytorch-builder
 
-# Upgrade pip first and clean up
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    git \
+    build-essential \
+    libsndfile1 \
+    libsndfile1-dev \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /worker
+
+# Upgrade pip first
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel && \
     python3 -m pip cache purge 2>/dev/null || true
 
-# CUDA is already included in the base image
-# Set CUDA environment variables (already set by base image, but explicit for clarity)
+# Copy requirements first for better caching
+COPY assessment/requirements.txt /tmp/requirements.txt
+
+# Install PyTorch with CUDA 11.8 to a specific location
+RUN python3 -m pip install --no-cache-dir \
+    --target /opt/python-packages \
+    torch torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu118 && \
+    python3 -m pip cache purge 2>/dev/null || true && \
+    rm -rf /tmp/* /var/tmp/* /root/.cache/pip 2>/dev/null || true
+
+# Install Python dependencies to the same location
+RUN python3 -m pip install --no-cache-dir \
+    --target /opt/python-packages \
+    -r /tmp/requirements.txt && \
+    python3 -m pip install --no-cache-dir \
+    --target /opt/python-packages \
+    textgrid librosa numpy && \
+    python3 -m pip cache purge && \
+    rm -rf /root/.cache/pip /tmp/requirements.txt
+
+# ============================================================================
+# Stage 3: Final Image - Combine MFA and PyTorch
+# ============================================================================
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    libsndfile1 \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/* && \
+    python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Copy conda installation from mfa-builder
+COPY --from=mfa-builder /opt/conda /opt/conda
+
+# Copy Python packages from pytorch-builder
+COPY --from=pytorch-builder /opt/python-packages /opt/python-packages
+
+# Add Python packages to Python path
+ENV PYTHONPATH=/opt/python-packages:${PYTHONPATH}
+
+# Set environment variables
+ENV CONDA_DIR=/opt/conda
+ENV PATH=/opt/conda/bin:/opt/conda/envs/mfa-env/bin:/usr/local/bin:$PATH
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64
 
-# Install PyTorch with CUDA 11.8 (same as ipa_generation)
-# Note: Using --extra-index-url instead of --index-url to allow PyPI fallback
-RUN python3 -m pip install --no-cache-dir \
-    torch torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu118
+WORKDIR /worker
 
-# Copy files
+# Copy application files
 COPY shared/ /worker/shared/
 COPY assessment/ /worker/assessment/
 
-# Install dependencies
-RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt && \
-    python3 -m pip install --no-cache-dir textgrid librosa numpy && \
-    python3 -m pip cache purge && \
-    rm -rf /root/.cache/pip
-
-ENV PYTHONPATH=/worker
-# Set HuggingFace cache to network volume (if attached, otherwise uses default)
+# Set Python path (packages from pytorch-builder + worker directory)
+ENV PYTHONPATH=/opt/python-packages:/worker
 ENV HF_HOME=/runpod-volume/.cache/huggingface
 
 CMD ["python3", "assessment/handler.py"]
