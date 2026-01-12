@@ -52,44 +52,59 @@ FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 AS pytorch-builder
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
+# Install system dependencies (minimal set for PyTorch installation)
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-dev \
-    git \
-    build-essential \
     libsndfile1 \
     libsndfile1-dev \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /worker
 
-# Upgrade pip first
+# Upgrade pip first and clean up
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    python3 -m pip cache purge 2>/dev/null || true
+    python3 -m pip cache purge 2>/dev/null || true && \
+    rm -rf /tmp/* /var/tmp/* /root/.cache 2>/dev/null || true
 
 # Copy requirements first for better caching
 COPY assessment/requirements.txt /tmp/requirements.txt
 
-# Install PyTorch with CUDA 11.8 to a specific location
+# Create target directory for Python packages
+RUN mkdir -p /opt/python-packages
+
+# Install PyTorch with CUDA 11.8 to a specific location (install separately to reduce peak usage)
 RUN python3 -m pip install --no-cache-dir \
     --target /opt/python-packages \
-    torch torchaudio \
+    torch \
     --extra-index-url https://download.pytorch.org/whl/cu118 && \
     python3 -m pip cache purge 2>/dev/null || true && \
-    rm -rf /var/tmp/* /root/.cache/pip 2>/dev/null || true
+    rm -rf /var/tmp/* /root/.cache/pip /tmp/* 2>/dev/null || true
+
+# Install torchaudio separately
+RUN python3 -m pip install --no-cache-dir \
+    --target /opt/python-packages \
+    torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu118 && \
+    python3 -m pip cache purge 2>/dev/null || true && \
+    rm -rf /var/tmp/* /root/.cache/pip /tmp/* 2>/dev/null || true
 
 # Install Python dependencies to the same location
 RUN python3 -m pip install --no-cache-dir \
     --target /opt/python-packages \
     -r /tmp/requirements.txt && \
-    python3 -m pip install --no-cache-dir \
+    python3 -m pip cache purge 2>/dev/null || true && \
+    rm -rf /var/tmp/* /root/.cache/pip /tmp/* 2>/dev/null || true
+
+# Install additional packages
+RUN python3 -m pip install --no-cache-dir \
     --target /opt/python-packages \
     textgrid librosa numpy && \
-    python3 -m pip cache purge && \
-    rm -rf /root/.cache/pip /tmp/requirements.txt /tmp/* 2>/dev/null || true
+    python3 -m pip cache purge 2>/dev/null || true && \
+    rm -rf /root/.cache/pip /tmp/requirements.txt /tmp/* /var/tmp/* 2>/dev/null || true
 
 # ============================================================================
 # Stage 3: Final Image - Combine MFA and PyTorch
@@ -112,6 +127,8 @@ RUN apt-get update && apt-get install -y \
 COPY --from=mfa-builder /opt/conda /opt/conda
 
 # Copy Python packages from pytorch-builder
+# Note: If pytorch-builder stage fails due to disk space, this will fail too
+# The build will need to be retried with more disk space or optimizations
 COPY --from=pytorch-builder /opt/python-packages /opt/python-packages
 
 # Add Python packages to Python path
