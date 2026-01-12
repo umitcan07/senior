@@ -31,7 +31,8 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     rm /tmp/miniconda.sh && \
     conda clean -afy && \
     find $CONDA_DIR -follow -type f -name '*.a' -delete && \
-    find $CONDA_DIR -follow -type f -name '*.pyc' -delete
+    find $CONDA_DIR -follow -type f -name '*.pyc' -delete && \
+    rm -rf $CONDA_DIR/pkgs/cache
 
 # Initialize conda and configure to use only conda-forge (MFA recommended approach)
 # Accept ToS for default channels (required for newer conda versions) and configure conda-forge
@@ -45,13 +46,16 @@ WORKDIR /worker
 
 # Create conda environment for MFA (recommended approach: use conda-forge channel only)
 RUN conda create -n mfa-env -y --override-channels -c conda-forge montreal-forced-aligner && \
-    conda clean -afy
+    conda clean -afy && \
+    rm -rf $CONDA_DIR/pkgs && \
+    find $CONDA_DIR -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
 # Add conda MFA environment to PATH
 ENV PATH=/opt/conda/envs/mfa-env/bin:$PATH
 
-# Upgrade pip first
-RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
+# Upgrade pip first and clean up
+RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    python3 -m pip cache purge 2>/dev/null || true
 
 # CUDA is already included in the base image
 # Set CUDA environment variables (already set by base image, but explicit for clarity)
@@ -70,10 +74,10 @@ COPY shared/ /worker/shared/
 COPY assessment/ /worker/assessment/
 
 # Install dependencies
-RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt
-
-# Add textgrid for parsing MFA output (even if MFA not installed)
-RUN python3 -m pip install --no-cache-dir textgrid librosa numpy
+RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt && \
+    python3 -m pip install --no-cache-dir textgrid librosa numpy && \
+    python3 -m pip cache purge && \
+    rm -rf /root/.cache/pip
 
 ENV PYTHONPATH=/worker
 # Set HuggingFace cache to network volume (if attached, otherwise uses default)
