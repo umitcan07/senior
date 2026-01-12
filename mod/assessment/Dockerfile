@@ -4,7 +4,7 @@
 # MFA (Montreal Forced Aligner) is installed via conda using recommended approach.
 # Installation order: MFA first (via conda), then CUDA/PyTorch.
 
-FROM ubuntu:22.04
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -53,13 +53,8 @@ ENV PATH=/opt/conda/envs/mfa-env/bin:$PATH
 # Upgrade pip first
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install CUDA toolkit and cuDNN (required for PyTorch CUDA support)
-RUN apt-get update && apt-get install -y \
-    cuda-toolkit-11-8 \
-    libcudnn8 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set CUDA environment variables
+# CUDA is already included in the base image
+# Set CUDA environment variables (already set by base image, but explicit for clarity)
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64
