@@ -30,8 +30,51 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Free up disk space on CI system
+        run: |
+          echo "=============================================================================="
+          echo "Freeing up disk space on CI system"
+          echo "=============================================================================="
+
+          echo "Disk usage before cleanup:"
+          df -h
+
+          echo "Listing 100 largest packages"
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 || true
+
+          echo "Removing large packages"
+          sudo apt-get remove -y '^ghc-8.*' || true
+          sudo apt-get remove -y '^dotnet-.*' || true
+          sudo apt-get remove -y '^llvm-.*' || true
+          sudo apt-get remove -y 'php.*' || true
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+
+          echo "Removing large directories"
+          # Delete .NET (can free ~15GB)
+          sudo rm -rf /usr/share/dotnet/ || true
+          # Delete hosted tool cache (can free several GB)
+          sudo rm -rf /opt/hostedtoolcache || true
+          # Delete Android SDK if present
+          sudo rm -rf /usr/local/lib/android || true
+          # Delete Swift if present
+          sudo rm -rf /usr/share/swift || true
+
+          echo "Disk usage after cleanup:"
+          df -h
+
+          echo "=============================================================================="
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Clean up Docker before build
+        run: |
+          docker system prune -af --volumes || true
+          docker builder prune -af || true
+          docker buildx prune -af || true
+          df -h
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -75,8 +118,16 @@ jobs:
           tags: ${{ steps.meta-assessment.outputs.tags }}
           labels: ${{ steps.meta-assessment.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
           platforms: linux/amd64
+
+      - name: Clean up after assessment build
+        if: always()
+        run: |
+          docker system prune -af --volumes || true
+          docker builder prune -af || true
+          docker buildx prune -af || true
+          df -h
 
       - name: Build and push IPA generation image
         uses: docker/build-push-action@v5
@@ -87,5 +138,13 @@ jobs:
           tags: ${{ steps.meta-ipa.outputs.tags }}
           labels: ${{ steps.meta-ipa.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
           platforms: linux/amd64
+
+      - name: Clean up Docker to free space
+        if: always()
+        run: |
+          docker system prune -af --volumes || true
+          docker builder prune -af || true
+          docker buildx prune -af || true
+          df -h
