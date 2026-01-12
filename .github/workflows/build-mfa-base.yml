@@ -33,30 +33,15 @@ jobs:
 
       - name: Free up disk space on CI system
         run: |
-          echo "=============================================================================="
-          echo "Freeing up disk space on CI system"
-          echo "=============================================================================="
-
-          echo "Disk usage before cleanup:"
-          df -h
-
-          echo "Removing large packages"
-          sudo apt-get remove -y '^ghc-8.*' || true
-          sudo apt-get remove -y '^dotnet-.*' || true
-          sudo apt-get remove -y '^llvm-.*' || true
-          sudo apt-get remove -y 'php.*' || true
-          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel || true
-          sudo apt-get autoremove -y || true
-          sudo apt-get clean || true
-
-          echo "Removing large directories"
-          sudo rm -rf /usr/share/dotnet/ || true
-          sudo rm -rf /opt/hostedtoolcache || true
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /usr/share/swift || true
-
-          echo "Disk usage after cleanup:"
-          df -h
+          echo "Freeing up disk space..."
+          # Remove packages and directories in parallel for speed
+          sudo apt-get remove -yqq '^ghc-8.*' '^llvm-.*' 2>/dev/null || true &
+          sudo rm -rf /usr/share/dotnet/ /opt/hostedtoolcache /usr/local/lib/android /usr/share/swift 2>/dev/null || true &
+          wait
+          sudo apt-get autoremove -yqq || true
+          sudo apt-get clean -qq || true
+          echo "Cleanup complete. Disk usage:"
+          df -h | head -2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

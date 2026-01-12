@@ -858,7 +858,7 @@ function AnalysisPage() {
 												? "The AI service is not currently available. Your recording is saved and will be analyzed when the service comes online."
 												: isPending
 													? "Your recording is in the queue and will be processed shortly."
-													: "Analyzing your pronunciation. This usually takes 10-30 seconds."}
+													: "Analyzing your pronunciation. This usually takes 5-10 seconds."}
 										</p>
 									</div>
 								</CardContent>
