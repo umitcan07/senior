@@ -1,9 +1,10 @@
 # Assessment endpoint Dockerfile
 # Build from mod/ directory: cd mod/ && docker build --platform linux/amd64 -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
 #
-# MFA (Montreal Forced Aligner) is installed via conda for proper dependency management.
+# MFA (Montreal Forced Aligner) is installed via conda using recommended approach.
+# Installation order: MFA first (via conda), then CUDA/PyTorch.
 
-FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -32,13 +33,15 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     find $CONDA_DIR -follow -type f -name '*.a' -delete && \
     find $CONDA_DIR -follow -type f -name '*.pyc' -delete
 
-# Initialize conda for bash
-RUN conda init bash
+# Initialize conda and add conda-forge channel (MFA recommended approach)
+RUN conda init bash && \
+    conda config --add channels conda-forge && \
+    conda config --set channel_priority strict
 
 WORKDIR /worker
 
-# Create conda environment for MFA
-RUN conda create -n mfa-env -y -c conda-forge montreal-forced-aligner && \
+# Create conda environment for MFA (recommended approach: use conda-forge channel)
+RUN conda create -n mfa-env -y montreal-forced-aligner && \
     conda clean -afy
 
 # Add conda MFA environment to PATH
@@ -46,6 +49,17 @@ ENV PATH=/opt/conda/envs/mfa-env/bin:$PATH
 
 # Upgrade pip first
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install CUDA toolkit and cuDNN (required for PyTorch CUDA support)
+RUN apt-get update && apt-get install -y \
+    cuda-toolkit-11-8 \
+    libcudnn8 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set CUDA environment variables
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
 # Install PyTorch with CUDA 11.8 (same as ipa_generation)
 RUN python3 -m pip install --no-cache-dir \
