@@ -684,7 +684,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 										{attempt.score}
 									</span>
 								) : (
-									<div className="flex size-8 items-center justify-center">
+									<div className="flex w-20 items-center justify-center">
 										{statusBadge}
 									</div>
 								)}
@@ -752,7 +752,7 @@ function PracticeTextPage() {
 	// Smart reference selection:
 	// 1. Find reference by preferred author (if exists for this text)
 	// 2. Fall back to first available reference
-	const getInitialReferenceId = () => {
+	const getInitialReferenceId = useMemo(() => {
 		if (preferredAuthorId) {
 			const preferredRef = references.find(
 				(ref) => ref.author?.id === preferredAuthorId,
@@ -760,11 +760,16 @@ function PracticeTextPage() {
 			if (preferredRef) return preferredRef.id;
 		}
 		return references[0]?.id ?? null;
-	};
+	}, [preferredAuthorId, references]);
 
 	const [selectedReferenceId, setSelectedReferenceId] = useState<string | null>(
 		getInitialReferenceId,
 	);
+
+	// Update selected reference when preferredAuthorId or references change (e.g., on route transitions)
+	useEffect(() => {
+		setSelectedReferenceId(getInitialReferenceId);
+	}, [getInitialReferenceId]);
 	const navigate = useNavigate();
 	const recording = useRecording(text?.id ?? "");
 

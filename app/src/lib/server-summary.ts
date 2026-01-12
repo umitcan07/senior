@@ -35,9 +35,6 @@ export type SummaryData = {
 export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ApiResponse<SummaryData>> => {
 		try {
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server-summary.ts:38',message:'serverGetSummary called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'route-transition',hypothesisId:'B'})}).catch(()=>{});
-			// #endregion
 			// Get authenticated userId from Clerk
 			let isAuthenticated = false;
 			let userId: string | null = null;
@@ -45,13 +42,7 @@ export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 				const authResult = await auth();
 				isAuthenticated = authResult.isAuthenticated ?? false;
 				userId = authResult.userId ?? null;
-				// #region agent log
-				fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server-summary.ts:47',message:'Auth in server function',data:{isAuthenticated,userId:userId?.substring(0,10)+'...'},timestamp:Date.now(),sessionId:'debug-session',runId:'route-transition',hypothesisId:'B'})}).catch(()=>{});
-				// #endregion
 			} catch (authError) {
-				// #region agent log
-				fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server-summary.ts:52',message:'Auth error in server function',data:{error:String(authError)},timestamp:Date.now(),sessionId:'debug-session',runId:'route-transition',hypothesisId:'B'})}).catch(()=>{});
-				// #endregion
 				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
@@ -62,9 +53,6 @@ export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 			}
 
 			if (!isAuthenticated || !userId) {
-				// #region agent log
-				fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server-summary.ts:63',message:'Not authenticated in server function',data:{isAuthenticated,hasUserId:!!userId},timestamp:Date.now(),sessionId:'debug-session',runId:'route-transition',hypothesisId:'B'})}).catch(()=>{});
-				// #endregion
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
 					"User is not authenticated",
@@ -73,19 +61,12 @@ export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 				);
 			}
 
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server-summary.ts:72',message:'Fetching data from DB',data:{userId:userId.substring(0,10)+'...'},timestamp:Date.now(),sessionId:'debug-session',runId:'route-transition',hypothesisId:'B'})}).catch(()=>{});
-			// #endregion
 			const [attempts, stats, commonErrors, texts] = await Promise.all([
 				getUserAttempts(userId),
 				getUserAttemptStats(userId),
 				getCommonPhonemeErrors(userId, 10),
 				getTextsWithAttempts(userId),
 			]);
-
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/d2b68487-89be-4953-bab3-f54ee4c6a9fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'server-summary.ts:80',message:'Data fetched',data:{attemptsCount:attempts.length,statsTotal:stats.totalAttempts},timestamp:Date.now(),sessionId:'debug-session',runId:'route-transition',hypothesisId:'B'})}).catch(()=>{});
-			// #endregion
 
 			return createSuccessResponse({
 				attempts,

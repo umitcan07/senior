@@ -1,4 +1,3 @@
-import { createClerkClient } from "@clerk/backend";
 import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 
@@ -8,7 +7,6 @@ import {
 	type UserPreferences,
 	upsertUserPreferences,
 } from "@/db/user-preferences";
-import { getClerkSecretKey } from "./auth";
 import {
 	type ApiResponse,
 	createErrorResponse,
@@ -18,26 +16,9 @@ import {
 
 // Schemas
 
-const GetUserPreferencesSchema = z.object({
-	userId: z.string().min(1, "User ID is required"),
-});
-
 const UpdateUserPreferencesSchema = z.object({
-	userId: z.string().min(1, "User ID is required"),
 	preferredAuthorId: z.string().uuid().nullable().optional(),
 });
-
-async function validateUserId(userId: string): Promise<boolean> {
-	try {
-		const secretKey = getClerkSecretKey();
-		const clerk = createClerkClient({ secretKey });
-		const user = await clerk.users.getUser(userId);
-		return !!user;
-	} catch (error) {
-		console.error("User validation error:", error);
-		return false;
-	}
-}
 
 /**
  * Server function to get preferred author ID.
@@ -73,21 +54,36 @@ export const serverGetPreferredAuthorId = createServerFn({
 
 // Server Functions
 
-export const serverGetUserPreferences = createServerFn({ method: "POST" })
-	.inputValidator(GetUserPreferencesSchema)
-	.handler(async ({ data }): Promise<ApiResponse<UserPreferences | null>> => {
+export const serverGetUserPreferences = createServerFn({ method: "GET" })
+	.handler(async (): Promise<ApiResponse<UserPreferences | null>> => {
 		try {
-			const isValid = await validateUserId(data.userId);
-			if (!isValid) {
+			// Get authenticated userId from Clerk - require authentication
+			let isAuthenticated = false;
+			let userId: string | null = null;
+			try {
+				const authResult = await auth();
+				isAuthenticated = authResult.isAuthenticated ?? false;
+				userId = authResult.userId ?? null;
+			} catch (authError) {
+				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
-					"Invalid user ID",
+					"User is not authenticated",
 					undefined,
 					401,
 				);
 			}
 
-			const result = await getUserPreferences(data.userId);
+			if (!isAuthenticated || !userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
+
+			const result = await getUserPreferences(userId);
 			return createSuccessResponse(result);
 		} catch (error) {
 			console.error("Get user preferences error:", error);
@@ -104,17 +100,33 @@ export const serverUpdateUserPreferences = createServerFn({ method: "POST" })
 	.inputValidator(UpdateUserPreferencesSchema)
 	.handler(async ({ data }): Promise<ApiResponse<UserPreferences>> => {
 		try {
-			const isValid = await validateUserId(data.userId);
-			if (!isValid) {
+			// Get authenticated userId from Clerk - require authentication
+			let isAuthenticated = false;
+			let userId: string | null = null;
+			try {
+				const authResult = await auth();
+				isAuthenticated = authResult.isAuthenticated ?? false;
+				userId = authResult.userId ?? null;
+			} catch (authError) {
+				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
-					"Invalid user ID",
+					"User is not authenticated",
 					undefined,
 					401,
 				);
 			}
 
-			const result = await upsertUserPreferences(data.userId, {
+			if (!isAuthenticated || !userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
+
+			const result = await upsertUserPreferences(userId, {
 				preferredAuthorId: data.preferredAuthorId ?? null,
 			});
 

@@ -69,7 +69,7 @@ function HeroSection() {
 			/>
 			<div className="flex flex-col items-center gap-4 py-12 md:py-20">
 				<span className="flex items-center gap-2 text-primary text-xs uppercase tracking-widest">
-					<span className="h-[1px] w-3 bg-primary/20"></span> Free & Open Source{" "}
+					<span className="h-[1px] w-3 bg-primary/20"></span> Detailed Phonetic Analysis{" "}
 					<span className="h-[1px] w-3 bg-primary/20"></span>
 				</span>
 				<h1 className="max-w-2xl text-balance bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-3xl text-transparent tracking-tight sm:text-5xl md:text-6xl">

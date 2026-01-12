@@ -2,12 +2,11 @@ import {
 	SignedIn,
 	SignedOut,
 	SignInButton,
-	useUser,
 } from "@clerk/tanstack-react-start";
 import { RiComputerLine, RiMicLine, RiUserLine } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	MainLayout,
 	PageContainer,
@@ -25,7 +24,8 @@ import {
 } from "@/components/ui/select";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
-import type { Author } from "@/db/types";
+import type { Author, UserPreferences } from "@/db/types";
+import type { ApiResponse } from "@/lib/errors";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";
 import {
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/settings")({
 			serverGetPreferredAuthorId(),
 		]);
 
-		const authors = authorsResult.success ? authorsResult.data : [];
+		const authors = authorsResult.success && 'data' in authorsResult ? authorsResult.data : [];
 		const preferredAuthorId = preferredAuthorIdResult ?? authors[0]?.id ?? null;
 
 		return {
@@ -188,7 +188,6 @@ function GuestSettings() {
 function SettingsPage() {
 	const { authors, currentPreferredAuthorId: initialAuthorId } =
 		Route.useLoaderData();
-	const { user } = useUser();
 	const [savedAuthorId, setSavedAuthorId] = useState<string | null>(
 		initialAuthorId,
 	);
@@ -198,27 +197,24 @@ function SettingsPage() {
 	const [isSaving, setIsSaving] = useState(false);
 	const { toast } = useToast();
 
+	// Update state when loader data changes (e.g., on route transitions or after saving)
+	useEffect(() => {
+		setSavedAuthorId(initialAuthorId);
+		setPendingAuthorId(initialAuthorId);
+	}, [initialAuthorId]);
+
 	const hasChanges = pendingAuthorId !== savedAuthorId;
 
 	const handleSave = async () => {
-		if (!user?.id) {
-			toast({
-				title: "Authentication required",
-				description: "Please sign in to save preferences.",
-				variant: "destructive",
-			});
-			return;
-		}
-
 		setIsSaving(true);
 
 		try {
+			// Server function gets userId from auth() internally
 			const result = await serverUpdateUserPreferences({
 				data: {
-					userId: user.id,
 					preferredAuthorId: pendingAuthorId,
 				},
-			});
+			}) as ApiResponse<UserPreferences>;
 
 			if (!result.success) {
 				toast({
