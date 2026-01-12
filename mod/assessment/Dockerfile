@@ -79,7 +79,7 @@ RUN python3 -m pip install --no-cache-dir \
     torch torchaudio \
     --extra-index-url https://download.pytorch.org/whl/cu118 && \
     python3 -m pip cache purge 2>/dev/null || true && \
-    rm -rf /tmp/* /var/tmp/* /root/.cache/pip 2>/dev/null || true
+    rm -rf /var/tmp/* /root/.cache/pip 2>/dev/null || true
 
 # Install Python dependencies to the same location
 RUN python3 -m pip install --no-cache-dir \
@@ -89,7 +89,7 @@ RUN python3 -m pip install --no-cache-dir \
     --target /opt/python-packages \
     textgrid librosa numpy && \
     python3 -m pip cache purge && \
-    rm -rf /root/.cache/pip /tmp/requirements.txt
+    rm -rf /root/.cache/pip /tmp/requirements.txt /tmp/* 2>/dev/null || true
 
 # ============================================================================
 # Stage 3: Final Image - Combine MFA and PyTorch
@@ -115,7 +115,7 @@ COPY --from=mfa-builder /opt/conda /opt/conda
 COPY --from=pytorch-builder /opt/python-packages /opt/python-packages
 
 # Add Python packages to Python path
-ENV PYTHONPATH=/opt/python-packages:${PYTHONPATH}
+ENV PYTHONPATH=/opt/python-packages
 
 # Set environment variables
 ENV CONDA_DIR=/opt/conda
