@@ -2,9 +2,8 @@ name: Deploy to Fly.io
 
 on:
   push:
-    branches-ignore: [] # Run on all branches
-  pull_request:
-    branches-ignore: [] # Run on PRs to all branches
+    branches:
+      - main
   workflow_dispatch: # Allow manual triggers
 
 jobs:

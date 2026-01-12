@@ -2,12 +2,12 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches-ignore: [] # Run on all branches
+    branches-ignore: [ignore] # Run on all branches
     paths:
       - "mod/**"
       - ".github/workflows/build-and-push-images.yml"
   pull_request:
-    branches-ignore: [] # Run on PRs to all branches
+    branches-ignore: [ignore] # Run on PRs to all branches
     paths:
       - "mod/**"
       - ".github/workflows/build-and-push-images.yml"
@@ -50,7 +50,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Extract metadata for assessment image
@@ -63,7 +63,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push IPA generation image
