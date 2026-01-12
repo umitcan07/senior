@@ -1,9 +1,7 @@
 # Assessment endpoint Dockerfile
 # Build from mod/ directory: cd mod/ && docker build --platform linux/amd64 -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
 #
-# NOTE: MFA (Montreal Forced Aligner) is optional for local dev.
-# On Apple Silicon, build without MFA for faster iteration.
-# For production (RunPod), MFA will be installed separately or use network volume.
+# MFA (Montreal Forced Aligner) is installed via conda for proper dependency management.
 
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
@@ -20,9 +18,31 @@ RUN apt-get update && apt-get install -y \
     libsndfile1 \
     libsndfile1-dev \
     ffmpeg \
+    wget \
+    bzip2 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Miniconda3
+ENV CONDA_DIR=/opt/conda
+ENV PATH=$CONDA_DIR/bin:$PATH
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -b -p $CONDA_DIR && \
+    rm /tmp/miniconda.sh && \
+    conda clean -afy && \
+    find $CONDA_DIR -follow -type f -name '*.a' -delete && \
+    find $CONDA_DIR -follow -type f -name '*.pyc' -delete
+
+# Initialize conda for bash
+RUN conda init bash
+
 WORKDIR /worker
+
+# Create conda environment for MFA
+RUN conda create -n mfa-env -y -c conda-forge montreal-forced-aligner && \
+    conda clean -afy
+
+# Add conda MFA environment to PATH
+ENV PATH=/opt/conda/envs/mfa-env/bin:$PATH
 
 # Upgrade pip first
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel

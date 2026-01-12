@@ -984,8 +984,9 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     # Check if MFA is available
     mfa_command = "mfa"
     mfa_paths = [
-        "mfa",  # In PATH
-        "/opt/conda/envs/mfa/bin/mfa",  # MFA conda environment
+        "mfa",  # In PATH (should work if conda env is in PATH)
+        "/opt/conda/envs/mfa-env/bin/mfa",  # MFA conda environment (created in Dockerfile)
+        "/opt/conda/envs/mfa/bin/mfa",  # Alternative MFA conda environment name
         "/opt/conda/envs/worker/bin/mfa",  # Worker conda environment
         "/opt/conda/bin/mfa",  # Base conda
     ]
