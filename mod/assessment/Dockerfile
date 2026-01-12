@@ -60,9 +60,10 @@ ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64
 
 # Install PyTorch with CUDA 11.8 (same as ipa_generation)
+# Note: Using --extra-index-url instead of --index-url to allow PyPI fallback
 RUN python3 -m pip install --no-cache-dir \
     torch torchaudio \
-    --index-url https://download.pytorch.org/whl/cu118
+    --extra-index-url https://download.pytorch.org/whl/cu118
 
 # Copy files
 COPY shared/ /worker/shared/
