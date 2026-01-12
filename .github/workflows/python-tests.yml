@@ -2,12 +2,12 @@ name: Python Tests
 
 on:
     push:
-        branches: [main, develop]
+        branches-ignore: [] # Run on all branches
         paths:
             - "mod/**"
             - ".github/workflows/python-tests.yml"
     pull_request:
-        branches: [main, develop]
+        branches-ignore: [] # Run on PRs to all branches
         paths:
             - "mod/**"
             - ".github/workflows/python-tests.yml"
