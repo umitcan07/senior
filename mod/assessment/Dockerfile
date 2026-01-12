@@ -33,14 +33,18 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     find $CONDA_DIR -follow -type f -name '*.a' -delete && \
     find $CONDA_DIR -follow -type f -name '*.pyc' -delete
 
-# Initialize conda and add conda-forge channel (MFA recommended approach)
-RUN conda config --add channels conda-forge && \
+# Initialize conda and configure to use only conda-forge (MFA recommended approach)
+# Accept ToS for default channels (required for newer conda versions) and configure conda-forge
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    conda config --remove channels defaults && \
+    conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
 WORKDIR /worker
 
-# Create conda environment for MFA (recommended approach: use conda-forge channel)
-RUN conda create -n mfa-env -y -c conda-forge montreal-forced-aligner && \
+# Create conda environment for MFA (recommended approach: use conda-forge channel only)
+RUN conda create -n mfa-env -y --override-channels -c conda-forge montreal-forced-aligner && \
     conda clean -afy
 
 # Add conda MFA environment to PATH
