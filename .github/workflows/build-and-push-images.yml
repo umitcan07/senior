@@ -66,18 +66,6 @@ jobs:
             type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push IPA generation image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./mod
-          file: ./mod/ipa_generation/Dockerfile
-          push: true
-          tags: ${{ steps.meta-ipa.outputs.tags }}
-          labels: ${{ steps.meta-ipa.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
-
       - name: Build and push assessment image
         uses: docker/build-push-action@v5
         with:
@@ -86,6 +74,18 @@ jobs:
           push: true
           tags: ${{ steps.meta-assessment.outputs.tags }}
           labels: ${{ steps.meta-assessment.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Build and push IPA generation image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./mod
+          file: ./mod/ipa_generation/Dockerfile
+          push: true
+          tags: ${{ steps.meta-ipa.outputs.tags }}
+          labels: ${{ steps.meta-ipa.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
