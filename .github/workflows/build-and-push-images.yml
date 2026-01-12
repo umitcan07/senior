@@ -2,12 +2,12 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches-ignore: [ignore] # Run on all branches
+    branches:
+      - main
     paths:
       - "mod/**"
       - ".github/workflows/build-and-push-images.yml"
   pull_request:
-    branches-ignore: [ignore] # Run on PRs to all branches
     paths:
       - "mod/**"
       - ".github/workflows/build-and-push-images.yml"

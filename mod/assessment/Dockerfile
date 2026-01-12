@@ -34,14 +34,13 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     find $CONDA_DIR -follow -type f -name '*.pyc' -delete
 
 # Initialize conda and add conda-forge channel (MFA recommended approach)
-RUN conda init bash && \
-    conda config --add channels conda-forge && \
+RUN conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
 WORKDIR /worker
 
 # Create conda environment for MFA (recommended approach: use conda-forge channel)
-RUN conda create -n mfa-env -y montreal-forced-aligner && \
+RUN conda create -n mfa-env -y -c conda-forge montreal-forced-aligner && \
     conda clean -afy
 
 # Add conda MFA environment to PATH
@@ -59,7 +58,7 @@ RUN apt-get update && apt-get install -y \
 # Set CUDA environment variables
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64
 
 # Install PyTorch with CUDA 11.8 (same as ipa_generation)
 RUN python3 -m pip install --no-cache-dir \
