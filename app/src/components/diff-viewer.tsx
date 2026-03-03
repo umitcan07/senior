@@ -238,6 +238,7 @@ export function DiffViewer({
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<button
+								title="Information"
 								type="button"
 								className="text-muted-foreground transition-colors hover:text-foreground"
 							>
