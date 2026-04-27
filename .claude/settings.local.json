@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Bash(source C:/Users/faruq/miniconda3/etc/profile.d/conda.sh)",
+      "Bash(conda activate:*)",
+      "Bash(PYTHONIOENCODING=utf-8 C:/Users/faruq/miniconda3/envs/senior/python.exe -c \":*)",
+      "Bash(conda run:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)",
+      "Bash(gh search:*)",
+      "Bash(find C:/Users/faruq/Desktop/college/senior/app/src -name *api* -o -name *route* -o -name *handler*)",
+      "WebSearch",
+      "WebFetch(domain:arxiv.org)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 -c \"\nimport json\nphones = set\\(\\)\nfiles = ['C:/Users/faruq/Desktop/college/senior/sig/exp-faruq/results/pr/12/umit12.json',\n         'C:/Users/faruq/Desktop/college/senior/sig/exp-faruq/results/pr/12/yusuf12.json',\n         'C:/Users/faruq/Desktop/college/senior/sig/exp-faruq/results/pr/14/umit14.json']\nfor f in files:\n    with open\\(f, encoding='utf-8'\\) as fh:\n        d = json.load\\(fh\\)\n        for p in d['phone_recognition']['phones']:\n            phones.add\\(p\\)\nprint\\(sorted\\(phones\\)\\)\nprint\\(len\\(phones\\)\\)\n\")",
+      "Bash(pnpm add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(conda install:*)",
+      "Bash(CONDA_NO_PLUGINS=true conda install -y -c conda-forge tectonic)",
+      "Bash(where tectonic:*)",
+      "Bash(tectonic:*)",
+      "Bash(pdflatex report-v3.tex)",
+      "Bash(/c/Users/faruq/miniconda3/Library/bin/tectonic report-v3.tex)",
+      "Bash(pip show:*)",
+      "Bash(python -c ':*)"
+    ]
+  }
+}

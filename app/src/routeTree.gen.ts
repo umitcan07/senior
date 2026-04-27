@@ -23,9 +23,12 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PracticeTextIdRouteImport } from './routes/practice/$textId'
 import { Route as ApiJobsRouteImport } from './routes/api/jobs'
 import { Route as ApiAssessmentRouteImport } from './routes/api/assessment'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
 import { Route as AdminReferencesRouteImport } from './routes/admin/references'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as ApiWebhookJobsRouteImport } from './routes/api/webhook.jobs'
 import { Route as ApiWebhookIpaGenerationRouteImport } from './routes/api/webhook/ipa-generation'
 import { Route as ApiWebhookAssessmentRouteImport } from './routes/api/webhook/assessment'
@@ -106,6 +109,11 @@ const ApiAssessmentRoute = ApiAssessmentRouteImport.update({
   path: '/api/assessment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTextRoute = AdminTextRouteImport.update({
   id: '/admin/text',
   path: '/admin/text',
@@ -116,9 +124,19 @@ const AdminReferencesRoute = AdminReferencesRouteImport.update({
   path: '/admin/references',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAuthorsRoute = AdminAuthorsRouteImport.update({
   id: '/admin/authors',
   path: '/admin/authors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiWebhookJobsRoute = ApiWebhookJobsRouteImport.update({
@@ -178,13 +196,16 @@ export interface FileRoutesByFullPath {
   '/practice': typeof PracticeRouteWithChildren
   '/settings': typeof SettingsRoute
   '/summary': typeof SummaryRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/assessment': typeof ApiAssessmentRoute
   '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
-  '/admin': typeof AdminIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/practice/': typeof PracticeIndexRoute
   '/api/admin/ipa-generation': typeof ApiAdminIpaGenerationRoute
   '/api/audio/$id': typeof ApiAudioIdRoute
@@ -205,9 +226,12 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/summary': typeof SummaryRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/assessment': typeof ApiAssessmentRoute
   '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
@@ -234,9 +258,12 @@ export interface FileRoutesById {
   '/practice': typeof PracticeRouteWithChildren
   '/settings': typeof SettingsRoute
   '/summary': typeof SummaryRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/assessment': typeof ApiAssessmentRoute
   '/api/jobs': typeof ApiJobsRouteWithChildren
   '/practice/$textId': typeof PracticeTextIdRouteWithChildren
@@ -264,13 +291,16 @@ export interface FileRouteTypes {
     | '/practice'
     | '/settings'
     | '/summary'
+    | '/admin/analytics'
     | '/admin/authors'
+    | '/admin/dashboard'
     | '/admin/references'
     | '/admin/text'
+    | '/admin/users'
     | '/api/assessment'
     | '/api/jobs'
     | '/practice/$textId'
-    | '/admin'
+    | '/admin/'
     | '/practice/'
     | '/api/admin/ipa-generation'
     | '/api/audio/$id'
@@ -291,9 +321,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/settings'
     | '/summary'
+    | '/admin/analytics'
     | '/admin/authors'
+    | '/admin/dashboard'
     | '/admin/references'
     | '/admin/text'
+    | '/admin/users'
     | '/api/assessment'
     | '/api/jobs'
     | '/practice/$textId'
@@ -319,9 +352,12 @@ export interface FileRouteTypes {
     | '/practice'
     | '/settings'
     | '/summary'
+    | '/admin/analytics'
     | '/admin/authors'
+    | '/admin/dashboard'
     | '/admin/references'
     | '/admin/text'
+    | '/admin/users'
     | '/api/assessment'
     | '/api/jobs'
     | '/practice/$textId'
@@ -348,9 +384,12 @@ export interface RootRouteChildren {
   PracticeRoute: typeof PracticeRouteWithChildren
   SettingsRoute: typeof SettingsRoute
   SummaryRoute: typeof SummaryRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuthorsRoute: typeof AdminAuthorsRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AdminReferencesRoute: typeof AdminReferencesRoute
   AdminTextRoute: typeof AdminTextRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   ApiAssessmentRoute: typeof ApiAssessmentRoute
   ApiJobsRoute: typeof ApiJobsRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -438,7 +477,7 @@ declare module '@tanstack/react-router' {
     '/admin/': {
       id: '/admin/'
       path: '/admin'
-      fullPath: '/admin'
+      fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -463,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAssessmentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/text': {
       id: '/admin/text'
       path: '/admin/text'
@@ -477,11 +523,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReferencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/authors': {
       id: '/admin/authors'
       path: '/admin/authors'
       fullPath: '/admin/authors'
       preLoaderRoute: typeof AdminAuthorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/webhook/jobs': {
@@ -597,9 +657,12 @@ const rootRouteChildren: RootRouteChildren = {
   PracticeRoute: PracticeRouteWithChildren,
   SettingsRoute: SettingsRoute,
   SummaryRoute: SummaryRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuthorsRoute: AdminAuthorsRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
   AdminReferencesRoute: AdminReferencesRoute,
   AdminTextRoute: AdminTextRoute,
+  AdminUsersRoute: AdminUsersRoute,
   ApiAssessmentRoute: ApiAssessmentRoute,
   ApiJobsRoute: ApiJobsRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,

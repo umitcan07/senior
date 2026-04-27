@@ -1,0 +1,12 @@
+{
+  "sentence_id": "12",
+  "speaker": "yusuf12",
+  "audio_file": "yusuf12.wav",
+  "transcript": "The weather is rather warm this Thursday. I think we should go to the theater together. Thank you for thinking about this thoroughly.",
+  "timestamp": "2026-03-30T20:37:29.910729",
+  "model": "espnet/powsm",
+  "g2p": {
+    "raw": "",
+    "phones": []
+  }
+}
