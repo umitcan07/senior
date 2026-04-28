@@ -40,6 +40,7 @@ dependencies:
       # NLP
       - nltk
       # Other
+      - tqdm
       - protobuf
       - configargparse
       - filelock
