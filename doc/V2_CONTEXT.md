@@ -15,7 +15,7 @@ This is a senior project at Boğaziçi University. **Defense: 13 June 2026.** V2
 1. Real **POWSM CTC alignment** (replaces V1's fake/heuristic timestamps + abandoned MFA path).
 2. **Reference-based assessment** — comparing the learner's phones to a precomputed native reference, not a G2P-from-text canonical.
 3. **Human reference recordings** (US + UK) instead of TTS.
-4. **Fine-tuned POWSM** on a 10-hour Turkish-L1 dataset (done by teammate).
+4. **Fine-tuned POWSM** on a 10-hour Turkish-L1 dataset.
 
 Plus three smaller contributions: posterior-based **GOP** scoring, **Silero VAD** + abstention, and a **human-judgment validation study** (Spearman ρ vs expert ratings).
 
