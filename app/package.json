@@ -2,6 +2,10 @@
 	"name": "app",
 	"private": true,
 	"type": "module",
+	"packageManager": "pnpm@11.2.2",
+	"engines": {
+		"node": ">=22"
+	},
 	"scripts": {
 		"dev": "vite dev --port 3000 --host",
 		"build": "vite build",
