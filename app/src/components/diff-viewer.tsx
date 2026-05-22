@@ -1,4 +1,4 @@
-import { RiInformationLine, RiPlayLine } from "@remixicon/react";
+import { RiInformationLine } from "@remixicon/react";
 import {
 	Tooltip,
 	TooltipContent,
