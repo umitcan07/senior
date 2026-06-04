@@ -102,40 +102,54 @@ For models loaded from a local checkpoint (the fine-tuned case), use the lower-l
 
 ### POWSM CTC forced alignment
 
-**Which model — clear up the naming.** On HF there are two related artifacts: `espnet/powsm` (the ~350M hybrid CTC/attention model we use) and `espnet/powsm_ctc` (a separate CTC-only variant — buggy, see ESPnet issues [#6360](https://github.com/espnet/espnet/issues/6360) and [#6426](https://github.com/espnet/espnet/issues/6426); we do **not** use this). When this codebase says "POWSM CTC alignment" we mean *using the CTC head of `espnet/powsm`*, accessed via `model.s2t_model.forced_align(...)` (forced) and `model.s2t_model.ctc.log_softmax(...)` (free / GOP). ESPnet ships a reference recipe at [`egs2/powsm/s2t1/force_align.py`](https://github.com/espnet/espnet/blob/master/egs2/powsm/s2t1/force_align.py) — useful as a starting point but **note the recipe bugs called out below**.
+**Which model — clear up the naming.** On HF there are two related artifacts: `espnet/powsm` (the ~350M hybrid CTC/attention model we use) and `espnet/powsm_ctc` (a separate CTC-only variant — buggy, see ESPnet issues [#6360](https://github.com/espnet/espnet/issues/6360) and [#6426](https://github.com/espnet/espnet/issues/6426); we do **not** use this). When this codebase says "POWSM CTC alignment" we mean *using the CTC head of `espnet/powsm`*: drive `torchaudio.functional.forced_align(...)` on the CTC log-posteriors (forced) and read `model.s2t_model.ctc.log_softmax(...)` (free / GOP). ESPnet ships a reference recipe at [`egs2/powsm/s2t1/force_align.py`](https://github.com/espnet/espnet/blob/master/egs2/powsm/s2t1/force_align.py) — useful as a starting point but **note the recipe bugs called out below**.
 
-**API skeleton — forced alignment:**
+> **Verified locally 2026-06-05** (espnet 202412, torch/torchaudio 2.7.1+cu118, RTX 4060 Ti) with `mod/dev/powsm_ctc_probe.py`. The skeletons below are the *actually-working* API, which differs from earlier drafts — see the correction note.
+>
+> **Correction:** there is **no `forced_align` method** on `ESPnetS2TModel` or on `espnet2.asr.ctc.CTC` in espnet 202412 (the old skeleton's `model.s2t_model.forced_align(speech=..., text=...)` does not exist). Forced alignment is done by computing CTC log-probs yourself and passing them to `torchaudio.functional.forced_align`. The `ctc.py:240` / `espnet_model.py:156` line refs below were from a hypothetical wrapper and don't apply.
+
+**API skeleton — forced alignment (verified):**
 ```python
-align_label, align_score = model.s2t_model.forced_align(
-    speech=speech_tensor,        # [1, T_samples], padded to 20s
-    speech_lengths=...,
-    text=token_ids,              # [1, n_phones], from converter.tokens2ids(tokenizer.text2tokens("/h//ɛ//l/..."))
-    text_lengths=...,
+import torchaudio.functional as AF
+model = s2t.s2t_model
+# 1. tokenize the target IPA; text2tokens prepends a SentencePiece "▁" marker
+#    (a non-phone) — strip it before aligning.
+tokens = [t for t in s2t.tokenizer.text2tokens("/h//ɛ//l//oʊ/") if t != "▁"]
+ids = s2t.converter.tokens2ids(tokens)            # must contain no <blank> (id 0)
+# 2. one encoder pass on the 20s-padded clip -> CTC frame log-probs
+enc, enc_lens = model.encode(speech_tensor, speech_lengths)   # [1, T_enc, D]
+log_probs = model.ctc.log_softmax(enc)                        # [1, T_enc, V]
+# 3. forced alignment + span merge
+targets = torch.tensor([ids], dtype=torch.int32, device=enc.device)
+target_lengths = torch.tensor([len(ids)], dtype=torch.int32, device=enc.device)
+path, scores = AF.forced_align(
+    log_probs.float(), targets, enc_lens.to(torch.int32), target_lengths,
+    blank=model.blank_id,                          # 0
 )
-spans = torchaudio.functional.merge_tokens(align_label[0], align_score[0])
-frame_sec = model.preprocessor_conf["speech_resolution"]  # 0.04 for espnet/powsm — read at runtime
-alignment = [(model.converter.ids2tokens([s.token])[0],
+spans = AF.merge_tokens(path[0], scores[0].exp())  # scores are log-probs; .exp() -> prob
+frame_sec = s2t.s2t_train_args.preprocessor_conf["speech_resolution"]  # 0.04 — read at runtime
+alignment = [(s2t.converter.token_list[s.token],
               [s.start * frame_sec * 1000, s.end * frame_sec * 1000])
-             for s in spans]
+             for s in spans if s.token != model.blank_id]
 ```
 
-**API skeleton — free alignment / GOP frame logprobs:**
+**API skeleton — free alignment / GOP frame logprobs (verified):**
 ```python
-enc, enc_lens = model.s2t_model.encode(speech_tensor, speech_lengths)   # one encoder pass
-log_probs = model.s2t_model.ctc.log_softmax(enc)                        # [1, T_enc, V] — frame posteriors
-argmax_path = model.s2t_model.ctc.argmax(enc)                           # [1, T_enc] — for greedy collapse
+enc, enc_lens = model.encode(speech_tensor, speech_lengths)   # one encoder pass; T_enc=499 for 20s
+log_probs = model.ctc.log_softmax(enc)                        # [1, T_enc, V] — frame posteriors
+argmax_path = model.ctc.argmax(enc)                           # [1, T_enc] — for greedy collapse
 # collapse blanks + duplicates → spans; multiply frame indices by frame_sec for ms
 ```
 
 **Key facts the V2 aligner must respect:**
-- **Frame stride is 40 ms** (`speech_resolution: 0.04` in POWSM config; `conv2d` input layer 4× subsamples the 10 ms frontend hop). The recipe's `force_align.py` uses `time_hop=0.02` — **that's a bug in the recipe** and would halve every timestamp. Always read `model.preprocessor_conf["speech_resolution"]` from the loaded model; never hardcode.
-- **`forced_align` is batch-size-1 only** — both `espnet2/asr/ctc.py:240` and `espnet2/s2t/espnet_model.py:156` hard-assert this. The precompute pass over 50 reference WAVs is fine (sequential); the assess endpoint cannot batch concurrent user requests.
-- **Target sequence must not contain `<blank>`** — `ctc.forced_align` hard-asserts `(ys_pad != blank_idx).all()` at `ctc.py:241`. Validate this before calling forced_align.
+- **Frame stride is 40 ms** (`speech_resolution: 0.04` in POWSM config; `conv2d` input layer 4× subsamples the 10 ms frontend hop). **Verified:** a 20 s padded clip yields **499 encoder frames** (≈19.96 s). The recipe's `force_align.py` uses `time_hop=0.02` — **that's a bug in the recipe** and would halve every timestamp. Read it at runtime from `s2t.s2t_train_args.preprocessor_conf["speech_resolution"]` (the `Speech2Text` object has no `.preprocessor_conf` attribute directly); never hardcode.
+- **Run forced alignment batch-size-1.** We pad to 20 s and align one clip at a time. The precompute pass over the reference WAVs is fine (sequential); the assess endpoint cannot batch concurrent user requests anyway.
+- **Target sequence must not contain `<blank>` (id 0)** — `torchaudio.functional.forced_align` rejects targets containing the blank symbol. Validate `all(i != model.blank_id for i in ids)` before aligning. Also strip the leading `▁` SentencePiece marker that `tokenizer.text2tokens` emits — it is not a phone.
 - **`forced_align` requires that the supplied `text` actually appears in the audio.** For our free-alignment path on user audio we instead use the `log_softmax` / `argmax` route above (greedy CTC, collapse blanks + duplicates).
 - **20 s padding is effectively required** — the model is trained with `<0.00>` / `<20.00>` time markers (`speech_init_silence: 20` in config). Variable length technically works but quality degrades. Budget one 20 s encoder forward per request.
-- **The blank id and phone vocab live in the model config** — read `model.s2t_model.blank_id` and `model.converter.token_list` at startup, never hardcode.
+- **The blank id and phone vocab live in the model** — read `model.s2t_model.blank_id` (=0) and `s2t.converter.token_list` (len 40002, `token_list[0] == '<blank>'`) at startup, never hardcode.
 - **POWSM forced alignment is GPU-friendly but CPU-runnable**; the dominant cost is the encoder forward (350M params over a 20 s clip). No published CPU benchmark for POWSM specifically — measure before depending on it.
-- **Pin `torchaudio < 2.9`** — `torchaudio.functional.forced_align` (used downstream by ESPnet) is deprecated in torchaudio 2.9.
+- **Pin `torchaudio < 2.9`** — `torchaudio.functional.forced_align` is deprecated in torchaudio 2.9. The assessment image currently lands on **2.7.1+cu118** but `mod/assessment/Dockerfile` installs `torch torchaudio` *unpinned*, so a rebuild could pull ≥2.9 and break alignment. Pin it in `requirements.txt`.
 - **Fine-tuned checkpoint drop-in works** as long as the fine-tune preserves `token_list`, `ctc_type: builtin`, and `encoder.input_layer: conv2d` — standard ESPnet `--init_param` fine-tuning preserves all three. Assert these at aligner startup.
 
 ### Goodness of Pronunciation (GOP)

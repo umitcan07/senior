@@ -3,4 +3,6 @@
 .llms
 sig/exp/audio/development/**/*.m4a
 sig/exp/audio/development/**/*.wav
+# E1 CTC probe scratch: reference WAVs + ~1.4GB HF model cache (regenerable)
+sig/exp/ctc_probe/
 node_modules
