@@ -134,7 +134,7 @@ python ipa_generation/handler.py
 - IPA transcription returns placeholder values
 - Timestamps are evenly distributed (dummy implementation)
 - Replace `extract_ipa_from_audio()` and `generate_ipa_*()` functions with actual POWSM model inference
-- Replace dummy timestamp generation with actual MFA alignment if needed
+- Replace dummy timestamp generation with POWSM CTC forced alignment (E3 / #19)
 
 ## Running Tests
 

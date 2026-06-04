@@ -159,8 +159,7 @@ After deployment is working:
 
 1. **Replace dummy implementations**:
    - Implement actual POWSM model inference in `assessment/assess.py`
-   - Implement actual POWSM G2P in `ipa_generation/generate.py`
-   - Implement actual MFA alignment in `alignment/mfa.py`
+   - Implement POWSM CTC forced alignment for phone timings (E3 / #19)
 
 2. **Optimize performance**:
    - Pre-load models in handler initialization
