@@ -267,8 +267,10 @@ state. Keep them in sync — drift here is how we ended up with the orphaned
    - `app/drizzle/NNNN_<name>.sql`
    - `app/drizzle/meta/NNNN_snapshot.json`
    - `app/drizzle/meta/_journal.json` (the appended entry)
-5. Apply/validate on a **Neon branch** (`pnpm db:push` or `db:migrate` against the
-   branch URL) before it reaches `main`/prod.
+5. Apply with `pnpm db:push`. **Note:** there is one Neon DB (the `development`
+   branch) used for both local and prod, so a push is immediately live — review the
+   generated SQL first and keep changes additive. For a risky/destructive change,
+   create a scratch Neon branch in the dashboard and test there before pushing.
 
 **Hard rules**
 
