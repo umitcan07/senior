@@ -90,7 +90,7 @@ export const practiceTexts = pgTable(
 );
 
 /**
- * Authors/voices for reference speeches (TTS or native speakers)
+ * Authors/voices for reference speeches (native speakers)
  */
 export const authors = pgTable("authors", {
 	id: uuid("id").primaryKey().defaultRandom(),
@@ -98,7 +98,6 @@ export const authors = pgTable("authors", {
 	accent: varchar("accent", { length: 50 }),
 	style: varchar("style", { length: 50 }),
 	languageCode: varchar("language_code", { length: 10 }),
-	elevenlabsVoiceId: varchar("elevenlabs_voice_id", { length: 255 }),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

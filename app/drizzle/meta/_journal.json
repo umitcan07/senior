@@ -64,6 +64,13 @@
       "when": 1768154135395,
       "tag": "0008_elite_photon",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1768154135396,
+      "tag": "0010_remove_elevenlabs_voice_id",
+      "breakpoints": true
     }
   ]
 }

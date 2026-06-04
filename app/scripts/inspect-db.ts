@@ -38,7 +38,7 @@ async function main() {
 
 	const authors = await db.execute(sql`
 		SELECT a.id, a.name, a.accent, a.style, a.language_code,
-		       a.elevenlabs_voice_id, count(rs.id) AS ref_count
+		       count(rs.id) AS ref_count
 		FROM authors a
 		LEFT JOIN reference_speeches rs ON rs.author_id = a.id
 		GROUP BY a.id
@@ -72,7 +72,6 @@ async function main() {
 			accent: r.accent,
 			style: r.style,
 			lang: r.language_code,
-			voice: r.elevenlabs_voice_id,
 			refs: Number(r.ref_count),
 		})),
 	);

@@ -22,7 +22,6 @@ const InsertAuthorSchema = z.object({
 	accent: z.string().nullable().optional(),
 	style: z.string().nullable().optional(),
 	languageCode: z.string().nullable().optional(),
-	elevenlabsVoiceId: z.string().nullable().optional(),
 });
 
 const UpdateAuthorSchema = z.object({
@@ -31,7 +30,6 @@ const UpdateAuthorSchema = z.object({
 	accent: z.string().nullable().optional(),
 	style: z.string().nullable().optional(),
 	languageCode: z.string().nullable().optional(),
-	elevenlabsVoiceId: z.string().nullable().optional(),
 });
 
 const DeleteAuthorSchema = z.object({
@@ -66,7 +64,6 @@ export const serverInsertAuthor = createServerFn({ method: "POST" })
 				accent: data.accent,
 				style: data.style,
 				languageCode: data.languageCode,
-				elevenlabsVoiceId: data.elevenlabsVoiceId,
 			});
 			return createSuccessResponse(result);
 		} catch (error) {
@@ -99,7 +96,6 @@ export const serverUpdateAuthor = createServerFn({ method: "POST" })
 				accent: data.accent,
 				style: data.style,
 				languageCode: data.languageCode,
-				elevenlabsVoiceId: data.elevenlabsVoiceId,
 			});
 			return createSuccessResponse(result);
 		} catch (error) {

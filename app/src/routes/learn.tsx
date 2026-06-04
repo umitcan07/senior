@@ -1,11 +1,5 @@
-import {
-	RiArrowDownSLine,
-	RiRefreshLine,
-	RiVolumeUpLine,
-} from "@remixicon/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { RiArrowDownSLine, RiVolumeUpLine } from "@remixicon/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
 import { useCallback, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
@@ -16,12 +10,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useToast } from "@/hooks/use-toast";
-import { useRequireAdmin } from "@/lib/auth";
 import { DIALECTS } from "@/lib/dialect";
-import {
-	serverGenerateIPAAudio,
-	serverGetIPAAudioStatus,
-} from "@/lib/ipa-audio";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/learn")({
@@ -487,119 +476,6 @@ function IPASection({
 					);
 				})}
 			</div>
-		</section>
-	);
-}
-
-// ADMIN SECTION
-
-function AdminAudioSection() {
-	const { isAdmin } = useRequireAdmin();
-	const queryClient = useQueryClient();
-	const getStatusFn = useServerFn(serverGetIPAAudioStatus);
-	const generateFn = useServerFn(serverGenerateIPAAudio);
-
-	const { data: status, isLoading: statusLoading } = useQuery({
-		queryKey: ["ipa-audio-status"],
-		queryFn: async () => {
-			const result = await getStatusFn();
-			if (!result.success) throw new Error(result.error.message);
-			return result.data;
-		},
-		enabled: isAdmin,
-	});
-
-	const { mutate: generateAudio, isPending: isGenerating } = useMutation({
-		mutationFn: async () => {
-			const result = await generateFn();
-			if (!result.success) throw new Error(result.error.message);
-			return result.data;
-		},
-		onSuccess: (data) => {
-			queryClient.invalidateQueries({ queryKey: ["ipa-audio-status"] });
-			console.log("Generation complete:", data);
-		},
-	});
-
-	if (!isAdmin) return null;
-
-	return (
-		<section className="mt-8 flex flex-col gap-4 border-border/40 border-t pt-8">
-			<div className="flex flex-col gap-1">
-				<h3 className="font-medium text-muted-foreground text-base uppercase tracking-wide">
-					Admin: IPA Audio Management
-				</h3>
-			</div>
-
-			{statusLoading ? (
-				<div className="flex items-center gap-2 text-muted-foreground text-base">
-					<Spinner className="size-4" />
-					Checking audio status...
-				</div>
-			) : status ? (
-				<div className="flex flex-col gap-4">
-					<div className="flex gap-8">
-						<div className="flex flex-col">
-							<span className="text-muted-foreground text-sm uppercase">
-								Existing
-							</span>
-							<span className="font-mono text-xl">
-								{status.existing.length}
-							</span>
-						</div>
-						<div className="flex flex-col">
-							<span className="text-muted-foreground text-sm uppercase">
-								Missing
-							</span>
-							<span className="font-mono text-destructive text-xl">
-								{status.missing.length}
-							</span>
-						</div>
-						<div className="flex flex-col">
-							<span className="text-muted-foreground text-sm uppercase">
-								Total
-							</span>
-							<span className="font-mono text-xl">{status.total}</span>
-						</div>
-					</div>
-
-					<div className="flex items-center gap-2">
-						<Button
-							onClick={() => generateAudio()}
-							disabled={isGenerating || status.missing.length === 0}
-							size="sm"
-							variant="outline"
-						>
-							{isGenerating ? (
-								<>
-									<Spinner className="size-4" />
-									Generating...
-								</>
-							) : (
-								<>
-									<RiRefreshLine
-										className={cn("size-4", isGenerating && "animate-spin")}
-									/>
-									Generate Missing Audio ({status.missing.length})
-								</>
-							)}
-						</Button>
-					</div>
-
-					{status.missing.length > 0 && (
-						<details className="text-sm">
-							<summary className="cursor-pointer text-muted-foreground">
-								Show missing files
-							</summary>
-							<div className="mt-2 max-h-32 overflow-auto rounded bg-muted/20 p-2 font-mono">
-								{status.missing.map((key) => (
-									<div key={key}>{key}</div>
-								))}
-							</div>
-						</details>
-					)}
-				</div>
-			) : null}
 		</section>
 	);
 }
@@ -1349,13 +1225,10 @@ function LearningPage() {
 								requirements of a particular clip, browse to it from the general
 								phonetics page at the Wikimedia Commons. Vowel trapezoid
 								background by User:Denelson83; see File:Blank vowel
-								trapezoid.png on Wikimedia Commons for details. Example words
-								and TTS speeches are generated via ElevenLabs.
+								trapezoid.png on Wikimedia Commons for details. Word audio is
+								spoken by human voice talent.
 							</p>
 						</section>
-
-						{/* Admin Section - only visible to admins */}
-						<AdminAudioSection />
 
 						<div className="h-px bg-border/40" />
 
