@@ -555,7 +555,13 @@ def download_audio(audio_uri: str) -> Tuple[str, str]:
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
         
-        with urllib.request.urlopen(audio_uri, context=ctx) as response, open(temp_path, 'wb') as out_file:
+        # Cloudflare (e.g. files.nounce.pro) blocks the default "Python-urllib"
+        # User-Agent with a 403, so send a browser-like UA.
+        req = urllib.request.Request(
+            audio_uri,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; NounceWorker/1.0)"},
+        )
+        with urllib.request.urlopen(req, context=ctx) as response, open(temp_path, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
             
         file_size = os.path.getsize(temp_path)
