@@ -414,6 +414,8 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
 											"text-emerald-600 dark:text-emerald-400",
+											error.errorType === "delete" &&
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -431,6 +433,8 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
 											"text-emerald-600 dark:text-emerald-400",
+											error.errorType === "delete" &&
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -529,6 +533,8 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
 											"text-emerald-600 dark:text-emerald-400",
+											error.errorType === "delete" &&
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -540,6 +546,8 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
 											"text-emerald-600 dark:text-emerald-400",
+											error.errorType === "delete" &&
+											"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
