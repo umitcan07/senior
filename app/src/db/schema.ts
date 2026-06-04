@@ -28,9 +28,12 @@ export const qualityStatusEnum = pgEnum("quality_status", [
 	"warning",
 	"reject",
 ]);
+// `mfa` and `wav2textgrid` are V1-only, kept for historical rows. V2 writes
+// `powsm_ctc` (added in E1 / #13). See doc/db.md.
 export const alignmentMethodEnum = pgEnum("alignment_method", [
 	"mfa",
 	"wav2textgrid",
+	"powsm_ctc",
 ]);
 export const errorTypeEnum = pgEnum("error_type", [
 	"substitute",
@@ -264,6 +267,10 @@ export const phonemeErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by V2 code
+		// but present in the live DB; kept here so schema.ts matches the database.
+		targetPosition: integer("target_position"),
+		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 10 }),
 		actual: varchar("actual", { length: 10 }),
 		timestampStartMs: integer("timestamp_start_ms"),
@@ -290,6 +297,10 @@ export const wordErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by V2 code
+		// but present in the live DB; kept here so schema.ts matches the database.
+		targetPosition: integer("target_position"),
+		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 100 }),
 		actual: varchar("actual", { length: 100 }),
 		createdAt: timestamp("created_at").defaultNow().notNull(),

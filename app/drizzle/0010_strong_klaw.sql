@@ -1,0 +1,1 @@
+ALTER TYPE "public"."alignment_method" ADD VALUE 'powsm_ctc';
