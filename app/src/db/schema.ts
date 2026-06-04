@@ -263,6 +263,11 @@ export const phonemeErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by current
+		// code but present in the live DB; kept here so schema.ts matches the
+		// database and a `db:push` doesn't drop them.
+		targetPosition: integer("target_position"),
+		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 10 }),
 		actual: varchar("actual", { length: 10 }),
 		timestampStartMs: integer("timestamp_start_ms"),
@@ -289,6 +294,11 @@ export const wordErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by current
+		// code but present in the live DB; kept here so schema.ts matches the
+		// database and a `db:push` doesn't drop them.
+		targetPosition: integer("target_position"),
+		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 100 }),
 		actual: varchar("actual", { length: 100 }),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
