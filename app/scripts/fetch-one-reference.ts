@@ -20,22 +20,55 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, "..", ".env") });
 
 if (typeof WebSocket === "undefined") neonConfig.webSocketConstructor = ws;
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL not set");
+
+function requireEnv(name: string): string {
+	const value = process.env[name];
+	if (!value) throw new Error(`${name} not set`);
+	return value;
+}
+
+const DATABASE_URL = requireEnv("DATABASE_URL");
+const R2_ENDPOINT = requireEnv("R2_ENDPOINT");
+const R2_ACCESS_KEY_ID = requireEnv("R2_ACCESS_KEY_ID");
+const R2_SECRET_ACCESS_KEY = requireEnv("R2_SECRET_ACCESS_KEY");
+const R2_BUCKET_NAME = requireEnv("R2_BUCKET_NAME");
 
 const outDir = join(__dirname, "..", "..", "sig", "exp", "ctc_probe");
 mkdirSync(outDir, { recursive: true });
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: DATABASE_URL });
 const db = drizzle(pool);
 
 const s3 = new S3Client({
 	region: "auto",
-	endpoint: process.env.R2_ENDPOINT,
+	endpoint: R2_ENDPOINT,
 	credentials: {
-		accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
-		secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
+		accessKeyId: R2_ACCESS_KEY_ID,
+		secretAccessKey: R2_SECRET_ACCESS_KEY,
 	},
 });
+
+interface RefRow {
+	id: string;
+	storage_key: string;
+	ipa_transcription: string;
+	ipa_method: string | null;
+	generation_method: string | null;
+	content: string;
+	word_count: number;
+	author: string;
+}
+
+interface ManifestEntry {
+	id: string;
+	author: string;
+	content: string;
+	ipa: string;
+	ipa_method: string | null;
+	generation_method: string | null;
+	storage_key: string;
+	wav: string;
+}
 
 async function main() {
 	// Prefer a short, clean sentence with a real IPA transcription.
@@ -57,8 +90,8 @@ async function main() {
 		return;
 	}
 
-	const manifest: any[] = [];
-	for (const r of res.rows as any[]) {
+	const manifest: ManifestEntry[] = [];
+	for (const r of res.rows as unknown as RefRow[]) {
 		console.log("\n--- reference ---");
 		console.log("id:        ", r.id);
 		console.log("author:    ", r.author);
@@ -69,13 +102,12 @@ async function main() {
 
 		const obj = await s3.send(
 			new GetObjectCommand({
-				Bucket: process.env.R2_BUCKET_NAME,
+				Bucket: R2_BUCKET_NAME,
 				Key: r.storage_key,
 			}),
 		);
-		const bytes = Buffer.from(
-			await (obj.Body as any).transformToByteArray(),
-		);
+		if (!obj.Body) throw new Error(`empty R2 body for ${r.storage_key}`);
+		const bytes = Buffer.from(await obj.Body.transformToByteArray());
 		const wavPath = join(outDir, `${r.id}.wav`);
 		writeFileSync(wavPath, bytes);
 		console.log(`wrote ${wavPath} (${bytes.length} bytes)`);

@@ -64,7 +64,10 @@ def main():
 
     sep("3. load reference clip + IPA")
     manifest = json.load(open(f"{PROBE_DIR}/manifest.json"))
-    ref = manifest[-1]  # shortest sentence: "Please send the report today."
+    if not manifest:
+        raise SystemExit("manifest.json is empty — run app/scripts/fetch-one-reference.ts first")
+    # fetch-one-reference.ts orders by word_count ASC, so [0] is the shortest clip.
+    ref = manifest[0]
     print("content:", ref["content"])
     print("ipa:    ", ref["ipa"])
     wav, _ = librosa.load(f"{PROBE_DIR}/{ref['wav']}", sr=TARGET_SR, mono=True)
