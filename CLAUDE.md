@@ -11,7 +11,7 @@ Web-based English pronunciation assessment for Turkish-native learners. Browser 
 ## Repo layout
 
 - `app/` — TanStack Start + React 19. DB via Drizzle/Neon (`app/src/db/`). R2 via `app/src/lib/r2.ts`. Clerk auth. Deployed on Fly.io.
-- `mod/` — Python RunPod workers. `assessment/` is the live one; `ipa_generation/` is V1 G2P slated for removal (issue #12).
+- `mod/` — Python RunPod workers. `assessment/` is the live one. (V1's `ipa_generation/` G2P worker was removed in E1 / #12.)
 - `mod/dev/runpod_proxy.py` + `docker-compose.dev.yml` — local RunPod simulator. Run with `python scripts/runpod.py`.
 - `sig/` — research notebooks (POWSM exploration).
 - `scripts/` — one-off Python/TS scripts (deploy, eval, audio download).

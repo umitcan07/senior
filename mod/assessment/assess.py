@@ -211,7 +211,6 @@ def parse_ipa_phonemes(ipa_phonemes: str) -> List[str]:
 
 # Singleton model instances (loaded once on worker startup)
 _pr_model = None
-_g2p_model = None
 _asr_model = None
 _device = None
 
@@ -241,39 +240,34 @@ def get_device():
 
 def get_models(device: Optional[str] = None):
     """
-    Load and cache POWSM models for PR, G2P, and ASR tasks.
-    
+    Load and cache POWSM models for PR and ASR tasks.
+
+    V2 references carry precomputed IPA (E4), so the on-demand G2P model was
+    dropped in E1 (#12).
+
     Args:
         device: Device to load models on ("cuda" or "cpu"). If None, auto-detect.
-        
+
     Returns:
-        Tuple of (pr_model, g2p_model, asr_model)
+        Tuple of (pr_model, asr_model)
     """
-    global _pr_model, _g2p_model, _asr_model
-    
+    global _pr_model, _asr_model
+
     # Auto-detect device if not specified
     if device is None:
         device = get_device()
-    
-    if _pr_model is None or _g2p_model is None or _asr_model is None:
+
+    if _pr_model is None or _asr_model is None:
         from espnet2.bin.s2t_inference import Speech2Text
-        
+
         print(f"DEBUG: Loading POWSM models on device: {device}")
-        
+
         # PR model (Phone Recognition: Audio → IPA)
         _pr_model = Speech2Text.from_pretrained(
             "espnet/powsm",
             device=device,
             lang_sym="<eng>",
             task_sym="<pr>",
-        )
-        
-        # G2P model (Grapheme-to-Phoneme: Text → IPA)
-        _g2p_model = Speech2Text.from_pretrained(
-            "espnet/powsm",
-            device=device,
-            lang_sym="<eng>",
-            task_sym="<g2p>",
         )
 
         # ASR model (Automatic Speech Recognition: Audio → Text)
@@ -285,10 +279,10 @@ def get_models(device: Optional[str] = None):
             task_sym="<asr>",
             beam_size=5,  # Increase from default 3 for better accuracy
         )
-        
+
         print(f"DEBUG: POWSM models loaded successfully on {device}")
-    
-    return _pr_model, _g2p_model, _asr_model
+
+    return _pr_model, _asr_model
 
 
 def extract_ipa_from_audio(audio_uri: str, device: Optional[str] = None) -> str:
@@ -326,7 +320,7 @@ def extract_ipa_from_audio(audio_uri: str, device: Optional[str] = None) -> str:
         print(f"DEBUG: Audio stats - min: {speech.min():.4f}, max: {speech.max():.4f}, mean: {speech.mean():.4f}, std: {speech.std():.4f}")
         
         # Get PR model
-        pr_model, _, _ = get_models(device)
+        pr_model, _ = get_models(device)
         
         # Run PR inference
         inference_start = time.time()
@@ -419,13 +413,14 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     Args:
         audio_uri: URI to audio file
         target_text: Target text (ground truth transcript)
-        target_ipa: Optional target IPA (if not provided, will generate with G2P)
+        target_ipa: Target IPA (required). V2 references carry precomputed IPA;
+            the on-demand G2P fallback was removed in E1 (#12).
         device: Device to run inference on ("cuda" or "cpu"). If None, auto-detect.
-    
+
     Returns:
         Dictionary with:
         - actual_ipa: str (detected IPA from PR)
-        - target_ipa: str (target IPA from G2P)
+        - target_ipa: str (precomputed reference IPA)
         - score: float (0.0-1.0)
         - errors: List[Dict] (timestamps are None until POWSM CTC alignment lands in E3)
     """
@@ -447,30 +442,19 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     print(f"DEBUG: Detected {len(actual_phonemes)} phones from PR")
     print(f"DEBUG: Actual phonemes list: {actual_phonemes[:20]}..." if len(actual_phonemes) > 20 else f"DEBUG: Actual phonemes list: {actual_phonemes}")
     
-    # Step 2: Generate target pronunciation from text using G2P
-    print("DEBUG: Step 2: Grapheme-to-Phoneme (G2P)...")
+    # Step 2: Target pronunciation comes from the precomputed reference IPA.
+    # The on-demand G2P-from-text path was removed in E1 (#12); V2 references
+    # always carry precomputed IPA (E4).
+    print("DEBUG: Step 2: Using precomputed target IPA...")
     if target_ipa is None:
-        # Download audio for G2P (audio-guided)
-        temp_path, _ = download_audio(audio_uri)
-        try:
-            speech, rate = librosa.load(temp_path, sr=16000, mono=True)
-            _, g2p_model, _ = get_models(device)
-            result_g2p = g2p_model(speech, text_prev=target_text)
-            target_ipa_phonemes = result_g2p[0][0]
-            if "<notimestamps>" in target_ipa_phonemes:
-                target_ipa_phonemes = target_ipa_phonemes.split("<notimestamps>")[1].strip()
-            else:
-                target_ipa_phonemes = target_ipa_phonemes.strip()
-        finally:
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
-    else:
-        target_ipa_phonemes = target_ipa
-    
+        raise ValueError(
+            "target_ipa is required: V2 references carry precomputed IPA "
+            "(the G2P fallback was removed in E1 / #12)"
+        )
+    target_ipa_phonemes = target_ipa
+
     target_phonemes = parse_ipa_phonemes(target_ipa_phonemes)
-    print(f"DEBUG: Target {len(target_phonemes)} phones from G2P")
+    print(f"DEBUG: Target {len(target_phonemes)} phones from precomputed IPA")
     print(f"DEBUG: Raw target IPA: '{target_ipa_phonemes[:100]}...' if len(target_ipa_phonemes) > 100 else f'DEBUG: Raw target IPA: '{target_ipa_phonemes}'")
     
     # Step 3: Run edit distance to find errors
@@ -495,7 +479,7 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         print(f"DEBUG: ASR input audio stats - shape: {speech.shape}, duration: {len(speech)/rate:.2f}s, sample rate: {rate}Hz")
         print(f"DEBUG: ASR input audio stats - min: {speech.min():.4f}, max: {speech.max():.4f}, mean: {speech.mean():.4f}, std: {speech.std():.4f}")
         
-        _, _, asr_model = get_models(device)
+        _, asr_model = get_models(device)
         
         # Use target text as context to improve ASR accuracy
         # This helps the model better recognize words, especially at the start
