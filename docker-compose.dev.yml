@@ -43,6 +43,13 @@ services:
     # But exposing 8001 for debugging might be useful.
     ports:
       - "8001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   # -----------------------------------------------------
   # 3. IPA Generation Worker (The G2P Utility)
