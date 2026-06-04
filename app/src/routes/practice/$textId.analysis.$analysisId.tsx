@@ -371,9 +371,9 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 					error.errorType === "substitute" &&
 					"border-destructive/20 bg-destructive/5 hover:bg-destructive/10",
 					error.errorType === "insert" &&
-					"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
+					"border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10",
 					error.errorType === "delete" &&
-					"border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10",
+					"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
 				)}
 				initial={{ opacity: 0, x: -10 }}
 				animate={{ opacity: 1, x: 0 }}
@@ -392,9 +392,9 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 								error.errorType === "substitute" &&
 								"border-destructive/50 text-destructive",
 								error.errorType === "insert" &&
-								"border-amber-500/50 text-amber-600 dark:text-amber-400",
+								"border-emerald-500/50 text-emerald-600 dark:text-emerald-400",
 								error.errorType === "delete" &&
-								"border-blue-500/50 text-blue-600 dark:text-blue-400",
+								"border-amber-500/50 text-amber-600 dark:text-amber-400",
 							)}
 						>
 							{error.errorType}
@@ -413,7 +413,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"font-ipa text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-amber-600 dark:text-amber-400",
+											"text-emerald-600 dark:text-emerald-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -430,7 +430,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-amber-600 dark:text-amber-400",
+											"text-emerald-600 dark:text-emerald-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -528,7 +528,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"font-ipa text-lg",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-amber-600 dark:text-amber-400",
+											"text-emerald-600 dark:text-emerald-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -539,7 +539,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"text-xs",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-amber-600 dark:text-amber-400",
+											"text-emerald-600 dark:text-emerald-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -1088,8 +1088,12 @@ function AnalysisPage() {
 									Substitution
 								</span>
 								<span className="flex items-center gap-1">
+									<span className="size-1.5 rounded-full bg-emerald-500/60" />
+									Insertion
+								</span>
+								<span className="flex items-center gap-1">
 									<span className="size-1.5 rounded-full bg-amber-500/60" />
-									Insertion/Deletion
+									Deletion
 								</span>
 							</div>
 						)}
