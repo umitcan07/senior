@@ -77,7 +77,9 @@ export function AddReferenceDialog({
 			if (!textId) throw new Error("Text is required");
 			if (!authorId) throw new Error("Author is required");
 
-			const storageKey = `references/${textId}/${authorId}/${Date.now()}.wav`;
+			const ext =
+				file?.name.match(/\.(wav|mp3|m4a|ogg)$/i)?.[0].toLowerCase() ?? ".wav";
+			const storageKey = `references/${textId}/${authorId}/${Date.now()}${ext}`;
 			return insertReferenceFn({
 				data: {
 					storageKey,

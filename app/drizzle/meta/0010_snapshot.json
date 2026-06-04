@@ -856,18 +856,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "target_position": {
-          "name": "target_position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "actual_position": {
-          "name": "actual_position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "expected": {
           "name": "expected",
           "type": "varchar(10)",
@@ -1530,18 +1518,6 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
-        },
-        "target_position": {
-          "name": "target_position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "actual_position": {
-          "name": "actual_position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "expected": {
           "name": "expected",

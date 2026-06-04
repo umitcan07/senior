@@ -109,5 +109,5 @@ please record it the same natural way both times.
 | go (again) | `go-g.wav` |
 | sit (again) | `sit-s.wav` |
 
-**44 files total** (40 distinct words + the three `-k`/`-g`/`-s` repeats).
+**43 files total** (40 distinct words + the three `-k`/`-g`/`-s` repeats).
 Thank you!

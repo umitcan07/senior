@@ -278,9 +278,10 @@ function PracticePage() {
 										</div>
 										<Select
 											value={wordCountFilter}
-											onValueChange={(v) =>
-												setWordCountFilter(v as WordCountCategory)
-											}
+											onValueChange={(v) => {
+												setWordCountFilter(v as WordCountCategory);
+												setVisibleCount(ITEMS_PER_PAGE);
+											}}
 										>
 											<SelectTrigger className="w-[140px] border-border/40 bg-muted/40">
 												<SelectValue placeholder="Length" />
@@ -350,9 +351,10 @@ function PracticePage() {
 													<label className="font-medium text-muted-foreground text-sm">Length</label>
 													<Select
 														value={wordCountFilter}
-														onValueChange={(v) =>
-															setWordCountFilter(v as WordCountCategory)
-														}
+														onValueChange={(v) => {
+															setWordCountFilter(v as WordCountCategory);
+															setVisibleCount(ITEMS_PER_PAGE);
+														}}
 													>
 														<SelectTrigger className="w-full border-border/40 bg-muted/40">
 															<SelectValue placeholder="Length" />
@@ -428,7 +430,7 @@ function PracticePage() {
 						) : allTexts.length > 0 ? (
 							<EmptyState
 								title="No texts match your filters"
-								description="Try adjusting your type filters or search query to see more texts."
+								description="Try adjusting your type filters, length filter, or search query to see more texts."
 								icon={<RiSearch2Line className="size-full" />}
 								variant="minimal"
 								primaryAction={{
@@ -436,6 +438,8 @@ function PracticePage() {
 									onClick: () => {
 										setSearchQuery("");
 										setTypeFilter("all");
+										setWordCountFilter("all");
+										setVisibleCount(ITEMS_PER_PAGE);
 									},
 								}}
 							/>
