@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
+import { DIALECTS } from "@/lib/dialect";
 import {
 	serverGenerateIPAAudio,
 	serverGetIPAAudioStatus,
@@ -812,7 +813,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 			<div className="grid grid-cols-2 gap-4 pt-2 text-base">
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5 text-muted-foreground text-sm uppercase tracking-wider">
-						<span className="text-lg">🇺🇸</span> AmE
+						<span className="text-lg">{DIALECTS.us.flag}</span> {DIALECTS.us.short}
 					</div>
 					<p className="text-muted-foreground text-sm leading-relaxed">
 						{renderTextWithIPA(item.ame)}
@@ -821,7 +822,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5 text-muted-foreground text-sm uppercase tracking-wider">
-						<span className="text-lg">🇬🇧</span> BrE
+						<span className="text-lg">{DIALECTS.uk.flag}</span> {DIALECTS.uk.short}
 					</div>
 					<p className="text-muted-foreground text-sm leading-relaxed">
 						{renderTextWithIPA(item.bre)}
