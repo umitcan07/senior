@@ -19,7 +19,6 @@ REGISTRY_PREFIX = "ucede/nonce"
 
 class Service(Enum):
     ASSESSMENT = "assessment"
-    GENERATION = "generation"
 
 SERVICES = {
     Service.ASSESSMENT: {
@@ -27,12 +26,6 @@ SERVICES = {
         "dir_name": "assessment",
         "dockerfile": "assessment/Dockerfile",
         "image": f"{REGISTRY_PREFIX}-assessment"
-    },
-    Service.GENERATION: {
-        "name": "generation",
-        "dir_name": "ipa_generation",
-        "dockerfile": "ipa_generation/Dockerfile",
-        "image": f"{REGISTRY_PREFIX}-generation"
     }
 }
 
@@ -107,20 +100,9 @@ def bump_version(current: str, bump_type: str) -> str:
     return f"{major}.{minor}.{patch}"
 
 def select_services() -> List[Service]:
-    print("\nWhich services do you want to deploy?")
-    print("1. Assessment (Whisper + MFA)")
-    print("2. IPA Generation (POWSM G2P)")
-    print("3. Both")
-    
-    while True:
-        choice = input(f"{Color.BOLD}Select [1-3]: {Color.ENDC}").strip()
-        if choice == "1":
-            return [Service.ASSESSMENT]
-        elif choice == "2":
-            return [Service.GENERATION]
-        elif choice == "3":
-            return [Service.ASSESSMENT, Service.GENERATION]
-        print_error("Invalid selection. Please try again.")
+    # Only the assessment worker remains; the G2P (ipa_generation) endpoint was
+    # removed in E1 (#12).
+    return [Service.ASSESSMENT]
 
 def select_version_bump(service_name: str, current_version: str) -> str:
     print(f"\n{Color.HEADER}Configuration for {service_name.upper()}{Color.ENDC}")
