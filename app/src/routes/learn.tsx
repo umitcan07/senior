@@ -896,7 +896,7 @@ function LearningPage() {
 					<div className="flex flex-col gap-16">
 						{/* IPA Section Header with Controls */}
 						<section className="flex flex-col gap-12">
-							<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 								<div className="flex flex-col gap-1">
 									<h2 className="font-semibold text-3xl tracking-tight">
 										International Phonetic Alphabet
@@ -908,7 +908,7 @@ function LearningPage() {
 								</div>
 
 								{/* Playback Controls */}
-								<div className="flex w-full flex-col-reverse items-end gap-2 sm:w-auto">
+								<div className="flex w-full flex-col items-end gap-2 sm:w-auto">
 									{/* Sound / Word toggle */}
 									<Tabs
 										value={playbackMode}
