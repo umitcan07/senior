@@ -28,9 +28,12 @@ export const qualityStatusEnum = pgEnum("quality_status", [
 	"warning",
 	"reject",
 ]);
+// `mfa` and `wav2textgrid` are V1-only, kept for historical rows. V2 writes
+// `powsm_ctc` (added in E1 / #13). See doc/db.md.
 export const alignmentMethodEnum = pgEnum("alignment_method", [
 	"mfa",
 	"wav2textgrid",
+	"powsm_ctc",
 ]);
 export const errorTypeEnum = pgEnum("error_type", [
 	"substitute",
@@ -224,7 +227,7 @@ export const analyses = pgTable(
 );
 
 /**
- * Alignment data storage (TextGrid files)
+ * Alignment data storage (V1; alignment via the alignment_method enum)
  */
 export const alignments = pgTable("alignments", {
 	id: uuid("id").primaryKey().defaultRandom(),

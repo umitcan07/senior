@@ -5,9 +5,7 @@ import {
 	RiArrowUpDownLine,
 	RiClipboardLine,
 	RiDeleteBinLine,
-	RiLoader2Line,
 	RiMoreLine,
-	RiTranslate2,
 } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
@@ -77,8 +75,6 @@ export const Route = createFileRoute("/admin/references")({
 // Columns
 function createColumns(
 	onDelete: (ref: ReferenceSpeechWithRelations) => void,
-	onGenerateIpa: (ref: ReferenceSpeechWithRelations) => void,
-	ipaGeneratingIds: Set<string>,
 	onCopyIpa: () => void,
 ): ColumnDef<ReferenceSpeechWithRelations>[] {
 	return [
@@ -207,16 +203,6 @@ function createColumns(
 			},
 			cell: ({ row }) => {
 				const ref = row.original;
-				const isGenerating = ipaGeneratingIds.has(ref.id);
-
-				if (isGenerating) {
-					return (
-						<div className="flex items-center gap-1.5 text-blue-600">
-							<RiLoader2Line className="h-3 w-3 animate-spin" />
-							<span className="text-xs">Generating...</span>
-						</div>
-					);
-				}
 
 				if (!ref.ipaTranscription) {
 					return (
@@ -288,14 +274,6 @@ function createColumns(
 								<DropdownMenuLabel>Actions</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
-									onClick={() => onGenerateIpa(ref)}
-									disabled={ipaGeneratingIds.has(ref.id)}
-								>
-									<RiTranslate2 className="mr-2 h-4 w-4" />
-									{ref.ipaTranscription ? "Regenerate IPA" : "Generate IPA"}
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem
 									onClick={() => onDelete(ref)}
 									className="text-destructive"
 								>
@@ -316,8 +294,6 @@ interface ReferencesDataTableProps {
 	data: ReferenceSpeechWithRelations[];
 	onDelete: (ref: ReferenceSpeechWithRelations) => void;
 	onDeleteSelected: (rows: ReferenceSpeechWithRelations[]) => void;
-	onGenerateIpa: (ref: ReferenceSpeechWithRelations) => void;
-	ipaGeneratingIds: Set<string>;
 	textFilter: string | null;
 	onTextFilterChange: (textId: string | null) => void;
 	texts: PracticeText[];
@@ -328,8 +304,6 @@ function ReferencesDataTable({
 	data,
 	onDelete,
 	onDeleteSelected,
-	onGenerateIpa,
-	ipaGeneratingIds,
 	textFilter,
 	onTextFilterChange,
 	texts,
@@ -347,7 +321,7 @@ function ReferencesDataTable({
 		? data.filter((r) => r.textId === textFilter)
 		: data;
 
-	const columns = createColumns(onDelete, onGenerateIpa, ipaGeneratingIds, onCopyIpa);
+	const columns = createColumns(onDelete, onCopyIpa);
 
 	const table = useReactTable({
 		data: filteredData,
@@ -547,9 +521,6 @@ function ReferencesPage() {
 	} = useRequireAdmin();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
 	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-	const [ipaGeneratingIds, setIpaGeneratingIds] = useState<Set<string>>(
-		new Set(),
-	);
 	const queryClient = useQueryClient();
 	const getReferencesFn = useServerFn(serverGetReferences);
 	const getTextsFn = useServerFn(serverGetPracticeTexts);
@@ -680,65 +651,6 @@ function ReferencesPage() {
 		});
 	};
 
-	const handleGenerateIpa = async (ref: ReferenceSpeechWithRelations) => {
-		try {
-			setIpaGeneratingIds((prev) => new Set(prev).add(ref.id));
-
-			const response = await fetch("/api/admin/ipa-generation", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ referenceSpeechId: ref.id }),
-			});
-
-			const result = await response.json();
-
-			if (result.success) {
-				toast({
-					title: "IPA generation started",
-					description: "The IPA transcription is being generated. This may take a moment.",
-				});
-
-				// Poll for completion (simple implementation)
-				const pollInterval = setInterval(async () => {
-					await queryClient.invalidateQueries({ queryKey: ["references"] });
-				}, 3000);
-
-				// Stop polling after 30 seconds
-				setTimeout(() => {
-					clearInterval(pollInterval);
-					setIpaGeneratingIds((prev) => {
-						const next = new Set(prev);
-						next.delete(ref.id);
-						return next;
-					});
-					queryClient.invalidateQueries({ queryKey: ["references"] });
-				}, 30000);
-			} else {
-				setIpaGeneratingIds((prev) => {
-					const next = new Set(prev);
-					next.delete(ref.id);
-					return next;
-				});
-				toast({
-					title: "IPA generation failed",
-					description: result.error || "Failed to start IPA generation",
-					variant: "destructive",
-				});
-			}
-		} catch {
-			setIpaGeneratingIds((prev) => {
-				const next = new Set(prev);
-				next.delete(ref.id);
-				return next;
-			});
-			toast({
-				title: "IPA generation failed",
-				description: "An error occurred while starting IPA generation",
-				variant: "destructive",
-			});
-		}
-	};
-
 	return (
 		<AdminLayout
 			title="Reference Speeches"
@@ -762,8 +674,6 @@ function ReferencesPage() {
 							data={references}
 							onDelete={handleDelete}
 							onDeleteSelected={handleDeleteSelected}
-							onGenerateIpa={handleGenerateIpa}
-							ipaGeneratingIds={ipaGeneratingIds}
 							textFilter={selectedTextId}
 							onTextFilterChange={setSelectedTextId}
 							texts={texts}

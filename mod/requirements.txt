@@ -13,7 +13,3 @@ numpy<2
 
 # HTTP client for downloading audio files
 requests>=2.31.0
-
-# Forced alignment (Montreal Forced Aligner)
-# montreal-forced-alignment>=3.0.0  # Install separately if needed
-

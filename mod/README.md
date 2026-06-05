@@ -1,14 +1,11 @@
-# Pronunciation Assessment & IPA Generation - RunPod Monorepo
+# Pronunciation Assessment — RunPod worker
 
-Monorepo containing two separate RunPod serverless endpoints for pronunciation assessment and IPA generation.
+RunPod serverless worker that evaluates pronunciation by comparing a learner's
+audio to a target IPA transcription, using POWSM (phone recognition + ASR).
 
-## Overview
-
-This monorepo contains:
-1. **Assessment Endpoint**: Evaluates pronunciation by comparing audio to target IPA
-2. **IPA Generation Endpoint**: Generates IPA transcription from English text (with optional audio)
-
-Both endpoints are deployed as separate Docker containers from this single repository.
+> The V1 IPA-generation (G2P) endpoint was removed in E1 (#12); V2 references
+> carry precomputed IPA. Phone-level timestamps come from POWSM CTC forced
+> alignment, landing in E3 (#19) — until then `assess()` emits no timings.
 
 ## Structure
 
@@ -20,20 +17,14 @@ mod/
 │   ├── edit_distance.py # Edit distance for phoneme comparison
 │   ├── Dockerfile      # Assessment Docker image
 │   └── requirements.txt
-├── ipa_generation/      # IPA generation endpoint
-│   ├── handler.py      # RunPod handler
-│   ├── generate.py     # Core IPA generation logic
-│   ├── Dockerfile      # IPA generation Docker image
-│   └── requirements.txt
 ├── shared/             # Shared utilities
 │   └── audio.py        # Audio loading/preprocessing
+├── dev/                # Local RunPod simulator (runpod_proxy.py)
 ├── tests/              # Unit tests
 └── .dockerignore
 ```
 
-## Endpoints
-
-### Assessment Endpoint
+## Assessment endpoint
 
 **Input:**
 ```json
@@ -42,6 +33,7 @@ mod/
   "target_ipa": "hɛloʊ wɜrld"
 }
 ```
+`target_ipa` is required (precomputed reference IPA).
 
 **Output:**
 ```json
@@ -50,95 +42,48 @@ mod/
   "target_ipa": "hɛloʊ wɜrld",
   "score": 0.85,
   "errors": [
-    {
-      "type": "substitute",
-      "position": 2,
-      "expected": "ə",
-      "actual": "o",
-      "timestamp": {"start": 32000, "end": 40000}
-    }
+    { "type": "substitute", "position": 2, "expected": "ə", "actual": "o", "timestamp": null }
   ]
 }
 ```
+(`timestamp` is `null` until POWSM CTC alignment lands in E3.)
 
-### IPA Generation Endpoint
+## Building the Docker image
 
-**Input:**
-```json
-{
-  "text": "hello world",
-  "audio_uri": "https://..."  // optional
-}
-```
-
-**Output:**
-```json
-{
-  "ipa_phonemes": "/h//ɛ//l//o//ʊ// //w//ɜ//r//l//d/",
-  "phonemes": ["h", "ɛ", "l", "o", "ʊ", " ", "w", "ɜ", "r", "l", "d"]
-}
-```
-
-## Building Docker Images
-
-Both images are built from the `mod/` directory (build context is `mod/`, not the monorepo root):
+Built from the `mod/` directory (build context is `mod/`, not the monorepo root):
 
 ```bash
 cd mod/
-
-# Build assessment image (build context is mod/ directory)
 docker build -f assessment/Dockerfile -t ucede/nonce-assessment:latest .
-
-# Build IPA generation image (build context is mod/ directory)
-docker build -f ipa_generation/Dockerfile -t ucede/nonce-generation:latest .
-
-# Push to registry
 docker push ucede/nonce-assessment:latest
-docker push ucede/nonce-generation:latest
 ```
 
 ## Deployment on RunPod
 
-See `doc/runpod/deployment_plan.md` for detailed deployment instructions.
+See `mod/DEPLOYMENT_STEPS.md`. Quick start: build + push the image, then create the
+`pronunciation-assessment` endpoint in the RunPod Console pointing at
+`ucede/nonce-assessment:latest`.
 
-### Quick Start
-
-1. Build and push Docker images (see above)
-2. Create endpoints in RunPod Console:
-   - **Assessment**: `ucede/nonce-assessment:latest`
-   - **IPA Generation**: `ucede/nonce-generation:latest`
-3. Configure endpoints as described in deployment plan
-
-## Local Development
+## Local development
 
 ```bash
 # Create virtual environment
 python -m venv venv
 source venv/bin/activate
 
-# Install dependencies for assessment
+# Install dependencies
 pip install -r assessment/requirements.txt
-
-# Or for IPA generation
-pip install -r ipa_generation/requirements.txt
-
-# Test handler locally (requires RUNPOD_API_KEY)
-python assessment/handler.py
-# or
-python ipa_generation/handler.py
 ```
 
-## Implementation Status
+Or run the full local RunPod simulator (proxy + worker) via `python scripts/runpod.py`.
 
-**Current Implementation**: Dummy/placeholder results
-- IPA transcription returns placeholder values
-- Timestamps are evenly distributed (dummy implementation)
-- Replace `extract_ipa_from_audio()` and `generate_ipa_*()` functions with actual POWSM model inference
-- Replace dummy timestamp generation with actual MFA alignment if needed
+## Implementation status
 
-## Running Tests
+- POWSM PR (phone recognition) + ASR run on real audio.
+- Phone-level timestamps: pending POWSM CTC forced alignment (E3 / #19).
+
+## Running tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
-

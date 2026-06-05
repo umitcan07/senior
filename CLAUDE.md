@@ -11,7 +11,7 @@ Web-based English pronunciation assessment for Turkish-native learners. Browser 
 ## Repo layout
 
 - `app/` — TanStack Start + React 19. DB via Drizzle/Neon (`app/src/db/`). R2 via `app/src/lib/r2.ts`. Clerk auth. Deployed on Fly.io.
-- `mod/` — Python RunPod workers. `assessment/` is the live one; `ipa_generation/` is V1 G2P slated for removal (issue #12).
+- `mod/` — Python RunPod workers. `assessment/` is the live one. (V1's `ipa_generation/` G2P worker was removed in E1 / #12.)
 - `mod/dev/runpod_proxy.py` + `docker-compose.dev.yml` — local RunPod simulator. Run with `python scripts/runpod.py`.
 - `sig/` — research notebooks (POWSM exploration).
 - `scripts/` — one-off Python/TS scripts (deploy, eval, audio download).
@@ -22,10 +22,11 @@ Web-based English pronunciation assessment for Turkish-native learners. Browser 
 - **Sample rate**: 16 kHz everywhere in the ML path. WAV uploads can be 16k/48k mono; `librosa.load(..., sr=16000, mono=True)` normalizes.
 - **POWSM frame stride is 40 ms** (read `model.preprocessor_conf["speech_resolution"]`, do **not** hardcode; ESPnet's `force_align.py` recipe has 0.02 which is wrong for POWSM). See `doc/V2_CONTEXT.md` §3.
 - **`forced_align` is batch-size-1 only**; target sequence must not contain `<blank>`; pad to 20 s. See issue #14.
-- **Drizzle migrations are append-only.** Never edit existing migration files in `app/drizzle/`. Add new ones via `pnpm db:generate`.
+- **Drizzle migrations** — `app/src/db/schema.ts` is the single source of truth. Every schema change: edit schema.ts → `pnpm db:generate` → **inspect the SQL** (if it changes anything you didn't intend, STOP and reconcile drift) → commit the schema change **and** the generated `app/drizzle/NNNN_*.sql` + `meta/NNNN_snapshot.json` + `meta/_journal.json` in **one commit**. Migrations are append-only (never edit/delete an existing migration or snapshot). **Never `db:push` without first generating + committing the migration** — that's how the `0009_chief_tiger_shark` orphan happened. There's a single Neon DB (the `development` branch) for local **and** prod, so `db:push` hits the live app immediately — review the generated SQL first and keep changes additive. Full rules: `doc/db.md` §Migrations.
+- **Generated files — never hand-edit.** `app/src/routeTree.gen.ts` is produced by the TanStack vite plugin; it regenerates on `pnpm dev`/`pnpm build`. When you add/remove a route file, regenerate and commit `routeTree.gen.ts` alongside the change. Same for Drizzle `meta/` snapshots.
 - **DB access** goes through `app/src/db/*.ts` helpers; **RunPod calls** through `app/src/lib/assessment-submission.ts`. Never from a route's `loader`.
 - **`mod/`**: singleton-load models on container startup, never per request. No MFA / Kaldi / TextGrid references in new code (we just stripped them — see Epic E1).
-- **TypeScript**: Biome (`biome.json`). Imports use `@/db/...`, `@/lib/...` aliases.
+- **TypeScript**: Biome (`biome.json`). Run `pnpm check` in `app/` before committing TS/TSX and don't introduce new lint/format errors (note: `scripts/` is excluded from Biome, so it won't catch issues there). Imports use `@/db/...`, `@/lib/...` aliases.
 - **Python**: standard library + numpy/torch idioms. Tests live in `mod/tests/`.
 - **Commits**: lowercase prefix (`app:`, `doc:`, `mod:`, `ci:`, `chore:`) + colon + short description. Include `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` when I authored. Never push without explicit ask.
 - **Issues + PRs**: reference issue number (`Fixes #N`). Cross-link parent epic.
