@@ -1,8 +1,15 @@
 .DS_Store
 **/.venv
+__pycache__/
 .llms
 sig/exp/audio/development/**/*.m4a
 sig/exp/audio/development/**/*.wav
 # E1 CTC probe scratch: reference WAVs + ~1.4GB HF model cache (regenerable)
 sig/exp/ctc_probe/
 node_modules
+
+# Long source takes (Fiverr orders + your own raw recordings) — cut into committed clips under
+# data/ via scripts/split_audio.py. Only the per-id clips, cut sheets, manifest, authors.json,
+# and goldens are tracked; the big sources are not.
+data/raw/
+data/fiverr/

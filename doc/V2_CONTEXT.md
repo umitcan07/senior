@@ -307,6 +307,7 @@ A quick "where do I go for X" cheat-sheet:
 | Add a script for evaluation or ingest | `scripts/` (new file) or `mod/` for inference scripts |
 | Sanity-check audio | `mod/shared/audio.py` |
 | Run the local RunPod simulator | `scripts/runpod.py` → `docker compose -f docker-compose.dev.yml up` |
+| Explore/verify audio offline (no DB) | `data/README.md` — fixtures + `manifest.json`; `mod/dev/verify.py` runs POWSM phone-recog/alignment/GOP on committed clips; `scripts/split_audio.py` cuts long takes |
 | Existing tests | `mod/tests/test_edit_operations.py` (the only test file) |
 
 ---

@@ -1,0 +1,452 @@
+{
+  "_note": "Prompt index (reference sentences + /learn word->dest mapping). Recordings live on disk under references/<author>/ and learn/<author>/ and are discovered by mod/dev/verify.py. Author metadata is in data/authors.json. Regenerate with scripts/gen_manifest.py.",
+  "references": [
+    {
+      "id": "ref_001",
+      "text": "I left my keys on the kitchen table again."
+    },
+    {
+      "id": "ref_002",
+      "text": "She wants to visit her family next month, maybe around the holidays."
+    },
+    {
+      "id": "ref_003",
+      "text": "The man sent the cup back to us."
+    },
+    {
+      "id": "ref_004",
+      "text": "They moved into a much bigger house just last spring."
+    },
+    {
+      "id": "ref_005",
+      "text": "We saw three deer near the river while walking early this morning."
+    },
+    {
+      "id": "ref_006",
+      "text": "My brother bought a shiny new red car last weekend."
+    },
+    {
+      "id": "ref_007",
+      "text": "These cheap seats are not very big."
+    },
+    {
+      "id": "ref_008",
+      "text": "She always drinks her morning coffee black, without any sugar."
+    },
+    {
+      "id": "ref_009",
+      "text": "Could you please turn off the lights before bed?"
+    },
+    {
+      "id": "ref_010",
+      "text": "She really enjoys speaking both English and a little French."
+    },
+    {
+      "id": "ref_011",
+      "text": "Could you please pass me the salt and the bottle of water?"
+    },
+    {
+      "id": "ref_012",
+      "text": "The weather looks lovely, so I think we'll go for a long walk later."
+    },
+    {
+      "id": "ref_013",
+      "text": "He found a nice little apartment downtown, close to his office."
+    },
+    {
+      "id": "ref_014",
+      "text": "I think we should leave a little early to beat the traffic."
+    },
+    {
+      "id": "ref_015",
+      "text": "I'd love to grab a coffee after work."
+    },
+    {
+      "id": "ref_016",
+      "text": "I completely forgot to bring my umbrella again this morning."
+    },
+    {
+      "id": "ref_017",
+      "text": "We watched a really good film together on Friday night."
+    },
+    {
+      "id": "ref_018",
+      "text": "Let's meet at that new little place near the park around noon."
+    },
+    {
+      "id": "ref_019",
+      "text": "They love walking along the beach together almost every evening."
+    },
+    {
+      "id": "ref_020",
+      "text": "He carefully put all the books back on the shelf."
+    },
+    {
+      "id": "ref_021",
+      "text": "I'm not sure who edited the final report."
+    },
+    {
+      "id": "ref_022",
+      "text": "Please close the window before you leave; it's getting really cold."
+    },
+    {
+      "id": "ref_023",
+      "text": "Do you want to come over this weekend and help me paint the kitchen?"
+    },
+    {
+      "id": "ref_024",
+      "text": "I usually like to read a good book before I fall asleep."
+    },
+    {
+      "id": "ref_025",
+      "text": "Don't forget to call your mother back tomorrow, okay?"
+    }
+  ],
+  "learn_words": [
+    {
+      "id": "word_01",
+      "word": "see",
+      "phonemes": [
+        "iː"
+      ],
+      "dest": "ipa/words/see.wav"
+    },
+    {
+      "id": "word_02",
+      "word": "sit",
+      "phonemes": [
+        "ɪ"
+      ],
+      "dest": "ipa/words/sit.wav"
+    },
+    {
+      "id": "word_03",
+      "word": "bed",
+      "phonemes": [
+        "e",
+        "b"
+      ],
+      "dest": "ipa/words/bed.wav"
+    },
+    {
+      "id": "word_04",
+      "word": "cat",
+      "phonemes": [
+        "æ"
+      ],
+      "dest": "ipa/words/cat.wav"
+    },
+    {
+      "id": "word_05",
+      "word": "father",
+      "phonemes": [
+        "ɑː"
+      ],
+      "dest": "ipa/words/father.wav"
+    },
+    {
+      "id": "word_06",
+      "word": "hot",
+      "phonemes": [
+        "ɒ"
+      ],
+      "dest": "ipa/words/hot.wav"
+    },
+    {
+      "id": "word_07",
+      "word": "saw",
+      "phonemes": [
+        "ɔː"
+      ],
+      "dest": "ipa/words/saw.wav"
+    },
+    {
+      "id": "word_08",
+      "word": "put",
+      "phonemes": [
+        "ʊ"
+      ],
+      "dest": "ipa/words/put.wav"
+    },
+    {
+      "id": "word_09",
+      "word": "too",
+      "phonemes": [
+        "uː"
+      ],
+      "dest": "ipa/words/too.wav"
+    },
+    {
+      "id": "word_10",
+      "word": "cup",
+      "phonemes": [
+        "ʌ"
+      ],
+      "dest": "ipa/words/cup.wav"
+    },
+    {
+      "id": "word_11",
+      "word": "bird",
+      "phonemes": [
+        "ɜː"
+      ],
+      "dest": "ipa/words/bird.wav"
+    },
+    {
+      "id": "word_12",
+      "word": "about",
+      "phonemes": [
+        "ə"
+      ],
+      "dest": "ipa/words/about.wav"
+    },
+    {
+      "id": "word_13",
+      "word": "day",
+      "phonemes": [
+        "eɪ"
+      ],
+      "dest": "ipa/words/day.wav"
+    },
+    {
+      "id": "word_14",
+      "word": "my",
+      "phonemes": [
+        "aɪ"
+      ],
+      "dest": "ipa/words/my.wav"
+    },
+    {
+      "id": "word_15",
+      "word": "boy",
+      "phonemes": [
+        "ɔɪ"
+      ],
+      "dest": "ipa/words/boy.wav"
+    },
+    {
+      "id": "word_16",
+      "word": "now",
+      "phonemes": [
+        "aʊ"
+      ],
+      "dest": "ipa/words/now.wav"
+    },
+    {
+      "id": "word_17",
+      "word": "go",
+      "phonemes": [
+        "əʊ"
+      ],
+      "dest": "ipa/words/go.wav"
+    },
+    {
+      "id": "word_18",
+      "word": "near",
+      "phonemes": [
+        "ɪə"
+      ],
+      "dest": "ipa/words/near.wav"
+    },
+    {
+      "id": "word_19",
+      "word": "hair",
+      "phonemes": [
+        "eə"
+      ],
+      "dest": "ipa/words/hair.wav"
+    },
+    {
+      "id": "word_20",
+      "word": "pure",
+      "phonemes": [
+        "ʊə"
+      ],
+      "dest": "ipa/words/pure.wav"
+    },
+    {
+      "id": "word_21",
+      "word": "pet",
+      "phonemes": [
+        "p"
+      ],
+      "dest": "ipa/words/pet.wav"
+    },
+    {
+      "id": "word_22",
+      "word": "ten",
+      "phonemes": [
+        "t"
+      ],
+      "dest": "ipa/words/ten.wav"
+    },
+    {
+      "id": "word_23",
+      "word": "dog",
+      "phonemes": [
+        "d"
+      ],
+      "dest": "ipa/words/dog.wav"
+    },
+    {
+      "id": "word_24",
+      "word": "fan",
+      "phonemes": [
+        "f"
+      ],
+      "dest": "ipa/words/fan.wav"
+    },
+    {
+      "id": "word_25",
+      "word": "van",
+      "phonemes": [
+        "v"
+      ],
+      "dest": "ipa/words/van.wav"
+    },
+    {
+      "id": "word_26",
+      "word": "think",
+      "phonemes": [
+        "θ"
+      ],
+      "dest": "ipa/words/think.wav"
+    },
+    {
+      "id": "word_27",
+      "word": "this",
+      "phonemes": [
+        "ð"
+      ],
+      "dest": "ipa/words/this.wav"
+    },
+    {
+      "id": "word_28",
+      "word": "zoo",
+      "phonemes": [
+        "z"
+      ],
+      "dest": "ipa/words/zoo.wav"
+    },
+    {
+      "id": "word_29",
+      "word": "ship",
+      "phonemes": [
+        "ʃ"
+      ],
+      "dest": "ipa/words/ship.wav"
+    },
+    {
+      "id": "word_30",
+      "word": "measure",
+      "phonemes": [
+        "ʒ"
+      ],
+      "dest": "ipa/words/measure.wav"
+    },
+    {
+      "id": "word_31",
+      "word": "hat",
+      "phonemes": [
+        "h"
+      ],
+      "dest": "ipa/words/hat.wav"
+    },
+    {
+      "id": "word_32",
+      "word": "church",
+      "phonemes": [
+        "tʃ"
+      ],
+      "dest": "ipa/words/church.wav"
+    },
+    {
+      "id": "word_33",
+      "word": "judge",
+      "phonemes": [
+        "dʒ"
+      ],
+      "dest": "ipa/words/judge.wav"
+    },
+    {
+      "id": "word_34",
+      "word": "man",
+      "phonemes": [
+        "m"
+      ],
+      "dest": "ipa/words/man.wav"
+    },
+    {
+      "id": "word_35",
+      "word": "no",
+      "phonemes": [
+        "n"
+      ],
+      "dest": "ipa/words/no.wav"
+    },
+    {
+      "id": "word_36",
+      "word": "sing",
+      "phonemes": [
+        "ŋ"
+      ],
+      "dest": "ipa/words/sing.wav"
+    },
+    {
+      "id": "word_37",
+      "word": "let",
+      "phonemes": [
+        "l"
+      ],
+      "dest": "ipa/words/let.wav"
+    },
+    {
+      "id": "word_38",
+      "word": "red",
+      "phonemes": [
+        "r"
+      ],
+      "dest": "ipa/words/red.wav"
+    },
+    {
+      "id": "word_39",
+      "word": "yes",
+      "phonemes": [
+        "j"
+      ],
+      "dest": "ipa/words/yes.wav"
+    },
+    {
+      "id": "word_40",
+      "word": "wet",
+      "phonemes": [
+        "w"
+      ],
+      "dest": "ipa/words/wet.wav"
+    },
+    {
+      "id": "word_41",
+      "word": "cat",
+      "phonemes": [
+        "k"
+      ],
+      "dest": "ipa/words/cat-k.wav"
+    },
+    {
+      "id": "word_42",
+      "word": "go",
+      "phonemes": [
+        "g"
+      ],
+      "dest": "ipa/words/go-g.wav"
+    },
+    {
+      "id": "word_43",
+      "word": "sit",
+      "phonemes": [
+        "s"
+      ],
+      "dest": "ipa/words/sit-s.wav"
+    }
+  ]
+}
