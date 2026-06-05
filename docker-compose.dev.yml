@@ -37,6 +37,13 @@ services:
       - ./mod/assessment:/worker/assessment
       - ./mod/shared:/worker/shared
       - ./mod/alignment.py:/worker/alignment.py
+      - ./mod/dev:/worker/dev
+      # split_audio.py runs in-container too (ffmpeg is in the image, no host install needed).
+      - ./scripts:/worker/scripts
+      # Audio fixtures + manifest for the offline verify harness. Read-write so
+      # `verify.py align-refs --save` can write golden *.expected.json back to the host,
+      # and so split_audio.py can write cut clips into data/.
+      - ./data:/data
     networks:
       - runpod-net
     # No ports exposed to host needed, only proxy talks to it.
