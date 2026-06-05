@@ -87,19 +87,5 @@
       "PowerShell(Stop-Process *)",
       "PowerShell(Restart-Computer *)"
     ]
-  },
-  "hooks": {
-    "WorktreeCreate": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/copy-env-to-worktree.ps1",
-            "timeout": 15,
-            "statusMessage": "Copying app/.env to worktree..."
-          }
-        ]
-      }
-    ]
   }
 }
