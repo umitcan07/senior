@@ -908,8 +908,8 @@ function LearningPage() {
 								</div>
 
 								{/* Playback Controls */}
-								<div className="flex w-full flex-row-reverse flex-wrap items-start justify-start gap-2 sm:w-auto sm:flex-nowrap">
-									{/* Sound / Word toggle — right-anchored so removing the speaker row causes no shift */}
+								<div className="flex w-full flex-col items-end gap-2 sm:w-auto">
+									{/* Sound / Word toggle */}
 									<Tabs
 										value={playbackMode}
 										onValueChange={(v) => setPlaybackMode(v as PlaybackMode)}
