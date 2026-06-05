@@ -18,7 +18,6 @@ export async function getAuthors(): Promise<Author[]> {
 			accent: authors.accent,
 			style: authors.style,
 			languageCode: authors.languageCode,
-			elevenlabsVoiceId: authors.elevenlabsVoiceId,
 			createdAt: authors.createdAt,
 			updatedAt: authors.updatedAt,
 		})
@@ -36,7 +35,6 @@ export async function getAuthorsWithReferenceCounts(): Promise<
 			accent: authors.accent,
 			style: authors.style,
 			languageCode: authors.languageCode,
-			elevenlabsVoiceId: authors.elevenlabsVoiceId,
 			createdAt: authors.createdAt,
 			updatedAt: authors.updatedAt,
 			referenceCount: sql<number>`count(${referenceSpeeches.id})::int`,
@@ -57,7 +55,6 @@ export async function getAuthorById(id: string): Promise<Author | null> {
 			accent: authors.accent,
 			style: authors.style,
 			languageCode: authors.languageCode,
-			elevenlabsVoiceId: authors.elevenlabsVoiceId,
 			createdAt: authors.createdAt,
 			updatedAt: authors.updatedAt,
 		})
@@ -72,7 +69,6 @@ export async function insertAuthor(data: {
 	accent?: string | null;
 	style?: string | null;
 	languageCode?: string | null;
-	elevenlabsVoiceId?: string | null;
 }): Promise<Author> {
 	const [result] = await db
 		.insert(authors)
@@ -81,7 +77,6 @@ export async function insertAuthor(data: {
 			accent: data.accent ?? null,
 			style: data.style ?? null,
 			languageCode: data.languageCode ?? null,
-			elevenlabsVoiceId: data.elevenlabsVoiceId ?? null,
 		})
 		.returning();
 	return result;
@@ -94,7 +89,6 @@ export async function updateAuthor(
 		accent?: string | null;
 		style?: string | null;
 		languageCode?: string | null;
-		elevenlabsVoiceId?: string | null;
 	},
 ): Promise<Author> {
 	const updateData: Partial<NewAuthor> = {
@@ -112,9 +106,6 @@ export async function updateAuthor(
 	}
 	if (data.languageCode !== undefined) {
 		updateData.languageCode = data.languageCode;
-	}
-	if (data.elevenlabsVoiceId !== undefined) {
-		updateData.elevenlabsVoiceId = data.elevenlabsVoiceId;
 	}
 
 	const [result] = await db

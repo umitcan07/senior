@@ -27,60 +27,61 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle(pool);
 
 async function main() {
-	const texts = await db.execute(sql`
-		SELECT pt.id, pt.content, pt.difficulty, pt.type, pt.word_count, pt.note,
-		       count(rs.id) AS ref_count
-		FROM practice_texts pt
-		LEFT JOIN reference_speeches rs ON rs.text_id = pt.id
-		GROUP BY pt.id
-		ORDER BY pt.type, pt.difficulty, pt.word_count
-	`);
+	try {
+		const texts = await db.execute(sql`
+			SELECT pt.id, pt.content, pt.difficulty, pt.type, pt.word_count, pt.note,
+			       count(rs.id) AS ref_count
+			FROM practice_texts pt
+			LEFT JOIN reference_speeches rs ON rs.text_id = pt.id
+			GROUP BY pt.id
+			ORDER BY pt.type, pt.difficulty, pt.word_count
+		`);
 
-	const authors = await db.execute(sql`
-		SELECT a.id, a.name, a.accent, a.style, a.language_code,
-		       a.elevenlabs_voice_id, count(rs.id) AS ref_count
-		FROM authors a
-		LEFT JOIN reference_speeches rs ON rs.author_id = a.id
-		GROUP BY a.id
-		ORDER BY a.name
-	`);
+		const authors = await db.execute(sql`
+			SELECT a.id, a.name, a.accent, a.style, a.language_code,
+			       count(rs.id) AS ref_count
+			FROM authors a
+			LEFT JOIN reference_speeches rs ON rs.author_id = a.id
+			GROUP BY a.id
+			ORDER BY a.name
+		`);
 
-	const refSummary = await db.execute(sql`
-		SELECT generation_method, ipa_method, count(*) AS n,
-		       count(ipa_transcription) AS with_ipa
-		FROM reference_speeches
-		GROUP BY generation_method, ipa_method
-		ORDER BY generation_method, ipa_method
-	`);
+		const refSummary = await db.execute(sql`
+			SELECT generation_method, ipa_method, count(*) AS n,
+			       count(ipa_transcription) AS with_ipa
+			FROM reference_speeches
+			GROUP BY generation_method, ipa_method
+			ORDER BY generation_method, ipa_method
+		`);
 
-	console.log(`\n=== practice_texts (${texts.rows.length}) ===`);
-	console.table(
-		texts.rows.map((r: any) => ({
-			type: r.type,
-			diff: r.difficulty,
-			wc: r.word_count,
-			refs: Number(r.ref_count),
-			content:
-				r.content.length > 70 ? `${r.content.slice(0, 70)}…` : r.content,
-		})),
-	);
+		console.log(`\n=== practice_texts (${texts.rows.length}) ===`);
+		console.table(
+			texts.rows.map((r: any) => ({
+				type: r.type,
+				diff: r.difficulty,
+				wc: r.word_count,
+				refs: Number(r.ref_count),
+				content:
+					r.content.length > 70 ? `${r.content.slice(0, 70)}…` : r.content,
+			})),
+		);
 
-	console.log(`\n=== authors (${authors.rows.length}) ===`);
-	console.table(
-		authors.rows.map((r: any) => ({
-			name: r.name,
-			accent: r.accent,
-			style: r.style,
-			lang: r.language_code,
-			voice: r.elevenlabs_voice_id,
-			refs: Number(r.ref_count),
-		})),
-	);
+		console.log(`\n=== authors (${authors.rows.length}) ===`);
+		console.table(
+			authors.rows.map((r: any) => ({
+				name: r.name,
+				accent: r.accent,
+				style: r.style,
+				lang: r.language_code,
+				refs: Number(r.ref_count),
+			})),
+		);
 
-	console.log("\n=== reference_speeches summary ===");
-	console.table(refSummary.rows);
-
-	await pool.end();
+		console.log("\n=== reference_speeches summary ===");
+		console.table(refSummary.rows);
+	} finally {
+		await pool.end();
+	}
 }
 
 main().catch((e) => {
