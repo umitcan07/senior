@@ -36,7 +36,7 @@ services:
       # Optional: Mount code for hot-reloading if your handler supports it (RunPod SDK might not auto-reload)
       - ./mod/assessment:/worker/assessment
       - ./mod/shared:/worker/shared
-      - ./mod/alignment:/worker/alignment
+      - ./mod/alignment.py:/worker/alignment.py
     networks:
       - runpod-net
     # No ports exposed to host needed, only proxy talks to it.
