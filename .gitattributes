@@ -1,0 +1,18 @@
+# Enforce LF line endings in the repo regardless of OS/git config.
+* text=auto eol=lf
+
+# Binary files — no line-ending normalization.
+*.wav binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.pyc binary
