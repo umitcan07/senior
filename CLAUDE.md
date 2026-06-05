@@ -28,8 +28,8 @@ Web-based English pronunciation assessment for Turkish-native learners. Browser 
 - **`mod/`**: singleton-load models on container startup, never per request. No MFA / Kaldi / TextGrid references in new code (we just stripped them — see Epic E1).
 - **TypeScript**: Biome (`biome.json`). Run `pnpm check` in `app/` before committing TS/TSX and don't introduce new lint/format errors (note: `scripts/` is excluded from Biome, so it won't catch issues there). Imports use `@/db/...`, `@/lib/...` aliases.
 - **Python**: standard library + numpy/torch idioms. Tests live in `mod/tests/`.
-- **Commits**: lowercase prefix (`app:`, `doc:`, `mod:`, `ci:`, `chore:`) + colon + short description. Include `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` when I authored. Never push without explicit ask.
-- **Issues + PRs**: reference issue number (`Fixes #N`). Cross-link parent epic.
+- **Commits**: lowercase prefix (`app:`, `doc:`, `mod:`, `ci:`, `chore:`) + colon + short description.
+- **Issues + PRs**: reference issue number (`Fixes #N`). Cross-link parent epic. When implementing a task, ask user about the key design decisions.
 
 ## Two Turkish-L1 facts you'll touch often
 
@@ -45,7 +45,6 @@ These are surgical, low-context helpers — invoke via `Skill` tool, don't reinv
 
 ## Do-not list
 
-- Don't push to remote without explicit user ask.
 - Don't run destructive git (`reset --hard`, `push --force`, branch -D) without explicit ask.
 - Don't commit `NOUNCE_V2_PLAN.md`, `biome.json`, or untracked siblings unless that's the request.
 - Don't reintroduce MFA, the G2P endpoint, or heuristic timestamps.
