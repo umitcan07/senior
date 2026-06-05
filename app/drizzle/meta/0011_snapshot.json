@@ -1,6 +1,6 @@
 {
-  "id": "4c9736e6-bf9b-4064-b287-1684b9934d4b",
-  "prevId": "545b8ab3-f3bd-4229-8284-7871eb7aa23a",
+  "id": "253dd21a-a5ea-4538-93b0-ac730b1b8c83",
+  "prevId": "4c9736e6-bf9b-4064-b287-1684b9934d4b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -856,6 +856,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "target_position": {
+          "name": "target_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_position": {
+          "name": "actual_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "expected": {
           "name": "expected",
           "type": "varchar(10)",
@@ -1519,6 +1531,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "target_position": {
+          "name": "target_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_position": {
+          "name": "actual_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "expected": {
           "name": "expected",
           "type": "varchar(100)",
@@ -1629,7 +1653,8 @@
       "schema": "public",
       "values": [
         "mfa",
-        "wav2textgrid"
+        "wav2textgrid",
+        "powsm_ctc"
       ]
     },
     "public.analysis_status": {

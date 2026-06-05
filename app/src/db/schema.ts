@@ -93,7 +93,7 @@ export const practiceTexts = pgTable(
 );
 
 /**
- * Authors/voices for reference speeches (TTS or native speakers)
+ * Authors/voices for reference speeches (native speakers)
  */
 export const authors = pgTable("authors", {
 	id: uuid("id").primaryKey().defaultRandom(),
@@ -101,7 +101,6 @@ export const authors = pgTable("authors", {
 	accent: varchar("accent", { length: 50 }),
 	style: varchar("style", { length: 50 }),
 	languageCode: varchar("language_code", { length: 10 }),
-	elevenlabsVoiceId: varchar("elevenlabs_voice_id", { length: 255 }),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -267,8 +266,9 @@ export const phonemeErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
-		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by V2 code
-		// but present in the live DB; kept here so schema.ts matches the database.
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by current
+		// code but present in the live DB; kept here so schema.ts matches the
+		// database and a `db:push` doesn't drop them.
 		targetPosition: integer("target_position"),
 		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 10 }),
@@ -297,8 +297,9 @@ export const wordErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
-		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by V2 code
-		// but present in the live DB; kept here so schema.ts matches the database.
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by current
+		// code but present in the live DB; kept here so schema.ts matches the
+		// database and a `db:push` doesn't drop them.
 		targetPosition: integer("target_position"),
 		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 100 }),

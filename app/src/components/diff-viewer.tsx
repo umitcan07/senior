@@ -1,26 +1,31 @@
 import { RiInformationLine } from "@remixicon/react";
+import { useEffect, useState } from "react";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { PhonemeError, WordError } from "@/db/types";
+import { DIFF_VIEW_STORAGE_KEY_PREFIX } from "@/lib/constants";
 import {
+	buildDiff,
+	type DiffCell,
+	type DiffError,
 	errorBgVariants,
 	errorBorderVariants,
 	errorTextVariants,
 } from "@/lib/diff-viewer";
 import { cn } from "@/lib/utils";
 
+type DiffView = "unified" | "split";
+
 interface DiffViewerProps {
 	target: string;
 	recognized: string;
-	errors: PhonemeError[] | WordError[];
+	errors: DiffError[];
 	type: "phoneme" | "word";
 	audioSrc?: string;
 	onSegmentClick?: (startMs: number, endMs: number) => void;
-	showLegend?: boolean;
 }
 
 function formatTimestamp(ms: number): string {
@@ -37,28 +42,52 @@ const INFO_CONTENT = {
 		"Detailed phonetic analysis comparing expected pronunciation with what was detected. Phoneme-level comparison provides granular feedback on individual sounds.",
 };
 
-// Individual segment component
-interface SegmentProps {
-	segment: string;
-	error?: PhonemeError | WordError;
-	audioSrc?: string;
-	onSegmentClick?: (startMs: number, endMs: number) => void;
+/**
+ * Remember the chosen view per comparison type, independently, across sessions.
+ * Defaults to "unified" (the merged git-style line).
+ */
+function useDiffView(type: "phoneme" | "word") {
+	const key = `${DIFF_VIEW_STORAGE_KEY_PREFIX}-${type}`;
+	const [view, setView] = useState<DiffView>(() => {
+		if (typeof window === "undefined") return "unified";
+		const stored = localStorage.getItem(key);
+		return stored === "split" || stored === "unified" ? stored : "unified";
+	});
+
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		localStorage.setItem(key, view);
+	}, [key, view]);
+
+	return [view, setView] as const;
 }
 
-function Segment({
-	segment,
+interface ChipProps {
+	error?: DiffError;
+	audioSrc?: string;
+	onSegmentClick?: (startMs: number, endMs: number) => void;
+	className?: string;
+	children: React.ReactNode;
+}
+
+/**
+ * A clickable token. When the error carries timestamps and audio is available,
+ * it plays that segment and shows a tooltip; otherwise it's inert.
+ */
+function Chip({
 	error,
 	audioSrc,
 	onSegmentClick,
-}: SegmentProps) {
-	const hasError = !!error;
+	className,
+	children,
+}: ChipProps) {
 	const hasTimestamps =
-		error &&
+		!!error &&
 		"timestampStartMs" in error &&
 		error.timestampStartMs != null &&
 		error.timestampEndMs != null;
 
-	const canPlay = audioSrc && hasTimestamps && onSegmentClick;
+	const canPlay = !!(audioSrc && hasTimestamps && onSegmentClick);
 
 	const handleClick = () => {
 		if (
@@ -72,28 +101,18 @@ function Segment({
 		}
 	};
 
-	const content = (
+	const button = (
 		<button
 			type="button"
-			className={cn(
-				"relative inline-flex items-center gap-1 text-lg rounded-sm px-2 py-1 font-ipa outline-hidden transition-all font-ipa! text-xl focus-visible:ring-2 focus-visible:ring-primary/8",
-				hasError &&
-				cn(
-					errorBgVariants({ errorType: error.errorType }),
-					errorBorderVariants({ errorType: error.errorType }),
-					errorTextVariants({ errorType: error.errorType }),
-					"font-bold",
-				),
-				!hasError &&
-				"bg-green-950/10 dark:bg-green-900/20 text-green-800 dark:text-green-300 font-medium border border-green-800/20 dark:border-green-700/30",
-				canPlay &&
-				"cursor-pointer hover:scale-105 hover:ring-2 hover:ring-primary/20",
-				!canPlay && "cursor-default",
-			)}
-			onClick={handleClick}
 			disabled={!canPlay}
+			onClick={handleClick}
+			className={cn(
+				"inline-flex items-center gap-1 rounded-sm outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-primary/40",
+				canPlay ? "cursor-pointer hover:brightness-110" : "cursor-default",
+				className,
+			)}
 		>
-			{segment}
+			{children}
 		</button>
 	);
 
@@ -106,7 +125,7 @@ function Segment({
 		return (
 			<TooltipProvider>
 				<Tooltip>
-					<TooltipTrigger asChild>{content}</TooltipTrigger>
+					<TooltipTrigger asChild>{button}</TooltipTrigger>
 					<TooltipContent side="top" className="text-xs">
 						<span className="font-medium capitalize">{error.errorType}</span>
 						<span className="mx-1.5 text-muted-foreground">·</span>
@@ -120,7 +139,205 @@ function Segment({
 		);
 	}
 
-	return content;
+	return button;
+}
+
+/** Shared padding/size for every token, scaled to phoneme vs. word. */
+function tokenSizing(type: "phoneme" | "word") {
+	return type === "phoneme"
+		? "px-1.5 py-0.5 font-ipa text-base"
+		: "px-1.5 py-0.5 text-sm";
+}
+
+function errorClasses(error: DiffError) {
+	return cn(
+		errorBgVariants({ errorType: error.errorType }),
+		errorBorderVariants({ errorType: error.errorType }),
+		errorTextVariants({ errorType: error.errorType }),
+		"border font-medium",
+	);
+}
+
+const PANEL_CLASS =
+	"flex flex-wrap items-center gap-1 rounded-md border border-border/60 bg-card/40 p-3 leading-relaxed";
+
+interface UnifiedViewProps {
+	cells: DiffCell[];
+	type: "phoneme" | "word";
+	audioSrc?: string;
+	onSegmentClick?: (startMs: number, endMs: number) => void;
+}
+
+/** Merged, git-unified line: grey unchanged, green added, amber removed, red changed. */
+function UnifiedView({
+	cells,
+	type,
+	audioSrc,
+	onSegmentClick,
+}: UnifiedViewProps) {
+	const sizing = tokenSizing(type);
+
+	if (cells.length === 0) {
+		return (
+			<div className={cn(PANEL_CLASS, "min-h-12 justify-center")}>
+				<span className="text-muted-foreground text-sm italic">
+					Nothing to compare
+				</span>
+			</div>
+		);
+	}
+
+	return (
+		<div className={cn(PANEL_CLASS, type === "phoneme" && "font-ipa")}>
+			{cells.map((cell, index) => {
+				const cellKey = `${cell.kind}-${index}`;
+
+				if (cell.kind === "equal") {
+					return (
+						<span
+							key={cellKey}
+							className={cn(sizing, "text-muted-foreground/80")}
+						>
+							{cell.segment}
+						</span>
+					);
+				}
+
+				if (cell.kind === "substitute") {
+					return (
+						<Chip
+							key={cellKey}
+							error={cell.error}
+							audioSrc={audioSrc}
+							onSegmentClick={onSegmentClick}
+							className={cn(sizing, errorClasses(cell.error))}
+						>
+							<span className="line-through opacity-60">{cell.expected}</span>
+							<span aria-hidden>→</span>
+							<span className="font-semibold">{cell.actual}</span>
+						</Chip>
+					);
+				}
+
+				// insert (added) or delete (removed)
+				return (
+					<Chip
+						key={cellKey}
+						error={cell.error}
+						audioSrc={audioSrc}
+						onSegmentClick={onSegmentClick}
+						className={cn(sizing, errorClasses(cell.error))}
+					>
+						<span className={cn(cell.kind === "delete" && "line-through")}>
+							{cell.segment}
+						</span>
+					</Chip>
+				);
+			})}
+		</div>
+	);
+}
+
+interface SplitLineProps {
+	label: string;
+	segments: string[];
+	errorMap: Map<number, DiffError>;
+	/** Which error types to highlight on this line. */
+	highlight: DiffError["errorType"][];
+	emptyLabel: string;
+	type: "phoneme" | "word";
+	audioSrc?: string;
+	onSegmentClick?: (startMs: number, endMs: number) => void;
+}
+
+function SplitLine({
+	label,
+	segments,
+	errorMap,
+	highlight,
+	emptyLabel,
+	type,
+	audioSrc,
+	onSegmentClick,
+}: SplitLineProps) {
+	const sizing = tokenSizing(type);
+
+	return (
+		<div className="space-y-1.5">
+			<span className="text-muted-foreground text-xs uppercase tracking-wider">
+				{label}
+			</span>
+			<div
+				className={cn(
+					PANEL_CLASS,
+					type === "phoneme" && "font-ipa",
+					segments.length === 0 && "min-h-12 justify-center",
+				)}
+			>
+				{segments.length === 0 ? (
+					<span className="text-muted-foreground text-sm italic">
+						{emptyLabel}
+					</span>
+				) : (
+					segments.map((segment, index) => {
+						const error = errorMap.get(index);
+						const isHighlighted = error && highlight.includes(error.errorType);
+
+						if (!error || !isHighlighted) {
+							return (
+								<span
+									key={`${label}-${index}-${segment}`}
+									className={cn(sizing, "text-foreground/80")}
+								>
+									{segment}
+								</span>
+							);
+						}
+
+						return (
+							<Chip
+								key={`${label}-${index}-${segment}`}
+								error={error}
+								audioSrc={audioSrc}
+								onSegmentClick={onSegmentClick}
+								className={cn(sizing, errorClasses(error))}
+							>
+								{segment}
+							</Chip>
+						);
+					})
+				)}
+			</div>
+		</div>
+	);
+}
+
+interface ViewToggleProps {
+	view: DiffView;
+	onChange: (view: DiffView) => void;
+}
+
+function ViewToggle({ view, onChange }: ViewToggleProps) {
+	return (
+		<div className="inline-flex rounded-md border border-border/60 p-0.5">
+			{(["unified", "split"] as const).map((option) => (
+				<button
+					key={option}
+					type="button"
+					onClick={() => onChange(option)}
+					aria-pressed={view === option}
+					className={cn(
+						"rounded-[5px] px-2 py-0.5 text-xs capitalize transition-colors",
+						view === option
+							? "bg-muted font-medium text-foreground"
+							: "text-muted-foreground hover:text-foreground",
+					)}
+				>
+					{option}
+				</button>
+			))}
+		</div>
+	);
 }
 
 export function DiffViewer({
@@ -130,108 +347,27 @@ export function DiffViewer({
 	type,
 	audioSrc,
 	onSegmentClick,
-	showLegend = false,
 }: DiffViewerProps) {
-	const targetSegments =
-		type === "word"
-			? target.split(" ").filter(Boolean)
-			: target.split(/\s+/).filter(Boolean);
+	const [view, setView] = useDiffView(type);
 
-	const recognizedSegments =
-		type === "word"
-			? recognized.split(" ").filter(Boolean)
-			: recognized.split(/\s+/).filter(Boolean);
+	const targetSegments = target.split(/\s+/).filter(Boolean);
+	const recognizedSegments = recognized.split(/\s+/).filter(Boolean);
 
 	const title = type === "word" ? "Word Comparison" : "Phoneme Comparison";
 	const targetLabel = type === "word" ? "Expected" : "Target";
 	const recognizedLabel = type === "word" ? "Recognized" : "Detected";
 
-	// Build error maps for target and recognized segments separately
-	// Edit distance positions are:
-	// - delete: position in target sequence (marks missing target element)
-	// - insert: position in actual/recognized sequence (marks extra recognized element)
-	// - substitute: position in actual/recognized sequence (marks changed element)
-
-	const targetErrorMap = new Map<number, PhonemeError | WordError>();
-	const recognizedErrorMap = new Map<number, PhonemeError | WordError>();
-
-	// Reconstruct alignment by simulating edit operations
-	// We need to map substitute positions (which are in recognized sequence) to target positions
-
-	// Separate errors by type
-	const deletes = errors.filter(e => e.errorType === "delete").sort((a, b) => a.position - b.position);
-	const inserts = errors.filter(e => e.errorType === "insert").sort((a, b) => a.position - b.position);
-	const substitutes = errors.filter(e => e.errorType === "substitute").sort((a, b) => a.position - b.position);
-
-	// Map delete errors directly to target positions
-	for (const error of deletes) {
-		if (error.position < targetSegments.length) {
-			targetErrorMap.set(error.position, error);
-		}
-	}
-
-	// Map insert errors directly to recognized positions
-	for (const error of inserts) {
-		if (error.position < recognizedSegments.length) {
-			recognizedErrorMap.set(error.position, error);
-		}
-	}
-
-	// For substitutes, we need to reconstruct which target position each corresponds to
-	// We do this by simulating the alignment, accounting for inserts and deletes
-	// The key insight: we walk through both sequences, and when positions align,
-	// a substitute at recognized position i corresponds to target position j (accounting for deletes)
-
-	// Create sets for quick lookup
-	const deletePositions = new Set(deletes.map(e => e.position));
-	const insertPositions = new Set(inserts.map(e => e.position));
-
-	// Map substitutes to recognized positions first
-	for (const substitute of substitutes) {
-		if (substitute.position < recognizedSegments.length) {
-			recognizedErrorMap.set(substitute.position, substitute);
-		}
-	}
-
-	// Now reconstruct alignment to map substitutes to target positions
-	// We simulate walking through both sequences simultaneously
-	let targetIdx = 0;
-	let recognizedIdx = 0;
-
-	// Process until we've covered all substitutes or exhausted sequences
-	while (targetIdx < targetSegments.length || recognizedIdx < recognizedSegments.length) {
-		// Skip deleted target positions
-		while (targetIdx < targetSegments.length && deletePositions.has(targetIdx)) {
-			targetIdx++;
-		}
-
-		// Skip inserted recognized positions
-		while (recognizedIdx < recognizedSegments.length && insertPositions.has(recognizedIdx)) {
-			recognizedIdx++;
-		}
-
-		// Check if current recognized position has a substitute
-		const substitute = substitutes.find(s => s.position === recognizedIdx);
-		if (substitute && targetIdx < targetSegments.length) {
-			// This substitute corresponds to current target position
-			targetErrorMap.set(targetIdx, substitute);
-		}
-
-		// Advance both indices (they align at this point)
-		if (targetIdx < targetSegments.length) targetIdx++;
-		if (recognizedIdx < recognizedSegments.length) recognizedIdx++;
-
-		// Stop if we've processed all segments
-		if (targetIdx >= targetSegments.length && recognizedIdx >= recognizedSegments.length) {
-			break;
-		}
-	}
+	const { targetErrorMap, recognizedErrorMap, cells } = buildDiff(
+		targetSegments,
+		recognizedSegments,
+		errors,
+	);
 
 	const hasErrors = errors.length > 0;
 
 	return (
-		<div className="space-y-4">
-			{/* Header with title and info */}
+		<div className="space-y-3">
+			{/* Header: title, info, count, view toggle */}
 			<div className="flex items-center gap-2">
 				<h3 className="font-medium">{title}</h3>
 				<TooltipProvider>
@@ -252,97 +388,48 @@ export function DiffViewer({
 						</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
-				{hasErrors && (
-					<span className="ml-auto text-muted-foreground text-xs">
-						{errors.length} {errors.length === 1 ? "difference" : "differences"}
-					</span>
-				)}
-			</div>
-
-			{/* Legend - only show if showLegend is true */}
-			{showLegend && hasErrors && (
-				<div className="flex flex-wrap gap-3 text-muted-foreground text-[10px]">
-					<span className="flex items-center gap-1">
-						<span className="size-1.5 rounded-full bg-destructive/60" />
-						Substitution
-					</span>
-					<span className="flex items-center gap-1">
-						<span className="size-1.5 rounded-full bg-amber-500/60" />
-						Insertion
-					</span>
-					<span className="flex items-center gap-1">
-						<span className="size-1.5 rounded-full bg-amber-500/60" />
-						Deletion
-					</span>
-				</div>
-			)}
-
-			{/* Target */}
-			<div className="space-y-2">
-				<span className="text-muted-foreground text-xs uppercase tracking-wider">
-					{targetLabel}
-				</span>
-				<div
-					className={cn(
-						"flex flex-wrap gap-1 rounded-lg border border-border/50 border-dashed bg-muted/20 p-4 leading-relaxed",
-						type === "phoneme" && "font-ipa text-sm",
-						type === "word" && "text-base",
-					)}
-				>
-					{targetSegments.map((segment, index) => {
-						const error = targetErrorMap.get(index);
-						const isSubstitute = error?.errorType === "substitute";
-						const isDelete = error?.errorType === "delete";
-						const relevantError = isSubstitute || isDelete ? error : undefined;
-
-						return (
-							<Segment
-								key={`target-${index}-${segment}`}
-								segment={segment}
-								error={relevantError}
-								audioSrc={audioSrc}
-								onSegmentClick={onSegmentClick}
-							/>
-						);
-					})}
-				</div>
-			</div>
-
-			{/* Recognized */}
-			<div className="space-y-2">
-				<span className="text-muted-foreground text-xs uppercase tracking-wider">
-					{recognizedLabel}
-				</span>
-				<div
-					className={cn(
-						"flex flex-wrap gap-1 rounded-lg border border-border/50 border-dashed bg-muted/20 p-4 leading-relaxed",
-						recognizedSegments.length === 0 && "items-center justify-center min-h-12",
-					)}
-				>
-					{recognizedSegments.length > 0 ? (
-						recognizedSegments.map((segment, index) => {
-							const error = recognizedErrorMap.get(index);
-							const isSubstitute = error?.errorType === "substitute";
-							const isInsert = error?.errorType === "insert";
-							const relevantError = isSubstitute || isInsert ? error : undefined;
-
-							return (
-								<Segment
-									key={`recognized-${index}-${segment}`}
-									segment={segment}
-									error={relevantError}
-									audioSrc={audioSrc}
-									onSegmentClick={onSegmentClick}
-								/>
-							);
-						})
-					) : (
-						<span className="text-muted-foreground text-sm italic">
-							No {type === "word" ? "words" : "phonemes"} detected
+				<div className="ml-auto flex items-center gap-3">
+					{hasErrors && (
+						<span className="text-muted-foreground text-xs">
+							{errors.length}{" "}
+							{errors.length === 1 ? "difference" : "differences"}
 						</span>
 					)}
+					<ViewToggle view={view} onChange={setView} />
 				</div>
 			</div>
+
+			{view === "unified" ? (
+				<UnifiedView
+					cells={cells}
+					type={type}
+					audioSrc={audioSrc}
+					onSegmentClick={onSegmentClick}
+				/>
+			) : (
+				<div className="space-y-3">
+					<SplitLine
+						label={targetLabel}
+						segments={targetSegments}
+						errorMap={targetErrorMap}
+						highlight={["substitute", "delete"]}
+						emptyLabel={`No ${type === "word" ? "words" : "phonemes"}`}
+						type={type}
+						audioSrc={audioSrc}
+						onSegmentClick={onSegmentClick}
+					/>
+					<SplitLine
+						label={recognizedLabel}
+						segments={recognizedSegments}
+						errorMap={recognizedErrorMap}
+						highlight={["substitute", "insert"]}
+						emptyLabel={`No ${type === "word" ? "words" : "phonemes"} detected`}
+						type={type}
+						audioSrc={audioSrc}
+						onSegmentClick={onSegmentClick}
+					/>
+				</div>
+			)}
 		</div>
 	);
 }

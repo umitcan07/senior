@@ -252,7 +252,6 @@ function AuthorFormDialog({
 	const [accent, setAccent] = useState("");
 	const [style, setStyle] = useState("");
 	const [languageCode, setLanguageCode] = useState("en-US");
-	const [elevenlabsVoiceId, setElevenlabsVoiceId] = useState("");
 	const queryClient = useQueryClient();
 	const insertAuthorFn = useServerFn(serverInsertAuthor);
 	const updateAuthorFn = useServerFn(serverUpdateAuthor);
@@ -266,7 +265,6 @@ function AuthorFormDialog({
 			setAccent(author?.accent ?? "");
 			setStyle(author?.style ?? "");
 			setLanguageCode(author?.languageCode ?? "en-US");
-			setElevenlabsVoiceId(author?.elevenlabsVoiceId ?? "");
 		}
 	}, [open, author]);
 
@@ -280,7 +278,6 @@ function AuthorFormDialog({
 						accent: accent || null,
 						style: style || null,
 						languageCode: languageCode || null,
-						elevenlabsVoiceId: elevenlabsVoiceId || null,
 					},
 				});
 			}
@@ -290,7 +287,6 @@ function AuthorFormDialog({
 					accent: accent || null,
 					style: style || null,
 					languageCode: languageCode || null,
-					elevenlabsVoiceId: elevenlabsVoiceId || null,
 				},
 			});
 		},
@@ -389,19 +385,6 @@ function AuthorFormDialog({
 								))}
 							</SelectContent>
 						</Select>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="elevenlabsVoiceId">ElevenLabs Voice ID</Label>
-						<Input
-							id="elevenlabsVoiceId"
-							value={elevenlabsVoiceId}
-							onChange={(e) => setElevenlabsVoiceId(e.target.value)}
-							placeholder="e.g., JBFqnCBsd6RMkjVDRZzb"
-						/>
-						<p className="text-muted-foreground text-xs">
-							Optional. Voice ID from ElevenLabs for TTS generation.
-						</p>
 					</div>
 
 					<DialogFooter>
