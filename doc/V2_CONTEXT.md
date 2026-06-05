@@ -308,6 +308,7 @@ A quick "where do I go for X" cheat-sheet:
 | Sanity-check audio | `mod/shared/audio.py` |
 | Run the local RunPod simulator | `scripts/runpod.py` → `docker compose -f docker-compose.dev.yml up` |
 | Explore/verify audio offline (no DB) | `data/README.md` — fixtures + `manifest.json`; `mod/dev/verify.py` runs POWSM phone-recog/alignment/GOP on committed clips; `scripts/split_audio.py` cuts long takes |
+| Fine-tune Turkish-L1 corpus (gates 0–12) | `corpus/finetune_qc.md` — manual QC; raw data via `CORPUS_RAW_DIR` or `corpus/raw`; scripts in `corpus/scripts/` |
 | Existing tests | `mod/tests/test_edit_operations.py` (the only test file) |
 
 ---
