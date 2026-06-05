@@ -19,6 +19,10 @@ export const generationMethodEnum = pgEnum("generation_method", [
 	"native",
 ]);
 export const ipaMethodEnum = pgEnum("ipa_method", ["powsm", "cmudict"]);
+// Reference dialect. Values match data/authors.json + mod/dev/verify.py (genam/rp),
+// not the us/uk in the original #23 brief. The E7 selector (#36) renders US/UK labels
+// but filters on these values.
+export const dialectEnum = pgEnum("dialect", ["genam", "rp"]);
 export const recordingMethodEnum = pgEnum("recording_method", [
 	"upload",
 	"record",
@@ -97,6 +101,10 @@ export const practiceTexts = pgTable(
  */
 export const authors = pgTable("authors", {
 	id: uuid("id").primaryKey().defaultRandom(),
+	// Stable external key from data/authors.json (e.g. "genam_jordan"). Nullable
+	// so pre-existing V1 author rows (no slug) are unaffected; unique so ingest can
+	// upsert idempotently on it.
+	slug: varchar("slug", { length: 100 }).unique(),
 	name: varchar("name", { length: 255 }).notNull(),
 	accent: varchar("accent", { length: 50 }),
 	style: varchar("style", { length: 50 }),
@@ -120,8 +128,14 @@ export const referenceSpeeches = pgTable(
 			.notNull()
 			.references(() => practiceTexts.id),
 		generationMethod: generationMethodEnum("generation_method").notNull(),
+		// Nullable so V1 TTS rows (no dialect) stay valid.
+		dialect: dialectEnum("dialect"),
 		ipaTranscription: text("ipa_transcription"),
 		ipaMethod: ipaMethodEnum("ipa_method"),
+		// Cached POWSMAligner free_alignment output: array of
+		// { token, start_ms, end_ms, confidence }. Read by the assess path so it
+		// doesn't recompute reference alignment on every call.
+		phoneTimingsJson: jsonb("phone_timings_json").$type<Array<{token: string; start_ms: number; end_ms: number; confidence: number}>>(),
 		priority: integer("priority").default(0),
 		durationMs: integer("duration_ms"),
 		fileSizeBytes: integer("file_size_bytes"),
@@ -134,6 +148,7 @@ export const referenceSpeeches = pgTable(
 	(table) => [
 		index("idx_reference_speeches_author_id").on(table.authorId),
 		index("idx_reference_speeches_text_id").on(table.textId),
+		index("idx_reference_speeches_dialect").on(table.dialect),
 	],
 );
 

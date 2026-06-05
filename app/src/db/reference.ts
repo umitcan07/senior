@@ -3,8 +3,11 @@ import { db } from "./index";
 import { authors, practiceTexts, referenceSpeeches } from "./schema";
 import type {
 	Author,
+	Dialect,
 	GenerationMethod,
+	IpaMethod,
 	NewReferenceSpeech,
+	PhoneTiming,
 	PracticeText,
 	ReferenceSpeech,
 } from "./types";
@@ -31,8 +34,10 @@ export async function getReferenceSpeechesWithRelations(): Promise<
 			authorId: referenceSpeeches.authorId,
 			textId: referenceSpeeches.textId,
 			generationMethod: referenceSpeeches.generationMethod,
+			dialect: referenceSpeeches.dialect,
 			ipaTranscription: referenceSpeeches.ipaTranscription,
 			ipaMethod: referenceSpeeches.ipaMethod,
+			phoneTimingsJson: referenceSpeeches.phoneTimingsJson,
 			priority: referenceSpeeches.priority,
 			durationMs: referenceSpeeches.durationMs,
 			fileSizeBytes: referenceSpeeches.fileSizeBytes,
@@ -43,6 +48,7 @@ export async function getReferenceSpeechesWithRelations(): Promise<
 			updatedAt: referenceSpeeches.updatedAt,
 			author: {
 				id: authors.id,
+				slug: authors.slug,
 				name: authors.name,
 				accent: authors.accent,
 				style: authors.style,
@@ -90,8 +96,10 @@ export async function getReferenceSpeechWithText(
 			authorId: referenceSpeeches.authorId,
 			textId: referenceSpeeches.textId,
 			generationMethod: referenceSpeeches.generationMethod,
+			dialect: referenceSpeeches.dialect,
 			ipaTranscription: referenceSpeeches.ipaTranscription,
 			ipaMethod: referenceSpeeches.ipaMethod,
+			phoneTimingsJson: referenceSpeeches.phoneTimingsJson,
 			priority: referenceSpeeches.priority,
 			durationMs: referenceSpeeches.durationMs,
 			fileSizeBytes: referenceSpeeches.fileSizeBytes,
@@ -128,8 +136,10 @@ export async function getReferenceSpeechesForText(
 			authorId: referenceSpeeches.authorId,
 			textId: referenceSpeeches.textId,
 			generationMethod: referenceSpeeches.generationMethod,
+			dialect: referenceSpeeches.dialect,
 			ipaTranscription: referenceSpeeches.ipaTranscription,
 			ipaMethod: referenceSpeeches.ipaMethod,
+			phoneTimingsJson: referenceSpeeches.phoneTimingsJson,
 			priority: referenceSpeeches.priority,
 			durationMs: referenceSpeeches.durationMs,
 			fileSizeBytes: referenceSpeeches.fileSizeBytes,
@@ -140,6 +150,7 @@ export async function getReferenceSpeechesForText(
 			updatedAt: referenceSpeeches.updatedAt,
 			author: {
 				id: authors.id,
+				slug: authors.slug,
 				name: authors.name,
 				accent: authors.accent,
 				style: authors.style,
@@ -172,7 +183,10 @@ export async function insertReferenceSpeech(data: {
 	authorId: string;
 	textId: string;
 	generationMethod: GenerationMethod;
+	dialect?: Dialect | null;
 	ipaTranscription?: string | null;
+	ipaMethod?: IpaMethod | null;
+	phoneTimingsJson?: PhoneTiming[] | null;
 	priority?: number;
 	durationMs?: number | null;
 	fileSizeBytes?: number | null;
@@ -187,7 +201,10 @@ export async function insertReferenceSpeech(data: {
 			authorId: data.authorId,
 			textId: data.textId,
 			generationMethod: data.generationMethod,
+			dialect: data.dialect ?? null,
 			ipaTranscription: data.ipaTranscription ?? null,
+			ipaMethod: data.ipaMethod ?? null,
+			phoneTimingsJson: data.phoneTimingsJson ?? null,
 			priority: data.priority ?? 0,
 			durationMs: data.durationMs ?? null,
 			fileSizeBytes: data.fileSizeBytes ?? null,
@@ -206,7 +223,10 @@ export async function updateReferenceSpeech(
 		authorId?: string;
 		textId?: string;
 		generationMethod?: GenerationMethod;
+		dialect?: Dialect | null;
 		ipaTranscription?: string | null;
+		ipaMethod?: IpaMethod | null;
+		phoneTimingsJson?: PhoneTiming[] | null;
 		priority?: number;
 		durationMs?: number | null;
 		fileSizeBytes?: number | null;
@@ -224,8 +244,12 @@ export async function updateReferenceSpeech(
 	if (data.textId !== undefined) updateData.textId = data.textId;
 	if (data.generationMethod !== undefined)
 		updateData.generationMethod = data.generationMethod;
+	if (data.dialect !== undefined) updateData.dialect = data.dialect;
 	if (data.ipaTranscription !== undefined)
 		updateData.ipaTranscription = data.ipaTranscription;
+	if (data.ipaMethod !== undefined) updateData.ipaMethod = data.ipaMethod;
+	if (data.phoneTimingsJson !== undefined)
+		updateData.phoneTimingsJson = data.phoneTimingsJson;
 	if (data.priority !== undefined) updateData.priority = data.priority;
 	if (data.durationMs !== undefined) updateData.durationMs = data.durationMs;
 	if (data.fileSizeBytes !== undefined)
