@@ -87,5 +87,21 @@
       "PowerShell(Stop-Process *)",
       "PowerShell(Restart-Computer *)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR}\\.claude\\hooks\\copy-env-on-session-start.ps1\"",
+            "timeout": 15,
+            "statusMessage": "Seeding app/.env in worktree..."
+          }
+        ]
+      }
+    ]
   }
 }
