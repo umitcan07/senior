@@ -377,6 +377,41 @@ _g2p_model = None
 _asr_model = None
 _device = None
 
+# Turkish LoRA adapter baked into the image at build time (mod/assessment/adapter/).
+# If the directory is absent, the worker falls back to the baseline POWSM PR model.
+ADAPTER_DIR = os.path.join(os.path.dirname(__file__), "adapter")
+
+
+def attach_lora_adapter(s2t, adapter_dir: str) -> bool:
+    """Attach a PEFT LoRA adapter to a Speech2Text PR model, in place.
+
+    ESPnet's BeamSearch caches nn.Module references from the original model, so
+    after wrapping with PeftModel we must repoint the decoder/CTC scorers at the
+    new modules — otherwise the adapter loads but never affects decoding.
+
+    Returns True if an adapter was attached, False if none was found.
+    """
+    if not os.path.isdir(adapter_dir):
+        print(f"DEBUG: No LoRA adapter at {adapter_dir}; using baseline PR model")
+        return False
+
+    from peft import PeftModel
+
+    base = s2t.s2t_model
+    s2t.s2t_model = PeftModel.from_pretrained(base, adapter_dir)
+    m = s2t.s2t_model
+    bs = s2t.beam_search
+
+    # In-place scorer refresh (version-agnostic: avoids importing CTCPrefixScorer)
+    for d in (bs.nn_dict, bs.scorers, bs.full_scorers):
+        if "decoder" in d:
+            d["decoder"] = m.decoder
+        if "ctc" in d:
+            d["ctc"].ctc = m.ctc
+
+    print(f"DEBUG: LoRA adapter attached to PR model from {adapter_dir}")
+    return True
+
 
 def get_device():
     """
@@ -423,12 +458,17 @@ def get_models(device: Optional[str] = None):
         print(f"DEBUG: Loading POWSM models on device: {device}")
         
         # PR model (Phone Recognition: Audio → IPA)
+        # The Turkish LoRA adapter was fine-tuned with lang_sym="<unk>", so the PR
+        # model must use the same symbol when the adapter is attached. Fall back to
+        # "<eng>" (baseline behaviour) when no adapter is baked into the image.
+        pr_lang_sym = "<unk>" if os.path.isdir(ADAPTER_DIR) else "<eng>"
         _pr_model = Speech2Text.from_pretrained(
             "espnet/powsm",
             device=device,
-            lang_sym="<eng>",
+            lang_sym=pr_lang_sym,
             task_sym="<pr>",
         )
+        attach_lora_adapter(_pr_model, ADAPTER_DIR)
         
         # G2P model (Grapheme-to-Phoneme: Text → IPA)
         _g2p_model = Speech2Text.from_pretrained(
