@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
+import { SignedIn, SignedOut } from "@clerk/tanstack-react-start";
 import {
 	RiAlertLine,
 	RiArrowDownSLine,
@@ -31,11 +31,13 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
+import { SignInPrompt } from "@/components/ui/sign-in-prompt";
 import {
 	WaveformPlayer,
 	WaveformPlayerInline,
 } from "@/components/ui/waveform-player";
 import type { Author, ReferenceSpeech } from "@/db/types";
+import { useGuestTrial } from "@/hooks/use-guest-trial";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import type { ApiResponse } from "@/lib/errors";
 import { formatIpaForDisplay } from "@/lib/ipa";
@@ -762,6 +764,23 @@ function PracticeTextLayout() {
 	return <PracticeTextPage />;
 }
 
+function GuestRecordPrompt() {
+	const { remaining, maxFree } = useGuestTrial();
+	return (
+		<SignInPrompt
+			title="Sign in to start practicing"
+			description="Record your pronunciation and get instant feedback on every sound."
+			className="w-full max-w-md border-0 bg-transparent px-0 py-8"
+		>
+			{remaining > 0 && (
+				<p className="text-muted-foreground text-xs">
+					{remaining} of {maxFree} free tries available
+				</p>
+			)}
+		</SignInPrompt>
+	);
+}
+
 // Main Page
 function PracticeTextPage() {
 	const { text, references, recentAttempts, preferredAuthorId } =
@@ -1128,17 +1147,7 @@ function PracticeTextPage() {
 									</SignedIn>
 
 									<SignedOut>
-										<div className="flex w-full max-w-md flex-col gap-3">
-											<Button disabled className="gap-2" size="lg">
-												<RiMicLine size={18} />
-												Sign in to record
-											</Button>
-											<Button variant="outline" asChild size="lg">
-												<SignInButton mode="modal">
-													Sign in to start practicing
-												</SignInButton>
-											</Button>
-										</div>
+										<GuestRecordPrompt />
 									</SignedOut>
 								</div>
 							</div>

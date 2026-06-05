@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
+import { SignedIn, SignedOut } from "@clerk/tanstack-react-start";
 import { RiComputerLine, RiMicLine, RiUserLine } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
@@ -10,7 +10,6 @@ import {
 } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
 	Select,
 	SelectContent,
@@ -19,6 +18,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
+import { SignInPrompt } from "@/components/ui/sign-in-prompt";
 import { Spinner } from "@/components/ui/spinner";
 import type { Author, UserPreferences } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
@@ -161,21 +161,10 @@ function GuestSettings() {
 				<div className="flex flex-col gap-8">
 					<PageHeader title="Settings" description="Manage your preferences" />
 
-					<Card className="bg-muted/30">
-						<CardContent className="flex flex-col items-center gap-4 py-8 text-center md:py-12">
-							<div className="flex flex-col gap-2">
-								<h2 className="font-medium text-lg">
-									Sign in to access settings
-								</h2>
-								<p className="max-w-md text-muted-foreground text-sm">
-									Save your preferences and customize your learning experience.
-								</p>
-							</div>
-							<Button asChild>
-								<SignInButton mode="modal">Sign in</SignInButton>
-							</Button>
-						</CardContent>
-					</Card>
+					<SignInPrompt
+						title="Sign in to access settings"
+						description="Save your preferences and customize your learning experience."
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>
