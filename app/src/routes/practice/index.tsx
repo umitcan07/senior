@@ -9,8 +9,8 @@ import {
 	RiSearch2Line,
 	RiStackLine,
 } from "@remixicon/react";
-import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
@@ -332,12 +332,16 @@ function PracticePage() {
 											</DrawerHeader>
 											<div className="flex flex-col gap-4 px-4 pb-6">
 												<div className="flex flex-col gap-2">
-													<label className="font-medium text-muted-foreground text-sm">
+													<label
+														htmlFor="drawer-search"
+														className="font-medium text-muted-foreground text-sm"
+													>
 														Search
 													</label>
 													<div className="relative">
 														<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 														<Input
+															id="drawer-search"
 															type="search"
 															placeholder="Search texts..."
 															className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
@@ -350,9 +354,9 @@ function PracticePage() {
 													</div>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="font-medium text-muted-foreground text-sm">
+													<span className="font-medium text-muted-foreground text-sm">
 														Length
-													</label>
+													</span>
 													<Select
 														value={wordCountFilter}
 														onValueChange={(v) => {

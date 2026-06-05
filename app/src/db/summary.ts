@@ -2,10 +2,10 @@ import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
 	analyses,
+	phonemeErrors,
 	practiceTexts,
 	referenceSpeeches,
 	userRecordings,
-	phonemeErrors,
 } from "./schema";
 
 export type UserAttempt = {

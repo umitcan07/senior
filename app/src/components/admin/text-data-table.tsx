@@ -12,7 +12,6 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { WaveformPlayerInline } from "@/components/ui/waveform-player";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -30,6 +29,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { WaveformPlayerInline } from "@/components/ui/waveform-player";
 import type { ReferenceSpeechWithRelations } from "@/db/reference";
 import type { PracticeTextWithReferenceCount } from "@/db/text";
 import { formatDuration } from "@/lib/reference";

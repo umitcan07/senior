@@ -21,9 +21,9 @@ import {
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
 import type { Author, UserPreferences } from "@/db/types";
-import type { ApiResponse } from "@/lib/errors";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";
+import type { ApiResponse } from "@/lib/errors";
 import {
 	serverGetPreferredAuthorId,
 	serverUpdateUserPreferences,

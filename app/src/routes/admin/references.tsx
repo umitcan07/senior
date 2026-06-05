@@ -26,7 +26,6 @@ import {
 import { Fragment, useState } from "react";
 import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
 import { AdminLayout } from "@/components/layout/admin-layout";
-import { WaveformPlayer } from "@/components/ui/waveform-player";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,17 +52,18 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { WaveformPlayer } from "@/components/ui/waveform-player";
 import type { ReferenceSpeechWithRelations } from "@/db/reference";
 import type { PracticeText } from "@/db/text";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
 import { serverGetAuthors } from "@/lib/author";
+import { formatIpaClean } from "@/lib/ipa";
 import {
 	formatDuration,
 	serverDeleteReference,
 	serverGetReferences,
 } from "@/lib/reference";
-import { formatIpaClean } from "@/lib/ipa";
 import { serverGetPracticeTexts } from "@/lib/text";
 
 export const Route = createFileRoute("/admin/references")({

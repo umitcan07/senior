@@ -1,4 +1,5 @@
 import {
+	RiAlertLine,
 	RiArrowDownSLine,
 	RiArrowLeftLine,
 	RiPlayLine,
@@ -10,11 +11,10 @@ import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DiffViewer } from "@/components/diff-viewer";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { RiAlertLine } from "@remixicon/react";
 import {
 	Collapsible,
 	CollapsibleContent,

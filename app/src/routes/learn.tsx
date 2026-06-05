@@ -643,12 +643,12 @@ function renderTextWithIPA(text: string) {
 	const ipaRegex = /(\/[^/]+\/|\[[^\]]+\])/g;
 	const parts: string[] = [];
 	let lastIndex = 0;
-	let match;
 
 	// Reset regex
 	ipaRegex.lastIndex = 0;
 
-	while ((match = ipaRegex.exec(text)) !== null) {
+	let match = ipaRegex.exec(text);
+	while (match !== null) {
 		// Add text before the match
 		if (match.index > lastIndex) {
 			parts.push(text.slice(lastIndex, match.index));
@@ -656,6 +656,7 @@ function renderTextWithIPA(text: string) {
 		// Add the IPA match
 		parts.push(match[0]);
 		lastIndex = ipaRegex.lastIndex;
+		match = ipaRegex.exec(text);
 	}
 
 	// Add remaining text

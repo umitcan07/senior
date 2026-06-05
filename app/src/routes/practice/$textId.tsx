@@ -36,8 +36,8 @@ import {
 	WaveformPlayerInline,
 } from "@/components/ui/waveform-player";
 import type { Author, ReferenceSpeech } from "@/db/types";
-import type { ApiResponse } from "@/lib/errors";
 import { uploadAudioRecording } from "@/lib/audio-upload";
+import type { ApiResponse } from "@/lib/errors";
 import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel } from "@/lib/score";
@@ -215,7 +215,7 @@ function useRecording(textId: string) {
 			});
 
 			// Permission granted - stop the stream (we'll get a new one when recording starts)
-			stream.getTracks().forEach((track) => track.stop());
+			for (const track of stream.getTracks()) track.stop();
 
 			// Now start countdown, which will call audioRecorder.startRecording when done
 			runCountdown();
