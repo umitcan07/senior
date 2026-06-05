@@ -1,7 +1,7 @@
 import { RiArrowDownSLine, RiVolumeUpLine } from "@remixicon/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
@@ -237,12 +237,12 @@ const IPA_AUDIO_MAP: Record<
 	tʃ: {
 		word: "church",
 		wordAudio: "church.wav",
-		soundAudio: "ipa/sounds/ch.wav",
+		soundAudio: "ipa/sounds/ch.ogg",
 	},
 	dʒ: {
 		word: "judge",
 		wordAudio: "judge.wav",
-		soundAudio: "ipa/sounds/j.wav",
+		soundAudio: "ipa/sounds/dʒ.ogg",
 	},
 	m: {
 		word: "man",
@@ -784,7 +784,17 @@ function AccentDifferencesSection() {
 function LearningPage() {
 	const { toast } = useToast();
 	const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("word");
-	const [speakerId, setSpeakerId] = useState<SpeakerId>(getSavedSpeaker);
+	const [speakerId, setSpeakerId] = useState<SpeakerId>(DEFAULT_SPEAKER);
+
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem(SPEAKER_PREF_KEY);
+			if (saved && SPEAKERS.some((s) => s.id === saved))
+				setSpeakerId(saved as SpeakerId);
+		} catch {
+			// localStorage unavailable (private mode)
+		}
+	}, []);
 	const [playingId, setPlayingId] = useState<string | null>(null);
 	const [loadingId, setLoadingId] = useState<string | null>(null);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -796,7 +806,10 @@ function LearningPage() {
 
 	const handlePlay = useCallback(
 		async (symbol: string, mode: PlaybackMode) => {
-			const id = `${symbol}-${mode}`;
+			const id =
+				mode === "word"
+					? `${symbol}-${mode}-${speakerId}`
+					: `${symbol}-${mode}`;
 
 			// If already playing this item, stop it
 			if (playingId === id && audioRef.current) {
@@ -902,7 +915,10 @@ function LearningPage() {
 										onValueChange={(v) => setPlaybackMode(v as PlaybackMode)}
 										className="w-full sm:w-auto"
 									>
-										<TabsList className="w-full sm:w-auto">
+										<TabsList
+											aria-label="Playback mode"
+											className="w-full sm:w-auto"
+										>
 											<TabsTrigger
 												value="sound"
 												className="flex-1 sm:flex-initial"
@@ -918,27 +934,33 @@ function LearningPage() {
 										</TabsList>
 									</Tabs>
 
-									{/* Speaker selector — only relevant in word mode */}
-									{playbackMode === "word" && (
-										<Tabs
-											value={speakerId}
-											onValueChange={(v) => handleSpeakerChange(v as SpeakerId)}
-											className="w-full sm:w-auto"
+									{/* Speaker selector — only relevant in word mode; kept in DOM to avoid layout shift */}
+									<Tabs
+										value={speakerId}
+										onValueChange={(v) => handleSpeakerChange(v as SpeakerId)}
+										className={cn(
+											"w-full sm:w-auto",
+											playbackMode !== "word" &&
+												"pointer-events-none invisible",
+										)}
+										aria-hidden={playbackMode !== "word"}
+									>
+										<TabsList
+											aria-label="Word speaker"
+											className="h-auto w-full flex-wrap gap-0.5 sm:w-auto"
 										>
-											<TabsList className="h-auto w-full flex-wrap gap-0.5 sm:w-auto">
-												{SPEAKERS.map((s) => (
-													<TabsTrigger
-														key={s.id}
-														value={s.id}
-														className="flex-1 gap-1 text-xs sm:flex-initial"
-													>
-														<span>{DIALECTS[s.dialect].flag}</span>
-														{s.name}
-													</TabsTrigger>
-												))}
-											</TabsList>
-										</Tabs>
-									)}
+											{SPEAKERS.map((s) => (
+												<TabsTrigger
+													key={s.id}
+													value={s.id}
+													className="flex-1 gap-1 text-xs sm:flex-initial"
+												>
+													<span>{DIALECTS[s.dialect].flag}</span>
+													{s.name}
+												</TabsTrigger>
+											))}
+										</TabsList>
+									</Tabs>
 								</div>
 							</div>
 

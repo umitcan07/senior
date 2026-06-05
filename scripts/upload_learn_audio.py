@@ -68,12 +68,28 @@ def r2_client():
 
 def load_word_map():
     """Return {word_id: dest_filename} from manifest.json."""
-    with open(MANIFEST_PATH, encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(MANIFEST_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        raise ValueError(f"Manifest not found: {MANIFEST_PATH}") from None
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Malformed JSON in {MANIFEST_PATH}: {exc}") from exc
+
+    if not isinstance(data, (dict, list)):
+        raise ValueError(f"Unexpected top-level type in {MANIFEST_PATH}: {type(data)}")
+
     # manifest.json is {"_note": ..., "references": [...], "learn_words": [...]}
     entries = data.get("learn_words", data) if isinstance(data, dict) else data
     if isinstance(entries, list):
-        return {e["id"]: Path(e["dest"]).name for e in entries if isinstance(e, dict) and e.get("dest")}
+        result = {}
+        for e in entries:
+            if not isinstance(e, dict):
+                continue
+            if "id" not in e or "dest" not in e:
+                continue
+            result[e["id"]] = Path(e["dest"]).name
+        return result
     # fallback: flat dict of id -> dest
     return {k: Path(v).name for k, v in entries.items()}
 
@@ -92,8 +108,17 @@ def main():
     word_map = load_word_map()  # {word_01: see.wav, ...}
     print(f"Manifest: {len(word_map)} words")
 
-    with open(AUTHORS_PATH, encoding="utf-8") as f:
-        authors_data = json.load(f)
+    try:
+        with open(AUTHORS_PATH, encoding="utf-8") as f:
+            authors_data = json.load(f)
+    except FileNotFoundError:
+        sys.exit(f"Authors file not found: {AUTHORS_PATH}")
+    except json.JSONDecodeError as exc:
+        sys.exit(f"Malformed JSON in {AUTHORS_PATH}: {exc}")
+
+    if "authors" not in authors_data:
+        sys.exit(f"Missing 'authors' key in {AUTHORS_PATH}")
+
     authors = {
         k: v
         for k, v in authors_data["authors"].items()
