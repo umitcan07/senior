@@ -1,7 +1,7 @@
 import { RiArrowDownSLine, RiVolumeUpLine } from "@remixicon/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,40 @@ import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useToast } from "@/hooks/use-toast";
-import { DIALECTS } from "@/lib/dialect";
+import { DIALECTS, type Dialect } from "@/lib/dialect";
 import { cn } from "@/lib/utils";
+
+// Speaker metadata for /learn word audio (matches data/authors.json)
+const SPEAKERS = [
+	{ id: "genam_jordan", dialect: "us" as Dialect, name: "Jordan" },
+	{ id: "genam_katherine", dialect: "us" as Dialect, name: "Katherine" },
+	{ id: "genam_teyanna", dialect: "us" as Dialect, name: "Teyanna" },
+	{ id: "rp_jon", dialect: "uk" as Dialect, name: "Jon" },
+] as const;
+
+type SpeakerId = (typeof SPEAKERS)[number]["id"];
+
+const DEFAULT_SPEAKER: SpeakerId = "genam_jordan";
+const SPEAKER_PREF_KEY = "nounce_learn_speaker";
+
+function getSavedSpeaker(): SpeakerId {
+	try {
+		const saved = localStorage.getItem(SPEAKER_PREF_KEY);
+		if (saved && SPEAKERS.some((s) => s.id === saved))
+			return saved as SpeakerId;
+	} catch {
+		// localStorage unavailable (SSR / private mode)
+	}
+	return DEFAULT_SPEAKER;
+}
+
+function saveSpeaker(id: SpeakerId) {
+	try {
+		localStorage.setItem(SPEAKER_PREF_KEY, id);
+	} catch {
+		// ignore
+	}
+}
 
 export const Route = createFileRoute("/learn")({
 	component: LearningPage,
@@ -27,224 +59,224 @@ const IPA_AUDIO_MAP: Record<
 	// Vowels
 	iː: {
 		word: "see",
-		wordAudio: "ipa/words/see.wav",
+		wordAudio: "see.wav",
 		soundAudio: "ipa/sounds/i.ogg",
 	},
 	ɪ: {
 		word: "sit",
-		wordAudio: "ipa/words/sit.wav",
+		wordAudio: "sit.wav",
 		soundAudio: "ipa/sounds/ɪ.ogg",
 	},
 	e: {
 		word: "bed",
-		wordAudio: "ipa/words/bed.wav",
+		wordAudio: "bed.wav",
 		soundAudio: "ipa/sounds/e.ogg",
 	},
 	æ: {
 		word: "cat",
-		wordAudio: "ipa/words/cat.wav",
+		wordAudio: "cat.wav",
 		soundAudio: "ipa/sounds/æ.ogg",
 	},
 	ɑː: {
 		word: "father",
-		wordAudio: "ipa/words/father.wav",
+		wordAudio: "father.wav",
 		soundAudio: "ipa/sounds/ɑ.ogg",
 	},
 	ɒ: {
 		word: "hot",
-		wordAudio: "ipa/words/hot.wav",
+		wordAudio: "hot.wav",
 		soundAudio: "ipa/sounds/ɒ.ogg",
 	},
 	ɔː: {
 		word: "saw",
-		wordAudio: "ipa/words/saw.wav",
+		wordAudio: "saw.wav",
 		soundAudio: "ipa/sounds/ɔ.ogg",
 	},
 	ʊ: {
 		word: "put",
-		wordAudio: "ipa/words/put.wav",
+		wordAudio: "put.wav",
 		soundAudio: "ipa/sounds/ʊ.ogg",
 	},
 	uː: {
 		word: "too",
-		wordAudio: "ipa/words/too.wav",
+		wordAudio: "too.wav",
 		soundAudio: "ipa/sounds/u.ogg",
 	},
 	ʌ: {
 		word: "cup",
-		wordAudio: "ipa/words/cup.wav",
+		wordAudio: "cup.wav",
 		soundAudio: "ipa/sounds/ʌ.ogg",
 	},
 	ɜː: {
 		word: "bird",
-		wordAudio: "ipa/words/bird.wav",
+		wordAudio: "bird.wav",
 		soundAudio: "ipa/sounds/ɜ.ogg",
 	},
 	ə: {
 		word: "about",
-		wordAudio: "ipa/words/about.wav",
+		wordAudio: "about.wav",
 		soundAudio: "ipa/sounds/ə.ogg",
 	},
 	// Diphthongs
 	eɪ: {
 		word: "day",
-		wordAudio: "ipa/words/day.wav",
+		wordAudio: "day.wav",
 		soundAudio: "ipa/sounds/ei.wav",
 	},
 	aɪ: {
 		word: "my",
-		wordAudio: "ipa/words/my.wav",
+		wordAudio: "my.wav",
 		soundAudio: "ipa/sounds/ai.wav",
 	},
 	ɔɪ: {
 		word: "boy",
-		wordAudio: "ipa/words/boy.wav",
+		wordAudio: "boy.wav",
 		soundAudio: "ipa/sounds/oi.wav",
 	},
 	aʊ: {
 		word: "now",
-		wordAudio: "ipa/words/now.wav",
+		wordAudio: "now.wav",
 		soundAudio: "ipa/sounds/au.wav",
 	},
 	əʊ: {
 		word: "go",
-		wordAudio: "ipa/words/go.wav",
+		wordAudio: "go.wav",
 		soundAudio: "ipa/sounds/ou.wav",
 	},
 	ɪə: {
 		word: "near",
-		wordAudio: "ipa/words/near.wav",
+		wordAudio: "near.wav",
 		soundAudio: "ipa/sounds/ia.wav",
 	},
 	eə: {
 		word: "hair",
-		wordAudio: "ipa/words/hair.wav",
+		wordAudio: "hair.wav",
 		soundAudio: "ipa/sounds/ea.wav",
 	},
 	ʊə: {
 		word: "pure",
-		wordAudio: "ipa/words/pure.wav",
+		wordAudio: "pure.wav",
 		soundAudio: "ipa/sounds/ua.wav",
 	},
 	// Consonants
 	p: {
 		word: "pet",
-		wordAudio: "ipa/words/pet.wav",
+		wordAudio: "pet.wav",
 		soundAudio: "ipa/sounds/p.ogg",
 	},
 	b: {
 		word: "bed",
-		wordAudio: "ipa/words/bed.wav",
+		wordAudio: "bed.wav",
 		soundAudio: "ipa/sounds/b.ogg",
 	},
 	t: {
 		word: "ten",
-		wordAudio: "ipa/words/ten.wav",
+		wordAudio: "ten.wav",
 		soundAudio: "ipa/sounds/t.ogg",
 	},
 	d: {
 		word: "dog",
-		wordAudio: "ipa/words/dog.wav",
+		wordAudio: "dog.wav",
 		soundAudio: "ipa/sounds/d.ogg",
 	},
 	k: {
 		word: "cat",
-		wordAudio: "ipa/words/cat-k.wav",
+		wordAudio: "cat-k.wav",
 		soundAudio: "ipa/sounds/k.ogg",
 	},
 	g: {
 		word: "go",
-		wordAudio: "ipa/words/go-g.wav",
+		wordAudio: "go-g.wav",
 		soundAudio: "ipa/sounds/g.ogg",
 	},
 	f: {
 		word: "fan",
-		wordAudio: "ipa/words/fan.wav",
+		wordAudio: "fan.wav",
 		soundAudio: "ipa/sounds/f.ogg",
 	},
 	v: {
 		word: "van",
-		wordAudio: "ipa/words/van.wav",
+		wordAudio: "van.wav",
 		soundAudio: "ipa/sounds/v.ogg",
 	},
 	θ: {
 		word: "think",
-		wordAudio: "ipa/words/think.wav",
+		wordAudio: "think.wav",
 		soundAudio: "ipa/sounds/θ.ogg",
 	},
 	ð: {
 		word: "this",
-		wordAudio: "ipa/words/this.wav",
+		wordAudio: "this.wav",
 		soundAudio: "ipa/sounds/ð.ogg",
 	},
 	s: {
 		word: "sit",
-		wordAudio: "ipa/words/sit-s.wav",
+		wordAudio: "sit-s.wav",
 		soundAudio: "ipa/sounds/s.ogg",
 	},
 	z: {
 		word: "zoo",
-		wordAudio: "ipa/words/zoo.wav",
+		wordAudio: "zoo.wav",
 		soundAudio: "ipa/sounds/z.ogg",
 	},
 	ʃ: {
 		word: "ship",
-		wordAudio: "ipa/words/ship.wav",
+		wordAudio: "ship.wav",
 		soundAudio: "ipa/sounds/ʃ.ogg",
 	},
 	ʒ: {
 		word: "measure",
-		wordAudio: "ipa/words/measure.wav",
+		wordAudio: "measure.wav",
 		soundAudio: "ipa/sounds/ʒ.ogg",
 	},
 	h: {
 		word: "hat",
-		wordAudio: "ipa/words/hat.wav",
+		wordAudio: "hat.wav",
 		soundAudio: "ipa/sounds/h.ogg",
 	},
 	tʃ: {
 		word: "church",
-		wordAudio: "ipa/words/church.wav",
-		soundAudio: "ipa/sounds/ch.wav",
+		wordAudio: "church.wav",
+		soundAudio: "ipa/sounds/ch.ogg",
 	},
 	dʒ: {
 		word: "judge",
-		wordAudio: "ipa/words/judge.wav",
-		soundAudio: "ipa/sounds/j.wav",
+		wordAudio: "judge.wav",
+		soundAudio: "ipa/sounds/dʒ.ogg",
 	},
 	m: {
 		word: "man",
-		wordAudio: "ipa/words/man.wav",
+		wordAudio: "man.wav",
 		soundAudio: "ipa/sounds/m.ogg",
 	},
 	n: {
 		word: "no",
-		wordAudio: "ipa/words/no.wav",
+		wordAudio: "no.wav",
 		soundAudio: "ipa/sounds/n.ogg",
 	},
 	ŋ: {
 		word: "sing",
-		wordAudio: "ipa/words/sing.wav",
+		wordAudio: "sing.wav",
 		soundAudio: "ipa/sounds/ŋ.ogg",
 	},
 	l: {
 		word: "let",
-		wordAudio: "ipa/words/let.wav",
+		wordAudio: "let.wav",
 		soundAudio: "ipa/sounds/l.ogg",
 	},
 	r: {
 		word: "red",
-		wordAudio: "ipa/words/red.wav",
+		wordAudio: "red.wav",
 		soundAudio: "ipa/sounds/r.ogg",
 	},
 	j: {
 		word: "yes",
-		wordAudio: "ipa/words/yes.wav",
+		wordAudio: "yes.wav",
 		soundAudio: "ipa/sounds/j.ogg",
 	},
 	w: {
 		word: "wet",
-		wordAudio: "ipa/words/wet.wav",
+		wordAudio: "wet.wav",
 		soundAudio: "ipa/sounds/w.ogg",
 	},
 };
@@ -752,13 +784,32 @@ function AccentDifferencesSection() {
 function LearningPage() {
 	const { toast } = useToast();
 	const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("word");
+	const [speakerId, setSpeakerId] = useState<SpeakerId>(DEFAULT_SPEAKER);
+
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem(SPEAKER_PREF_KEY);
+			if (saved && SPEAKERS.some((s) => s.id === saved))
+				setSpeakerId(saved as SpeakerId);
+		} catch {
+			// localStorage unavailable (private mode)
+		}
+	}, []);
 	const [playingId, setPlayingId] = useState<string | null>(null);
 	const [loadingId, setLoadingId] = useState<string | null>(null);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 
+	const handleSpeakerChange = useCallback((id: SpeakerId) => {
+		setSpeakerId(id);
+		saveSpeaker(id);
+	}, []);
+
 	const handlePlay = useCallback(
 		async (symbol: string, mode: PlaybackMode) => {
-			const id = `${symbol}-${mode}`;
+			const id =
+				mode === "word"
+					? `${symbol}-${mode}-${speakerId}`
+					: `${symbol}-${mode}`;
 
 			// If already playing this item, stop it
 			if (playingId === id && audioRef.current) {
@@ -786,7 +837,9 @@ function LearningPage() {
 			}
 
 			const audioKey =
-				mode === "word" ? audioData.wordAudio : audioData.soundAudio;
+				mode === "word"
+					? `ipa/words/${speakerId}/${audioData.wordAudio}`
+					: audioData.soundAudio;
 			const audioUrl = audioKey.endsWith(".ogg")
 				? `/${audioKey}`
 				: `/api/audio/learn/${encodeURIComponent(audioKey)}`;
@@ -828,7 +881,7 @@ function LearningPage() {
 				});
 			}
 		},
-		[playingId, toast],
+		[playingId, speakerId, toast],
 	);
 
 	return (
@@ -843,7 +896,7 @@ function LearningPage() {
 					<div className="flex flex-col gap-16">
 						{/* IPA Section Header with Controls */}
 						<section className="flex flex-col gap-12">
-							<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 								<div className="flex flex-col gap-1">
 									<h2 className="font-semibold text-3xl tracking-tight">
 										International Phonetic Alphabet
@@ -854,27 +907,58 @@ function LearningPage() {
 									</p>
 								</div>
 
-								{/* Playback Mode Toggle */}
-								<Tabs
-									value={playbackMode}
-									onValueChange={(v) => setPlaybackMode(v as PlaybackMode)}
-									className="w-full sm:w-auto"
-								>
-									<TabsList className="w-full sm:w-auto">
-										<TabsTrigger
-											value="sound"
-											className="flex-1 sm:flex-initial"
+								{/* Playback Controls */}
+								<div className="flex w-full flex-col items-end gap-2 sm:w-auto">
+									{/* Sound / Word toggle */}
+									<Tabs
+										value={playbackMode}
+										onValueChange={(v) => setPlaybackMode(v as PlaybackMode)}
+										className="w-full sm:w-auto"
+									>
+										<TabsList
+											aria-label="Playback mode"
+											className="w-full sm:w-auto"
 										>
-											Sound
-										</TabsTrigger>
-										<TabsTrigger
-											value="word"
-											className="flex-1 sm:flex-initial"
+											<TabsTrigger
+												value="sound"
+												className="flex-1 sm:flex-initial"
+											>
+												Sound
+											</TabsTrigger>
+											<TabsTrigger
+												value="word"
+												className="flex-1 sm:flex-initial"
+											>
+												Word
+											</TabsTrigger>
+										</TabsList>
+									</Tabs>
+
+									{/* Speaker selector — only shown in word mode */}
+									{playbackMode === "word" && (
+										<Tabs
+											value={speakerId}
+											onValueChange={(v) => handleSpeakerChange(v as SpeakerId)}
+											className="w-full sm:w-auto"
 										>
-											Word
-										</TabsTrigger>
-									</TabsList>
-								</Tabs>
+											<TabsList
+												aria-label="Word speaker"
+												className="h-auto w-full flex-wrap gap-0.5 sm:w-auto"
+											>
+												{SPEAKERS.map((s) => (
+													<TabsTrigger
+														key={s.id}
+														value={s.id}
+														className="flex-1 gap-1 text-xs sm:flex-initial"
+													>
+														<span>{DIALECTS[s.dialect].flag}</span>
+														{s.name}
+													</TabsTrigger>
+												))}
+											</TabsList>
+										</Tabs>
+									)}
+								</div>
 							</div>
 
 							{/* IPA Charts */}
@@ -1286,15 +1370,21 @@ function LearningPage() {
 								Sound Clip Attribution
 							</h4>
 							<p className="text-muted-foreground text-sm leading-relaxed">
-								Each audio clip is the work of Peter Isotalo, User:Denelson83,
-								UCLA Phonetics Lab Archive 2003, User:Halibutt, User:Pmx or
-								User:Octane, and made available under a free and/or copyleft
-								licence. For details on the licensing and attribution
-								requirements of a particular clip, browse to it from the general
-								phonetics page at the Wikimedia Commons. Vowel trapezoid
-								background by User:Denelson83; see File:Blank vowel
-								trapezoid.png on Wikimedia Commons for details. Word audio is
-								spoken by human voice talent.
+								Word recordings by Jordan, Katherine, Teyanna (General American)
+								and Jon (Received Pronunciation). IPA sound clips are the work
+								of Peter Isotalo, User:Denelson83, UCLA Phonetics Lab Archive
+								2003, User:Halibutt, User:Pmx or User:Octane, made available
+								under a free and/or copyleft licence — see the{" "}
+								<a
+									href="https://commons.wikimedia.org/wiki/General_phonetics"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="underline hover:text-foreground"
+								>
+									Wikimedia Commons general phonetics page
+								</a>{" "}
+								for per-clip licensing details. Vowel trapezoid background by
+								User:Denelson83.
 							</p>
 						</section>
 
