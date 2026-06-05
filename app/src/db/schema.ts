@@ -227,7 +227,7 @@ export const analyses = pgTable(
 );
 
 /**
- * Alignment data storage (TextGrid files)
+ * Alignment data storage (V1; alignment via the alignment_method enum)
  */
 export const alignments = pgTable("alignments", {
 	id: uuid("id").primaryKey().defaultRandom(),

@@ -23,7 +23,7 @@ WORKDIR /worker
 # Upgrade pip first
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install PyTorch with CUDA 11.8 (same as ipa_generation)
+# Install PyTorch with CUDA 11.8
 RUN python3 -m pip install --no-cache-dir \
     torch torchaudio \
     --index-url https://download.pytorch.org/whl/cu118
