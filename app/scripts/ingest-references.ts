@@ -28,6 +28,7 @@ import ws from "ws";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..", "..");
+const DATA_ROOT = process.env.DATA_DIR ?? join(ROOT, "data");
 
 config({ path: join(__dirname, "..", ".env") });
 
@@ -143,8 +144,8 @@ function readWavMeta(wavPath: string): {
 }
 
 async function main() {
-	const authorsPath = join(ROOT, "data", "authors.json");
-	const manifestPath = join(ROOT, "data", "manifest.json");
+	const authorsPath = join(DATA_ROOT, "authors.json");
+	const manifestPath = join(DATA_ROOT, "manifest.json");
 
 	const authorsData: Record<string, AuthorMeta> = JSON.parse(
 		readFileSync(authorsPath, "utf-8"),
@@ -226,8 +227,7 @@ async function main() {
 
 		for (const entry of manifest) {
 			const precomputePath = join(
-				ROOT,
-				"data",
+				DATA_ROOT,
 				"precompute",
 				slug,
 				`${entry.id}.json`,
@@ -251,8 +251,7 @@ async function main() {
 			// R2 upload (idempotent)
 			const r2Key = `references/${slug}/${entry.id}.wav`;
 			const wavPath = join(
-				ROOT,
-				"data",
+				DATA_ROOT,
 				"references",
 				slug,
 				`${entry.id}.wav`,
