@@ -201,7 +201,7 @@ class POWSMAligner:
                 PhoneSegment(
                     token=bare,
                     start_ms=round(s.start * self.frame_sec * 1000, 1),
-                    end_ms=round(s.end * self.frame_sec * 1000, 1),
+                    end_ms=round((s.end + 1) * self.frame_sec * 1000, 1),
                     confidence=round(float(s.score), 4),
                 )
             )
@@ -231,7 +231,7 @@ class POWSMAligner:
                                 start_frame * self.frame_sec * 1000, 1
                             ),
                             end_ms=round(
-                                (f - 1) * self.frame_sec * 1000, 1
+                                f * self.frame_sec * 1000, 1
                             ),
                             confidence=round(conf, 4),
                         )
@@ -247,7 +247,7 @@ class POWSMAligner:
                 PhoneSegment(
                     token=bare,
                     start_ms=round(start_frame * self.frame_sec * 1000, 1),
-                    end_ms=round((n_frames - 1) * self.frame_sec * 1000, 1),
+                    end_ms=round(n_frames * self.frame_sec * 1000, 1),
                     confidence=round(conf, 4),
                 )
             )
