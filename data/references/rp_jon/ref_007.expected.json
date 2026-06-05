@@ -1,0 +1,180 @@
+{
+  "clip": "/data/references/rp_jon/ref_007.wav",
+  "mode": "free_alignment",
+  "n_phones": 24,
+  "phones": [
+    "▁",
+    "ð",
+    "i",
+    "z",
+    "tʰ",
+    "ʃ",
+    "i",
+    "p",
+    "s",
+    "i",
+    "t",
+    "s",
+    "ɑ",
+    "ɹ",
+    "n",
+    "ɑ",
+    "t",
+    "v",
+    "ɛ",
+    "ɹ",
+    "i",
+    "p",
+    "ɪ",
+    "ɡ"
+  ],
+  "segments": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 120.0,
+      "confidence": 1.0
+    },
+    {
+      "token": "ð",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "i",
+      "start_ms": 200.0,
+      "end_ms": 240.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "z",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 480.0,
+      "end_ms": 520.0,
+      "confidence": 0.9992
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9983
+    },
+    {
+      "token": "i",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.9986
+    },
+    {
+      "token": "p",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.9964
+    },
+    {
+      "token": "s",
+      "start_ms": 840.0,
+      "end_ms": 920.0,
+      "confidence": 0.9805
+    },
+    {
+      "token": "i",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.9967
+    },
+    {
+      "token": "t",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "s",
+      "start_ms": 1160.0,
+      "end_ms": 1240.0,
+      "confidence": 0.9802
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9505
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1360.0,
+      "end_ms": 1440.0,
+      "confidence": 0.926
+    },
+    {
+      "token": "n",
+      "start_ms": 1480.0,
+      "end_ms": 1560.0,
+      "confidence": 0.9981
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 1560.0,
+      "end_ms": 1640.0,
+      "confidence": 0.9826
+    },
+    {
+      "token": "t",
+      "start_ms": 1640.0,
+      "end_ms": 1680.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "v",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 1880.0,
+      "end_ms": 1920.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1960.0,
+      "end_ms": 2040.0,
+      "confidence": 0.8556
+    },
+    {
+      "token": "i",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "p",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2320.0,
+      "end_ms": 2360.0,
+      "confidence": 0.9986
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 2400.0,
+      "end_ms": 2440.0,
+      "confidence": 0.9998
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "author": "rp_jon",
+  "id": "ref_007"
+}
