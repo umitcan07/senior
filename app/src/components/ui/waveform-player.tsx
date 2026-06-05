@@ -79,7 +79,7 @@ function WaveformPlayerContent({
 		barWidth: 2,
 		barGap: 4,
 		barRadius: 4,
-		barHeight: .75,
+		barHeight: 0.75,
 		normalize: true,
 		interact: true, // Enable click-to-seek
 	});
@@ -226,7 +226,7 @@ function WaveformPlayerContent({
 			)}
 			<div
 				className={cn(
-					"relative overflow-hidden rounded-sm bg-primary/4 flex items-center justify-center",
+					"relative flex items-center justify-center overflow-hidden rounded-sm bg-primary/4",
 					compact ? "min-h-16" : "min-h-24",
 				)}
 			>
@@ -326,7 +326,7 @@ function LoadingSkeleton({
 		>
 			<div
 				className={cn(
-					"flex items-center justify-center rounded-lg bg-primary/20 animate-pulse",
+					"flex animate-pulse items-center justify-center rounded-lg bg-primary/20",
 					compact ? "h-12" : "h-16",
 				)}
 			>

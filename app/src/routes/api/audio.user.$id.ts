@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/audio/user/$id")({
 						const authResult = await auth();
 						isAuthenticated = authResult.isAuthenticated ?? false;
 						userId = authResult.userId ?? null;
-					} catch (authError) {
+					} catch (_authError) {
 						// Auth context not available
 						return new Response("Unauthorized", { status: 401 });
 					}

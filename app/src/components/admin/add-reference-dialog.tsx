@@ -219,7 +219,10 @@ export function AddReferenceDialog({
 								{authors.length === 0 ? (
 									<div className="p-2 text-muted-foreground text-sm">
 										No authors available.{" "}
-										<Link to="/admin/authors" className="text-primary underline">
+										<Link
+											to="/admin/authors"
+											className="text-primary underline"
+										>
 											Create one first
 										</Link>
 									</div>
@@ -250,7 +253,9 @@ export function AddReferenceDialog({
 									<div className="flex items-center gap-3">
 										<RiMicLine className="h-6 w-6 shrink-0 text-primary" />
 										<div className="min-w-0 flex-1">
-											<p className="truncate font-medium text-sm">{file.name}</p>
+											<p className="truncate font-medium text-sm">
+												{file.name}
+											</p>
 											<p className="text-muted-foreground text-xs">
 												{(file.size / 1024 / 1024).toFixed(2)} MB
 											</p>

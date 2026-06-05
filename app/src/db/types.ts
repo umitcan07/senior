@@ -89,4 +89,3 @@ export type TextDifficulty =
 	(typeof schema.textDifficultyEnum.enumValues)[number];
 export type TextType = (typeof schema.textTypeEnum.enumValues)[number];
 export type JobStatus = (typeof schema.jobStatusEnum.enumValues)[number];
-

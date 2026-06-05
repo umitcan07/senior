@@ -93,10 +93,7 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 					: "opacity-70 hover:scale-[1.02] hover:opacity-100 active:scale-[0.98]",
 			)}
 		>
-			<Icon
-				className="size-5 shrink-0 text-white/80"
-				strokeWidth={1.5}
-			/>
+			<Icon className="size-5 shrink-0 text-white/80" strokeWidth={1.5} />
 			<span className="truncate font-medium text-sm text-white leading-tight tracking-tight">
 				{categoryLabels[type]}
 			</span>
@@ -240,7 +237,10 @@ function PracticePage() {
 				<PageContainer>
 					<EmptyState
 						title="Failed to load practice texts"
-						description={error?.message ?? "An error occurred while loading practice texts."}
+						description={
+							error?.message ??
+							"An error occurred while loading practice texts."
+						}
 						primaryAction={{
 							label: "Try Again",
 							onClick: () => window.location.reload(),
@@ -259,7 +259,6 @@ function PracticePage() {
 						<>
 							{/* Filters Section */}
 							<section className="flex flex-col gap-10">
-
 								{/* Desktop: Inline filters */}
 								<div className="hidden md:flex md:flex-row md:items-end md:justify-between">
 									<div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end md:flex-1">
@@ -321,7 +320,8 @@ function PracticePage() {
 												Filters
 												{(searchQuery || wordCountFilter !== "all") && (
 													<span className="ml-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-														{(searchQuery ? 1 : 0) + (wordCountFilter !== "all" ? 1 : 0)}
+														{(searchQuery ? 1 : 0) +
+															(wordCountFilter !== "all" ? 1 : 0)}
 													</span>
 												)}
 											</Button>
@@ -332,7 +332,9 @@ function PracticePage() {
 											</DrawerHeader>
 											<div className="flex flex-col gap-4 px-4 pb-6">
 												<div className="flex flex-col gap-2">
-													<label className="font-medium text-muted-foreground text-sm">Search</label>
+													<label className="font-medium text-muted-foreground text-sm">
+														Search
+													</label>
 													<div className="relative">
 														<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 														<Input
@@ -348,7 +350,9 @@ function PracticePage() {
 													</div>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="font-medium text-muted-foreground text-sm">Length</label>
+													<label className="font-medium text-muted-foreground text-sm">
+														Length
+													</label>
 													<Select
 														value={wordCountFilter}
 														onValueChange={(v) => {
@@ -361,8 +365,12 @@ function PracticePage() {
 														</SelectTrigger>
 														<SelectContent>
 															<SelectItem value="all">Any Length</SelectItem>
-															<SelectItem value="short">Short (&lt;15)</SelectItem>
-															<SelectItem value="medium">Medium (15-30)</SelectItem>
+															<SelectItem value="short">
+																Short (&lt;15)
+															</SelectItem>
+															<SelectItem value="medium">
+																Medium (15-30)
+															</SelectItem>
 															<SelectItem value="long">Long (30+)</SelectItem>
 														</SelectContent>
 													</Select>

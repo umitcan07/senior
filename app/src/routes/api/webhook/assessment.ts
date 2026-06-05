@@ -98,9 +98,7 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 					// Find assessment job by external ID
 					const job = await getAssessmentJobByExternalId(id);
 					if (!job) {
-						console.warn(
-							`Assessment webhook received for unknown job: ${id}`,
-						);
+						console.warn(`Assessment webhook received for unknown job: ${id}`);
 						// Return 200 to prevent RunPod from retrying
 						return Response.json({
 							success: true,
@@ -126,7 +124,9 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 						status: hasOutputError ? "failed" : jobStatus,
 						result: output as Record<string, unknown> | undefined,
 						error: hasOutputError
-							? String((output as Record<string, unknown>)?.error ?? "Unknown error")
+							? String(
+									(output as Record<string, unknown>)?.error ?? "Unknown error",
+								)
 							: jobError,
 						executionTimeMs: executionTime ?? null,
 						delayTimeMs: delayTime ?? null,
@@ -167,9 +167,14 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 							overallScore: assessmentOutput.score.toFixed(4),
 							phonemeScore: assessmentOutput.score.toFixed(4),
 							targetPhonemes: parsePowsmPhonemes(assessmentOutput.target_ipa),
-							recognizedPhonemes: parsePowsmPhonemes(assessmentOutput.actual_ipa),
+							recognizedPhonemes: parsePowsmPhonemes(
+								assessmentOutput.actual_ipa,
+							),
 							targetWords: assessmentOutput.target_text_normalized ?? null,
-							recognizedWords: assessmentOutput.actual_text_normalized ?? assessmentOutput.actual_text ?? null,
+							recognizedWords:
+								assessmentOutput.actual_text_normalized ??
+								assessmentOutput.actual_text ??
+								null,
 							wordScore: assessmentOutput.word_score?.toFixed(4) ?? null,
 							phonemeDistance: assessmentOutput.errors.length,
 							processingDurationMs: executionTime ?? null,
@@ -223,7 +228,10 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 						}
 
 						// Insert word errors
-						if (assessmentOutput.word_errors && assessmentOutput.word_errors.length > 0) {
+						if (
+							assessmentOutput.word_errors &&
+							assessmentOutput.word_errors.length > 0
+						) {
 							console.log(
 								`[Webhook] Processing ${assessmentOutput.word_errors.length} word errors`,
 							);

@@ -1,8 +1,4 @@
-import {
-	SignedIn,
-	SignedOut,
-	SignInButton,
-} from "@clerk/tanstack-react-start";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
 import { RiComputerLine, RiMicLine, RiUserLine } from "@remixicon/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
@@ -43,7 +39,10 @@ export const Route = createFileRoute("/settings")({
 			serverGetPreferredAuthorId(),
 		]);
 
-		const authors = authorsResult.success && 'data' in authorsResult ? authorsResult.data : [];
+		const authors =
+			authorsResult.success && "data" in authorsResult
+				? authorsResult.data
+				: [];
 		const preferredAuthorId = preferredAuthorIdResult ?? authors[0]?.id ?? null;
 
 		return {
@@ -210,11 +209,11 @@ function SettingsPage() {
 
 		try {
 			// Server function gets userId from auth() internally
-			const result = await serverUpdateUserPreferences({
+			const result = (await serverUpdateUserPreferences({
 				data: {
 					preferredAuthorId: pendingAuthorId,
 				},
-			}) as ApiResponse<UserPreferences>;
+			})) as ApiResponse<UserPreferences>;
 
 			if (!result.success) {
 				toast({

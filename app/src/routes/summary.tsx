@@ -271,14 +271,14 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 						"flex size-12 shrink-0 items-center justify-center rounded-lg font-medium text-lg",
 						// Using minimal text color instead of heavy background
 						attempt.score !== null &&
-						getScoreLevel(attempt.score) === "high" &&
-						"bg-emerald-500/10 text-emerald-600",
+							getScoreLevel(attempt.score) === "high" &&
+							"bg-emerald-500/10 text-emerald-600",
 						attempt.score !== null &&
-						getScoreLevel(attempt.score) === "medium" &&
-						"bg-amber-500/10 text-amber-600",
+							getScoreLevel(attempt.score) === "medium" &&
+							"bg-amber-500/10 text-amber-600",
 						attempt.score !== null &&
-						getScoreLevel(attempt.score) === "low" &&
-						"bg-red-500/10 text-red-600",
+							getScoreLevel(attempt.score) === "low" &&
+							"bg-red-500/10 text-red-600",
 						attempt.score === null && "bg-muted text-muted-foreground",
 					)}
 				>

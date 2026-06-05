@@ -135,7 +135,15 @@ export const referenceSpeeches = pgTable(
 		// Cached POWSMAligner free_alignment output: array of
 		// { token, start_ms, end_ms, confidence }. Read by the assess path so it
 		// doesn't recompute reference alignment on every call.
-		phoneTimingsJson: jsonb("phone_timings_json").$type<Array<{token: string; start_ms: number; end_ms: number; confidence: number}>>(),
+		phoneTimingsJson:
+			jsonb("phone_timings_json").$type<
+				Array<{
+					token: string;
+					start_ms: number;
+					end_ms: number;
+					confidence: number;
+				}>
+			>(),
 		priority: integer("priority").default(0),
 		durationMs: integer("duration_ms"),
 		fileSizeBytes: integer("file_size_bytes"),
@@ -411,5 +419,3 @@ export const assessmentJobs = pgTable(
 		index("idx_assessment_jobs_status").on(table.status),
 	],
 );
-
-

@@ -98,7 +98,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 	// Close mobile menu on route change
 	useEffect(() => {
 		closeMobileMenu();
-	}, [currentPath, closeMobileMenu]);
+	}, [closeMobileMenu]);
 
 	const isRouteActive = (to: string) => {
 		if (to === "/") return currentPath === "/";
@@ -131,10 +131,10 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 									aria-expanded={isMobileMenuOpen}
 									aria-controls="mobile-menu"
 									aria-label="Open menu"
-								className={cn(
-									"rounded-lg transition-colors",
-									isMobileMenuOpen && "bg-muted"
-								)}
+									className={cn(
+										"rounded-lg transition-colors",
+										isMobileMenuOpen && "bg-muted",
+									)}
 								>
 									<RiMenuLine size={24} />
 								</Button>
@@ -232,7 +232,7 @@ export function Navbar({ isAdmin = false, className }: NavbarProps) {
 					</div>
 
 					{/* Right Side Actions */}
-					<div className="flex min-w-[40px] items-center justify-end justify-self-end gap-2 md:gap-4 md:min-w-32">
+					<div className="flex min-w-[40px] items-center justify-end gap-2 justify-self-end md:min-w-32 md:gap-4">
 						{/* Desktop only: Theme toggle and Settings */}
 						<div className="hidden md:flex md:items-center md:gap-2">
 							<ThemeToggle />

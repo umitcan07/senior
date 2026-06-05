@@ -37,7 +37,7 @@ export const Route = createFileRoute("/api/assessment")({
 						const authResult = await auth();
 						isAuthenticated = authResult.isAuthenticated ?? false;
 						userId = authResult.userId ?? null;
-					} catch (authError) {
+					} catch (_authError) {
 						// Auth context not available
 						return Response.json(
 							{ success: false, error: "Unauthorized" },
@@ -53,11 +53,7 @@ export const Route = createFileRoute("/api/assessment")({
 					}
 
 					// Submit assessment job using shared function
-					const result = await submitAssessmentJob(
-						analysisId,
-						userId,
-						request,
-					);
+					const result = await submitAssessmentJob(analysisId, userId, request);
 
 					if (!result.success) {
 						return Response.json(

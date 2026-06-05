@@ -71,7 +71,6 @@ export const Route = createFileRoute("/admin/references")({
 	pendingComponent: ReferencesSkeleton,
 });
 
-
 // Columns
 function createColumns(
 	onDelete: (ref: ReferenceSpeechWithRelations) => void,
@@ -219,9 +218,9 @@ function createColumns(
 						<PopoverTrigger asChild>
 							<button
 								type="button"
-								className="flex flex-col gap-0.5 text-left hover:opacity-80 transition-opacity"
+								className="flex flex-col gap-0.5 text-left transition-opacity hover:opacity-80"
 							>
-								<span className="max-w-48 truncate font-ipa text-xl text-muted-foreground">
+								<span className="max-w-48 truncate font-ipa text-muted-foreground text-xl">
 									{formattedIpa}
 								</span>
 							</button>
@@ -229,7 +228,9 @@ function createColumns(
 						<PopoverContent className="w-96" align="start">
 							<div className="flex flex-col gap-3">
 								<div className="flex items-center justify-between">
-									<span className="text-sm font-semibold">IPA Transcription</span>
+									<span className="font-semibold text-sm">
+										IPA Transcription
+									</span>
 									<Button
 										variant="ghost"
 										size="sm"
@@ -248,7 +249,7 @@ function createColumns(
 									</Button>
 								</div>
 								<div className="rounded-md bg-muted p-3">
-									<p className="font-ipa text-xl break-all">{formattedIpa}</p>
+									<p className="break-all font-ipa text-xl">{formattedIpa}</p>
 								</div>
 							</div>
 						</PopoverContent>
@@ -387,9 +388,9 @@ function ReferencesDataTable({
 										{header.isPlaceholder
 											? null
 											: flexRender(
-												header.column.columnDef.header,
-												header.getContext(),
-											)}
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
 									</TableHead>
 								))}
 							</TableRow>
@@ -421,15 +422,21 @@ function ReferencesDataTable({
 													{row.original.ipaTranscription && (
 														<div className="flex flex-col gap-2">
 															<div className="flex items-center justify-between">
-																<span className="text-sm font-semibold">IPA Transcription</span>
+																<span className="font-semibold text-sm">
+																	IPA Transcription
+																</span>
 																<Button
 																	variant="ghost"
 																	size="sm"
 																	className="h-7 px-2"
 																	onClick={async () => {
 																		try {
-																			const formattedIpa = formatIpaClean(row.original.ipaTranscription!);
-																			await navigator.clipboard.writeText(formattedIpa);
+																			const formattedIpa = formatIpaClean(
+																				row.original.ipaTranscription!,
+																			);
+																			await navigator.clipboard.writeText(
+																				formattedIpa,
+																			);
 																			onCopyIpa();
 																		} catch {
 																			// Clipboard API not available
@@ -440,9 +447,11 @@ function ReferencesDataTable({
 																	Copy
 																</Button>
 															</div>
-															<div className="rounded-md bg-background border p-3">
-																<p className="font-mono text-sm break-all">
-																	{formatIpaClean(row.original.ipaTranscription)}
+															<div className="rounded-md border bg-background p-3">
+																<p className="break-all font-mono text-sm">
+																	{formatIpaClean(
+																		row.original.ipaTranscription,
+																	)}
 																</p>
 															</div>
 														</div>

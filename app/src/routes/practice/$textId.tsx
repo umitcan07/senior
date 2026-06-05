@@ -75,9 +75,9 @@ export const Route = createFileRoute("/practice/$textId")({
 		const references =
 			referencesResult.success && referencesResult.data
 				? referencesResult.data.map((ref: any) => ({
-					...ref,
-					author: ref.author,
-				}))
+						...ref,
+						author: ref.author,
+					}))
 				: [];
 
 		// Get recent attempts for this text - server function handles auth
@@ -90,7 +90,7 @@ export const Route = createFileRoute("/practice/$textId")({
 			if (recentAttemptsResult.success && recentAttemptsResult.data) {
 				recentAttempts = recentAttemptsResult.data;
 			}
-		} catch (error) {
+		} catch (_error) {
 			// Server function handles auth errors, just use empty array
 			recentAttempts = [];
 		}
@@ -148,11 +148,19 @@ function useRecording(textId: string) {
 		if (uiState === "recording" && audioRecorder.isRecording) {
 			return "recording";
 		}
-		if (uiState === "preview" && (audioRecorder.audioBlob || uploadedFileBlob)) {
+		if (
+			uiState === "preview" &&
+			(audioRecorder.audioBlob || uploadedFileBlob)
+		) {
 			return "preview";
 		}
 		return uiState;
-	}, [uiState, audioRecorder.isRecording, audioRecorder.audioBlob, uploadedFileBlob]);
+	}, [
+		uiState,
+		audioRecorder.isRecording,
+		audioRecorder.audioBlob,
+		uploadedFileBlob,
+	]);
 
 	// Cleanup uploaded file URL on unmount
 	useEffect(() => {
@@ -211,7 +219,7 @@ function useRecording(textId: string) {
 
 			// Now start countdown, which will call audioRecorder.startRecording when done
 			runCountdown();
-		} catch (err) {
+		} catch (_err) {
 			// Permission denied or error - reset to idle state
 			setUiState("idle");
 		}
@@ -430,7 +438,7 @@ function ReferenceVoice({
 	}
 
 	return (
-		<div className="flex flex-col gap-4 p-4 ring-muted ring-1 rounded-3xl max-w-3xl w-full self-center">
+		<div className="flex w-full max-w-3xl flex-col gap-4 self-center rounded-3xl p-4 ring-1 ring-muted">
 			{/* Selection area */}
 			<div className="flex flex-col gap-2">
 				{selectedReference ? (
@@ -561,7 +569,7 @@ function ReferenceVoice({
 			{selectedReference && (
 				<WaveformPlayerInline
 					src={`/api/audio/${selectedReference.id}`}
-					className="bg-card w-full border"
+					className="w-full border bg-card"
 				/>
 			)}
 
@@ -581,7 +589,7 @@ function ReferenceVoice({
 								: "Dictionary"}
 						</Badge>
 					</div>
-					<p className="font-ipa text-xl leading-relaxed tracking-wide text-foreground/80">
+					<p className="font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide">
 						{formatIpaForDisplay(selectedReference.ipaTranscription)}
 					</p>
 				</div>
@@ -620,21 +628,30 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 		}
 		if (status === "pending") {
 			return (
-				<Badge variant="secondary" className="h-5 bg-blue-500/10 text-blue-600 text-[10px] dark:text-blue-400">
+				<Badge
+					variant="secondary"
+					className="h-5 bg-blue-500/10 text-[10px] text-blue-600 dark:text-blue-400"
+				>
 					Pending
 				</Badge>
 			);
 		}
 		if (status === "processing") {
 			return (
-				<Badge variant="secondary" className="h-5 bg-amber-500/10 text-amber-600 text-[10px] dark:text-amber-400">
+				<Badge
+					variant="secondary"
+					className="h-5 bg-amber-500/10 text-[10px] text-amber-600 dark:text-amber-400"
+				>
 					Processing
 				</Badge>
 			);
 		}
 		if (status === "failed") {
 			return (
-				<Badge variant="secondary" className="h-5 bg-red-500/10 text-red-600 text-[10px] dark:text-red-400">
+				<Badge
+					variant="secondary"
+					className="h-5 bg-red-500/10 text-[10px] text-red-600 dark:text-red-400"
+				>
 					Failed
 				</Badge>
 			);
@@ -659,7 +676,8 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 			<div className="grid grid-cols-2 gap-2 sm:flex sm:flex-col">
 				{attempts.map((attempt) => {
 					const statusBadge = getStatusBadge(attempt.status, attempt.score);
-					const showScore = attempt.status === "completed" && attempt.score !== null;
+					const showScore =
+						attempt.status === "completed" && attempt.score !== null;
 
 					return (
 						<Link
@@ -674,11 +692,11 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 										className={cn(
 											"flex size-8 items-center justify-center rounded-md font-medium text-xs tabular-nums",
 											getScoreLevel(attempt.score!) === "high" &&
-											"bg-emerald-500/10 text-emerald-600",
+												"bg-emerald-500/10 text-emerald-600",
 											getScoreLevel(attempt.score!) === "medium" &&
-											"bg-amber-500/10 text-amber-600",
+												"bg-amber-500/10 text-amber-600",
 											getScoreLevel(attempt.score!) === "low" &&
-											"bg-red-500/10 text-red-600",
+												"bg-red-500/10 text-red-600",
 										)}
 									>
 										{attempt.score}
@@ -837,7 +855,7 @@ function PracticeTextPage() {
 							{/* Practice text - clean typography, no box */}
 							<div
 								className={cn(
-									"relative transition-all max-w-3xl w-full self-center",
+									"relative w-full max-w-3xl self-center transition-all",
 									isActiveRecording && "opacity-80",
 								)}
 							>
@@ -854,7 +872,9 @@ function PracticeTextPage() {
 										{isUploading && (
 											<div className="flex w-full max-w-xs flex-col items-center gap-4 p-6">
 												<div className="h-2 w-2 animate-ping rounded-full bg-white" />
-												<span className="font-medium">Uploading your speech...</span>
+												<span className="font-medium">
+													Uploading your speech...
+												</span>
 											</div>
 										)}
 										{isAnalyzing && (
@@ -862,7 +882,7 @@ function PracticeTextPage() {
 												<div className="h-2 w-2 animate-ping rounded-full bg-white" />
 												<ShimmeringText
 													text="Hang on, we are bringing your analysis here."
-													className="text-white text-lg font-medium"
+													className="font-medium text-lg text-white"
 													shimmerWidth={200}
 												/>
 											</div>
@@ -1022,7 +1042,7 @@ function PracticeTextPage() {
 																	42 *
 																	(1 -
 																		recording.recordingTime /
-																		MAX_RECORDING_TIME),
+																			MAX_RECORDING_TIME),
 															}}
 															transition={{
 																strokeDashoffset: {
@@ -1038,10 +1058,10 @@ function PracticeTextPage() {
 															<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
 															<span className="relative inline-flex size-2.5 rounded-full bg-destructive" />
 														</span>
-														<span className="mt-1 font-mono text-sm font-semibold tabular-nums">
+														<span className="mt-1 font-mono font-semibold text-sm tabular-nums">
 															{Math.round(
 																(recording.recordingTime / MAX_RECORDING_TIME) *
-																100,
+																	100,
 															)}
 															%
 														</span>
@@ -1105,8 +1125,6 @@ function PracticeTextPage() {
 												</div>
 											</div>
 										)}
-
-
 									</SignedIn>
 
 									<SignedOut>

@@ -69,8 +69,8 @@ function HeroSection() {
 			/>
 			<div className="flex flex-col items-center gap-4 py-12 md:py-20">
 				<span className="flex items-center gap-2 text-primary text-xs uppercase tracking-widest">
-					<span className="h-[1px] w-3 bg-primary/20"></span> Detailed Phonetic Analysis{" "}
-					<span className="h-[1px] w-3 bg-primary/20"></span>
+					<span className="h-[1px] w-3 bg-primary/20"></span> Detailed Phonetic
+					Analysis <span className="h-[1px] w-3 bg-primary/20"></span>
 				</span>
 				<h1 className="max-w-2xl text-balance bg-linear-to-b from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-3xl text-transparent tracking-tight sm:text-5xl md:text-6xl">
 					Practice Pronunciation with Confidence
@@ -84,11 +84,22 @@ function HeroSection() {
 					<Button size="lg" className="w-full sm:w-auto" asChild>
 						<Link to="/practice">Start Practicing</Link>
 					</Button>
-					<Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
-						<a href="https://github.com/umitcan07/senior" target="_blank" rel="noopener noreferrer">Learn More</a>
+					<Button
+						variant="outline"
+						size="lg"
+						className="w-full sm:w-auto"
+						asChild
+					>
+						<a
+							href="https://github.com/umitcan07/senior"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Learn More
+						</a>
 					</Button>
 				</div>
-				<p className="mt-6 rounded-sm px-2 py-1 text-balance text-center text-muted-foreground text-xs sm:ring-1 sm:ring-muted">
+				<p className="mt-6 text-balance rounded-sm px-2 py-1 text-center text-muted-foreground text-xs sm:ring-1 sm:ring-muted">
 					Powered by{" "}
 					<a
 						href="https://huggingface.co/espnet/powsm"
