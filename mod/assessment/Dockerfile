@@ -25,12 +25,13 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Install PyTorch with CUDA 11.8
 RUN python3 -m pip install --no-cache-dir \
-    torch torchaudio \
+    torch "torchaudio<2.9" \
     --index-url https://download.pytorch.org/whl/cu118
 
 # Copy files
 COPY shared/ /worker/shared/
 COPY assessment/ /worker/assessment/
+COPY alignment.py /worker/alignment.py
 
 # Install dependencies
 RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt
