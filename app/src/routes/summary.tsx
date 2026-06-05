@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/tanstack-react-start";
+import { SignedIn, SignedOut } from "@clerk/tanstack-react-start";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -7,6 +7,7 @@ import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SignInPrompt } from "@/components/ui/sign-in-prompt";
 import {
 	Pagination,
 	PaginationContent,
@@ -453,21 +454,11 @@ function GuestFeed() {
 	return (
 		<MainLayout>
 			<PageContainer>
-				<div className="flex flex-col gap-16 py-12">
-					<div className="flex flex-col items-center gap-6 text-center">
-						<div className="flex flex-col gap-2">
-							<h2 className="font-medium text-xl">
-								Sign in to see your progress
-							</h2>
-							<p className="max-w-md text-muted-foreground text-sm leading-relaxed">
-								Track your pronunciation improvements, identify challenging
-								sounds, and review your practice history.
-							</p>
-						</div>
-						<Button asChild size="lg" className="rounded-full px-8">
-							<SignInButton mode="modal">Sign in</SignInButton>
-						</Button>
-					</div>
+				<div className="py-12">
+					<SignInPrompt
+						title="Sign in to see your progress"
+						description="Track your pronunciation improvements, identify challenging sounds, and review your practice history."
+					/>
 				</div>
 			</PageContainer>
 		</MainLayout>
