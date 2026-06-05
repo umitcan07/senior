@@ -267,18 +267,26 @@ state. Keep them in sync — drift here is how we ended up with the orphaned
    - `app/drizzle/NNNN_<name>.sql`
    - `app/drizzle/meta/NNNN_snapshot.json`
    - `app/drizzle/meta/_journal.json` (the appended entry)
-5. Apply with `pnpm db:push`. **Note:** there is one Neon DB (the `development`
-   branch) used for both local and prod, so a push is immediately live — review the
-   generated SQL first and keep changes additive. For a risky/destructive change,
-   create a scratch Neon branch in the dashboard and test there before pushing.
+5. **The deploy applies migrations with `db:migrate`** — Fly's `release_command`
+   runs `scripts/migrate.ts` against the single Neon DB (the `development` branch,
+   used for local **and** prod). So merging to `main` runs your migration on the
+   live DB; it **must apply cleanly**. Test first with `pnpm db:migrate` locally (or
+   a scratch Neon branch for risky changes). `db:push` is quick local schema-sync
+   only — it does **not** write journal/`__drizzle_migrations` entries, so never use
+   it against the shared DB.
 
 **Hard rules**
 
-- **Never `db:push` to a shared DB without first generating + committing the
-  migration.** Push-without-generate is what created the orphan above: the DB moved
-  forward but the tracked history didn't.
-- **Migrations are append-only.** Never edit or delete an existing `NNNN_*.sql` or
-  `meta/NNNN_snapshot.json`.
+- **Never apply DDL to the shared DB by hand (`ALTER …`) or via `db:push`.** It
+  desyncs the journal / `__drizzle_migrations`, so the next `db:migrate` on deploy
+  fails with `already exists`. Both the `0009_chief_tiger_shark` orphan *and* a
+  manually-added `powsm_ctc` enum value broke deploys exactly this way.
+- **Migrations must apply cleanly under `db:migrate`.** If an object might already
+  exist from out-of-band history, write it idempotently — `ADD VALUE IF NOT EXISTS`,
+  `ADD COLUMN IF NOT EXISTS`. The *only* allowed edit to an existing migration is
+  making a not-yet-deployed one idempotent.
+- **Migrations are otherwise append-only.** Never edit or delete an applied
+  `NNNN_*.sql` or `meta/NNNN_snapshot.json`.
 - **Don't hand-edit `_journal.json`** except to repair an already-existing drift you
   fully understand — and call it out in the commit message when you do.
 - Adding an enum value is non-destructive (`ALTER TYPE … ADD VALUE`); **dropping**
