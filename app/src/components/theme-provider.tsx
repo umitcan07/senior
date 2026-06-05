@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { withoutTransition } from "@/lib/without-transition";
 import { THEME_STORAGE_KEY } from "@/lib/constants";
+import { withoutTransition } from "@/lib/without-transition";
 
 type Theme = "light" | "dark" | "system";
 

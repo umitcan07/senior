@@ -12,7 +12,6 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { WaveformPlayerInline } from "@/components/ui/waveform-player";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -30,6 +29,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { WaveformPlayerInline } from "@/components/ui/waveform-player";
 import type { ReferenceSpeechWithRelations } from "@/db/reference";
 import type { PracticeTextWithReferenceCount } from "@/db/text";
 import { formatDuration } from "@/lib/reference";
@@ -61,7 +61,9 @@ function ReferenceRow({
 					</div>
 					<div className="flex flex-col gap-0.5">
 						<div className="flex items-center gap-2">
-							<span className="font-medium text-sm">{reference.author.name}</span>
+							<span className="font-medium text-sm">
+								{reference.author.name}
+							</span>
 							{reference.author.accent && (
 								<span className="text-muted-foreground text-xs">
 									({reference.author.accent})
@@ -197,153 +199,151 @@ export function DataTable({
 
 	return (
 		<div className="flex flex-col gap-4">
-				<div className="flex items-center justify-between gap-4">
-					<Input
-						placeholder="Filter by content..."
-						value={
-							(table.getColumn("content")?.getFilterValue() as string) ?? ""
-						}
-						onChange={(event) =>
-							table.getColumn("content")?.setFilterValue(event.target.value)
-						}
-						className="max-w-sm"
-					/>
-					<div className="flex items-center gap-2">
-						{hasSelection && onDeleteSelected && (
-							<Button
-								variant="destructive"
-								size="sm"
-								onClick={handleDeleteSelected}
-							>
-								<RiDeleteBinLine size={16} />
-								Delete {selectedRows.length}
-							</Button>
-						)}
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="outline">Columns</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{table
-									.getAllColumns()
-									.filter((column) => column.getCanHide())
-									.map((column) => {
-										return (
-											<DropdownMenuCheckboxItem
-												key={column.id}
-												className="capitalize"
-												checked={column.getIsVisible()}
-												onCheckedChange={(value) =>
-													column.toggleVisibility(!!value)
-												}
-											>
-												{column.id}
-											</DropdownMenuCheckboxItem>
-										);
-									})}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
-				</div>
-				<div className="overflow-hidden rounded-md border">
-					<Table className="table-fixed">
-						<TableHeader>
-							{table.getHeaderGroups().map((headerGroup) => (
-								<TableRow key={headerGroup.id}>
-									{headerGroup.headers.map((header) => {
-										return (
-											<TableHead
-												key={header.id}
-												style={{
-													width:
-														header.getSize() !== 150
-															? header.getSize()
-															: undefined,
-												}}
-											>
-												{header.isPlaceholder
-													? null
-													: flexRender(
-															header.column.columnDef.header,
-															header.getContext(),
-														)}
-											</TableHead>
-										);
-									})}
-								</TableRow>
-							))}
-						</TableHeader>
-						<TableBody>
-							{table.getRowModel().rows?.length ? (
-								table.getRowModel().rows.map((row) => {
-									const isExpanded = expandedRows.has(row.original.id);
+			<div className="flex items-center justify-between gap-4">
+				<Input
+					placeholder="Filter by content..."
+					value={(table.getColumn("content")?.getFilterValue() as string) ?? ""}
+					onChange={(event) =>
+						table.getColumn("content")?.setFilterValue(event.target.value)
+					}
+					className="max-w-sm"
+				/>
+				<div className="flex items-center gap-2">
+					{hasSelection && onDeleteSelected && (
+						<Button
+							variant="destructive"
+							size="sm"
+							onClick={handleDeleteSelected}
+						>
+							<RiDeleteBinLine size={16} />
+							Delete {selectedRows.length}
+						</Button>
+					)}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline">Columns</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{table
+								.getAllColumns()
+								.filter((column) => column.getCanHide())
+								.map((column) => {
 									return (
-										<React.Fragment key={row.id}>
-											<TableRow data-state={row.getIsSelected() && "selected"}>
-												{row.getVisibleCells().map((cell) => (
-													<TableCell key={cell.id}>
-														{flexRender(
-															cell.column.columnDef.cell,
-															cell.getContext(),
-														)}
-													</TableCell>
-												))}
-											</TableRow>
-											{isExpanded && (
-												<TableRow className="hover:bg-transparent">
-													<TableCell
-														colSpan={columns.length}
-														className="bg-muted/30 p-0"
-													>
-														<ExpandedContent
-															textId={row.original.id}
-															references={references}
-															loading={referencesLoading}
-															onDeleteReference={onDeleteReference}
-														/>
-													</TableCell>
-												</TableRow>
-											)}
-										</React.Fragment>
+										<DropdownMenuCheckboxItem
+											key={column.id}
+											className="capitalize"
+											checked={column.getIsVisible()}
+											onCheckedChange={(value) =>
+												column.toggleVisibility(!!value)
+											}
+										>
+											{column.id}
+										</DropdownMenuCheckboxItem>
 									);
-								})
-							) : (
-								<TableRow>
-									<TableCell
-										colSpan={columns.length}
-										className="h-24 text-center"
-									>
-										No results.
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-				</div>
-				<div className="flex items-center justify-between">
-					<div className="flex-1 text-muted-foreground text-sm">
-						{table.getFilteredSelectedRowModel().rows.length} of{" "}
-						{table.getFilteredRowModel().rows.length} row(s) selected.
-					</div>
-					<div className="flex items-center gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => table.previousPage()}
-							disabled={!table.getCanPreviousPage()}
-						>
-							Previous
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => table.nextPage()}
-							disabled={!table.getCanNextPage()}
-						>
-							Next
-						</Button>
-					</div>
+								})}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
+			<div className="overflow-hidden rounded-md border">
+				<Table className="table-fixed">
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => {
+									return (
+										<TableHead
+											key={header.id}
+											style={{
+												width:
+													header.getSize() !== 150
+														? header.getSize()
+														: undefined,
+											}}
+										>
+											{header.isPlaceholder
+												? null
+												: flexRender(
+														header.column.columnDef.header,
+														header.getContext(),
+													)}
+										</TableHead>
+									);
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+					<TableBody>
+						{table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => {
+								const isExpanded = expandedRows.has(row.original.id);
+								return (
+									<React.Fragment key={row.id}>
+										<TableRow data-state={row.getIsSelected() && "selected"}>
+											{row.getVisibleCells().map((cell) => (
+												<TableCell key={cell.id}>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext(),
+													)}
+												</TableCell>
+											))}
+										</TableRow>
+										{isExpanded && (
+											<TableRow className="hover:bg-transparent">
+												<TableCell
+													colSpan={columns.length}
+													className="bg-muted/30 p-0"
+												>
+													<ExpandedContent
+														textId={row.original.id}
+														references={references}
+														loading={referencesLoading}
+														onDeleteReference={onDeleteReference}
+													/>
+												</TableCell>
+											</TableRow>
+										)}
+									</React.Fragment>
+								);
+							})
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="h-24 text-center"
+								>
+									No results.
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			</div>
+			<div className="flex items-center justify-between">
+				<div className="flex-1 text-muted-foreground text-sm">
+					{table.getFilteredSelectedRowModel().rows.length} of{" "}
+					{table.getFilteredRowModel().rows.length} row(s) selected.
+				</div>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+					>
+						Previous
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+					>
+						Next
+					</Button>
+				</div>
+			</div>
+		</div>
 	);
 }

@@ -3,13 +3,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { insertAnalysis } from "@/db/analysis";
 import { insertUserRecording } from "@/db/recording";
+import { submitAssessmentJob } from "./assessment-submission";
 import {
 	type ApiResponse,
 	createErrorResponse,
 	createSuccessResponse,
 	ErrorCode,
 } from "./errors";
-import { submitAssessmentJob } from "./assessment-submission";
 import { uploadToR2 } from "./r2";
 
 const UploadAudioSchema = z.object({
@@ -40,7 +40,7 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 				const authResult = await auth();
 				isAuthenticated = authResult.isAuthenticated ?? false;
 				userId = authResult.userId ?? null;
-			} catch (authError) {
+			} catch (_authError) {
 				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
@@ -60,7 +60,7 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 			}
 
 			console.log(`[Server] attribution recording to user: ${userId}`);
-			
+
 			const fileExtension = data.mimeType.split("/")[1] || "webm";
 			const storageKey = `users/${userId}/recordings/${crypto.randomUUID()}.${fileExtension}`;
 
@@ -109,10 +109,7 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 
 			// Submit assessment job to RunPod directly (no HTTP call needed)
 			try {
-				const assessmentResult = await submitAssessmentJob(
-					analysis.id,
-					userId,
-				);
+				const assessmentResult = await submitAssessmentJob(analysis.id, userId);
 
 				if (!assessmentResult.success) {
 					console.error(
@@ -149,4 +146,3 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 			);
 		}
 	});
-

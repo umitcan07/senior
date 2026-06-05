@@ -18,12 +18,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
+import { SignInPrompt } from "@/components/ui/sign-in-prompt";
 import { Spinner } from "@/components/ui/spinner";
 import type { Author, UserPreferences } from "@/db/types";
-import type { ApiResponse } from "@/lib/errors";
-import { SignInPrompt } from "@/components/ui/sign-in-prompt";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";
+import type { ApiResponse } from "@/lib/errors";
 import {
 	serverGetPreferredAuthorId,
 	serverUpdateUserPreferences,
@@ -39,7 +39,10 @@ export const Route = createFileRoute("/settings")({
 			serverGetPreferredAuthorId(),
 		]);
 
-		const authors = authorsResult.success && 'data' in authorsResult ? authorsResult.data : [];
+		const authors =
+			authorsResult.success && "data" in authorsResult
+				? authorsResult.data
+				: [];
 		const preferredAuthorId = preferredAuthorIdResult ?? authors[0]?.id ?? null;
 
 		return {
@@ -195,11 +198,11 @@ function SettingsPage() {
 
 		try {
 			// Server function gets userId from auth() internally
-			const result = await serverUpdateUserPreferences({
+			const result = (await serverUpdateUserPreferences({
 				data: {
 					preferredAuthorId: pendingAuthorId,
 				},
-			}) as ApiResponse<UserPreferences>;
+			})) as ApiResponse<UserPreferences>;
 
 			if (!result.success) {
 				toast({

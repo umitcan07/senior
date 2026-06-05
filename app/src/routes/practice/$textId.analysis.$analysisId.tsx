@@ -1,4 +1,5 @@
 import {
+	RiAlertLine,
 	RiArrowDownSLine,
 	RiArrowLeftLine,
 	RiPlayLine,
@@ -10,15 +11,10 @@ import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DiffViewer } from "@/components/diff-viewer";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-	Alert,
-	AlertDescription,
-	AlertTitle,
-} from "@/components/ui/alert"
-import { RiAlertLine } from "@remixicon/react";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -47,7 +43,6 @@ import type { ApiResponse } from "@/lib/errors";
 import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetAnalysisDetails } from "@/lib/server-analysis";
 import { cn } from "@/lib/utils";
-
 
 type PreviousAttempt = {
 	id: string;
@@ -89,7 +84,10 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 
 			// If auth failed or access denied, return empty data
 			if (!response.success) {
-				if (response.error.statusCode === 401 || response.error.statusCode === 403) {
+				if (
+					response.error.statusCode === 401 ||
+					response.error.statusCode === 403
+				) {
 					return {
 						analysis: null,
 						userRecording: null,
@@ -122,8 +120,15 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				};
 			}
 
-			const { analysis, userRecording, audioQualityMetrics, reference, phonemeErrors, wordErrors, assessmentJob } =
-				response.data;
+			const {
+				analysis,
+				userRecording,
+				audioQualityMetrics,
+				reference,
+				phonemeErrors,
+				wordErrors,
+				assessmentJob,
+			} = response.data;
 
 			const mockPreviousAttempts: PreviousAttempt[] = [];
 
@@ -291,9 +296,9 @@ function ScoreOverview({
 								.replace("500", "500/15")
 								.replace("400", "500/25")}text-foreground`, // Hacky color mapping, ideally use separate variants
 							level === "high" &&
-							"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+								"bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
 							level === "medium" &&
-							"bg-amber-500/15 text-amber-700 dark:text-amber-400",
+								"bg-amber-500/15 text-amber-700 dark:text-amber-400",
 							level === "low" && "bg-red-500/15 text-red-700 dark:text-red-400",
 						)}
 					>
@@ -307,21 +312,33 @@ function ScoreOverview({
 						<div className="grid w-full grid-cols-2 gap-4 border-border/40 border-t pt-6">
 							<div className="flex flex-col items-center border-border/40 border-r">
 								{phonemeScore !== null ? (
-									<ScoreRing score={phonemeScore} size="md" label="Phoneme Accuracy" />
+									<ScoreRing
+										score={phonemeScore}
+										size="md"
+										label="Phoneme Accuracy"
+									/>
 								) : (
 									<div className="flex flex-col items-center gap-2 opacity-50">
 										<div className="size-16 rounded-full border-4 border-muted/20" />
-										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">Phonemes</span>
+										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+											Phonemes
+										</span>
 									</div>
 								)}
 							</div>
 							<div className="flex flex-col items-center">
 								{wordScore !== null ? (
-									<ScoreRing score={wordScore} size="md" label="Word Accuracy" />
+									<ScoreRing
+										score={wordScore}
+										size="md"
+										label="Word Accuracy"
+									/>
 								) : (
 									<div className="flex flex-col items-center gap-2 opacity-50">
 										<div className="size-16 rounded-full border-4 border-muted/20" />
-										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">Words</span>
+										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+											Words
+										</span>
 									</div>
 								)}
 							</div>
@@ -369,11 +386,11 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 				className={cn(
 					"rounded-xl border transition-colors",
 					error.errorType === "substitute" &&
-					"border-destructive/20 bg-destructive/5 hover:bg-destructive/10",
+						"border-destructive/20 bg-destructive/5 hover:bg-destructive/10",
 					error.errorType === "insert" &&
-					"border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10",
+						"border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10",
 					error.errorType === "delete" &&
-					"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
+						"border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10",
 				)}
 				initial={{ opacity: 0, x: -10 }}
 				animate={{ opacity: 1, x: 0 }}
@@ -390,11 +407,11 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 							className={cn(
 								"shrink-0 capitalize",
 								error.errorType === "substitute" &&
-								"border-destructive/50 text-destructive",
+									"border-destructive/50 text-destructive",
 								error.errorType === "insert" &&
-								"border-emerald-500/50 text-emerald-600 dark:text-emerald-400",
+									"border-emerald-500/50 text-emerald-600 dark:text-emerald-400",
 								error.errorType === "delete" &&
-								"border-amber-500/50 text-amber-600 dark:text-amber-400",
+									"border-amber-500/50 text-amber-600 dark:text-amber-400",
 							)}
 						>
 							{error.errorType}
@@ -404,7 +421,7 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 						<div className="flex flex-1 items-center gap-2">
 							{type === "phoneme" ? (
 								<>
-									<span className="font-medium font-ipa text-sm">
+									<span className="font-ipa font-medium text-sm">
 										{error.expected ?? " "}
 									</span>
 									<span className="text-muted-foreground">→</span>
@@ -413,9 +430,9 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"font-ipa text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-emerald-600 dark:text-emerald-400",
+												"text-emerald-600 dark:text-emerald-400",
 											error.errorType === "delete" &&
-											"text-amber-600 dark:text-amber-400",
+												"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -432,9 +449,9 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"text-sm",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-emerald-600 dark:text-emerald-400",
+												"text-emerald-600 dark:text-emerald-400",
 											error.errorType === "delete" &&
-											"text-amber-600 dark:text-amber-400",
+												"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -532,9 +549,9 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"font-ipa text-lg",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-emerald-600 dark:text-emerald-400",
+												"text-emerald-600 dark:text-emerald-400",
 											error.errorType === "delete" &&
-											"text-amber-600 dark:text-amber-400",
+												"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										{error.actual ?? "∅"}
@@ -545,9 +562,9 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 											"text-xs",
 											error.errorType === "substitute" && "text-destructive",
 											error.errorType === "insert" &&
-											"text-emerald-600 dark:text-emerald-400",
+												"text-emerald-600 dark:text-emerald-400",
 											error.errorType === "delete" &&
-											"text-amber-600 dark:text-amber-400",
+												"text-amber-600 dark:text-amber-400",
 										)}
 									>
 										"{error.actual ?? "—"}"
@@ -757,7 +774,8 @@ function AnalysisPage() {
 
 	// Use polled data if available, otherwise use initial loader data
 	const analysis = polledData?.analysis ?? initialAnalysis;
-	const qualityMetrics = polledData?.audioQualityMetrics ?? initialQualityMetrics;
+	const qualityMetrics =
+		polledData?.audioQualityMetrics ?? initialQualityMetrics;
 	const phonemeErrors = polledData?.phonemeErrors ?? initialLoaderPhonemeErrors;
 	const wordErrors = polledData?.wordErrors ?? initialLoaderWordErrors;
 
@@ -834,7 +852,6 @@ function AnalysisPage() {
 										? "We're analyzing your speech"
 										: "We're analyzing your speech"}
 								</h1>
-
 							</div>
 						</motion.div>
 
@@ -844,7 +861,11 @@ function AnalysisPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.4 }}
 						>
-							<Card className={isPending && !jobSubmitted ? "border-amber-500/20" : undefined}>
+							<Card
+								className={
+									isPending && !jobSubmitted ? "border-amber-500/20" : undefined
+								}
+							>
 								<CardContent className="flex flex-col items-center justify-center gap-4 py-12">
 									{jobSubmitted ? (
 										<Spinner className="size-8" />
@@ -1004,33 +1025,34 @@ function AnalysisPage() {
 					>
 						{qualityMetrics && qualityMetrics.qualityStatus !== "accept" && (
 							<Alert variant={"default"} className="mb-6">
-
 								<RiAlertLine size={16} className="text-muted" />
 								<AlertTitle>Recording quality issues detected</AlertTitle>
 								<AlertDescription>
 									<ul className="">
-										{
-											<li>
-												Results might not be accurate.
-											</li>
-										}
+										{<li>Results might not be accurate.</li>}
 										{Number(qualityMetrics.snrDb) < 15 && (
 											<li>High background noise: {qualityMetrics.snrDb}dB</li>
 										)}
 										{Number(qualityMetrics.silenceRatio) > 0.75 && (
-											<li>Too much silence: {Number(qualityMetrics.silenceRatio) * 100}% of the recording.</li>
+											<li>
+												Too much silence:{" "}
+												{Number(qualityMetrics.silenceRatio) * 100}% of the
+												recording.
+											</li>
 										)}
 										{Number(qualityMetrics.clippingRatio) > 0.01 && (
-											<li>Audio distortion (clipping) detected: {qualityMetrics.clippingRatio} clipping ratio</li>
+											<li>
+												Audio distortion (clipping) detected:{" "}
+												{qualityMetrics.clippingRatio} clipping ratio
+											</li>
 										)}
-										{(qualityMetrics.qualityStatus) === "reject" && (
+										{qualityMetrics.qualityStatus === "reject" && (
 											<li className="text-sm">
 												Recording quality is too low for an accurate analysis
 											</li>
 										)}
 									</ul>
 								</AlertDescription>
-
 							</Alert>
 						)}
 

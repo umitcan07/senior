@@ -163,10 +163,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<body>
 					<ThemeInitializer />
 					<ThemeProvider>
-
 						{children}
 						<Toaster />
-
 					</ThemeProvider>
 					<Scripts />
 				</body>

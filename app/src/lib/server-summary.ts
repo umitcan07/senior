@@ -2,11 +2,11 @@ import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
+	type CommonError,
 	getCommonPhonemeErrors,
 	getTextsWithAttempts,
-	getUserAttempts,
 	getUserAttemptStats,
-	type CommonError,
+	getUserAttempts,
 	type UserAttempt,
 } from "@/db/summary";
 import type { ApiResponse } from "./errors";
@@ -42,7 +42,7 @@ export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 				const authResult = await auth();
 				isAuthenticated = authResult.isAuthenticated ?? false;
 				userId = authResult.userId ?? null;
-			} catch (authError) {
+			} catch (_authError) {
 				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
@@ -106,60 +106,55 @@ export const serverGetRecentAttemptsForText = createServerFn({
 	method: "GET",
 })
 	.inputValidator(GetRecentAttemptsSchema)
-	.handler(
-		async ({
-			data,
-		}): Promise<ApiResponse<UserAttempt[]>> => {
+	.handler(async ({ data }): Promise<ApiResponse<UserAttempt[]>> => {
+		try {
+			// Get authenticated userId from Clerk
+			let isAuthenticated = false;
+			let userId: string | null = null;
 			try {
-				// Get authenticated userId from Clerk
-				let isAuthenticated = false;
-				let userId: string | null = null;
-				try {
-					const authResult = await auth();
-					isAuthenticated = authResult.isAuthenticated ?? false;
-					userId = authResult.userId ?? null;
-				} catch (authError) {
-					// Auth context not available
-					return createErrorResponse(
-						ErrorCode.AUTH_ERROR,
-						"User is not authenticated",
-						undefined,
-						401,
-					);
-				}
+				const authResult = await auth();
+				isAuthenticated = authResult.isAuthenticated ?? false;
+				userId = authResult.userId ?? null;
+			} catch (_authError) {
+				// Auth context not available
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
 
-				if (!isAuthenticated || !userId) {
-					return createErrorResponse(
-						ErrorCode.AUTH_ERROR,
-						"User is not authenticated",
-						undefined,
-						401,
-					);
-				}
+			if (!isAuthenticated || !userId) {
+				return createErrorResponse(
+					ErrorCode.AUTH_ERROR,
+					"User is not authenticated",
+					undefined,
+					401,
+				);
+			}
 
-				const attempts = await getUserAttempts(userId, {
-					textId: data.textId,
-					limit: 10,
-				});
+			const attempts = await getUserAttempts(userId, {
+				textId: data.textId,
+				limit: 10,
+			});
 
-				return createSuccessResponse(attempts);
-			} catch (error) {
-				console.error("Get recent attempts error:", error);
-				if (error instanceof Error) {
-					return createErrorResponse(
-						ErrorCode.DATABASE_ERROR,
-						"Failed to retrieve recent attempts",
-						{ originalError: error.message },
-						500,
-					);
-				}
+			return createSuccessResponse(attempts);
+		} catch (error) {
+			console.error("Get recent attempts error:", error);
+			if (error instanceof Error) {
 				return createErrorResponse(
 					ErrorCode.DATABASE_ERROR,
 					"Failed to retrieve recent attempts",
-					undefined,
+					{ originalError: error.message },
 					500,
 				);
 			}
-		},
-	);
-
+			return createErrorResponse(
+				ErrorCode.DATABASE_ERROR,
+				"Failed to retrieve recent attempts",
+				undefined,
+				500,
+			);
+		}
+	});

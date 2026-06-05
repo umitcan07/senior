@@ -2,10 +2,10 @@ import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
 	analyses,
+	phonemeErrors,
 	practiceTexts,
 	referenceSpeeches,
 	userRecordings,
-	phonemeErrors,
 } from "./schema";
 
 export type UserAttempt = {
@@ -54,7 +54,9 @@ export async function getUserAttempts(
 			id: analyses.id,
 			textId: practiceTexts.id,
 			textPreview: practiceTexts.content,
-			score: sql<number | null>`CASE WHEN ${analyses.status} = 'completed' AND ${analyses.overallScore} IS NOT NULL THEN (${analyses.overallScore} * 100)::int ELSE NULL END`,
+			score: sql<
+				number | null
+			>`CASE WHEN ${analyses.status} = 'completed' AND ${analyses.overallScore} IS NOT NULL THEN (${analyses.overallScore} * 100)::int ELSE NULL END`,
 			date: analyses.createdAt,
 			analysisId: analyses.id,
 			status: analyses.status,
@@ -112,10 +114,7 @@ export async function getUserAttemptStats(
 		.from(analyses)
 		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
 		.where(
-			and(
-				eq(userRecordings.userId, userId),
-				eq(analyses.status, "completed"),
-			),
+			and(eq(userRecordings.userId, userId), eq(analyses.status, "completed")),
 		);
 
 	// Get weekly completed attempts (only completed for consistency with totalAttempts)
@@ -164,7 +163,9 @@ export async function getUserAttemptStats(
 	// Calculate weekly progress (percentage change)
 	const weeklyProgress =
 		previousWeekCount > 0
-			? Math.round(((weeklyCount - previousWeekCount) / previousWeekCount) * 100)
+			? Math.round(
+					((weeklyCount - previousWeekCount) / previousWeekCount) * 100,
+				)
 			: weeklyCount > 0
 				? 100
 				: 0;
@@ -234,4 +235,3 @@ export async function getTextsWithAttempts(
 
 	return results;
 }
-

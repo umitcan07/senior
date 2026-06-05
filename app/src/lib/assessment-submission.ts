@@ -14,7 +14,7 @@ import { RunJobResponseSchema } from "@/lib/runpod-schemas";
 /**
  * Submit an assessment job for an analysis.
  * This function can be called directly from server functions or API routes.
- * 
+ *
  * @param analysisId - The analysis ID to submit
  * @param userId - The authenticated user ID (must match the recording owner)
  * @param request - Optional request object for webhook URL construction
@@ -25,7 +25,15 @@ export async function submitAssessmentJob(
 	userId: string,
 	request?: Request,
 ): Promise<
-	| { success: true; data: { id: string; analysisId: string; externalJobId: string; status: string } }
+	| {
+			success: true;
+			data: {
+				id: string;
+				analysisId: string;
+				externalJobId: string;
+				status: string;
+			};
+	  }
 	| { success: false; error: string; statusCode: number }
 > {
 	try {
@@ -76,7 +84,9 @@ export async function submitAssessmentJob(
 		const config = getRunPodConfig();
 
 		// Build webhook URL for assessment results
-		let webhookBaseUrl = request ? getWebhookBaseUrl(request) : (process.env.WEBHOOK_BASE_URL || "http://localhost:3000");
+		let webhookBaseUrl = request
+			? getWebhookBaseUrl(request)
+			: process.env.WEBHOOK_BASE_URL || "http://localhost:3000";
 
 		// FIX: If talking to local RunPod proxy (localhost), ensure webhook uses host.docker.internal
 		if (
@@ -155,10 +165,7 @@ export async function submitAssessmentJob(
 		}
 
 		// Create assessment job in database
-		const job = await createAssessmentJob(
-			analysisId,
-			runJobResult.data.id,
-		);
+		const job = await createAssessmentJob(analysisId, runJobResult.data.id);
 
 		// Update analysis status to processing and set target text
 		await updateAnalysis(analysisId, {

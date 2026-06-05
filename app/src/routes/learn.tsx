@@ -355,14 +355,14 @@ function IPAMarkerCard({
 }: IPAMarkerCardProps) {
 	return (
 		<details className="group overflow-hidden rounded-xl border border-border/40 bg-card transition-colors hover:border-border/60 hover:bg-muted/5">
-			<summary className="flex cursor-pointer items-center justify-between list-none p-5 transition-colors hover:bg-muted/10">
+			<summary className="flex cursor-pointer list-none items-center justify-between p-5 transition-colors hover:bg-muted/10">
 				<div className="flex items-center gap-3">
 					<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 font-ipa text-2xl text-primary">
 						{icon}
 					</div>
 					<div className="flex flex-col">
 						<h4 className="font-semibold text-base">{title}</h4>
-						<span className="font-mono text-muted-foreground text-base">
+						<span className="font-mono text-base text-muted-foreground">
 							{subtitle}
 						</span>
 					</div>
@@ -370,7 +370,7 @@ function IPAMarkerCard({
 				<RiArrowDownSLine className="size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
 			</summary>
 			<div className="flex flex-col gap-3 px-5 pb-5 transition-all duration-200 ease-in-out">
-				<p className="text-muted-foreground text-base leading-relaxed">
+				<p className="text-base text-muted-foreground leading-relaxed">
 					{description}
 				</p>
 				<div className="mt-2 rounded bg-muted/20 p-2">
@@ -425,7 +425,7 @@ function IPAItem({
 
 			{/* Top section - IPA symbol */}
 			<div className="flex flex-1 items-center justify-center px-4 pt-6 pb-3">
-				<span className="font-ipa text-foreground/80 text-2xl tracking-wide transition-colors group-hover:text-foreground">
+				<span className="font-ipa text-2xl text-foreground/80 tracking-wide transition-colors group-hover:text-foreground">
 					{item.symbol}
 				</span>
 			</div>
@@ -640,15 +640,15 @@ const ACCENT_DATA: AccentCategory[] = [
 // Helper function to wrap IPA symbols in font-ipa spans
 function renderTextWithIPA(text: string) {
 	// Match IPA symbols in slashes /.../ or brackets [...]
-	const ipaRegex = /(\/[^\/]+\/|\[[^\]]+\])/g;
+	const ipaRegex = /(\/[^/]+\/|\[[^\]]+\])/g;
 	const parts: string[] = [];
 	let lastIndex = 0;
-	let match;
 
 	// Reset regex
 	ipaRegex.lastIndex = 0;
 
-	while ((match = ipaRegex.exec(text)) !== null) {
+	let match = ipaRegex.exec(text);
+	while (match !== null) {
 		// Add text before the match
 		if (match.index > lastIndex) {
 			parts.push(text.slice(lastIndex, match.index));
@@ -656,6 +656,7 @@ function renderTextWithIPA(text: string) {
 		// Add the IPA match
 		parts.push(match[0]);
 		lastIndex = ipaRegex.lastIndex;
+		match = ipaRegex.exec(text);
 	}
 
 	// Add remaining text
@@ -665,7 +666,7 @@ function renderTextWithIPA(text: string) {
 
 	return parts.map((part, index) => {
 		// Check if this part is an IPA symbol (starts with / or [)
-		if (part.startsWith('/') || part.startsWith('[')) {
+		if (part.startsWith("/") || part.startsWith("[")) {
 			return (
 				<span key={index} className="font-ipa text-xl">
 					{part}
@@ -680,7 +681,9 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 	return (
 		<div className="flex flex-col gap-3 rounded-lg border border-border/40 bg-card p-4 transition-all hover:bg-muted/10 hover:shadow-sm">
 			<div className="flex flex-col gap-1">
-				<h4 className="font-semibold text-foreground text-base">{item.title}</h4>
+				<h4 className="font-semibold text-base text-foreground">
+					{item.title}
+				</h4>
 				{item.subtitle && (
 					<span className="text-muted-foreground text-sm">{item.subtitle}</span>
 				)}
@@ -689,7 +692,8 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 			<div className="grid grid-cols-2 gap-4 pt-2 text-base">
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5 text-muted-foreground text-sm uppercase tracking-wider">
-						<span className="text-lg">{DIALECTS.us.flag}</span> {DIALECTS.us.short}
+						<span className="text-lg">{DIALECTS.us.flag}</span>{" "}
+						{DIALECTS.us.short}
 					</div>
 					<p className="text-muted-foreground text-sm leading-relaxed">
 						{renderTextWithIPA(item.ame)}
@@ -698,7 +702,8 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5 text-muted-foreground text-sm uppercase tracking-wider">
-						<span className="text-lg">{DIALECTS.uk.flag}</span> {DIALECTS.uk.short}
+						<span className="text-lg">{DIALECTS.uk.flag}</span>{" "}
+						{DIALECTS.uk.short}
 					</div>
 					<p className="text-muted-foreground text-sm leading-relaxed">
 						{renderTextWithIPA(item.bre)}
@@ -712,7 +717,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 function AccentCategorySection({ category }: { category: AccentCategory }) {
 	return (
 		<div className="flex flex-col gap-4">
-			<h3 className="font-medium text-xl text-primary/80 tracking-tight">
+			<h3 className="font-medium text-primary/80 text-xl tracking-tight">
 				{category.title}
 			</h3>
 			<div className="grid gap-4 md:grid-cols-2">
@@ -818,7 +823,8 @@ function LearningPage() {
 				setLoadingId(null);
 				toast({
 					variant: "destructive",
-					description: "The audio for the selected phoneme is not available. Please check back soon",
+					description:
+						"The audio for the selected phoneme is not available. Please check back soon",
 				});
 			}
 		},
@@ -855,10 +861,16 @@ function LearningPage() {
 									className="w-full sm:w-auto"
 								>
 									<TabsList className="w-full sm:w-auto">
-										<TabsTrigger value="sound" className="flex-1 sm:flex-initial">
+										<TabsTrigger
+											value="sound"
+											className="flex-1 sm:flex-initial"
+										>
 											Sound
 										</TabsTrigger>
-										<TabsTrigger value="word" className="flex-1 sm:flex-initial">
+										<TabsTrigger
+											value="word"
+											className="flex-1 sm:flex-initial"
+										>
 											Word
 										</TabsTrigger>
 									</TabsList>
@@ -919,9 +931,19 @@ function LearningPage() {
 									description="Indicates a vowel is pronounced with r-coloring, common in American English. The vowel sound is modified by the presence of /r/."
 									examples={
 										<>
-											Examples: <span className="font-ipa text-primary text-2xl">ə˞</span> (her),
-											<span className="font-ipa text-primary text-2xl"> ɜ˞</span> (bird),
-											<span className="font-ipa text-primary text-2xl"> o˞</span> (or)
+											Examples:{" "}
+											<span className="font-ipa text-2xl text-primary">ə˞</span>{" "}
+											(her),
+											<span className="font-ipa text-2xl text-primary">
+												{" "}
+												ɜ˞
+											</span>{" "}
+											(bird),
+											<span className="font-ipa text-2xl text-primary">
+												{" "}
+												o˞
+											</span>{" "}
+											(or)
 										</>
 									}
 								/>
@@ -933,9 +955,13 @@ function LearningPage() {
 									description="Shows that air flows through the nose while pronouncing the vowel, often occurring before nasal consonants like /m/, /n/, or /ŋ/."
 									examples={
 										<>
-											Examples: <span className="font-ipa text-primary text-2xl">ɪ̃</span> (in),
-											<span className="font-ipa text-primary text-2xl"> ẽ</span> (end),
-											<span className="font-ipa text-primary text-2xl"> ɑ̃</span> (on)
+											Examples:{" "}
+											<span className="font-ipa text-2xl text-primary">ɪ̃</span>{" "}
+											(in),
+											<span className="font-ipa text-2xl text-primary"> ẽ</span>{" "}
+											(end),
+											<span className="font-ipa text-2xl text-primary"> ɑ̃</span>{" "}
+											(on)
 										</>
 									}
 								/>
@@ -947,9 +973,19 @@ function LearningPage() {
 									description="Indicates a puff of air follows the consonant, especially noticeable in voiceless stops (/p/, /t/, /k/) at the beginning of stressed syllables."
 									examples={
 										<>
-											Examples: <span className="font-ipa text-primary text-2xl">pʰ</span> (pin),
-											<span className="font-ipa text-primary text-2xl"> tʰ</span> (tin),
-											<span className="font-ipa text-primary text-2xl"> kʰ</span> (kin)
+											Examples:{" "}
+											<span className="font-ipa text-2xl text-primary">pʰ</span>{" "}
+											(pin),
+											<span className="font-ipa text-2xl text-primary">
+												{" "}
+												tʰ
+											</span>{" "}
+											(tin),
+											<span className="font-ipa text-2xl text-primary">
+												{" "}
+												kʰ
+											</span>{" "}
+											(kin)
 										</>
 									}
 								/>
@@ -961,10 +997,18 @@ function LearningPage() {
 									description="Shows a long vowel sound. The colon indicates the vowel is held longer than its short counterpart."
 									examples={
 										<>
-											Examples: <span className="font-ipa text-primary text-2xl">iː</span> (see) vs{" "}
-											<span className="font-ipa text-primary text-2xl">ɪ</span> (sit),
-											<span className="font-ipa text-primary text-2xl"> uː</span> (too) vs{" "}
-											<span className="font-ipa text-primary text-2xl">ʊ</span> (put)
+											Examples:{" "}
+											<span className="font-ipa text-2xl text-primary">iː</span>{" "}
+											(see) vs{" "}
+											<span className="font-ipa text-2xl text-primary">ɪ</span>{" "}
+											(sit),
+											<span className="font-ipa text-2xl text-primary">
+												{" "}
+												uː
+											</span>{" "}
+											(too) vs{" "}
+											<span className="font-ipa text-2xl text-primary">ʊ</span>{" "}
+											(put)
 										</>
 									}
 								/>
@@ -976,8 +1020,15 @@ function LearningPage() {
 									description="Marks the primary stressed syllable in a word. Placed before the stressed syllable."
 									examples={
 										<>
-											Example: <span className="font-ipa text-primary text-2xl">ˈfɑðər</span> (father),{" "}
-											<span className="font-ipa text-primary text-2xl">ˈhæpi</span> (happy)
+											Example:{" "}
+											<span className="font-ipa text-2xl text-primary">
+												ˈfɑðər
+											</span>{" "}
+											(father),{" "}
+											<span className="font-ipa text-2xl text-primary">
+												ˈhæpi
+											</span>{" "}
+											(happy)
 										</>
 									}
 								/>
@@ -989,7 +1040,10 @@ function LearningPage() {
 									description="Marks a syllable with secondary stress, less prominent than primary stress but more than unstressed syllables."
 									examples={
 										<>
-											Example: <span className="font-ipa text-primary text-2xl">ˌɪntərˈnæʃənəl</span>{" "}
+											Example:{" "}
+											<span className="font-ipa text-2xl text-primary">
+												ˌɪntərˈnæʃənəl
+											</span>{" "}
 											(international)
 										</>
 									}
@@ -1002,8 +1056,11 @@ function LearningPage() {
 									description="Consonant sounds that begin as a stop (complete closure) and release as a fricative (partial closure). They function as single phonemes despite being written with two symbols."
 									examples={
 										<>
-											Examples: <span className="font-ipa text-primary text-2xl">tʃ</span> (church,
-											chair), <span className="font-ipa text-primary text-2xl">dʒ</span> (judge, joy)
+											Examples:{" "}
+											<span className="font-ipa text-2xl text-primary">tʃ</span>{" "}
+											(church, chair),{" "}
+											<span className="font-ipa text-2xl text-primary">dʒ</span>{" "}
+											(judge, joy)
 										</>
 									}
 								/>
@@ -1011,36 +1068,43 @@ function LearningPage() {
 
 							{/* Example Transcription */}
 							<div className="mt-4 rounded-xl border border-border/40 bg-muted/10 p-6">
-								<h4 className="mb-3 font-semibold text-base">Example: Detailed Transcription</h4>
-								<p className="mb-3 text-muted-foreground text-base leading-relaxed">
+								<h4 className="mb-3 font-semibold text-base">
+									Example: Detailed Transcription
+								</h4>
+								<p className="mb-3 text-base text-muted-foreground leading-relaxed">
 									Here's how these markers appear together in a detailed IPA
 									transcription:
 								</p>
 								<div className="rounded bg-background p-4">
 									<p className="mb-2 font-mono text-base">
-										<span className="text-muted-foreground">Text:</span> She regularly exercises at the gym, follows a healthy diet, maintains good sleeping habits, and practices meditation consistently to improve her overall well-being and mental health.
+										<span className="text-muted-foreground">Text:</span> She
+										regularly exercises at the gym, follows a healthy diet,
+										maintains good sleeping habits, and practices meditation
+										consistently to improve her overall well-being and mental
+										health.
 									</p>
 									<p className="font-mono text-base leading-relaxed">
 										<span className="text-muted-foreground">IPA:</span>{" "}
-										<span className="font-ipa text-foreground text-2xl">
-											ʃ i ɹ ɛ ɡ j ə˞ l ə˞ l i ɛ k s ə˞ s a ɪ z ə z æ t ð ə t
-											ʃ ɪ̃ m f ɑ l o ʊ z ə h ɛ l θ i t a ɪ ə t m e ɪ̃ n t e ɪ̃ n z
-											k ʊ d s l i p ɪ̃ ŋ h æ b ə t s ə n d pʰ ɹ æ k t ə s ə z m
-											ɛ d ə t e ɪ ʃ ə n kʰ ə n s ɪ s t ə n t l i tʰ u ɪ̃ m p ɹ
-											u v h ə˞ o ʊ v ə˞ ɔ l w ɛ l p i ɪ̃ ŋ ə n d m ɛ̃ n t ə l h ɛ
-											l θ
+										<span className="font-ipa text-2xl text-foreground">
+											ʃ i ɹ ɛ ɡ j ə˞ l ə˞ l i ɛ k s ə˞ s a ɪ z ə z æ t ð ə t ʃ ɪ̃
+											m f ɑ l o ʊ z ə h ɛ l θ i t a ɪ ə t m e ɪ̃ n t e ɪ̃ n z k ʊ
+											d s l i p ɪ̃ ŋ h æ b ə t s ə n d pʰ ɹ æ k t ə s ə z m ɛ d ə
+											t e ɪ ʃ ə n kʰ ə n s ɪ s t ə n t l i tʰ u ɪ̃ m p ɹ u v h ə˞
+											o ʊ v ə˞ ɔ l w ɛ l p i ɪ̃ ŋ ə n d m ɛ̃ n t ə l h ɛ l θ
 										</span>
 									</p>
 									<div className="mt-3 flex flex-wrap gap-2 text-base">
-										<span className="rounded bg-primary/10 px-2 py-1 font-ipa text-primary text-2xl">
+										<span className="rounded bg-primary/10 px-2 py-1 font-ipa text-2xl text-primary">
 											ə˞
 										</span>
-										<span className="text-muted-foreground">= r-colored schwa</span>
-										<span className="rounded bg-primary/10 px-2 py-1 font-ipa text-primary text-2xl">
+										<span className="text-muted-foreground">
+											= r-colored schwa
+										</span>
+										<span className="rounded bg-primary/10 px-2 py-1 font-ipa text-2xl text-primary">
 											ɪ̃
 										</span>
 										<span className="text-muted-foreground">= nasalized i</span>
-										<span className="rounded bg-primary/10 px-2 py-1 font-ipa text-primary text-2xl">
+										<span className="rounded bg-primary/10 px-2 py-1 font-ipa text-2xl text-primary">
 											pʰ
 										</span>
 										<span className="text-muted-foreground">= aspirated p</span>
@@ -1063,8 +1127,10 @@ function LearningPage() {
 									<div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
 										<RiVolumeUpLine size={16} />
 									</div>
-									<h4 className="font-medium text-base">Improve Pronunciation</h4>
-									<p className="text-muted-foreground text-base leading-relaxed">
+									<h4 className="font-medium text-base">
+										Improve Pronunciation
+									</h4>
+									<p className="text-base text-muted-foreground leading-relaxed">
 										IPA shows you exactly how to pronounce words, eliminating
 										guesswork from spelling. Each symbol represents one specific
 										sound, ensuring precision.
@@ -1088,7 +1154,7 @@ function LearningPage() {
 										</svg>
 									</div>
 									<h4 className="font-medium text-base">Use Any Dictionary</h4>
-									<p className="text-muted-foreground text-base leading-relaxed">
+									<p className="text-base text-muted-foreground leading-relaxed">
 										Most dictionaries use IPA for pronunciation guides. Once you
 										learn it, you can look up pronunciation anywhere in the
 										world.
@@ -1112,10 +1178,10 @@ function LearningPage() {
 										</svg>
 									</div>
 									<h4 className="font-medium text-base">Master New Sounds</h4>
-									<p className="text-muted-foreground text-base leading-relaxed">
-										IPA helps you identify and practice sounds that may not exist in
-										your native language, improving your pronunciation clarity and
-										communication skills.
+									<p className="text-base text-muted-foreground leading-relaxed">
+										IPA helps you identify and practice sounds that may not
+										exist in your native language, improving your pronunciation
+										clarity and communication skills.
 									</p>
 								</div>
 								<div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/10 p-5">
@@ -1135,8 +1201,10 @@ function LearningPage() {
 											/>
 										</svg>
 									</div>
-									<h4 className="font-medium text-base">Learn Languages Faster</h4>
-									<p className="text-muted-foreground text-base leading-relaxed">
+									<h4 className="font-medium text-base">
+										Learn Languages Faster
+									</h4>
+									<p className="text-base text-muted-foreground leading-relaxed">
 										IPA knowledge transfers to any language. Once you understand
 										the system, picking up new languages becomes significantly
 										easier.
@@ -1169,7 +1237,7 @@ function LearningPage() {
 									<h4 className="font-medium text-base transition-colors group-hover:text-primary">
 										Official IPA Chart
 									</h4>
-									<p className="text-muted-foreground text-base">
+									<p className="text-base text-muted-foreground">
 										The complete 2020 IPA chart from Wikimedia Commons with all
 										phonetic symbols.
 									</p>
@@ -1186,7 +1254,7 @@ function LearningPage() {
 									<h4 className="font-medium text-base transition-colors group-hover:text-primary">
 										Interactive IPA Chart
 									</h4>
-									<p className="text-muted-foreground text-base">
+									<p className="text-base text-muted-foreground">
 										Click any symbol to hear its pronunciation with audio
 										samples.
 									</p>
@@ -1201,7 +1269,7 @@ function LearningPage() {
 									<h4 className="font-medium text-base transition-colors group-hover:text-primary">
 										IPA Translator
 									</h4>
-									<p className="text-muted-foreground text-base">
+									<p className="text-base text-muted-foreground">
 										Convert English text to IPA transcription with support for
 										American and British accents.
 									</p>
@@ -1214,7 +1282,7 @@ function LearningPage() {
 
 						{/* Attribution Section */}
 						<section className="rounded-xl bg-muted/20 p-6">
-							<h4 className="mb-3 font-medium text-muted-foreground text-base">
+							<h4 className="mb-3 font-medium text-base text-muted-foreground">
 								Sound Clip Attribution
 							</h4>
 							<p className="text-muted-foreground text-sm leading-relaxed">
@@ -1239,7 +1307,7 @@ function LearningPage() {
 									<h3 className="font-medium text-xl">
 										Ready to test your pronunciation?
 									</h3>
-									<p className="mx-auto max-w-md text-muted-foreground text-base">
+									<p className="mx-auto max-w-md text-base text-muted-foreground">
 										Practice with our curated texts and get instant AI feedback
 										on your pronunciation accuracy.
 									</p>

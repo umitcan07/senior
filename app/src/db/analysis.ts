@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "./index";
-import { analyses,  audioQualityMetrics, phonemeErrors, wordErrors } from "./schema";
+import {
+	analyses,
+	audioQualityMetrics,
+	phonemeErrors,
+	wordErrors,
+} from "./schema";
 import type {
 	Analysis,
 	AudioQualityMetrics,
@@ -28,7 +33,9 @@ export async function getAnalysisById(id: string): Promise<Analysis | null> {
 	return result || null;
 }
 
-export async function getAnalysisByJobId(jobId: string): Promise<Analysis | null> {
+export async function getAnalysisByJobId(
+	jobId: string,
+): Promise<Analysis | null> {
 	const [result] = await db
 		.select()
 		.from(analyses)
@@ -84,7 +91,10 @@ export async function getWordErrorsByAnalysisId(
 export async function insertAudioQualityMetrics(
 	metrics: Omit<NewAudioQualityMetrics, "id" | "createdAt">,
 ): Promise<AudioQualityMetrics> {
-	const [result] = await db.insert(audioQualityMetrics).values(metrics).returning();
+	const [result] = await db
+		.insert(audioQualityMetrics)
+		.values(metrics)
+		.returning();
 	return result;
 }
 

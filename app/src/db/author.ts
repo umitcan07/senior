@@ -14,6 +14,7 @@ export async function getAuthors(): Promise<Author[]> {
 	return await db
 		.select({
 			id: authors.id,
+			slug: authors.slug,
 			name: authors.name,
 			accent: authors.accent,
 			style: authors.style,
@@ -31,6 +32,7 @@ export async function getAuthorsWithReferenceCounts(): Promise<
 	const result = await db
 		.select({
 			id: authors.id,
+			slug: authors.slug,
 			name: authors.name,
 			accent: authors.accent,
 			style: authors.style,
@@ -51,6 +53,7 @@ export async function getAuthorById(id: string): Promise<Author | null> {
 	const [result] = await db
 		.select({
 			id: authors.id,
+			slug: authors.slug,
 			name: authors.name,
 			accent: authors.accent,
 			style: authors.style,
@@ -64,8 +67,18 @@ export async function getAuthorById(id: string): Promise<Author | null> {
 	return result || null;
 }
 
+export async function getAuthorBySlug(slug: string): Promise<Author | null> {
+	const [result] = await db
+		.select()
+		.from(authors)
+		.where(eq(authors.slug, slug))
+		.limit(1);
+	return result || null;
+}
+
 export async function insertAuthor(data: {
 	name: string;
+	slug?: string | null;
 	accent?: string | null;
 	style?: string | null;
 	languageCode?: string | null;
@@ -74,6 +87,7 @@ export async function insertAuthor(data: {
 		.insert(authors)
 		.values({
 			name: data.name,
+			slug: data.slug ?? null,
 			accent: data.accent ?? null,
 			style: data.style ?? null,
 			languageCode: data.languageCode ?? null,
@@ -86,6 +100,7 @@ export async function updateAuthor(
 	id: string,
 	data: {
 		name?: string;
+		slug?: string | null;
 		accent?: string | null;
 		style?: string | null;
 		languageCode?: string | null;
@@ -97,6 +112,9 @@ export async function updateAuthor(
 
 	if (data.name !== undefined) {
 		updateData.name = data.name;
+	}
+	if (data.slug !== undefined) {
+		updateData.slug = data.slug;
 	}
 	if (data.accent !== undefined) {
 		updateData.accent = data.accent;
