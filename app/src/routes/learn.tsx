@@ -908,8 +908,8 @@ function LearningPage() {
 								</div>
 
 								{/* Playback Controls */}
-								<div className="flex w-full flex-col gap-2 sm:w-auto">
-									{/* Sound / Word toggle */}
+								<div className="flex w-full flex-row-reverse flex-wrap items-start justify-start gap-2 sm:w-auto sm:flex-nowrap">
+									{/* Sound / Word toggle — right-anchored so removing the speaker row causes no shift */}
 									<Tabs
 										value={playbackMode}
 										onValueChange={(v) => setPlaybackMode(v as PlaybackMode)}
@@ -934,33 +934,30 @@ function LearningPage() {
 										</TabsList>
 									</Tabs>
 
-									{/* Speaker selector — only relevant in word mode; kept in DOM to avoid layout shift */}
-									<Tabs
-										value={speakerId}
-										onValueChange={(v) => handleSpeakerChange(v as SpeakerId)}
-										className={cn(
-											"w-full sm:w-auto",
-											playbackMode !== "word" &&
-												"pointer-events-none invisible",
-										)}
-										aria-hidden={playbackMode !== "word"}
-									>
-										<TabsList
-											aria-label="Word speaker"
-											className="h-auto w-full flex-wrap gap-0.5 sm:w-auto"
+									{/* Speaker selector — only shown in word mode */}
+									{playbackMode === "word" && (
+										<Tabs
+											value={speakerId}
+											onValueChange={(v) => handleSpeakerChange(v as SpeakerId)}
+											className="w-full sm:w-auto"
 										>
-											{SPEAKERS.map((s) => (
-												<TabsTrigger
-													key={s.id}
-													value={s.id}
-													className="flex-1 gap-1 text-xs sm:flex-initial"
-												>
-													<span>{DIALECTS[s.dialect].flag}</span>
-													{s.name}
-												</TabsTrigger>
-											))}
-										</TabsList>
-									</Tabs>
+											<TabsList
+												aria-label="Word speaker"
+												className="h-auto w-full flex-wrap gap-0.5 sm:w-auto"
+											>
+												{SPEAKERS.map((s) => (
+													<TabsTrigger
+														key={s.id}
+														value={s.id}
+														className="flex-1 gap-1 text-xs sm:flex-initial"
+													>
+														<span>{DIALECTS[s.dialect].flag}</span>
+														{s.name}
+													</TabsTrigger>
+												))}
+											</TabsList>
+										</Tabs>
+									)}
 								</div>
 							</div>
 
