@@ -1,12 +1,16 @@
-"""Unit tests for mod/alignment.py (no GPU required)."""
+"""Unit tests for mod/alignment.py (requires numpy, no GPU required)."""
 
 import unittest
 
-import numpy as np
+try:
+    import numpy as np
+    from alignment import PhoneSegment, AlignerOutput, TARGET_SR, PAD_SECONDS
+    HAS_DEPS = True
+except ImportError:
+    HAS_DEPS = False
 
-from alignment import PhoneSegment, AlignerOutput, TARGET_SR, PAD_SECONDS
 
-
+@unittest.skipUnless(HAS_DEPS, "numpy/alignment deps not installed")
 class TestPhoneSegment(unittest.TestCase):
     def test_to_dict(self):
         seg = PhoneSegment(token="h", start_ms=0.0, end_ms=40.0, confidence=0.95)
@@ -30,6 +34,7 @@ class TestPhoneSegment(unittest.TestCase):
         self.assertIsInstance(serialized, str)
 
 
+@unittest.skipUnless(HAS_DEPS, "numpy/alignment deps not installed")
 class TestAlignerOutput(unittest.TestCase):
     def test_to_dict(self):
         logprobs = np.zeros((10, 50), dtype=np.float32)
@@ -61,6 +66,7 @@ class TestAlignerOutput(unittest.TestCase):
         self.assertIsInstance(serialized, str)
 
 
+@unittest.skipUnless(HAS_DEPS, "numpy/alignment deps not installed")
 class TestPad20s(unittest.TestCase):
     def _make_aligner_stub(self):
         """Create a minimal object with _pad_20s without loading the model."""
