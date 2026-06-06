@@ -10,7 +10,6 @@ import {
 import { Link } from "@tanstack/react-router";
 import { cva } from "class-variance-authority";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
 	Table,
 	TableBody,
@@ -243,20 +242,11 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 									)}
 								</TableCell>
 								<TableCell className="text-right">
-									<Button
-										asChild
-										size="default"
-										className="relative z-10 h-9 w-9 px-0 opacity-100 transition-opacity duration-300 sm:h-9 sm:w-auto sm:px-3 sm:opacity-0 sm:group-hover:opacity-100"
-									>
-										<Link
-											to="/practice/$textId"
-											params={{ textId: text.id }}
-											className="flex items-center gap-2"
-										>
-											<span className="hidden sm:inline">Practice</span>
-											<RiArrowRightLine size={16} />
-										</Link>
-									</Button>
+									<RiArrowRightLine
+										size={16}
+										aria-hidden="true"
+										className="ml-auto text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+									/>
 								</TableCell>
 							</TableRow>
 						))}
