@@ -12,10 +12,12 @@ export type UserAttempt = {
 	id: string;
 	textId: string;
 	textPreview: string;
-	score: number | null; // null for pending/processing/failed
+	score: number | null; // null for pending/processing/failed and abstained
 	date: Date;
 	analysisId: string;
 	status: "pending" | "processing" | "completed" | "failed";
+	// Non-null when the worker abstained (completed but unscored) — #20/#38.
+	abstentionReason: string | null;
 };
 
 export type AttemptStats = {
@@ -60,6 +62,7 @@ export async function getUserAttempts(
 			date: analyses.createdAt,
 			analysisId: analyses.id,
 			status: analyses.status,
+			abstentionReason: analyses.abstentionReason,
 		})
 		.from(analyses)
 		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
@@ -92,6 +95,7 @@ export async function getUserAttempts(
 		date: row.date,
 		analysisId: row.analysisId,
 		status: row.status,
+		abstentionReason: row.abstentionReason,
 	}));
 }
 

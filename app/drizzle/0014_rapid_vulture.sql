@@ -1,0 +1,1 @@
+ALTER TABLE "analyses" ADD COLUMN IF NOT EXISTS "recognized_phone_timings_json" jsonb;

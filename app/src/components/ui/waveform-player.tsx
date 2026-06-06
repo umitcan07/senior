@@ -55,6 +55,7 @@ export interface WaveformPlayerProps {
 	errorRegions?: ErrorRegion[];
 	phoneRegions?: PhoneRegion[];
 	onRegionClick?: (startMs: number, endMs: number, type: string) => void;
+	onTimeUpdate?: (seconds: number) => void;
 	compact?: boolean;
 	className?: string;
 	defaultSpeed?: number;
@@ -68,6 +69,7 @@ function WaveformPlayerContent({
 	errorRegions = [],
 	phoneRegions = [],
 	onRegionClick,
+	onTimeUpdate,
 	compact = false,
 	className,
 	defaultSpeed = 1,
@@ -104,6 +106,12 @@ function WaveformPlayerContent({
 	useEffect(() => {
 		errorRegionsRef.current = errorRegions;
 	}, [errorRegions]);
+
+	// Keep the latest onTimeUpdate without resubscribing the timeupdate listener.
+	const onTimeUpdateRef = useRef(onTimeUpdate);
+	useEffect(() => {
+		onTimeUpdateRef.current = onTimeUpdate;
+	}, [onTimeUpdate]);
 
 	// Initialize regions plugin when wavesurfer is ready
 	useEffect(() => {
@@ -142,14 +150,15 @@ function WaveformPlayerContent({
 		// Clear existing regions and add new ones
 		regions.clearRegions();
 
-		// Display-only phone timeline (drawn first so error regions sit on top).
+		// Display-only phone timeline: faint alternating bands, NO per-phone labels
+		// (a full label strip is unreadable at sentence length). The phone under
+		// the cursor is surfaced live via the readout below instead.
 		phoneRegions.forEach((region, index) => {
 			regions.addRegion({
 				id: `phone-${index}`,
 				start: region.start,
 				end: region.end,
 				color: PHONE_REGION_COLORS[index % PHONE_REGION_COLORS.length],
-				content: region.label,
 				drag: false,
 				resize: false,
 			});
@@ -186,6 +195,7 @@ function WaveformPlayerContent({
 				const time = wavesurfer.getCurrentTime();
 				const dur = wavesurfer.getDuration();
 				setCurrentTime(time);
+				onTimeUpdateRef.current?.(time);
 				if (dur && dur !== duration) {
 					setDuration(dur);
 				}
@@ -239,6 +249,15 @@ function WaveformPlayerContent({
 		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	};
 
+	// Phone under the playback cursor, live as the audio plays. Gap-tolerant:
+	// hold the most recently started phone through inter-phone gaps so the
+	// readout doesn't strobe on/off. (phoneRegions are in start order.)
+	let activePhone: string | undefined;
+	for (const r of phoneRegions) {
+		if (r.start <= currentTime) activePhone = r.label;
+		else break;
+	}
+
 	return (
 		<div
 			className={cn(
@@ -247,9 +266,14 @@ function WaveformPlayerContent({
 				className,
 			)}
 		>
-			{label && (
+			{(label || phoneRegions.length > 0) && (
 				<div className="mb-3 flex items-center gap-2 text-muted-foreground text-sm">
-					{label}
+					<span>{label}</span>
+					{phoneRegions.length > 0 && (
+						<span className="ml-auto flex h-6 min-w-10 items-center justify-center rounded-md bg-primary/10 px-2 font-mono text-foreground text-xs tabular-nums">
+							{activePhone ? `/${activePhone}/` : "·"}
+						</span>
+					)}
 				</div>
 			)}
 			<div
@@ -404,6 +428,7 @@ export function WaveformPlayer(props: WaveformPlayerProps) {
 export function WaveformPlayerInline(props: {
 	src: string;
 	className?: string;
+	onTimeUpdate?: (seconds: number) => void;
 }) {
 	return (
 		<WaveformPlayer
@@ -412,6 +437,7 @@ export function WaveformPlayerInline(props: {
 			showSpeedControl={false}
 			showRestartButton={false}
 			className={props.className}
+			onTimeUpdate={props.onTimeUpdate}
 		/>
 	);
 }

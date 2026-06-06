@@ -172,6 +172,16 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 							}));
 							await insertPhonemeErrors(phonemeErrorRows);
 
+							// Recognized phone timeline for the "Your Recording" overlay.
+							const recognizedPhoneTimings =
+								assessmentOutput.phones?.map((p) => ({
+									token: p.token,
+									start_ms: p.start_ms,
+									end_ms: p.end_ms,
+									gop_score: p.gop_score ?? null,
+									uncertain: p.uncertain ?? null,
+								})) ?? null;
+
 							await updateAnalysis(job.analysisId, {
 								status: "completed",
 								abstentionReason: null,
@@ -183,6 +193,7 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 									assessmentOutput.actual_ipa,
 								),
 								phonemeDistance: assessmentOutput.errors.length,
+								recognizedPhoneTimingsJson: recognizedPhoneTimings,
 								processingDurationMs: executionTime ?? null,
 							});
 							console.log(

@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/tanstack-react-start";
 import {
 	RiAlertLine,
 	RiArrowDownSLine,
@@ -81,6 +82,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				userRecording: UserRecording | null;
 				audioQualityMetrics: AudioQualityMetrics | null;
 				reference: ReferenceSpeech | null;
+				author: Author | null;
 				phonemeErrors: PhonemeError[];
 				wordErrors: WordError[];
 				assessmentJob: { id: string; status: string } | null;
@@ -129,6 +131,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				userRecording,
 				audioQualityMetrics,
 				reference,
+				author,
 				phonemeErrors,
 				wordErrors,
 				assessmentJob,
@@ -142,7 +145,7 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 				audioQualityMetrics,
 				reference,
 				text: null,
-				author: null,
+				author,
 				phonemeErrors,
 				wordErrors,
 				previousAttempts: mockPreviousAttempts,
@@ -281,7 +284,7 @@ function ScoreOverview({ overallScore, phonemeScore }: ScoreOverviewProps) {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, delay: 0.1 }}
 		>
-			<Card className="overflow-hidden">
+			<Card className="overflow-hidden border-0">
 				<CardHeader className="flex flex-row items-center justify-between pb-2">
 					<CardTitle className="text-base">Score Overview</CardTitle>
 					<Badge
@@ -581,7 +584,7 @@ function ErrorList({
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.3, delay: 0.3 }}
 				>
-					<Card className="overflow-hidden bg-linear-to-br from-emerald-500/5 via-background to-emerald-500/10">
+					<Card className="overflow-hidden border-0 bg-linear-to-br from-emerald-500/5 via-background to-emerald-500/10">
 						<CardContent className="py-12">
 							<div className="flex flex-col items-center gap-3 text-center">
 								<motion.div
@@ -612,7 +615,7 @@ function ErrorList({
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.3, delay: 0.3 }}
 			>
-				<Card className="overflow-hidden">
+				<Card className="overflow-hidden border-0">
 					<CardContent className="py-10">
 						<div className="flex flex-col items-center gap-2 text-center">
 							<h3 className="font-medium text-base">Analysis complete</h3>
@@ -632,7 +635,7 @@ function ErrorList({
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, delay: 0.2 }}
 		>
-			<Card className="overflow-hidden">
+			<Card className="overflow-hidden border-0">
 				<CardHeader className="pb-3">
 					<CardTitle className="flex items-center justify-between text-base">
 						<span>Error Details</span>
@@ -733,7 +736,7 @@ function AbstentionBanner({
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ duration: 0.3, delay: 0.1 }}
 		>
-			<Card className="overflow-hidden border-amber-500/30 bg-linear-to-br from-amber-500/5 via-background to-amber-500/10">
+			<Card className="overflow-hidden border-0 bg-linear-to-br from-amber-500/5 via-background to-amber-500/10">
 				<CardContent className="py-10">
 					<div className="flex flex-col items-center gap-4 text-center">
 						<div className="flex size-14 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -782,10 +785,12 @@ function AnalysisPage() {
 		phonemeErrors: initialLoaderPhonemeErrors,
 		textId,
 		reference,
+		author,
 		audioQualityMetrics: initialQualityMetrics,
 		jobSubmitted: initialJobSubmitted,
 	} = Route.useLoaderData();
 	const navigate = useNavigate();
+	const { user } = useUser();
 	const [activeSegment, setActiveSegment] = useState<{
 		start: number;
 		end: number;
@@ -875,6 +880,27 @@ function AnalysisPage() {
 				label: p.token,
 			}));
 	}, [reference]);
+
+	// Recognized (user) phone timeline — same overlay + live readout as the
+	// reference, sourced from what POWSM heard in the user's recording.
+	const userPhoneRegions: PhoneRegion[] = useMemo(() => {
+		const timings = analysis?.recognizedPhoneTimingsJson;
+		if (!timings) return [];
+		return timings
+			.filter((p) => p.token !== "▁")
+			.map((p) => ({
+				start: p.start_ms / 1000,
+				end: p.end_ms / 1000,
+				label: p.token,
+			}));
+	}, [analysis]);
+
+	const referenceLabel = author
+		? `Reference · ${author.name}${author.accent ? ` · ${author.accent}` : ""}`
+		: "Reference Audio";
+	const userLabel = user?.firstName
+		? `${user.firstName}'s recording`
+		: "Your recording";
 
 	if (!analysis) {
 		return (
@@ -1130,13 +1156,14 @@ function AnalysisPage() {
 							{reference && (
 								<WaveformPlayer
 									src={`/api/audio/${reference.id}`}
-									label="Reference Audio"
+									label={referenceLabel}
 									phoneRegions={referencePhoneRegions}
 								/>
 							)}
 							<WaveformPlayer
 								src={`/api/audio/user/${userRecording?.id ?? ""}`}
-								label="Your Recording"
+								label={userLabel}
+								phoneRegions={userPhoneRegions}
 								errorRegions={errorRegions}
 							/>
 						</div>

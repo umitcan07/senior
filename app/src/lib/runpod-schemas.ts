@@ -90,6 +90,18 @@ const AssessPhonemeErrorSchema = z.object({
 });
 export type AssessPhonemeError = z.infer<typeof AssessPhonemeErrorSchema>;
 
+// Recognized (user) phone with timing + GOP — the free-alignment timeline.
+const AssessPhoneSchema = z.object({
+	token: z.string(),
+	start_ms: z.number(),
+	end_ms: z.number(),
+	confidence: z.number().nullable().optional(),
+	gop_score: z.number().nullable().optional(),
+	entropy: z.number().nullable().optional(),
+	uncertain: z.boolean().nullable().optional(),
+});
+export type AssessPhone = z.infer<typeof AssessPhoneSchema>;
+
 // Scored result: a real assessment with per-phone GOP + CTC timestamps.
 const ScoredOutputSchema = z.object({
 	status: z.literal("scored"),
@@ -99,7 +111,7 @@ const ScoredOutputSchema = z.object({
 	target_ipa: z.string(),
 	per: z.number().optional(),
 	errors: z.array(AssessPhonemeErrorSchema),
-	phones: z.array(z.unknown()).optional(),
+	phones: z.array(AssessPhoneSchema).optional(),
 	signal_quality: SignalQualitySchema.optional(),
 	alignment_method: z.string().nullable().optional(),
 });

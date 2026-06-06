@@ -246,6 +246,19 @@ export const analyses = pgTable(
 		// uncertain. Score columns are left NULL in this case; the UI shows a
 		// banner (#38). status stays "completed".
 		abstentionReason: text("abstention_reason"),
+		// Recognized (user) phone timeline from POWSM free alignment: per-phone
+		// { token, start_ms, end_ms, gop_score, uncertain }. Mirrors
+		// reference_speeches.phone_timings_json; drives the per-phone overlay +
+		// live readout on the "Your Recording" waveform.
+		recognizedPhoneTimingsJson: jsonb("recognized_phone_timings_json").$type<
+			Array<{
+				token: string;
+				start_ms: number;
+				end_ms: number;
+				gop_score: number | null;
+				uncertain: boolean | null;
+			}>
+		>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [

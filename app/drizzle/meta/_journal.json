@@ -99,6 +99,13 @@
       "when": 1780755341394,
       "tag": "0013_wooden_wilson_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1780759773916,
+      "tag": "0014_rapid_vulture",
+      "breakpoints": true
     }
   ]
 }
