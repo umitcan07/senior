@@ -32,6 +32,8 @@ RUN python3 -m pip install --no-cache-dir \
 COPY shared/ /worker/shared/
 COPY assessment/ /worker/assessment/
 COPY alignment.py /worker/alignment.py
+COPY gop_scoring.py /worker/gop_scoring.py
+COPY phone_diff.py /worker/phone_diff.py
 
 # Install dependencies
 RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt
