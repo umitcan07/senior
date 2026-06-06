@@ -87,7 +87,7 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 			aria-pressed={isSelected}
 			className={cn(
 				"group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-3 transition-all duration-200",
-				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+				"focus:outline-none focus-visible:outline-none",
 				categoryGradientVariants({ type }),
 				isSelected
 					? "ring-2 ring-white/50 ring-offset-2 ring-offset-background"
