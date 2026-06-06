@@ -6,6 +6,7 @@
     "genam_teyanna": { "kind": "reference", "dialect": "genam", "name": "Teyanna", "accent": "General American", "source": "fiverr" },
     "rp_jon": { "kind": "reference", "dialect": "rp", "name": "Jon", "accent": "Received Pronunciation", "source": "fiverr" },
     "umit": { "kind": "test_user", "l1": "tr", "name": "Umit" },
-    "erem": { "kind": "test_user", "l1": "tr", "name": "Erem" }
+    "erem": { "kind": "test_user", "l1": "tr", "name": "Erem" },
+    "omer": { "kind": "test_user", "l1": "tr", "name": "Omer" }
   }
 }
