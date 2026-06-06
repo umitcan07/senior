@@ -11,11 +11,13 @@ import {
 	type AssessmentJob,
 	getLatestAssessmentJob,
 } from "@/db/assessment-job";
+import { getAuthorById } from "@/db/author";
 import { getUserRecordingById } from "@/db/recording";
 import { getReferenceSpeechById } from "@/db/reference";
 import type {
 	Analysis,
 	AudioQualityMetrics,
+	Author,
 	PhonemeError,
 	ReferenceSpeech,
 	UserRecording,
@@ -37,6 +39,7 @@ type AnalysisDetails = {
 	userRecording: UserRecording | null;
 	audioQualityMetrics: AudioQualityMetrics | null;
 	reference: ReferenceSpeech | null;
+	author: Author | null;
 	phonemeErrors: PhonemeError[];
 	wordErrors: WordError[];
 	assessmentJob: AssessmentJob | null;
@@ -116,11 +119,14 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 				? await getAudioQualityMetricsByUserRecordingId(userRecording.id)
 				: null;
 
+			const author = reference ? await getAuthorById(reference.authorId) : null;
+
 			return createSuccessResponse({
 				analysis,
 				userRecording,
 				audioQualityMetrics: qualityMetrics,
 				reference,
+				author,
 				phonemeErrors,
 				wordErrors,
 				assessmentJob,

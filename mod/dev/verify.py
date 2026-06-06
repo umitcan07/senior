@@ -281,38 +281,66 @@ def resolve_ref_author(ctx: Ctx, args) -> str:
     sys.exit(f"--dialect {args.dialect} matches {len(cands)} authors {cands}; pass --author to pick one.")
 
 
-def cmd_assess(ctx: Ctx, args) -> int:
-    ref_author = resolve_ref_author(ctx, args)
-    user_clip = ctx.test_clip(args.speaker, args.ref)
-    ref_clip = ctx.ref_clip(ref_author, args.ref)
+def _candidate_clip(ctx: Ctx, speaker: str, ref: str) -> Path:
+    """Resolve the candidate ('user') clip — a test_recordings speaker by default,
+    or a reference author when ``speaker`` names one (lets us score natives against
+    each other to manufacture happy / wrong-sentence cases without learner labels)."""
+    kind = ctx.authors.get(speaker, {}).get("kind", "test_user")
+    return ctx.ref_clip(speaker, ref) if kind == "reference" else ctx.test_clip(speaker, ref)
+
+
+def _target_phones(ctx: Ctx, ref_author: str, ref_id: str) -> tuple[list[str], str]:
+    """Reference phones for ``ref_id`` (prefer committed golden, else live align)."""
+    ref_clip = ctx.ref_clip(ref_author, ref_id)
     gp = golden_path(ref_clip)
     if gp.exists():
-        target, src = json.loads(gp.read_text(encoding="utf-8"))["phones"], "golden"
+        return json.loads(gp.read_text(encoding="utf-8"))["phones"], "golden"
+    return [s.token for s in free_align(ref_clip)], "live (no golden — run align-refs --save)"
+
+
+def cmd_assess(ctx: Ctx, args) -> int:
+    """Run the REAL assess pipeline (mod/assessment/assess.py) on a local clip —
+    abstention gates + phone diff + GOP — so the validation matrix exercises the
+    same logic RunPod runs. ``--against-ref`` scores the candidate against a
+    DIFFERENT sentence's reference phones (manufactures the wrong_sentence case)."""
+    import librosa
+    sys.path.insert(0, str(_REPO_MOD / "assessment"))
+    from assess import assess_audio  # noqa: E402
+
+    ref_author = resolve_ref_author(ctx, args)
+    target_id = args.against_ref or args.ref
+    target, src = _target_phones(ctx, ref_author, target_id)
+
+    user_clip = _candidate_clip(ctx, args.speaker, args.ref)
+    audio, _ = librosa.load(str(user_clip), sr=alignment.TARGET_SR, mono=True)
+    result = assess_audio(audio, alignment.TARGET_SR, reference_id=target_id, reference_phones=target)
+
+    against = f"  (target phones: {target_id}, {src})" if args.against_ref else f"  (target phones: {src})"
+    print(f"\nassess {args.speaker} / {args.ref}  vs ref author {ref_author}{against}")
+    print(f"  target ({len(target)}): {' '.join(target)}")
+
+    if result["status"] == "abstained":
+        ab = result["abstention"]
+        print(f"  -> ABSTAINED: {ab['reason']}  {ab['detail']}")
     else:
-        target, src = [s.token for s in free_align(ref_clip)], "live (no golden — run align-refs --save)"
-
-    user_segs = free_align(user_clip)
-    actual = [s.token for s in user_segs]
-    d = diff_phones(actual, target)
-    mean_conf = sum(s.confidence for s in user_segs) / len(user_segs) if user_segs else 0.0
-
-    print(f"\nassess {args.speaker} / {args.ref}  vs ref author {ref_author}  (target phones: {src})")
-    print(f"  target ({d['n']}): {' '.join(target)}")
-    print(f"  actual ({len(actual)}): {' '.join(actual)}")
-    print(f"  errors: {len(d['subs'])} sub, {len(d['ins'])} ins, {len(d['dels'])} del")
-    for o in d["subs"]:
-        print(f"    sub @{o[1]}: expected /{o[2]}/ -> said /{o[3]}/")
-    for o in d["dels"]:
-        print(f"    del @{o[1]}: missing /{o[2]}/")
-    for o in d["ins"]:
-        print(f"    ins @{o[1]}: extra /{o[2]}/")
-    print(f"  score: {d['score']*100:.1f}%   mean GOP (conf): {mean_conf:.4f}")
+        errs = result["errors"]
+        n_sub = sum(1 for e in errs if e["type"] == "substitute")
+        n_ins = sum(1 for e in errs if e["type"] == "insert")
+        n_del = sum(1 for e in errs if e["type"] == "delete")
+        actual = [p["token"] for p in result["phones"]]
+        print(f"  actual ({len(actual)}): {' '.join(actual)}")
+        print(f"  -> SCORED: {result['score']*100:.1f}%   per: {result['per']:.3f}   "
+              f"mean conf: {result['confidence']:.4f}")
+        print(f"  errors: {n_sub} sub, {n_ins} ins, {n_del} del")
+        for e in errs:
+            ts = e.get("timestamp")
+            at = f" @{ts['start']:.2f}-{ts['end']:.2f}s" if ts else ""
+            print(f"    {e['type']}{at}: expected /{e['expected']}/ -> said /{e['actual']}/  gop={e['gop_score']}")
 
     if args.json:
         Path(args.json).write_text(json.dumps({
             "speaker": args.speaker, "ref": args.ref, "ref_author": ref_author,
-            "target": target, "actual": actual, "score": d["score"], "mean_confidence": mean_conf,
-            "errors": {"sub": d["subs"], "ins": d["ins"], "del": d["dels"]},
+            "target_id": target_id, "target": target, "result": result,
         }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return 0
 
@@ -473,7 +501,7 @@ def main() -> None:
 
     a = sub.add_parser("align"); a.add_argument("clip"); a.add_argument("--author"); a.add_argument("--save", action="store_true"); a.add_argument("--json")
     ar = sub.add_parser("align-refs"); ar.add_argument("--author"); ar.add_argument("--dialect", choices=("genam", "rp")); ar.add_argument("--save", action="store_true")
-    asg = sub.add_parser("assess"); asg.add_argument("speaker"); asg.add_argument("ref"); asg.add_argument("--author"); asg.add_argument("--dialect", choices=("genam", "rp")); asg.add_argument("--json")
+    asg = sub.add_parser("assess"); asg.add_argument("speaker"); asg.add_argument("ref"); asg.add_argument("--author"); asg.add_argument("--dialect", choices=("genam", "rp")); asg.add_argument("--against-ref", help="score against a DIFFERENT sentence's reference phones (manufactures wrong_sentence)"); asg.add_argument("--json")
     b = sub.add_parser("batch"); b.add_argument("--check", action="store_true"); b.add_argument("--author"); b.add_argument("--dialect", choices=("genam", "rp"))
     asr = sub.add_parser("asr"); asr.add_argument("--author"); asr.add_argument("--dialect", choices=("genam", "rp")); asr.add_argument("--threshold", type=float, default=0.6)
     am = sub.add_parser("automap")

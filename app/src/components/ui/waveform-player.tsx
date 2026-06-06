@@ -8,7 +8,6 @@ import {
 } from "@remixicon/react";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type WaveSurfer from "wavesurfer.js";
 import Regions from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +28,14 @@ export interface ErrorRegion {
 	label?: string;
 }
 
+// Display-only per-phone region (e.g. the reference's precomputed CTC phone
+// timings) drawn as a subtle labeled band under the waveform.
+export interface PhoneRegion {
+	start: number;
+	end: number;
+	label?: string;
+}
+
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 
 const ERROR_COLORS = {
@@ -37,10 +44,22 @@ const ERROR_COLORS = {
 	delete: "rgba(59, 130, 246, 0.3)",
 } as const;
 
+// Alternating subtle fills so adjacent phones stay visually separable.
+const PHONE_REGION_COLORS = [
+	"rgba(100, 116, 139, 0.07)",
+	"rgba(100, 116, 139, 0.15)",
+] as const;
+
 export interface WaveformPlayerProps {
 	src: string;
 	errorRegions?: ErrorRegion[];
+	phoneRegions?: PhoneRegion[];
 	onRegionClick?: (startMs: number, endMs: number, type: string) => void;
+	onTimeUpdate?: (seconds: number) => void;
+	// Imperatively seek + play a window (e.g. a clicked phone). Bump `nonce` to
+	// replay the same region. A small pad is added so very short phones are
+	// audible in context.
+	playRegion?: { startMs: number; endMs: number; nonce: number };
 	compact?: boolean;
 	className?: string;
 	defaultSpeed?: number;
@@ -49,10 +68,16 @@ export interface WaveformPlayerProps {
 	label?: string;
 }
 
+// Padding added on each side of a clicked segment so a ~40ms phone is audible.
+const SEGMENT_PAD_S = 0.15;
+
 function WaveformPlayerContent({
 	src,
 	errorRegions = [],
+	phoneRegions = [],
 	onRegionClick,
+	onTimeUpdate,
+	playRegion,
 	compact = false,
 	className,
 	defaultSpeed = 1,
@@ -89,6 +114,12 @@ function WaveformPlayerContent({
 	useEffect(() => {
 		errorRegionsRef.current = errorRegions;
 	}, [errorRegions]);
+
+	// Keep the latest onTimeUpdate without resubscribing the timeupdate listener.
+	const onTimeUpdateRef = useRef(onTimeUpdate);
+	useEffect(() => {
+		onTimeUpdateRef.current = onTimeUpdate;
+	}, [onTimeUpdate]);
 
 	// Initialize regions plugin when wavesurfer is ready
 	useEffect(() => {
@@ -127,6 +158,20 @@ function WaveformPlayerContent({
 		// Clear existing regions and add new ones
 		regions.clearRegions();
 
+		// Display-only phone timeline: faint alternating bands, NO per-phone labels
+		// (a full label strip is unreadable at sentence length). The phone under
+		// the cursor is surfaced live via the readout below instead.
+		phoneRegions.forEach((region, index) => {
+			regions.addRegion({
+				id: `phone-${index}`,
+				start: region.start,
+				end: region.end,
+				color: PHONE_REGION_COLORS[index % PHONE_REGION_COLORS.length],
+				drag: false,
+				resize: false,
+			});
+		});
+
 		// Add error regions
 		errorRegions.forEach((region, index) => {
 			const regionId = region.id || `error-${index}`;
@@ -140,7 +185,7 @@ function WaveformPlayerContent({
 				resize: false,
 			});
 		});
-	}, [wavesurfer, isReady, errorRegions, onRegionClick]);
+	}, [wavesurfer, isReady, errorRegions, phoneRegions, onRegionClick]);
 
 	// Update playback speed
 	useEffect(() => {
@@ -148,6 +193,16 @@ function WaveformPlayerContent({
 			wavesurfer.setPlaybackRate(playbackSpeed);
 		}
 	}, [wavesurfer, isReady, playbackSpeed]);
+
+	// Play a requested region (clicked phone/error) in-context on this waveform.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: replay is keyed on playRegion.nonce
+	useEffect(() => {
+		if (!wavesurfer || !isReady || !playRegion) return;
+		const dur = wavesurfer.getDuration() || playRegion.endMs / 1000;
+		const start = Math.max(0, playRegion.startMs / 1000 - SEGMENT_PAD_S);
+		const end = Math.min(dur, playRegion.endMs / 1000 + SEGMENT_PAD_S);
+		wavesurfer.play(start, end);
+	}, [wavesurfer, isReady, playRegion?.nonce]);
 
 	// Update current time and duration
 	useEffect(() => {
@@ -158,6 +213,7 @@ function WaveformPlayerContent({
 				const time = wavesurfer.getCurrentTime();
 				const dur = wavesurfer.getDuration();
 				setCurrentTime(time);
+				onTimeUpdateRef.current?.(time);
 				if (dur && dur !== duration) {
 					setDuration(dur);
 				}
@@ -211,6 +267,15 @@ function WaveformPlayerContent({
 		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	};
 
+	// Phone under the playback cursor, live as the audio plays. Gap-tolerant:
+	// hold the most recently started phone through inter-phone gaps so the
+	// readout doesn't strobe on/off. (phoneRegions are in start order.)
+	let activePhone: string | undefined;
+	for (const r of phoneRegions) {
+		if (r.start <= currentTime) activePhone = r.label;
+		else break;
+	}
+
 	return (
 		<div
 			className={cn(
@@ -219,9 +284,14 @@ function WaveformPlayerContent({
 				className,
 			)}
 		>
-			{label && (
+			{(label || phoneRegions.length > 0) && (
 				<div className="mb-3 flex items-center gap-2 text-muted-foreground text-sm">
-					{label}
+					<span>{label}</span>
+					{phoneRegions.length > 0 && (
+						<span className="ml-auto flex h-6 min-w-10 items-center justify-center rounded-md bg-primary/10 px-2 font-mono text-foreground text-xs tabular-nums">
+							{activePhone ? `/${activePhone}/` : "·"}
+						</span>
+					)}
 				</div>
 			)}
 			<div
@@ -376,6 +446,7 @@ export function WaveformPlayer(props: WaveformPlayerProps) {
 export function WaveformPlayerInline(props: {
 	src: string;
 	className?: string;
+	onTimeUpdate?: (seconds: number) => void;
 }) {
 	return (
 		<WaveformPlayer
@@ -384,6 +455,7 @@ export function WaveformPlayerInline(props: {
 			showSpeedControl={false}
 			showRestartButton={false}
 			className={props.className}
+			onTimeUpdate={props.onTimeUpdate}
 		/>
 	);
 }

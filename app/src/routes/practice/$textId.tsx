@@ -18,7 +18,14 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Badge } from "@/components/ui/badge";
@@ -436,6 +443,61 @@ function ReferenceVoice({
 	const [isOpen, setIsOpen] = useState(false);
 	const selectedReference = references.find((ref) => ref.id === selectedId);
 
+	// Live reference playback position (seconds), driven by the audio player, used
+	// to highlight the current phone in the IPA below.
+	const [refTime, setRefTime] = useState(0);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset position when the selected voice changes
+	useEffect(() => {
+		setRefTime(0);
+	}, [selectedId]);
+
+	const timings = selectedReference?.phoneTimingsJson ?? null;
+	// Index of the phone under the cursor. Gap-tolerant: hold the most recently
+	// started phone through inter-phone gaps so highlights don't strobe.
+	let activePhoneIdx = -1;
+	if (timings) {
+		for (let i = 0; i < timings.length; i++) {
+			if (timings[i].start_ms / 1000 <= refTime) activePhoneIdx = i;
+			else break;
+		}
+	}
+
+	// A single sliding highlight box that CSS-translates between phones — smooth
+	// motion instead of toggling each token's background on/off.
+	const phonesRef = useRef<HTMLParagraphElement>(null);
+	const [highlight, setHighlight] = useState<{
+		x: number;
+		y: number;
+		w: number;
+		h: number;
+	} | null>(null);
+	const measureHighlight = useCallback(() => {
+		const container = phonesRef.current;
+		if (!container || activePhoneIdx < 0) {
+			setHighlight(null);
+			return;
+		}
+		const el = container.children[activePhoneIdx] as HTMLElement | undefined;
+		if (!el) {
+			setHighlight(null);
+			return;
+		}
+		setHighlight({
+			x: el.offsetLeft,
+			y: el.offsetTop,
+			w: el.offsetWidth,
+			h: el.offsetHeight,
+		});
+	}, [activePhoneIdx]);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when the phone set (timings) changes, not just on index change
+	useLayoutEffect(() => {
+		measureHighlight();
+	}, [measureHighlight, timings]);
+	useEffect(() => {
+		window.addEventListener("resize", measureHighlight);
+		return () => window.removeEventListener("resize", measureHighlight);
+	}, [measureHighlight]);
+
 	if (references.length === 0) {
 		return null;
 	}
@@ -575,7 +637,8 @@ function ReferenceVoice({
 			{selectedReference && (
 				<WaveformPlayerInline
 					src={`/api/audio/${selectedReference.id}`}
-					className="w-full border bg-card"
+					className="w-full bg-card"
+					onTimeUpdate={setRefTime}
 				/>
 			)}
 
@@ -595,9 +658,45 @@ function ReferenceVoice({
 								: "Dictionary"}
 						</Badge>
 					</div>
-					<p className="font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide">
-						{formatIpaForDisplay(selectedReference.ipaTranscription)}
-					</p>
+					{timings && timings.length > 0 ? (
+						<div className="relative">
+							<div
+								aria-hidden
+								className="pointer-events-none absolute top-0 left-0 rounded bg-primary/25 transition-[transform,width,height] duration-200 ease-out"
+								style={
+									highlight
+										? {
+												transform: `translate(${highlight.x}px, ${highlight.y}px)`,
+												width: highlight.w,
+												height: highlight.h,
+												opacity: 1,
+											}
+										: { opacity: 0 }
+								}
+							/>
+							<p
+								ref={phonesRef}
+								className="relative flex flex-wrap items-center gap-x-0.5 font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide"
+							>
+								{timings.map((t, i) =>
+									t.token === "▁" ? (
+										<span
+											key={`${t.start_ms}-${i}`}
+											className="inline-block w-2"
+										/>
+									) : (
+										<span key={`${t.start_ms}-${i}`} className="rounded px-0.5">
+											{t.token}
+										</span>
+									),
+								)}
+							</p>
+						</div>
+					) : (
+						<p className="font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide">
+							{formatIpaForDisplay(selectedReference.ipaTranscription)}
+						</p>
+					)}
 				</div>
 			) : (
 				<div className="rounded-lg bg-muted/30 p-4">
@@ -621,6 +720,7 @@ interface RecentAttemptsProps {
 		date: Date;
 		analysisId: string;
 		status: "pending" | "processing" | "completed" | "failed";
+		abstentionReason?: string | null;
 	}>;
 	textId: string;
 }
@@ -684,13 +784,16 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 					const statusBadge = getStatusBadge(attempt.status, attempt.score);
 					const showScore =
 						attempt.status === "completed" && attempt.score !== null;
+					// Completed but unscored == the worker abstained (#20/#38).
+					const isAbstained =
+						attempt.status === "completed" && attempt.score === null;
 
 					return (
 						<Link
 							key={attempt.id}
 							to="/practice/$textId/analysis/$analysisId"
 							params={{ textId, analysisId: attempt.analysisId }}
-							className="group flex flex-col gap-1 rounded-lg border border-border/40 p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between sm:rounded-md sm:border-0 sm:border-b sm:p-4 sm:last:border-0"
+							className="group flex flex-col gap-1 rounded-md p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between sm:p-4"
 						>
 							<div className="flex items-center gap-3 sm:gap-4">
 								{showScore ? (
@@ -709,7 +812,17 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 									</span>
 								) : (
 									<div className="flex w-20 items-center justify-center">
-										{statusBadge}
+										{isAbstained ? (
+											<Badge
+												variant="secondary"
+												className="h-5 bg-muted/50 text-[10px] text-muted-foreground"
+												title={attempt.abstentionReason ?? undefined}
+											>
+												Skipped
+											</Badge>
+										) : (
+											statusBadge
+										)}
 									</div>
 								)}
 								<span className="text-muted-foreground text-xs">

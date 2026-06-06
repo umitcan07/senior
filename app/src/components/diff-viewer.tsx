@@ -1,5 +1,6 @@
 import { RiInformationLine } from "@remixicon/react";
 import { useEffect, useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	Tooltip,
 	TooltipContent,
@@ -17,7 +18,16 @@ import {
 } from "@/lib/diff-viewer";
 import { cn } from "@/lib/utils";
 
-type DiffView = "unified" | "split";
+// Three diff visualizations, all driven by the aligned `cells` model.
+type DiffMode = "stacked" | "strike" | "blocks";
+
+const MODES: { id: DiffMode; label: string }[] = [
+	{ id: "stacked", label: "Stacked" },
+	{ id: "strike", label: "Strike" },
+	{ id: "blocks", label: "Blocks" },
+];
+
+const DEFAULT_MODE: DiffMode = "stacked";
 
 interface DiffViewerProps {
 	target: string;
@@ -28,316 +38,394 @@ interface DiffViewerProps {
 	onSegmentClick?: (startMs: number, endMs: number) => void;
 }
 
-function formatTimestamp(ms: number): string {
-	const seconds = Math.floor(ms / 1000);
-	const mins = Math.floor(seconds / 60);
-	const secs = seconds % 60;
-	return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
-
-// Info content for each type
 const INFO_CONTENT = {
 	word: "Based on ASR (Automatic Speech Recognition). May not capture all nuances and might auto-correct some errors. Still valuable as it simulates how a native speaker might interpret your speech.",
 	phoneme:
 		"Detailed phonetic analysis comparing expected pronunciation with what was detected. Phoneme-level comparison provides granular feedback on individual sounds.",
 };
 
-/**
- * Remember the chosen view per comparison type, independently, across sessions.
- * Defaults to "unified" (the merged git-style line).
- */
-function useDiffView(type: "phoneme" | "word") {
+/** Remember the chosen mode per comparison type, across sessions. */
+function useDiffMode(type: "phoneme" | "word") {
 	const key = `${DIFF_VIEW_STORAGE_KEY_PREFIX}-${type}`;
-	const [view, setView] = useState<DiffView>(() => {
-		if (typeof window === "undefined") return "unified";
+	const [mode, setMode] = useState<DiffMode>(() => {
+		if (typeof window === "undefined") return DEFAULT_MODE;
 		const stored = localStorage.getItem(key);
-		return stored === "split" || stored === "unified" ? stored : "unified";
+		return MODES.some((m) => m.id === stored)
+			? (stored as DiffMode)
+			: DEFAULT_MODE;
 	});
 
 	useEffect(() => {
 		if (typeof window === "undefined") return;
-		localStorage.setItem(key, view);
-	}, [key, view]);
+		localStorage.setItem(key, mode);
+	}, [key, mode]);
 
-	return [view, setView] as const;
+	return [mode, setMode] as const;
 }
 
-interface ChipProps {
+// "reference" = the target/expected phone; "your" = what we detected in the
+// recording. Only the "your" side can play audio (we segment the user clip).
+type Role = "reference" | "your";
+
+/** Safely extract play timestamps (narrows the PhonemeError | WordError union). */
+function getTimestamps(
+	error?: DiffError,
+): { start: number; end: number } | null {
+	if (
+		error &&
+		"timestampStartMs" in error &&
+		error.timestampStartMs != null &&
+		"timestampEndMs" in error &&
+		error.timestampEndMs != null
+	) {
+		return { start: error.timestampStartMs, end: error.timestampEndMs };
+	}
+	return null;
+}
+
+function sizing(type: "phoneme" | "word") {
+	return type === "phoneme" ? "font-ipa text-base" : "text-sm";
+}
+
+/** Tooltip showing which side a token belongs to, the phone, and a play hint. */
+function Hover({
+	side,
+	phone,
+	playable,
+	children,
+}: {
+	side: Role;
+	phone?: string | null;
+	playable?: boolean;
+	children: React.ReactNode;
+}) {
+	return (
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>{children}</TooltipTrigger>
+				<TooltipContent side="top" className="text-xs">
+					<span className="font-medium">
+						{side === "reference" ? "Reference" : "Your"}
+					</span>
+					{phone && <span className="ml-1.5 font-ipa">/{phone}/</span>}
+					{playable && <span className="ml-1.5 text-primary">▶ Play</span>}
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	);
+}
+
+interface BoxProps {
+	text: string;
+	tone: "equal" | DiffError["errorType"];
+	side?: Role;
 	error?: DiffError;
 	audioSrc?: string;
 	onSegmentClick?: (startMs: number, endMs: number) => void;
 	className?: string;
-	children: React.ReactNode;
+	bordered?: boolean;
+	rounded?: boolean;
 }
 
-/**
- * A clickable token. When the error carries timestamps and audio is available,
- * it plays that segment and shows a tooltip; otherwise it's inert.
- */
-function Chip({
+/** A single phone tile. Colored by tone; the "your" side plays its segment. */
+function Box({
+	text,
+	tone,
+	side,
 	error,
 	audioSrc,
 	onSegmentClick,
 	className,
-	children,
-}: ChipProps) {
-	const hasTimestamps =
-		!!error &&
-		"timestampStartMs" in error &&
-		error.timestampStartMs != null &&
-		error.timestampEndMs != null;
+	bordered = true,
+	rounded = true,
+}: BoxProps) {
+	const colorCls =
+		tone === "equal"
+			? "text-foreground/70"
+			: cn(
+					errorBgVariants({ errorType: tone }),
+					errorTextVariants({ errorType: tone }),
+				);
+	const borderCls =
+		bordered &&
+		(tone === "equal"
+			? "border border-border/40 bg-card/40"
+			: cn("border font-medium", errorBorderVariants({ errorType: tone })));
 
-	const canPlay = !!(audioSrc && hasTimestamps && onSegmentClick);
+	const ts = getTimestamps(error);
+	const canPlay = side === "your" && !!ts && !!audioSrc && !!onSegmentClick;
+
+	const base = cn(
+		"inline-flex items-center justify-center px-1.5 py-0.5",
+		rounded && "rounded-md",
+		colorCls,
+		borderCls,
+		className,
+	);
 
 	const handleClick = () => {
-		if (
-			canPlay &&
-			error &&
-			"timestampStartMs" in error &&
-			error.timestampStartMs != null &&
-			error.timestampEndMs != null
-		) {
-			onSegmentClick(error.timestampStartMs, error.timestampEndMs);
-		}
+		if (canPlay && ts) onSegmentClick?.(ts.start, ts.end);
 	};
 
-	const button = (
-		<button
-			type="button"
-			disabled={!canPlay}
-			onClick={handleClick}
-			className={cn(
-				"inline-flex items-center gap-1 rounded-sm outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-primary/40",
-				canPlay ? "cursor-pointer hover:brightness-110" : "cursor-default",
-				className,
-			)}
-		>
-			{children}
-		</button>
-	);
-
-	if (
-		hasTimestamps &&
-		error &&
-		"timestampStartMs" in error &&
-		error.timestampStartMs != null
-	) {
-		return (
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>{button}</TooltipTrigger>
-					<TooltipContent side="top" className="text-xs">
-						<span className="font-medium capitalize">{error.errorType}</span>
-						<span className="mx-1.5 text-muted-foreground">·</span>
-						<span className="font-mono text-muted-foreground">
-							{formatTimestamp(error.timestampStartMs)}
-						</span>
-						{canPlay && <span className="ml-1.5 text-primary">▶ Play</span>}
-					</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
-		);
+	// Equal/no-side tiles are inert and untipped.
+	if (tone === "equal" || !side) {
+		return <span className={base}>{text}</span>;
 	}
 
-	return button;
-}
-
-/** Shared padding/size for every token, scaled to phoneme vs. word. */
-function tokenSizing(type: "phoneme" | "word") {
-	return type === "phoneme"
-		? "px-1.5 py-0.5 font-ipa text-base"
-		: "px-1.5 py-0.5 text-sm";
-}
-
-function errorClasses(error: DiffError) {
-	return cn(
-		errorBgVariants({ errorType: error.errorType }),
-		errorBorderVariants({ errorType: error.errorType }),
-		errorTextVariants({ errorType: error.errorType }),
-		"border font-medium",
+	return (
+		<Hover side={side} phone={text} playable={canPlay}>
+			<button
+				type="button"
+				disabled={!canPlay}
+				onClick={handleClick}
+				className={cn(
+					base,
+					"outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40",
+					canPlay ? "cursor-pointer hover:brightness-110" : "cursor-default",
+				)}
+			>
+				{text}
+			</button>
+		</Hover>
 	);
 }
 
-const PANEL_CLASS =
-	"flex flex-wrap items-center gap-1 rounded-md border border-border/60 bg-card/40 p-3 leading-relaxed";
-
-interface UnifiedViewProps {
+interface ViewProps {
 	cells: DiffCell[];
 	type: "phoneme" | "word";
 	audioSrc?: string;
 	onSegmentClick?: (startMs: number, endMs: number) => void;
 }
 
-/** Merged, git-unified line: grey unchanged, green added, amber removed, red changed. */
-function UnifiedView({
-	cells,
-	type,
-	audioSrc,
-	onSegmentClick,
-}: UnifiedViewProps) {
-	const sizing = tokenSizing(type);
+const PANEL = "rounded-md bg-card/40 p-3";
 
-	if (cells.length === 0) {
-		return (
-			<div className={cn(PANEL_CLASS, "min-h-12 justify-center")}>
-				<span className="text-muted-foreground text-sm italic">
-					Nothing to compare
-				</span>
-			</div>
-		);
-	}
-
+/**
+ * Default. Inline line of tiles; a substitution stacks your phone over the
+ * reference phone, each the same tile size as a normal phone.
+ *   [a] [b/d] [c] [e]   — d sits under b but is a full tile.
+ */
+function StackedView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
+	const s = sizing(type);
 	return (
-		<div className={cn(PANEL_CLASS, type === "phoneme" && "font-ipa")}>
+		<div className={cn(PANEL, "flex flex-wrap items-start gap-1")}>
 			{cells.map((cell, index) => {
-				const cellKey = `${cell.kind}-${index}`;
-
-				if (cell.kind === "equal") {
+				const key = `${cell.kind}-${index}`;
+				if (cell.kind === "equal")
 					return (
-						<span
-							key={cellKey}
-							className={cn(sizing, "text-muted-foreground/80")}
-						>
-							{cell.segment}
+						<Box
+							key={key}
+							text={cell.segment}
+							tone="equal"
+							className={cn(s, "min-w-7")}
+						/>
+					);
+				if (cell.kind === "substitute")
+					return (
+						<span key={key} className="flex flex-col gap-0.5">
+							<Box
+								text={cell.actual}
+								tone="substitute"
+								side="your"
+								error={cell.error}
+								audioSrc={audioSrc}
+								onSegmentClick={onSegmentClick}
+								className={cn(s, "min-w-7")}
+							/>
+							<Box
+								text={cell.expected}
+								tone="substitute"
+								side="reference"
+								className={cn(s, "min-w-7")}
+							/>
 						</span>
 					);
-				}
-
-				if (cell.kind === "substitute") {
-					return (
-						<Chip
-							key={cellKey}
-							error={cell.error}
-							audioSrc={audioSrc}
-							onSegmentClick={onSegmentClick}
-							className={cn(sizing, errorClasses(cell.error))}
-						>
-							<span className="line-through opacity-60">{cell.expected}</span>
-							<span aria-hidden>→</span>
-							<span className="font-semibold">{cell.actual}</span>
-						</Chip>
-					);
-				}
-
-				// insert (added) or delete (removed)
 				return (
-					<Chip
-						key={cellKey}
+					<Box
+						key={key}
+						text={cell.segment}
+						tone={cell.kind}
+						side={cell.kind === "insert" ? "your" : "reference"}
 						error={cell.error}
 						audioSrc={audioSrc}
 						onSegmentClick={onSegmentClick}
-						className={cn(sizing, errorClasses(cell.error))}
-					>
-						<span className={cn(cell.kind === "delete" && "line-through")}>
-							{cell.segment}
-						</span>
-					</Chip>
+						className={cn(s, "min-w-7")}
+					/>
 				);
 			})}
 		</div>
 	);
 }
 
-interface SplitLineProps {
-	label: string;
-	segments: string[];
-	errorMap: Map<number, DiffError>;
-	/** Which error types to highlight on this line. */
-	highlight: DiffError["errorType"][];
-	emptyLabel: string;
-	type: "phoneme" | "word";
-	audioSrc?: string;
-	onSegmentClick?: (startMs: number, endMs: number) => void;
-}
-
-function SplitLine({
-	label,
-	segments,
-	errorMap,
-	highlight,
-	emptyLabel,
-	type,
-	audioSrc,
-	onSegmentClick,
-}: SplitLineProps) {
-	const sizing = tokenSizing(type);
-
+/**
+ * Inline line of tiles; a substitution is one tile split by a subtle vertical
+ * divider — reference on the left, your phone on the right.
+ */
+function StrikeView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
+	const s = sizing(type);
 	return (
-		<div className="space-y-1.5">
-			<span className="text-muted-foreground text-xs uppercase tracking-wider">
-				{label}
-			</span>
-			<div
-				className={cn(
-					PANEL_CLASS,
-					type === "phoneme" && "font-ipa",
-					segments.length === 0 && "min-h-12 justify-center",
-				)}
-			>
-				{segments.length === 0 ? (
-					<span className="text-muted-foreground text-sm italic">
-						{emptyLabel}
-					</span>
-				) : (
-					segments.map((segment, index) => {
-						const error = errorMap.get(index);
-						const isHighlighted = error && highlight.includes(error.errorType);
-
-						if (!error || !isHighlighted) {
-							return (
-								<span
-									key={`${label}-${index}-${segment}`}
-									className={cn(sizing, "text-foreground/80")}
-								>
-									{segment}
+		<div className={cn(PANEL, "flex flex-wrap items-center gap-1")}>
+			{cells.map((cell, index) => {
+				const key = `${cell.kind}-${index}`;
+				if (cell.kind === "equal")
+					return (
+						<Box
+							key={key}
+							text={cell.segment}
+							tone="equal"
+							className={cn(s, "min-w-7")}
+						/>
+					);
+				if (cell.kind === "substitute") {
+					const ts = getTimestamps(cell.error);
+					const canPlay = !!ts && !!audioSrc && !!onSegmentClick;
+					return (
+						<span
+							key={key}
+							className={cn(
+								"inline-flex items-stretch overflow-hidden rounded-md border font-medium",
+								errorBorderVariants({ errorType: "substitute" }),
+								errorBgVariants({ errorType: "substitute" }),
+								errorTextVariants({ errorType: "substitute" }),
+							)}
+						>
+							<Hover side="reference" phone={cell.expected}>
+								<span className={cn(s, "flex items-center px-1.5 py-0.5")}>
+									{cell.expected}
 								</span>
-							);
-						}
-
-						return (
-							<Chip
-								key={`${label}-${index}-${segment}`}
-								error={error}
-								audioSrc={audioSrc}
-								onSegmentClick={onSegmentClick}
-								className={cn(sizing, errorClasses(error))}
-							>
-								{segment}
-							</Chip>
-						);
-					})
-				)}
-			</div>
+							</Hover>
+							<span aria-hidden className="w-px bg-destructive/40" />
+							<Hover side="your" phone={cell.actual} playable={canPlay}>
+								<button
+									type="button"
+									disabled={!canPlay}
+									onClick={() =>
+										canPlay && ts && onSegmentClick?.(ts.start, ts.end)
+									}
+									className={cn(
+										s,
+										"flex items-center px-1.5 py-0.5 outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40",
+										canPlay
+											? "cursor-pointer hover:brightness-110"
+											: "cursor-default",
+									)}
+								>
+									{cell.actual}
+								</button>
+							</Hover>
+						</span>
+					);
+				}
+				return (
+					<Box
+						key={key}
+						text={cell.segment}
+						tone={cell.kind}
+						side={cell.kind === "insert" ? "your" : "reference"}
+						error={cell.error}
+						audioSrc={audioSrc}
+						onSegmentClick={onSegmentClick}
+						className={cn(s, "min-w-7")}
+					/>
+				);
+			})}
 		</div>
 	);
 }
 
-interface ViewToggleProps {
-	view: DiffView;
-	onChange: (view: DiffView) => void;
-}
+/**
+ * Dense aligned grid: two fixed-width rows (reference / your) that line up
+ * cell-for-cell, square cells separated by a very subtle divider, only the
+ * overall block is rounded.
+ */
+function BlocksView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
+	const s = sizing(type);
+	const cellCls =
+		"min-w-6 border-border/20 border-r px-1 py-1 text-center last:border-r-0";
 
-function ViewToggle({ view, onChange }: ViewToggleProps) {
+	const renderRow = (
+		side: (c: DiffCell) => {
+			text: string;
+			tone: "equal" | DiffError["errorType"] | "gap";
+			error?: DiffError;
+		},
+		sideRole: Role,
+	) =>
+		cells.map((cell, index) => {
+			const { text, tone, error } = side(cell);
+			const key = `${sideRole}-${cell.kind}-${index}`;
+			if (tone === "gap")
+				return (
+					<span
+						key={key}
+						className={cn(s, cellCls, "text-muted-foreground/25")}
+					>
+						·
+					</span>
+				);
+			return (
+				<Box
+					key={key}
+					text={text}
+					tone={tone}
+					side={tone === "equal" ? undefined : sideRole}
+					error={error}
+					audioSrc={audioSrc}
+					onSegmentClick={onSegmentClick}
+					bordered={false}
+					rounded={false}
+					className={cn(s, cellCls)}
+				/>
+			);
+		});
+
 	return (
-		<div className="inline-flex rounded-md border border-border/60 p-0.5">
-			{(["unified", "split"] as const).map((option) => (
-				<button
-					key={option}
-					type="button"
-					onClick={() => onChange(option)}
-					aria-pressed={view === option}
-					className={cn(
-						"rounded-[5px] px-2 py-0.5 text-xs capitalize transition-colors",
-						view === option
-							? "bg-muted font-medium text-foreground"
-							: "text-muted-foreground hover:text-foreground",
-					)}
-				>
-					{option}
-				</button>
-			))}
+		<div className="space-y-1.5 overflow-x-auto rounded-md border border-border/40 bg-card/40 p-3">
+			<div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+				Reference
+			</div>
+			<div className="flex">{renderRow(targetSide, "reference")}</div>
+			<div className="pt-1 text-[10px] text-muted-foreground uppercase tracking-wider">
+				Your
+			</div>
+			<div className="flex">{renderRow(detectedSide, "your")}</div>
 		</div>
 	);
+}
+
+const GAP = "·";
+
+function targetSide(cell: DiffCell): {
+	text: string;
+	tone: "equal" | DiffError["errorType"] | "gap";
+	error?: DiffError;
+} {
+	switch (cell.kind) {
+		case "equal":
+			return { text: cell.segment, tone: "equal" };
+		case "substitute":
+			return { text: cell.expected, tone: "substitute", error: cell.error };
+		case "delete":
+			return { text: cell.segment, tone: "delete", error: cell.error };
+		case "insert":
+			return { text: GAP, tone: "gap" };
+	}
+}
+
+function detectedSide(cell: DiffCell): {
+	text: string;
+	tone: "equal" | DiffError["errorType"] | "gap";
+	error?: DiffError;
+} {
+	switch (cell.kind) {
+		case "equal":
+			return { text: cell.segment, tone: "equal" };
+		case "substitute":
+			return { text: cell.actual, tone: "substitute", error: cell.error };
+		case "delete":
+			return { text: GAP, tone: "gap" };
+		case "insert":
+			return { text: cell.segment, tone: "insert", error: cell.error };
+	}
 }
 
 export function DiffViewer({
@@ -348,27 +436,19 @@ export function DiffViewer({
 	audioSrc,
 	onSegmentClick,
 }: DiffViewerProps) {
-	const [view, setView] = useDiffView(type);
+	const [mode, setMode] = useDiffMode(type);
 
 	const targetSegments = target.split(/\s+/).filter(Boolean);
 	const recognizedSegments = recognized.split(/\s+/).filter(Boolean);
-
 	const title = type === "word" ? "Word Comparison" : "Phoneme Comparison";
-	const targetLabel = type === "word" ? "Expected" : "Target";
-	const recognizedLabel = type === "word" ? "Recognized" : "Detected";
 
-	const { targetErrorMap, recognizedErrorMap, cells } = buildDiff(
-		targetSegments,
-		recognizedSegments,
-		errors,
-	);
-
+	const { cells } = buildDiff(targetSegments, recognizedSegments, errors);
 	const hasErrors = errors.length > 0;
+	const viewProps: ViewProps = { cells, type, audioSrc, onSegmentClick };
 
 	return (
 		<div className="space-y-3">
-			{/* Header: title, info, count, view toggle */}
-			<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center gap-2">
 				<h3 className="font-medium">{title}</h3>
 				<TooltipProvider>
 					<Tooltip>
@@ -396,40 +476,30 @@ export function DiffViewer({
 							{errors.length === 1 ? "difference" : "differences"}
 						</span>
 					)}
-					<ViewToggle view={view} onChange={setView} />
+					<Tabs value={mode} onValueChange={(v) => setMode(v as DiffMode)}>
+						<TabsList aria-label="Diff view">
+							{MODES.map((m) => (
+								<TabsTrigger key={m.id} value={m.id}>
+									{m.label}
+								</TabsTrigger>
+							))}
+						</TabsList>
+					</Tabs>
 				</div>
 			</div>
 
-			{view === "unified" ? (
-				<UnifiedView
-					cells={cells}
-					type={type}
-					audioSrc={audioSrc}
-					onSegmentClick={onSegmentClick}
-				/>
-			) : (
-				<div className="space-y-3">
-					<SplitLine
-						label={targetLabel}
-						segments={targetSegments}
-						errorMap={targetErrorMap}
-						highlight={["substitute", "delete"]}
-						emptyLabel={`No ${type === "word" ? "words" : "phonemes"}`}
-						type={type}
-						audioSrc={audioSrc}
-						onSegmentClick={onSegmentClick}
-					/>
-					<SplitLine
-						label={recognizedLabel}
-						segments={recognizedSegments}
-						errorMap={recognizedErrorMap}
-						highlight={["substitute", "insert"]}
-						emptyLabel={`No ${type === "word" ? "words" : "phonemes"} detected`}
-						type={type}
-						audioSrc={audioSrc}
-						onSegmentClick={onSegmentClick}
-					/>
+			{cells.length === 0 ? (
+				<div className={cn(PANEL, "flex min-h-12 items-center justify-center")}>
+					<span className="text-muted-foreground text-sm italic">
+						Nothing to compare
+					</span>
 				</div>
+			) : mode === "blocks" ? (
+				<BlocksView {...viewProps} />
+			) : mode === "strike" ? (
+				<StrikeView {...viewProps} />
+			) : (
+				<StackedView {...viewProps} />
 			)}
 		</div>
 	);

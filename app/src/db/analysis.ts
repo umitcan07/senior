@@ -14,6 +14,7 @@ import type {
 	NewPhonemeError,
 	NewWordError,
 	PhonemeError,
+	PhoneTiming,
 	WordError,
 } from "./types";
 
@@ -123,6 +124,7 @@ export async function getAnalysisWithDetails(analysisId: string): Promise<{
 		id: string;
 		ipaTranscription: string | null;
 		textContent: string;
+		phoneTimingsJson: PhoneTiming[] | null;
 	};
 } | null> {
 	const { referenceSpeeches, userRecordings, practiceTexts } = await import(
@@ -140,6 +142,7 @@ export async function getAnalysisWithDetails(analysisId: string): Promise<{
 			reference: {
 				id: referenceSpeeches.id,
 				ipaTranscription: referenceSpeeches.ipaTranscription,
+				phoneTimingsJson: referenceSpeeches.phoneTimingsJson,
 			},
 			text: {
 				content: practiceTexts.content,
@@ -164,6 +167,7 @@ export async function getAnalysisWithDetails(analysisId: string): Promise<{
 			id: result.reference.id,
 			ipaTranscription: result.reference.ipaTranscription,
 			textContent: result.text.content,
+			phoneTimingsJson: result.reference.phoneTimingsJson,
 		},
 	};
 }

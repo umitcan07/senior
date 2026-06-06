@@ -3,7 +3,6 @@ import {
 	getAnalysisById,
 	insertAudioQualityMetrics,
 	insertPhonemeErrors,
-	insertWordErrors,
 	updateAnalysis,
 } from "@/db/analysis";
 import {
@@ -11,51 +10,10 @@ import {
 	updateAssessmentJob,
 } from "@/db/assessment-job";
 import {
+	AssessmentOutputSchema,
 	mapRunPodStatusToDb,
 	WebhookPayloadSchema,
 } from "@/lib/runpod-schemas";
-
-// Assessment output schema from mod/assessment/assess.py
-interface AssessmentOutput {
-	actual_ipa: string;
-	actual_text?: string;
-	actual_text_normalized?: string;
-	target_text_normalized?: string;
-	target_ipa: string;
-	score: number;
-	word_score?: number;
-	errors: Array<{
-		type: "substitute" | "insert" | "delete";
-		position: number;
-		expected?: string | null;
-		actual?: string | null;
-		timestamp?: {
-			start: number; // seconds
-			end: number; // seconds
-		};
-	}>;
-	signal_quality?: {
-		is_acceptable: boolean;
-		quality_score: number;
-		rms_db: number;
-		clipping_ratio: number;
-		silence_ratio: number;
-		snr_estimate_db: number;
-		duration_seconds: number;
-		warnings: string[];
-		suggestions: string[];
-	};
-	word_errors?: Array<{
-		type: "substitute" | "insert" | "delete";
-		position: number;
-		expected?: string | null;
-		actual?: string | null;
-		timestamp?: {
-			start: number;
-			end: number;
-		};
-	}>;
-}
 
 /**
  * Parse POWSM phoneme format (/a//ɪ//n/) to space-separated phonemes (a ɪ n)
@@ -143,16 +101,12 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 
 					// Update analysis based on status
 					if (analysisStatus === "completed" && output) {
-						const assessmentOutput = output as AssessmentOutput;
-
-						// Validate we have the expected output format
-						if (
-							typeof assessmentOutput.score !== "number" ||
-							!Array.isArray(assessmentOutput.errors)
-						) {
+						// Parse the worker output (scored | abstained — contract #22).
+						const parsed = AssessmentOutputSchema.safeParse(output);
+						if (!parsed.success) {
 							console.error(
 								`Invalid assessment output format for job ${id}:`,
-								output,
+								parsed.error,
 							);
 							await updateAnalysis(job.analysisId, {
 								status: "failed",
@@ -160,39 +114,21 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 							});
 							return Response.json({ success: true });
 						}
+						const assessmentOutput = parsed.data;
 
-						// Update analysis with results
-						await updateAnalysis(job.analysisId, {
-							status: "completed",
-							overallScore: assessmentOutput.score.toFixed(4),
-							phonemeScore: assessmentOutput.score.toFixed(4),
-							targetPhonemes: parsePowsmPhonemes(assessmentOutput.target_ipa),
-							recognizedPhonemes: parsePowsmPhonemes(
-								assessmentOutput.actual_ipa,
-							),
-							targetWords: assessmentOutput.target_text_normalized ?? null,
-							recognizedWords:
-								assessmentOutput.actual_text_normalized ??
-								assessmentOutput.actual_text ??
-								null,
-							wordScore: assessmentOutput.word_score?.toFixed(4) ?? null,
-							phonemeDistance: assessmentOutput.errors.length,
-							processingDurationMs: executionTime ?? null,
-						});
-
-						// Insert audio quality metrics if available
+						// Persist audio quality metrics for either branch (if present).
 						if (assessmentOutput.signal_quality) {
 							const analysis = await getAnalysisById(job.analysisId);
-							if (analysis) {
-								const sq = assessmentOutput.signal_quality;
+							const sq = assessmentOutput.signal_quality;
+							if (analysis && sq.snr_estimate_db != null) {
 								await insertAudioQualityMetrics({
 									userRecordingId: analysis.userRecordingId,
 									snrDb: sq.snr_estimate_db.toString(),
 									noiseRatio: null, // Not calculated
-									silenceRatio: sq.silence_ratio.toString(),
-									clippingRatio: sq.clipping_ratio.toString(),
+									silenceRatio: sq.silence_ratio?.toString() ?? null,
+									clippingRatio: sq.clipping_ratio?.toString() ?? null,
 									qualityStatus: sq.is_acceptable
-										? sq.warnings.length > 0
+										? (sq.warnings?.length ?? 0) > 0
 											? "warning"
 											: "accept"
 										: "reject",
@@ -200,65 +136,70 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 							}
 						}
 
-						// Insert phoneme errors (convert timestamps from seconds to milliseconds)
-						if (assessmentOutput.errors.length > 0) {
+						if (assessmentOutput.status === "abstained") {
+							// Non-happy path: store the reason, leave score columns NULL.
+							// status stays "completed"; the UI renders a banner (#38).
+							await updateAnalysis(job.analysisId, {
+								status: "completed",
+								abstentionReason: assessmentOutput.abstention.reason,
+								processingDurationMs: executionTime ?? null,
+							});
 							console.log(
-								`[Webhook] Processing ${assessmentOutput.errors.length} errors. Sample timestamp:`,
-								assessmentOutput.errors[0]?.timestamp,
+								`Assessment abstained for analysis ${job.analysisId}: ${assessmentOutput.abstention.reason}`,
 							);
-							const phonemeErrors = assessmentOutput.errors.map((err) => ({
+						} else {
+							// Scored path. Insert phoneme errors BEFORE flipping status to
+							// "completed" so the polling analysis page never reads a
+							// completed row with missing errors (the #53 race that showed
+							// a false "Perfect Pronunciation").
+							const phonemeErrorRows = assessmentOutput.errors.map((err) => ({
 								analysisId: job.analysisId,
 								errorType: err.type,
 								position: err.position,
 								expected: err.expected ?? null,
 								actual: err.actual ?? null,
-								// Convert seconds to milliseconds
+								// Convert seconds to milliseconds.
 								timestampStartMs: err.timestamp
 									? Math.round(err.timestamp.start * 1000)
 									: null,
 								timestampEndMs: err.timestamp
 									? Math.round(err.timestamp.end * 1000)
 									: null,
+								gopScore:
+									err.gop_score != null ? err.gop_score.toFixed(3) : null,
+								entropy: err.entropy != null ? err.entropy.toFixed(3) : null,
+								uncertain: err.uncertain ?? false,
 							}));
+							await insertPhonemeErrors(phonemeErrorRows);
 
-							await insertPhonemeErrors(phonemeErrors);
+							// Recognized phone timeline for the "Your Recording" overlay.
+							const recognizedPhoneTimings =
+								assessmentOutput.phones?.map((p) => ({
+									token: p.token,
+									start_ms: p.start_ms,
+									end_ms: p.end_ms,
+									gop_score: p.gop_score ?? null,
+									uncertain: p.uncertain ?? null,
+								})) ?? null;
+
+							await updateAnalysis(job.analysisId, {
+								status: "completed",
+								abstentionReason: null,
+								overallScore: assessmentOutput.score.toFixed(4),
+								phonemeScore: assessmentOutput.score.toFixed(4),
+								confidence: assessmentOutput.confidence.toFixed(4),
+								targetPhonemes: parsePowsmPhonemes(assessmentOutput.target_ipa),
+								recognizedPhonemes: parsePowsmPhonemes(
+									assessmentOutput.actual_ipa,
+								),
+								phonemeDistance: assessmentOutput.errors.length,
+								recognizedPhoneTimingsJson: recognizedPhoneTimings,
+								processingDurationMs: executionTime ?? null,
+							});
 							console.log(
-								`Inserted ${phonemeErrors.length} phoneme errors for analysis ${job.analysisId}`,
+								`Assessment completed for analysis ${job.analysisId}: score=${assessmentOutput.score.toFixed(2)}, ${phonemeErrorRows.length} errors`,
 							);
 						}
-
-						// Insert word errors
-						if (
-							assessmentOutput.word_errors &&
-							assessmentOutput.word_errors.length > 0
-						) {
-							console.log(
-								`[Webhook] Processing ${assessmentOutput.word_errors.length} word errors`,
-							);
-							const wordErrors = assessmentOutput.word_errors.map((err) => ({
-								analysisId: job.analysisId,
-								errorType: err.type,
-								position: err.position,
-								expected: err.expected ?? null,
-								actual: err.actual ?? null,
-								// Word timestamps are optional currently
-								timestampStartMs: err.timestamp
-									? Math.round(err.timestamp.start * 1000)
-									: null,
-								timestampEndMs: err.timestamp
-									? Math.round(err.timestamp.end * 1000)
-									: null,
-							}));
-
-							await insertWordErrors(wordErrors);
-							console.log(
-								`Inserted ${wordErrors.length} word errors for analysis ${job.analysisId}`,
-							);
-						}
-
-						console.log(
-							`Assessment completed for analysis ${job.analysisId}: score=${assessmentOutput.score.toFixed(2)}`,
-						);
 					} else {
 						// Update status only (for in_queue, in_progress, or failed)
 						await updateAnalysis(job.analysisId, {
