@@ -495,8 +495,6 @@ function GuestFeed() {
 
 // MAIN PAGE
 
-// MAIN PAGE
-
 function FeedPage() {
 	const { attempts, stats, commonErrors, texts } = Route.useLoaderData();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);

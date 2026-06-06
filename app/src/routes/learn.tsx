@@ -787,13 +787,8 @@ function LearningPage() {
 	const [speakerId, setSpeakerId] = useState<SpeakerId>(DEFAULT_SPEAKER);
 
 	useEffect(() => {
-		try {
-			const saved = localStorage.getItem(SPEAKER_PREF_KEY);
-			if (saved && SPEAKERS.some((s) => s.id === saved))
-				setSpeakerId(saved as SpeakerId);
-		} catch {
-			// localStorage unavailable (private mode)
-		}
+		// Read the saved speaker on the client (avoids SSR localStorage access).
+		setSpeakerId(getSavedSpeaker());
 	}, []);
 	const [playingId, setPlayingId] = useState<string | null>(null);
 	const [loadingId, setLoadingId] = useState<string | null>(null);
