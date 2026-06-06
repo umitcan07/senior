@@ -8,7 +8,6 @@ import {
 } from "@remixicon/react";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type WaveSurfer from "wavesurfer.js";
 import Regions from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +28,14 @@ export interface ErrorRegion {
 	label?: string;
 }
 
+// Display-only per-phone region (e.g. the reference's precomputed CTC phone
+// timings) drawn as a subtle labeled band under the waveform.
+export interface PhoneRegion {
+	start: number;
+	end: number;
+	label?: string;
+}
+
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 
 const ERROR_COLORS = {
@@ -37,9 +44,16 @@ const ERROR_COLORS = {
 	delete: "rgba(59, 130, 246, 0.3)",
 } as const;
 
+// Alternating subtle fills so adjacent phones stay visually separable.
+const PHONE_REGION_COLORS = [
+	"rgba(100, 116, 139, 0.07)",
+	"rgba(100, 116, 139, 0.15)",
+] as const;
+
 export interface WaveformPlayerProps {
 	src: string;
 	errorRegions?: ErrorRegion[];
+	phoneRegions?: PhoneRegion[];
 	onRegionClick?: (startMs: number, endMs: number, type: string) => void;
 	compact?: boolean;
 	className?: string;
@@ -52,6 +66,7 @@ export interface WaveformPlayerProps {
 function WaveformPlayerContent({
 	src,
 	errorRegions = [],
+	phoneRegions = [],
 	onRegionClick,
 	compact = false,
 	className,
@@ -127,6 +142,19 @@ function WaveformPlayerContent({
 		// Clear existing regions and add new ones
 		regions.clearRegions();
 
+		// Display-only phone timeline (drawn first so error regions sit on top).
+		phoneRegions.forEach((region, index) => {
+			regions.addRegion({
+				id: `phone-${index}`,
+				start: region.start,
+				end: region.end,
+				color: PHONE_REGION_COLORS[index % PHONE_REGION_COLORS.length],
+				content: region.label,
+				drag: false,
+				resize: false,
+			});
+		});
+
 		// Add error regions
 		errorRegions.forEach((region, index) => {
 			const regionId = region.id || `error-${index}`;
@@ -140,7 +168,7 @@ function WaveformPlayerContent({
 				resize: false,
 			});
 		});
-	}, [wavesurfer, isReady, errorRegions, onRegionClick]);
+	}, [wavesurfer, isReady, errorRegions, phoneRegions, onRegionClick]);
 
 	// Update playback speed
 	useEffect(() => {

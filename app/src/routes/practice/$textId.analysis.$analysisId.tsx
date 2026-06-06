@@ -2,8 +2,12 @@ import {
 	RiAlertLine,
 	RiArrowDownSLine,
 	RiArrowLeftLine,
+	RiErrorWarningLine,
+	RiMicOffLine,
 	RiPlayLine,
+	RiQuestionLine,
 	RiTimeLine,
+	RiVolumeDownLine,
 } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -24,9 +28,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { SegmentPlayer } from "@/components/ui/segment-player";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	type ErrorRegion,
+	type PhoneRegion,
 	WaveformPlayer,
 } from "@/components/ui/waveform-player";
 import type {
@@ -258,14 +262,9 @@ function ScoreRing({
 interface ScoreOverviewProps {
 	overallScore: number;
 	phonemeScore: number | null;
-	wordScore: number | null;
 }
 
-function ScoreOverview({
-	overallScore,
-	phonemeScore,
-	wordScore,
-}: ScoreOverviewProps) {
+function ScoreOverview({ overallScore, phonemeScore }: ScoreOverviewProps) {
 	const percentage = Math.round(overallScore * 100);
 	const level = getScoreLevel(percentage);
 
@@ -309,40 +308,15 @@ function ScoreOverview({
 					<div className="flex flex-col items-center gap-8">
 						<ScoreRing score={overallScore} size="xl" label="Overall Score" />
 
-						<div className="grid w-full grid-cols-2 gap-4 border-border/40 border-t pt-6">
-							<div className="flex flex-col items-center border-border/40 border-r">
-								{phonemeScore !== null ? (
-									<ScoreRing
-										score={phonemeScore}
-										size="md"
-										label="Phoneme Accuracy"
-									/>
-								) : (
-									<div className="flex flex-col items-center gap-2 opacity-50">
-										<div className="size-16 rounded-full border-4 border-muted/20" />
-										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-											Phonemes
-										</span>
-									</div>
-								)}
+						{phonemeScore !== null && (
+							<div className="flex w-full justify-center border-border/40 border-t pt-6">
+								<ScoreRing
+									score={phonemeScore}
+									size="md"
+									label="Phoneme Accuracy"
+								/>
 							</div>
-							<div className="flex flex-col items-center">
-								{wordScore !== null ? (
-									<ScoreRing
-										score={wordScore}
-										size="md"
-										label="Word Accuracy"
-									/>
-								) : (
-									<div className="flex flex-col items-center gap-2 opacity-50">
-										<div className="size-16 rounded-full border-4 border-muted/20" />
-										<span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-											Words
-										</span>
-									</div>
-								)}
-							</div>
-						</div>
+						)}
 					</div>
 				</CardContent>
 			</Card>
@@ -579,45 +553,71 @@ function ErrorItem({ error, type, audioSrc, onPlaySegment }: ErrorItemProps) {
 	);
 }
 
-// Error List with Tabs
+// Phone-level error list. (V2 is aligner-only — the ASR word-error path was
+// dropped, so this is phonemes-only.)
 interface ErrorListProps {
 	phonemeErrors: PhonemeError[];
-	wordErrors: WordError[];
 	audioSrc?: string;
 	onPlaySegment?: (startMs: number, endMs: number) => void;
+	// Only celebrate "Perfect Pronunciation" when the result is genuinely a
+	// high-scoring, content-matched recognition — not merely "zero error rows"
+	// (which a half-written / abstained row could momentarily look like).
+	perfectEligible?: boolean;
 }
 
 function ErrorList({
 	phonemeErrors,
-	wordErrors,
 	audioSrc,
 	onPlaySegment,
+	perfectEligible = false,
 }: ErrorListProps) {
-	const totalErrors = phonemeErrors.length + wordErrors.length;
+	const totalErrors = phonemeErrors.length;
 
 	if (totalErrors === 0) {
+		if (perfectEligible) {
+			return (
+				<motion.div
+					initial={{ opacity: 0, scale: 0.95 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.3, delay: 0.3 }}
+				>
+					<Card className="overflow-hidden bg-linear-to-br from-emerald-500/5 via-background to-emerald-500/10">
+						<CardContent className="py-12">
+							<div className="flex flex-col items-center gap-3 text-center">
+								<motion.div
+									className="text-5xl"
+									initial={{ scale: 0 }}
+									animate={{ scale: 1 }}
+									transition={{ type: "spring", delay: 0.5 }}
+								>
+									🎉
+								</motion.div>
+								<h3 className="font-semibold text-emerald-600 text-lg dark:text-emerald-400">
+									Perfect Pronunciation!
+								</h3>
+								<p className="text-muted-foreground text-sm">
+									No errors detected in this recording. Great job!
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+				</motion.div>
+			);
+		}
+		// Zero error rows but not a clean high-confidence result — show a neutral
+		// completion state rather than a misleading celebration.
 		return (
 			<motion.div
 				initial={{ opacity: 0, scale: 0.95 }}
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.3, delay: 0.3 }}
 			>
-				<Card className="overflow-hidden bg-linear-to-br from-emerald-500/5 via-background to-emerald-500/10">
-					<CardContent className="py-12">
-						<div className="flex flex-col items-center gap-3 text-center">
-							<motion.div
-								className="text-5xl"
-								initial={{ scale: 0 }}
-								animate={{ scale: 1 }}
-								transition={{ type: "spring", delay: 0.5 }}
-							>
-								🎉
-							</motion.div>
-							<h3 className="font-semibold text-emerald-600 text-lg dark:text-emerald-400">
-								Perfect Pronunciation!
-							</h3>
+				<Card className="overflow-hidden">
+					<CardContent className="py-10">
+						<div className="flex flex-col items-center gap-2 text-center">
+							<h3 className="font-medium text-base">Analysis complete</h3>
 							<p className="text-muted-foreground text-sm">
-								No errors detected in this recording. Great job!
+								No phone-level errors were flagged for this recording.
 							</p>
 						</div>
 					</CardContent>
@@ -641,58 +641,116 @@ function ErrorList({
 						</Badge>
 					</CardTitle>
 				</CardHeader>
-				<CardContent>
-					<Tabs defaultValue={wordErrors.length > 0 ? "words" : "phonemes"}>
-						<TabsList className="mb-4 grid w-full grid-cols-2">
-							<TabsTrigger value="words" disabled={wordErrors.length === 0}>
-								Words
-								{wordErrors.length > 0 && (
-									<Badge
-										variant="secondary"
-										className="ml-2 font-mono text-[10px]"
-									>
-										{wordErrors.length}
-									</Badge>
-								)}
-							</TabsTrigger>
-							<TabsTrigger
-								value="phonemes"
-								disabled={phonemeErrors.length === 0}
-							>
-								Phonemes
-								{phonemeErrors.length > 0 && (
-									<Badge
-										variant="secondary"
-										className="ml-2 font-mono text-[10px]"
-									>
-										{phonemeErrors.length}
-									</Badge>
-								)}
-							</TabsTrigger>
-						</TabsList>
-						<TabsContent value="words" className="flex flex-col gap-2">
-							{wordErrors.map((error) => (
-								<ErrorItem
-									key={error.id}
-									error={error}
-									type="word"
-									audioSrc={audioSrc}
-									onPlaySegment={onPlaySegment}
-								/>
-							))}
-						</TabsContent>
-						<TabsContent value="phonemes" className="flex flex-col gap-2">
-							{phonemeErrors.map((error) => (
-								<ErrorItem
-									key={error.id}
-									error={error}
-									type="phoneme"
-									audioSrc={audioSrc}
-									onPlaySegment={onPlaySegment}
-								/>
-							))}
-						</TabsContent>
-					</Tabs>
+				<CardContent className="flex flex-col gap-2">
+					{phonemeErrors.map((error) => (
+						<ErrorItem
+							key={error.id}
+							error={error}
+							type="phoneme"
+							audioSrc={audioSrc}
+							onPlaySegment={onPlaySegment}
+						/>
+					))}
+				</CardContent>
+			</Card>
+		</motion.div>
+	);
+}
+
+// Banner shown when the worker abstained from scoring (#38). Replaces the score
+// rings + diff + error list; the recording playback stays so the user can hear
+// what was captured.
+interface AbstentionContent {
+	icon: typeof RiAlertLine;
+	title: string;
+	description: string;
+}
+
+function abstentionContent(
+	reason: string,
+	snrDb?: number | null,
+): AbstentionContent {
+	switch (reason) {
+		case "no_speech":
+			return {
+				icon: RiMicOffLine,
+				title: "No speech detected",
+				description:
+					"We couldn't hear any speech in this recording. Check your microphone and try again.",
+			};
+		case "low_audio_quality":
+			return {
+				icon: RiVolumeDownLine,
+				title: "Recording too noisy",
+				description: `The audio quality was too low to analyze${
+					snrDb != null ? ` (${snrDb} dB signal-to-noise)` : ""
+				}. Move somewhere quieter and record again.`,
+			};
+		case "duration_out_of_range":
+			return {
+				icon: RiTimeLine,
+				title: "Recording length out of range",
+				description:
+					"Recordings need to be between about half a second and 25 seconds. Please record again.",
+			};
+		case "wrong_sentence":
+			return {
+				icon: RiErrorWarningLine,
+				title: "That didn't match the sentence",
+				description:
+					"What we heard didn't match the sentence we asked you to read. Make sure you're reading the prompt, then record again.",
+			};
+		case "uncertain":
+			return {
+				icon: RiQuestionLine,
+				title: "Couldn't analyze confidently",
+				description:
+					"The model wasn't confident about this recording. Try recording again, speaking clearly.",
+			};
+		default:
+			return {
+				icon: RiAlertLine,
+				title: "We couldn't score this recording",
+				description:
+					"Something about this recording prevented analysis. Please record again.",
+			};
+	}
+}
+
+function AbstentionBanner({
+	reason,
+	snrDb,
+	textId,
+}: {
+	reason: string;
+	snrDb?: number | null;
+	textId: string;
+}) {
+	const { icon: Icon, title, description } = abstentionContent(reason, snrDb);
+	return (
+		<motion.div
+			initial={{ opacity: 0, scale: 0.97 }}
+			animate={{ opacity: 1, scale: 1 }}
+			transition={{ duration: 0.3, delay: 0.1 }}
+		>
+			<Card className="overflow-hidden border-amber-500/30 bg-linear-to-br from-amber-500/5 via-background to-amber-500/10">
+				<CardContent className="py-10">
+					<div className="flex flex-col items-center gap-4 text-center">
+						<div className="flex size-14 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+							<Icon size={26} />
+						</div>
+						<div className="space-y-1.5">
+							<h3 className="font-semibold text-lg">{title}</h3>
+							<p className="mx-auto max-w-md text-muted-foreground text-sm">
+								{description}
+							</p>
+						</div>
+						<Button asChild className="mt-2">
+							<Link to="/practice/$textId" params={{ textId }}>
+								Record again
+							</Link>
+						</Button>
+					</div>
 				</CardContent>
 			</Card>
 		</motion.div>
@@ -722,7 +780,6 @@ function AnalysisPage() {
 		analysis: initialAnalysis,
 		userRecording,
 		phonemeErrors: initialLoaderPhonemeErrors,
-		wordErrors: initialLoaderWordErrors,
 		textId,
 		reference,
 		audioQualityMetrics: initialQualityMetrics,
@@ -777,7 +834,6 @@ function AnalysisPage() {
 	const qualityMetrics =
 		polledData?.audioQualityMetrics ?? initialQualityMetrics;
 	const phonemeErrors = polledData?.phonemeErrors ?? initialLoaderPhonemeErrors;
-	const wordErrors = polledData?.wordErrors ?? initialLoaderWordErrors;
 
 	const audioSrc = userRecording
 		? `/api/audio/user/${userRecording.id}`
@@ -805,6 +861,20 @@ function AnalysisPage() {
 		// Sort by start time
 		return regions.sort((a, b) => a.start - b.start);
 	}, [phonemeErrors]);
+
+	// Reference audio phone timeline (precomputed CTC timings) — display-only
+	// overlay on the reference waveform. Skip the "▁" word-boundary marker.
+	const referencePhoneRegions: PhoneRegion[] = useMemo(() => {
+		const timings = reference?.phoneTimingsJson;
+		if (!timings) return [];
+		return timings
+			.filter((p) => p.token !== "▁")
+			.map((p) => ({
+				start: p.start_ms / 1000,
+				end: p.end_ms / 1000,
+				label: p.token,
+			}));
+	}, [reference]);
 
 	if (!analysis) {
 		return (
@@ -1061,6 +1131,7 @@ function AnalysisPage() {
 								<WaveformPlayer
 									src={`/api/audio/${reference.id}`}
 									label="Reference Audio"
+									phoneRegions={referencePhoneRegions}
 								/>
 							)}
 							<WaveformPlayer
@@ -1089,74 +1160,79 @@ function AnalysisPage() {
 						</motion.div>
 					)}
 
-					{/* Score Overview */}
-					<ScoreOverview
-						overallScore={Number(analysis.overallScore)}
-						phonemeScore={
-							analysis.phonemeScore !== null
-								? Number(analysis.phonemeScore)
-								: null
-						}
-						wordScore={
-							analysis.wordScore !== null ? Number(analysis.wordScore) : null
-						}
-					/>
-
-					{/* Comparisons - stacked vertically for better readability */}
-					<motion.div
-						className="flex flex-col gap-6"
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.4, delay: 0.15 }}
-					>
-						{/* Shared Legend */}
-						{(wordErrors?.length > 0 || phonemeErrors?.length > 0) && (
-							<div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
-								<span className="text-muted-foreground/70">Legend:</span>
-								<span className="flex items-center gap-1">
-									<span className="size-1.5 rounded-full bg-destructive/60" />
-									Substitution
-								</span>
-								<span className="flex items-center gap-1">
-									<span className="size-1.5 rounded-full bg-emerald-500/60" />
-									Insertion
-								</span>
-								<span className="flex items-center gap-1">
-									<span className="size-1.5 rounded-full bg-amber-500/60" />
-									Deletion
-								</span>
-							</div>
-						)}
-
-						{analysis.targetPhonemes && (
-							<DiffViewer
-								target={analysis.targetPhonemes}
-								recognized={analysis.recognizedPhonemes || ""}
-								errors={phonemeErrors ?? []}
-								type="phoneme"
-								audioSrc={audioSrc}
-								onSegmentClick={handlePlaySegment}
+					{analysis.abstentionReason ? (
+						/* Non-happy path: show a banner instead of a (misleading) score. */
+						<AbstentionBanner
+							reason={analysis.abstentionReason}
+							snrDb={
+								qualityMetrics?.snrDb != null
+									? Number(qualityMetrics.snrDb)
+									: null
+							}
+							textId={textId}
+						/>
+					) : (
+						<>
+							{/* Score Overview */}
+							<ScoreOverview
+								overallScore={Number(analysis.overallScore)}
+								phonemeScore={
+									analysis.phonemeScore !== null
+										? Number(analysis.phonemeScore)
+										: null
+								}
 							/>
-						)}
-						{analysis.targetWords && (
-							<DiffViewer
-								target={analysis.targetWords}
-								recognized={analysis.recognizedWords || ""}
-								errors={wordErrors ?? []}
-								type="word"
-								audioSrc={audioSrc}
-								onSegmentClick={handlePlaySegment}
-							/>
-						)}
-					</motion.div>
 
-					{/* Error List */}
-					<ErrorList
-						phonemeErrors={phonemeErrors ?? []}
-						wordErrors={wordErrors ?? []}
-						audioSrc={audioSrc}
-						onPlaySegment={handlePlaySegment}
-					/>
+							{/* Comparisons - stacked vertically for better readability */}
+							<motion.div
+								className="flex flex-col gap-6"
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.4, delay: 0.15 }}
+							>
+								{/* Shared Legend */}
+								{phonemeErrors?.length > 0 && (
+									<div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
+										<span className="text-muted-foreground/70">Legend:</span>
+										<span className="flex items-center gap-1">
+											<span className="size-1.5 rounded-full bg-destructive/60" />
+											Substitution
+										</span>
+										<span className="flex items-center gap-1">
+											<span className="size-1.5 rounded-full bg-emerald-500/60" />
+											Insertion
+										</span>
+										<span className="flex items-center gap-1">
+											<span className="size-1.5 rounded-full bg-amber-500/60" />
+											Deletion
+										</span>
+									</div>
+								)}
+
+								{analysis.targetPhonemes && (
+									<DiffViewer
+										target={analysis.targetPhonemes}
+										recognized={analysis.recognizedPhonemes || ""}
+										errors={phonemeErrors ?? []}
+										type="phoneme"
+										audioSrc={audioSrc}
+										onSegmentClick={handlePlaySegment}
+									/>
+								)}
+							</motion.div>
+
+							{/* Error List */}
+							<ErrorList
+								phonemeErrors={phonemeErrors ?? []}
+								audioSrc={audioSrc}
+								onPlaySegment={handlePlaySegment}
+								perfectEligible={
+									Number(analysis.overallScore) >= 0.95 &&
+									!!analysis.recognizedPhonemes
+								}
+							/>
+						</>
+					)}
 
 					{/* Actions */}
 					<motion.div
