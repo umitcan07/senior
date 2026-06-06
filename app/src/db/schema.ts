@@ -19,6 +19,10 @@ export const generationMethodEnum = pgEnum("generation_method", [
 	"native",
 ]);
 export const ipaMethodEnum = pgEnum("ipa_method", ["powsm", "cmudict"]);
+// Reference dialect. Values match data/authors.json + mod/dev/verify.py (genam/rp),
+// not the us/uk in the original #23 brief. The E7 selector (#36) renders US/UK labels
+// but filters on these values.
+export const dialectEnum = pgEnum("dialect", ["genam", "rp"]);
 export const recordingMethodEnum = pgEnum("recording_method", [
 	"upload",
 	"record",
@@ -28,9 +32,12 @@ export const qualityStatusEnum = pgEnum("quality_status", [
 	"warning",
 	"reject",
 ]);
+// `mfa` and `wav2textgrid` are V1-only, kept for historical rows. V2 writes
+// `powsm_ctc` (added in E1 / #13). See doc/db.md.
 export const alignmentMethodEnum = pgEnum("alignment_method", [
 	"mfa",
 	"wav2textgrid",
+	"powsm_ctc",
 ]);
 export const errorTypeEnum = pgEnum("error_type", [
 	"substitute",
@@ -90,15 +97,18 @@ export const practiceTexts = pgTable(
 );
 
 /**
- * Authors/voices for reference speeches (TTS or native speakers)
+ * Authors/voices for reference speeches (native speakers)
  */
 export const authors = pgTable("authors", {
 	id: uuid("id").primaryKey().defaultRandom(),
+	// Stable external key from data/authors.json (e.g. "genam_jordan"). Nullable
+	// so pre-existing V1 author rows (no slug) are unaffected; unique so ingest can
+	// upsert idempotently on it.
+	slug: varchar("slug", { length: 100 }).unique(),
 	name: varchar("name", { length: 255 }).notNull(),
 	accent: varchar("accent", { length: 50 }),
 	style: varchar("style", { length: 50 }),
 	languageCode: varchar("language_code", { length: 10 }),
-	elevenlabsVoiceId: varchar("elevenlabs_voice_id", { length: 255 }),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -118,8 +128,22 @@ export const referenceSpeeches = pgTable(
 			.notNull()
 			.references(() => practiceTexts.id),
 		generationMethod: generationMethodEnum("generation_method").notNull(),
+		// Nullable so V1 TTS rows (no dialect) stay valid.
+		dialect: dialectEnum("dialect"),
 		ipaTranscription: text("ipa_transcription"),
 		ipaMethod: ipaMethodEnum("ipa_method"),
+		// Cached POWSMAligner free_alignment output: array of
+		// { token, start_ms, end_ms, confidence }. Read by the assess path so it
+		// doesn't recompute reference alignment on every call.
+		phoneTimingsJson:
+			jsonb("phone_timings_json").$type<
+				Array<{
+					token: string;
+					start_ms: number;
+					end_ms: number;
+					confidence: number;
+				}>
+			>(),
 		priority: integer("priority").default(0),
 		durationMs: integer("duration_ms"),
 		fileSizeBytes: integer("file_size_bytes"),
@@ -132,6 +156,7 @@ export const referenceSpeeches = pgTable(
 	(table) => [
 		index("idx_reference_speeches_author_id").on(table.authorId),
 		index("idx_reference_speeches_text_id").on(table.textId),
+		index("idx_reference_speeches_dialect").on(table.dialect),
 	],
 );
 
@@ -225,7 +250,7 @@ export const analyses = pgTable(
 );
 
 /**
- * Alignment data storage (TextGrid files)
+ * Alignment data storage (V1; alignment via the alignment_method enum)
  */
 export const alignments = pgTable("alignments", {
 	id: uuid("id").primaryKey().defaultRandom(),
@@ -264,6 +289,11 @@ export const phonemeErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by current
+		// code but present in the live DB; kept here so schema.ts matches the
+		// database and a `db:push` doesn't drop them.
+		targetPosition: integer("target_position"),
+		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 10 }),
 		actual: varchar("actual", { length: 10 }),
 		timestampStartMs: integer("timestamp_start_ms"),
@@ -290,6 +320,11 @@ export const wordErrors = pgTable(
 			.references(() => analyses.id, { onDelete: "cascade" }),
 		errorType: errorTypeEnum("error_type").notNull(),
 		position: integer("position").notNull(),
+		// Legacy V1 columns (added in 0009_chief_tiger_shark). Unused by current
+		// code but present in the live DB; kept here so schema.ts matches the
+		// database and a `db:push` doesn't drop them.
+		targetPosition: integer("target_position"),
+		actualPosition: integer("actual_position"),
 		expected: varchar("expected", { length: 100 }),
 		actual: varchar("actual", { length: 100 }),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -384,5 +419,3 @@ export const assessmentJobs = pgTable(
 		index("idx_assessment_jobs_status").on(table.status),
 	],
 );
-
-

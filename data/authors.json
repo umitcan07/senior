@@ -1,0 +1,10 @@
+{
+  "_note": "Author / speaker metadata — hand-maintained, the source of truth for who recorded what. Author id convention: <dialect>_<name> for reference voices; test users get any short id. kind=reference -> native voice talent (has a dialect); kind=test_user -> learners / your own attempts. Each reference order in data/fiverr/<id>.wav holds BOTH the 25 sentences and the 40 /learn words. Add/rename authors here, then run scripts/gen_cutsheet.py.",
+  "authors": {
+    "genam_jordan": { "kind": "reference", "dialect": "genam", "name": "Jordan", "accent": "General American", "source": "fiverr" },
+    "genam_katherine": { "kind": "reference", "dialect": "genam", "name": "Katherine", "accent": "General American", "source": "fiverr" },
+    "genam_teyanna": { "kind": "reference", "dialect": "genam", "name": "Teyanna", "accent": "General American", "source": "fiverr" },
+    "rp_jon": { "kind": "reference", "dialect": "rp", "name": "Jon", "accent": "Received Pronunciation", "source": "fiverr" },
+    "umit": { "kind": "test_user", "l1": "tr", "name": "Umit" }
+  }
+}

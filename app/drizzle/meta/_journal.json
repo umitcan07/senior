@@ -64,6 +64,34 @@
       "when": 1768154135395,
       "tag": "0008_elite_photon",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1768154135395,
+      "tag": "0009_chief_tiger_shark",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1768154135396,
+      "tag": "0010_remove_elevenlabs_voice_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1780618523799,
+      "tag": "0011_elite_the_enforcers",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1780671427868,
+      "tag": "0012_deep_blue_shield",
+      "breakpoints": true
     }
   ]
 }

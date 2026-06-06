@@ -20,6 +20,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { TextDifficulty, TextType } from "@/db/types";
+import { DIALECTS } from "@/lib/dialect";
 import { getScoreLevel } from "@/lib/score";
 import { cn, formatRelativeTime } from "@/lib/utils";
 
@@ -116,9 +117,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 					<TableHeader>
 						<TableRow className="hover:bg-transparent">
 							<TableHead>Content</TableHead>
-							<TableHead className="hidden w-24 sm:table-cell">
-								Difficulty
-							</TableHead>
 							<TableHead className="hidden w-20 text-right md:table-cell">
 								Voices
 							</TableHead>
@@ -146,10 +144,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 												<span className="text-muted-foreground text-xs uppercase tracking-widest">
 													{getTypeLabel(text.type)}
 												</span>
-												{/* Show difficulty inline on mobile */}
-												<span className="text-muted-foreground text-xs capitalize sm:hidden">
-													· {text.difficulty}
-												</span>
 											</div>
 											<p className="line-clamp-2 break-words font-medium text-foreground/90 text-sm sm:text-base">
 												{text.content}
@@ -157,11 +151,19 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											{/* Show score inline on mobile */}
 											<div className="flex items-center gap-3 text-muted-foreground text-xs md:hidden">
 												<div className="flex items-center gap-2 tabular-nums">
-													<div className="flex items-center gap-1">
-														<span>🇺🇸</span> {text.usCount ?? 0}
+													<div
+														className="flex items-center gap-1"
+														title={`${DIALECTS.us.label} voices`}
+													>
+														<span className={`fi fi-${DIALECTS.us.flag}`} />{" "}
+														{text.usCount ?? 0}
 													</div>
-													<div className="flex items-center gap-1">
-														<span>🇬🇧</span> {text.ukCount ?? 0}
+													<div
+														className="flex items-center gap-1"
+														title={`${DIALECTS.uk.label} voices`}
+													>
+														<span className={`fi fi-${DIALECTS.uk.flag}`} />{" "}
+														{text.ukCount ?? 0}
 													</div>
 												</div>
 												{text.bestScore != null && (
@@ -183,27 +185,22 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 										</div>
 									</div>
 								</TableCell>
-								<TableCell className="hidden sm:table-cell">
-									<span className="text-muted-foreground text-sm capitalize">
-										{text.difficulty}
-									</span>
-								</TableCell>
 								<TableCell className="hidden text-right md:table-cell">
 									<div className="flex items-center justify-end gap-3 text-muted-foreground">
 										<div
 											className="flex items-center gap-1.5"
-											title="US Voices"
+											title={`${DIALECTS.us.label} voices`}
 										>
-											<span className="text-base">🇺🇸</span>
+											<span className={`fi fi-${DIALECTS.us.flag} text-base`} />
 											<span className="font-medium text-sm tabular-nums">
 												{text.usCount ?? 0}
 											</span>
 										</div>
 										<div
 											className="flex items-center gap-1.5"
-											title="UK Voices"
+											title={`${DIALECTS.uk.label} voices`}
 										>
-											<span className="text-base">🇬🇧</span>
+											<span className={`fi fi-${DIALECTS.uk.flag} text-base`} />
 											<span className="font-medium text-sm tabular-nums">
 												{text.ukCount ?? 0}
 											</span>

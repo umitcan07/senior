@@ -1,8 +1,8 @@
 "use client";
 
+import { RiAlertLine } from "@remixicon/react";
 import React, { Component, type ReactNode } from "react";
 import { Button } from "./button";
-import { RiAlertLine } from "@remixicon/react";
 
 interface Props {
 	children: ReactNode;

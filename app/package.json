@@ -2,6 +2,10 @@
 	"name": "app",
 	"private": true,
 	"type": "module",
+	"packageManager": "pnpm@11.2.2",
+	"engines": {
+		"node": ">=22"
+	},
 	"scripts": {
 		"dev": "vite dev --port 3000 --host",
 		"build": "vite build",
@@ -66,6 +70,7 @@
 		"cmdk": "^1.1.1",
 		"drizzle-kit": "^0.30.0",
 		"drizzle-orm": "^0.39.0",
+		"flag-icons": "^7.5.0",
 		"motion": "^12.23.26",
 		"pg": "^8.11.0",
 		"react": "^19.2.3",

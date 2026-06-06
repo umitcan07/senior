@@ -12,6 +12,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { THEME_STORAGE_KEY } from "@/lib/constants";
 import ClerkProvider from "../integrations/clerk/provider";
 import appCss from "../styles.css?url";
+import "flag-icons/css/flag-icons.min.css";
 import "remixicon/fonts/remixicon.css";
 
 interface MyRouterContext {
@@ -163,10 +164,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<body>
 					<ThemeInitializer />
 					<ThemeProvider>
-
 						{children}
 						<Toaster />
-
 					</ThemeProvider>
 					<Scripts />
 				</body>

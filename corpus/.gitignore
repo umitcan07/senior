@@ -1,0 +1,9 @@
+# Raw WAV/TextGrid drop from EXMARALDA (~3 GB+). Keep locally; set CORPUS_RAW_DIR.
+raw/
+
+# Gate pipeline outputs (regenerated).
+processed/**
+!processed/.gitkeep
+
+# Ad-hoc analysis captures.
+reports/

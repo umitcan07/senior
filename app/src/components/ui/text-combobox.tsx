@@ -83,8 +83,7 @@ export function TextCombobox({
 									<div className="flex flex-col gap-0.5 overflow-hidden">
 										<span className="truncate text-sm">{text.content}</span>
 										<span className="text-muted-foreground text-xs">
-											{text.difficulty} • {text.type.replace("_", " ")} •{" "}
-											{text.wordCount} words
+											{text.type.replace("_", " ")} • {text.wordCount} words
 										</span>
 									</div>
 								</CommandItem>

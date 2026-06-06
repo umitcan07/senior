@@ -1,4 +1,4 @@
-import { RiCloudLine, RiMicLine, RiUploadLine } from "@remixicon/react";
+import { RiMicLine, RiUploadLine } from "@remixicon/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -27,14 +27,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TextCombobox } from "@/components/ui/text-combobox";
 import type { Author } from "@/db/author";
 import type { PracticeText } from "@/db/text";
 import { useToast } from "@/hooks/use-toast";
-import { serverGenerateSpeech, serverInsertReference } from "@/lib/reference";
+import { serverInsertReference } from "@/lib/reference";
 import { cn } from "@/lib/utils";
 
 interface AddReferenceDialogProps {
@@ -61,24 +58,10 @@ export function AddReferenceDialog({
 	);
 	const [authorId, setAuthorId] = useState("");
 	const [file, setFile] = useState<File | null>(null);
-	const [activeTab, setActiveTab] = useState("upload");
-	const [stability, setStability] = useState(0.5);
-	const [similarityBoost, setSimilarityBoost] = useState(0.75);
-	const [voiceStyle, setVoiceStyle] = useState(0.0);
-	const [useSpeakerBoost, setUseSpeakerBoost] = useState(true);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const queryClient = useQueryClient();
 	const insertReferenceFn = useServerFn(serverInsertReference);
-	const generateSpeechFn = useServerFn(serverGenerateSpeech);
 	const { toast } = useToast();
-
-	const selectedAuthor = authorId
-		? authors.find((a) => a.id === authorId)
-		: null;
-	const canUseElevenLabs =
-		selectedAuthor?.elevenlabsVoiceId !== null &&
-		selectedAuthor?.elevenlabsVoiceId !== undefined &&
-		selectedAuthor.elevenlabsVoiceId.trim() !== "";
 
 	// Reset form when dialog opens
 	useEffect(() => {
@@ -86,46 +69,17 @@ export function AddReferenceDialog({
 			setTextId(preSelectedTextId ?? null);
 			setAuthorId("");
 			setFile(null);
-			// Default to ElevenLabs if available, otherwise upload
-			// Will be set properly when author is selected
-			setActiveTab("eleven_labs");
-			setStability(0.5);
-			setSimilarityBoost(0.5);
-			setVoiceStyle(0.5);
-			setUseSpeakerBoost(false); // enhance: false
 		}
 	}, [open, preSelectedTextId]);
-
-	// Switch to upload tab if ElevenLabs becomes unavailable
-	useEffect(() => {
-		if (activeTab === "eleven_labs" && !canUseElevenLabs && authorId) {
-			setActiveTab("upload");
-		}
-	}, [activeTab, canUseElevenLabs, authorId]);
 
 	const { mutate: createReference, isPending } = useMutation({
 		mutationFn: async () => {
 			if (!textId) throw new Error("Text is required");
 			if (!authorId) throw new Error("Author is required");
 
-			// If using ElevenLabs, generate speech
-			if (activeTab === "eleven_labs") {
-				return generateSpeechFn({
-					data: {
-						textId,
-						authorId,
-						voiceSettings: {
-							stability,
-							similarityBoost,
-							style: voiceStyle,
-							useSpeakerBoost,
-						},
-					},
-				});
-			}
-
-			// Otherwise, upload file (native)
-			const storageKey = `references/${textId}/${authorId}/${Date.now()}.wav`;
+			const ext =
+				file?.name.match(/\.(wav|mp3|m4a|ogg)$/i)?.[0].toLowerCase() ?? ".wav";
+			const storageKey = `references/${textId}/${authorId}/${Date.now()}${ext}`;
 			return insertReferenceFn({
 				data: {
 					storageKey,
@@ -161,8 +115,7 @@ export function AddReferenceDialog({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!textId || !authorId) return;
-		if (activeTab === "upload" && !file) return;
+		if (!textId || !authorId || !file) return;
 		createReference();
 	};
 
@@ -213,12 +166,7 @@ export function AddReferenceDialog({
 		};
 	}, [audioPreviewUrl]);
 
-	const canSubmit =
-		textId &&
-		authorId &&
-		(activeTab === "eleven_labs"
-			? canUseElevenLabs
-			: activeTab === "upload" && file);
+	const canSubmit = textId && authorId && file;
 
 	const selectedText = textId ? texts.find((t) => t.id === textId) : null;
 
@@ -233,7 +181,7 @@ export function AddReferenceDialog({
 								For: "{selectedText.content.slice(0, 80)}..."
 							</span>
 						) : (
-							"Upload an audio file or generate with ElevenLabs."
+							"Upload a human voice recording for this text."
 						)}
 					</DialogDescription>
 				</DialogHeader>
@@ -289,235 +237,90 @@ export function AddReferenceDialog({
 						</Select>
 					</div>
 
-					{/* Upload Method Tabs */}
-					<Tabs
-						value={activeTab}
-						onValueChange={setActiveTab}
-						className="w-full"
-					>
-						<TabsList className="grid w-full grid-cols-2">
-							<TabsTrigger value="upload" className="gap-2">
-								<RiUploadLine size={16} />
-								File Upload
-							</TabsTrigger>
-							<TabsTrigger
-								value="eleven_labs"
-								className="gap-2"
-								disabled={!canUseElevenLabs && !!authorId}
-							>
-								<RiCloudLine size={16} />
-								ElevenLabs
-							</TabsTrigger>
-						</TabsList>
-						<TabsContent value="upload" className="mt-4 space-y-4">
-							<div
-								className={cn(
-									"flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors",
-									file
-										? "border-primary/50 bg-primary/5"
-										: "border-muted-foreground/25",
-								)}
-							>
-								{file && audioPreviewUrl ? (
-									<div className="flex w-full flex-col gap-4">
-										<div className="flex items-center gap-3">
-											<RiMicLine className="h-6 w-6 shrink-0 text-primary" />
-											<div className="min-w-0 flex-1">
-												<p className="truncate font-medium text-sm">
-													{file.name}
-												</p>
-												<p className="text-muted-foreground text-xs">
-													{(file.size / 1024 / 1024).toFixed(2)} MB
-												</p>
-											</div>
-											<Button
-												type="button"
-												variant="outline"
-												size="sm"
-												onClick={() => {
-													setFile(null);
-													if (fileInputRef.current) {
-														fileInputRef.current.value = "";
-													}
-												}}
-											>
-												Remove
-											</Button>
-										</div>
-										<AudioPlayerProvider>
-											<div className="flex items-center gap-3">
-												<AudioPlayerButton
-													item={{
-														id: "preview",
-														src: audioPreviewUrl,
-													}}
-													variant="outline"
-													size="icon"
-												/>
-												<AudioPlayerProgress className="flex-1" />
-												<div className="flex items-center gap-1 text-muted-foreground text-xs">
-													<AudioPlayerTime />
-													<span>/</span>
-													<AudioPlayerDuration />
-												</div>
-											</div>
-										</AudioPlayerProvider>
-									</div>
-								) : (
-									<div className="flex flex-col items-center gap-2 text-center">
-										<RiUploadLine className="h-8 w-8 text-muted-foreground" />
-										<div>
-											<p className="font-medium">Drop audio file here</p>
-											<p className="text-muted-foreground text-sm">
-												WAV, MP3, M4A, OGG (max 10MB)
+					{/* File Upload */}
+					<div className="space-y-2">
+						<Label>Audio File</Label>
+						<div
+							className={cn(
+								"flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors",
+								file
+									? "border-primary/50 bg-primary/5"
+									: "border-muted-foreground/25",
+							)}
+						>
+							{file && audioPreviewUrl ? (
+								<div className="flex w-full flex-col gap-4">
+									<div className="flex items-center gap-3">
+										<RiMicLine className="h-6 w-6 shrink-0 text-primary" />
+										<div className="min-w-0 flex-1">
+											<p className="truncate font-medium text-sm">
+												{file.name}
+											</p>
+											<p className="text-muted-foreground text-xs">
+												{(file.size / 1024 / 1024).toFixed(2)} MB
 											</p>
 										</div>
 										<Button
 											type="button"
 											variant="outline"
 											size="sm"
-											onClick={() => fileInputRef.current?.click()}
+											onClick={() => {
+												setFile(null);
+												if (fileInputRef.current) {
+													fileInputRef.current.value = "";
+												}
+											}}
 										>
-											Browse Files
+											Remove
 										</Button>
 									</div>
-								)}
-								<input
-									ref={fileInputRef}
-									type="file"
-									accept=".wav,.mp3,.m4a,.ogg,audio/*"
-									onChange={handleFileChange}
-									className="hidden"
-								/>
-							</div>
-						</TabsContent>
-						<TabsContent value="eleven_labs" className="mt-4">
-							{canUseElevenLabs ? (
-								<div className="flex flex-col gap-6">
-									<div className="flex flex-col items-center justify-center gap-4 rounded-lg bg-muted/30 p-6 text-center">
-										<RiCloudLine className="h-12 w-12 text-primary" />
-										<div>
-											<p className="font-medium">ElevenLabs TTS Generation</p>
-											<p className="text-muted-foreground text-sm">
-												Generate speech using{" "}
-												{selectedAuthor?.name || "selected author"}'s voice
-											</p>
-											{selectedText && (
-												<p className="mt-2 text-muted-foreground text-xs">
-													Text: "{selectedText.content.slice(0, 60)}
-													{selectedText.content.length > 60 ? "..." : ""}"
-												</p>
-											)}
-										</div>
-									</div>
-
-									<div className="border-t pt-4">
-										<h3 className="mb-4 font-semibold text-sm">
-											Voice Settings
-										</h3>
-										<div className="flex flex-col gap-6">
-											<div className="space-y-2">
-												<div className="flex items-center justify-between">
-													<Label htmlFor="stability">Stability</Label>
-													<span className="text-muted-foreground text-sm">
-														{(stability * 100).toFixed(0)}%
-													</span>
-												</div>
-												<Slider
-													id="stability"
-													min={0}
-													max={1}
-													step={0.01}
-													value={[stability]}
-													onValueChange={(value) => setStability(value[0])}
-												/>
-												<p className="text-muted-foreground text-xs">
-													Controls voice consistency. Higher values produce more
-													stable speech.
-												</p>
-											</div>
-
-											<div className="space-y-2">
-												<div className="flex items-center justify-between">
-													<Label htmlFor="similarityBoost">
-														Similarity Boost
-													</Label>
-													<span className="text-muted-foreground text-sm">
-														{(similarityBoost * 100).toFixed(0)}%
-													</span>
-												</div>
-												<Slider
-													id="similarityBoost"
-													min={0}
-													max={1}
-													step={0.01}
-													value={[similarityBoost]}
-													onValueChange={(value) =>
-														setSimilarityBoost(value[0])
-													}
-												/>
-												<p className="text-muted-foreground text-xs">
-													How closely the AI adheres to the original voice.
-												</p>
-											</div>
-
-											<div className="space-y-2">
-												<div className="flex items-center justify-between">
-													<Label htmlFor="voiceStyle">Style</Label>
-													<span className="text-muted-foreground text-sm">
-														{(voiceStyle * 100).toFixed(0)}%
-													</span>
-												</div>
-												<Slider
-													id="voiceStyle"
-													min={0}
-													max={1}
-													step={0.01}
-													value={[voiceStyle]}
-													onValueChange={(value) => setVoiceStyle(value[0])}
-												/>
-												<p className="text-muted-foreground text-xs">
-													Adjusts voice expressiveness and emotional variation.
-												</p>
-											</div>
-
-											<div className="flex items-center justify-between">
-												<div className="space-y-0.5">
-													<Label htmlFor="useSpeakerBoost">Speaker Boost</Label>
-													<p className="text-muted-foreground text-xs">
-														Enhances voice clarity and quality.
-													</p>
-												</div>
-												<Switch
-													id="useSpeakerBoost"
-													checked={useSpeakerBoost}
-													onCheckedChange={setUseSpeakerBoost}
-												/>
+									<AudioPlayerProvider>
+										<div className="flex items-center gap-3">
+											<AudioPlayerButton
+												item={{
+													id: "preview",
+													src: audioPreviewUrl,
+												}}
+												variant="outline"
+												size="icon"
+											/>
+											<AudioPlayerProgress className="flex-1" />
+											<div className="flex items-center gap-1 text-muted-foreground text-xs">
+												<AudioPlayerTime />
+												<span>/</span>
+												<AudioPlayerDuration />
 											</div>
 										</div>
-									</div>
+									</AudioPlayerProvider>
 								</div>
 							) : (
-								<div className="flex flex-col items-center justify-center gap-4 rounded-lg bg-muted/30 p-6 text-center">
-									<RiCloudLine className="h-12 w-12 text-muted-foreground/50" />
+								<div className="flex flex-col items-center gap-2 text-center">
+									<RiUploadLine className="h-8 w-8 text-muted-foreground" />
 									<div>
-										<p className="font-medium">ElevenLabs Not Available</p>
+										<p className="font-medium">Drop audio file here</p>
 										<p className="text-muted-foreground text-sm">
-											{selectedAuthor
-												? "Selected author does not have an ElevenLabs voice ID configured."
-												: "Select an author with an ElevenLabs voice ID to generate speech."}
+											WAV, MP3, M4A, OGG (max 10MB)
 										</p>
 									</div>
-									<Link
-										to="/admin/authors"
-										className="text-primary text-sm underline"
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => fileInputRef.current?.click()}
 									>
-										Configure author voice ID
-									</Link>
+										Browse Files
+									</Button>
 								</div>
 							)}
-						</TabsContent>
-					</Tabs>
+							<input
+								ref={fileInputRef}
+								type="file"
+								accept=".wav,.mp3,.m4a,.ogg,audio/*"
+								onChange={handleFileChange}
+								className="hidden"
+							/>
+						</div>
+					</div>
 
 					<DialogFooter>
 						<Button

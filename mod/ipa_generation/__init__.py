@@ -1,2 +1,0 @@
-# IPA Generation Endpoint
-

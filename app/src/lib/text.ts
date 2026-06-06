@@ -163,7 +163,6 @@ export const serverGetPracticeTextsWithAttemptStats = createServerFn({
 	method: "GET",
 }).handler(async (): Promise<ApiResponse<PracticeTextWithAttemptStats[]>> => {
 	try {
-
 		// Get authenticated userId from Clerk (optional for this endpoint)
 		let userId: string | null = null;
 		try {

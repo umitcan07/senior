@@ -214,7 +214,7 @@ export function getPublicUrl(key: string): string {
 		const cleanKey = key.startsWith("/") ? key.slice(1) : key;
 		return `${baseUrl}/${cleanKey}`;
 	}
-	
+
 	// Fallback to S3 endpoint (which likely fails for public access without auth)
 	return `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET_NAME}/${key}`;
 }

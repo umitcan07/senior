@@ -1,0 +1,107 @@
+{
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Agent",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git tag *)",
+      "Bash(git stash *)",
+      "Bash(git rebase *)",
+      "Bash(npm *)",
+      "Bash(pnpm *)",
+      "Bash(yarn *)",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(touch *)",
+      "Bash(echo *)",
+      "Bash(test *)",
+      "Bash(true)",
+      "Bash(false)",
+      "PowerShell",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "TaskList",
+      "Workflow",
+      "Agent",
+      "ScheduleWakeup",
+      "Monitor"
+    ],
+    "deny": [
+      "Bash(git reset --hard *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git branch -D *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -f *)",
+      "Bash(sudo *)",
+      "PowerShell(Remove-Item -Recurse *)",
+      "PowerShell(Remove-Item -R *)",
+      "PowerShell(Remove-Item -Force *)",
+      "PowerShell(rm -Recurse *)",
+      "PowerShell(rm -R *)",
+      "PowerShell(rm -Force *)",
+      "PowerShell(Clear-Content *)",
+      "PowerShell(Stop-Process -Force *)",
+      "PowerShell(Stop-Process -Kill *)",
+      "PowerShell(Remove-Variable *)",
+      "PowerShell(Remove-Module *)",
+      "PowerShell(git reset --hard *)",
+      "PowerShell(git push --force *)",
+      "PowerShell(git push -f *)",
+      "PowerShell(git branch -D *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)",
+      "Bash(pnpm db:push)",
+      "Bash(npm run db:push)",
+      "Bash(scripts/migrate.ts)",
+      "PowerShell(git push *)",
+      "PowerShell(git pull *)",
+      "PowerShell(git merge *)",
+      "PowerShell(Invoke-WebRequest *)",
+      "PowerShell(Invoke-RestMethod *)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Restart-Computer *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PROJECT_DIR}\\.claude\\hooks\\copy-env-on-session-start.ps1\"",
+            "timeout": 15,
+            "statusMessage": "Seeding app/.env in worktree..."
+          }
+        ]
+      }
+    ]
+  }
+}

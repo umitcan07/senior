@@ -11,7 +11,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME_IPA: ipa-generation
   IMAGE_NAME_ASSESSMENT: assessment
 
 jobs:
@@ -36,19 +35,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for IPA generation image
-        id: meta-ipa
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_IPA }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
       - name: Extract metadata for assessment image
         id: meta-assessment
         uses: docker/metadata-action@v5
@@ -61,18 +47,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push IPA generation image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./mod
-          file: ./mod/ipa_generation/Dockerfile
-          push: true
-          tags: ${{ steps.meta-ipa.outputs.tags }}
-          labels: ${{ steps.meta-ipa.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
 
       - name: Build and push assessment image
         uses: docker/build-push-action@v5

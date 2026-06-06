@@ -9,8 +9,8 @@ import {
 	RiSearch2Line,
 	RiStackLine,
 } from "@remixicon/react";
-import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
@@ -41,8 +41,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { TextDifficulty, TextType } from "@/db/types";
+import type { TextType } from "@/db/types";
 import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
 import { cn } from "@/lib/utils";
 import {
@@ -62,34 +61,6 @@ const categoryTypes: Array<TextType | "all"> = [
 	"phonetic_challenge",
 	"common_phrase",
 ];
-
-// Difficulty config
-const difficultyConfig: Array<{
-	value: TextDifficulty | "all";
-	label: string;
-	color: string;
-}> = [
-		{
-			value: "all",
-			label: "All",
-			color: "text-muted-foreground",
-		},
-		{
-			value: "beginner",
-			label: "Beginner",
-			color: "text-green-500",
-		},
-		{
-			value: "intermediate",
-			label: "Intermediate",
-			color: "text-amber-500",
-		},
-		{
-			value: "advanced",
-			label: "Advanced",
-			color: "text-red-500",
-		},
-	];
 
 interface CategoryCardProps {
 	type: TextType | "all";
@@ -122,57 +93,11 @@ function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
 					: "opacity-70 hover:scale-[1.02] hover:opacity-100 active:scale-[0.98]",
 			)}
 		>
-			<Icon
-				className="size-5 shrink-0 text-white/80"
-				strokeWidth={1.5}
-			/>
+			<Icon className="size-5 shrink-0 text-white/80" strokeWidth={1.5} />
 			<span className="truncate font-medium text-sm text-white leading-tight tracking-tight">
 				{categoryLabels[type]}
 			</span>
 		</button>
-	);
-}
-
-interface DifficultySwitcherProps {
-	value: TextDifficulty | "all";
-	onChange: (value: TextDifficulty | "all") => void;
-}
-
-function DifficultySwitcher({ value, onChange }: DifficultySwitcherProps) {
-	const validValues = [
-		"all",
-		"beginner",
-		"intermediate",
-		"advanced",
-	] as const satisfies ReadonlyArray<TextDifficulty | "all">;
-
-	const isValidValue = (v: string): v is TextDifficulty | "all" => {
-		return (validValues as ReadonlyArray<string>).includes(v);
-	};
-
-	return (
-		<Tabs
-			value={value}
-			onValueChange={(v) => {
-				if (isValidValue(v)) {
-					onChange(v);
-				}
-			}}
-			className="w-full"
-		>
-			<TabsList className="w-full">
-				{difficultyConfig.map((item) => {
-					const isActive = value === item.value;
-					return (
-						<TabsTrigger key={item.value} value={item.value} className="flex-1 text-xs sm:text-sm">
-							<span className={isActive ? item.color : undefined}>
-								{item.label}
-							</span>
-						</TabsTrigger>
-					);
-				})}
-			</TabsList>
-		</Tabs>
 	);
 }
 
@@ -251,14 +176,8 @@ function PracticePage() {
 	const allTexts = textsData ?? [];
 	const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 	const [searchQuery, setSearchQuery] = useState("");
-	const {
-		difficultyFilter,
-		typeFilter,
-		wordCountFilter,
-		setDifficultyFilter,
-		setTypeFilter,
-		setWordCountFilter,
-	} = useTextFilterStore();
+	const { typeFilter, wordCountFilter, setTypeFilter, setWordCountFilter } =
+		useTextFilterStore();
 
 	// Memoize filtered texts to prevent unnecessary recalculations
 	const filteredTexts = useMemo(() => {
@@ -267,9 +186,6 @@ function PracticePage() {
 				searchQuery &&
 				!text.content.toLowerCase().includes(searchQuery.toLowerCase())
 			) {
-				return false;
-			}
-			if (difficultyFilter !== "all" && text.difficulty !== difficultyFilter) {
 				return false;
 			}
 			if (typeFilter !== "all" && text.type !== typeFilter) {
@@ -283,7 +199,7 @@ function PracticePage() {
 			}
 			return true;
 		});
-	}, [allTexts, difficultyFilter, typeFilter, wordCountFilter, searchQuery]);
+	}, [allTexts, typeFilter, wordCountFilter, searchQuery]);
 
 	// Split into groups
 	const { attemptedTexts, newTexts } = useMemo(() => {
@@ -305,14 +221,6 @@ function PracticePage() {
 		[setTypeFilter],
 	);
 
-	const handleDifficultyFilterChange = useCallback(
-		(difficulty: TextDifficulty | "all") => {
-			setDifficultyFilter(difficulty);
-			setVisibleCount(ITEMS_PER_PAGE);
-		},
-		[setDifficultyFilter],
-	);
-
 	const handleLoadMore = useCallback(() => {
 		setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
 	}, []);
@@ -329,7 +237,10 @@ function PracticePage() {
 				<PageContainer>
 					<EmptyState
 						title="Failed to load practice texts"
-						description={error?.message ?? "An error occurred while loading practice texts."}
+						description={
+							error?.message ??
+							"An error occurred while loading practice texts."
+						}
 						primaryAction={{
 							label: "Try Again",
 							onClick: () => window.location.reload(),
@@ -348,7 +259,6 @@ function PracticePage() {
 						<>
 							{/* Filters Section */}
 							<section className="flex flex-col gap-10">
-
 								{/* Desktop: Inline filters */}
 								<div className="hidden md:flex md:flex-row md:items-end md:justify-between">
 									<div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end md:flex-1">
@@ -367,9 +277,10 @@ function PracticePage() {
 										</div>
 										<Select
 											value={wordCountFilter}
-											onValueChange={(v) =>
-												setWordCountFilter(v as WordCountCategory)
-											}
+											onValueChange={(v) => {
+												setWordCountFilter(v as WordCountCategory);
+												setVisibleCount(ITEMS_PER_PAGE);
+											}}
 										>
 											<SelectTrigger className="w-[140px] border-border/40 bg-muted/40">
 												<SelectValue placeholder="Length" />
@@ -400,16 +311,6 @@ function PracticePage() {
 									</div>
 								</div>
 
-								<div className="flex flex-col gap-2">
-									<h3 className="font-medium text-muted-foreground text-sm">
-										Difficulty
-									</h3>
-									<DifficultySwitcher
-										value={difficultyFilter}
-										onChange={handleDifficultyFilterChange}
-									/>
-								</div>
-
 								{/* Mobile: Filter button + drawer */}
 								<div className="md:hidden">
 									<Drawer>
@@ -419,7 +320,8 @@ function PracticePage() {
 												Filters
 												{(searchQuery || wordCountFilter !== "all") && (
 													<span className="ml-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-														{(searchQuery ? 1 : 0) + (wordCountFilter !== "all" ? 1 : 0)}
+														{(searchQuery ? 1 : 0) +
+															(wordCountFilter !== "all" ? 1 : 0)}
 													</span>
 												)}
 											</Button>
@@ -430,10 +332,16 @@ function PracticePage() {
 											</DrawerHeader>
 											<div className="flex flex-col gap-4 px-4 pb-6">
 												<div className="flex flex-col gap-2">
-													<label className="font-medium text-muted-foreground text-sm">Search</label>
+													<label
+														htmlFor="drawer-search"
+														className="font-medium text-muted-foreground text-sm"
+													>
+														Search
+													</label>
 													<div className="relative">
 														<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 														<Input
+															id="drawer-search"
 															type="search"
 															placeholder="Search texts..."
 															className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
@@ -446,20 +354,27 @@ function PracticePage() {
 													</div>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="font-medium text-muted-foreground text-sm">Length</label>
+													<span className="font-medium text-muted-foreground text-sm">
+														Length
+													</span>
 													<Select
 														value={wordCountFilter}
-														onValueChange={(v) =>
-															setWordCountFilter(v as WordCountCategory)
-														}
+														onValueChange={(v) => {
+															setWordCountFilter(v as WordCountCategory);
+															setVisibleCount(ITEMS_PER_PAGE);
+														}}
 													>
 														<SelectTrigger className="w-full border-border/40 bg-muted/40">
 															<SelectValue placeholder="Length" />
 														</SelectTrigger>
 														<SelectContent>
 															<SelectItem value="all">Any Length</SelectItem>
-															<SelectItem value="short">Short (&lt;15)</SelectItem>
-															<SelectItem value="medium">Medium (15-30)</SelectItem>
+															<SelectItem value="short">
+																Short (&lt;15)
+															</SelectItem>
+															<SelectItem value="medium">
+																Medium (15-30)
+															</SelectItem>
 															<SelectItem value="long">Long (30+)</SelectItem>
 														</SelectContent>
 													</Select>
@@ -527,7 +442,7 @@ function PracticePage() {
 						) : allTexts.length > 0 ? (
 							<EmptyState
 								title="No texts match your filters"
-								description="Try adjusting your difficulty, type filters, or search query to see more texts."
+								description="Try adjusting your type filters, length filter, or search query to see more texts."
 								icon={<RiSearch2Line className="size-full" />}
 								variant="minimal"
 								primaryAction={{
@@ -535,7 +450,8 @@ function PracticePage() {
 									onClick: () => {
 										setSearchQuery("");
 										setTypeFilter("all");
-										setDifficultyFilter("all");
+										setWordCountFilter("all");
+										setVisibleCount(ITEMS_PER_PAGE);
 									},
 								}}
 							/>

@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/webhook/jobs")({
 						});
 					}
 
-// Update job status
+					// Update job status
 					let dbStatus = mapRunPodStatusToDb(status);
 					const jobError = error ?? null;
 

@@ -1,0 +1,264 @@
+{
+  "clip": "/data/references/genam_teyanna/ref_006.wav",
+  "mode": "free_alignment",
+  "n_phones": 36,
+  "phones": [
+    "▁",
+    "m",
+    "a",
+    "ɪ",
+    "p",
+    "ɹ",
+    "ʌ",
+    "ð",
+    "ə˞",
+    "p",
+    "ɔ",
+    "t",
+    "ə",
+    "ʃ",
+    "a",
+    "ɪ̃",
+    "n",
+    "i",
+    "n",
+    "u",
+    "ɹ",
+    "ɛ",
+    "d",
+    "kʰ",
+    "ɑ",
+    "ɹ",
+    "l",
+    "æ",
+    "s",
+    "t",
+    "w",
+    "i",
+    "k",
+    "ɛ̃",
+    "n",
+    "t"
+  ],
+  "segments": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 120.0,
+      "confidence": 0.9958
+    },
+    {
+      "token": "m",
+      "start_ms": 160.0,
+      "end_ms": 240.0,
+      "confidence": 0.9917
+    },
+    {
+      "token": "a",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 280.0,
+      "end_ms": 320.0,
+      "confidence": 1.0
+    },
+    {
+      "token": "p",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "ʌ",
+      "start_ms": 480.0,
+      "end_ms": 520.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "ð",
+      "start_ms": 560.0,
+      "end_ms": 600.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 640.0,
+      "end_ms": 680.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "p",
+      "start_ms": 880.0,
+      "end_ms": 920.0,
+      "confidence": 0.9827
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.6045
+    },
+    {
+      "token": "t",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9982
+    },
+    {
+      "token": "ə",
+      "start_ms": 1160.0,
+      "end_ms": 1200.0,
+      "confidence": 0.9972
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 1360.0,
+      "end_ms": 1440.0,
+      "confidence": 0.9692
+    },
+    {
+      "token": "a",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.9939
+    },
+    {
+      "token": "ɪ̃",
+      "start_ms": 1560.0,
+      "end_ms": 1600.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "n",
+      "start_ms": 1640.0,
+      "end_ms": 1680.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "i",
+      "start_ms": 1760.0,
+      "end_ms": 1800.0,
+      "confidence": 0.9973
+    },
+    {
+      "token": "n",
+      "start_ms": 1960.0,
+      "end_ms": 2000.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "u",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 2400.0,
+      "end_ms": 2440.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 2480.0,
+      "end_ms": 2520.0,
+      "confidence": 0.998
+    },
+    {
+      "token": "d",
+      "start_ms": 2600.0,
+      "end_ms": 2640.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 2760.0,
+      "end_ms": 2800.0,
+      "confidence": 0.9955
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 2840.0,
+      "end_ms": 2880.0,
+      "confidence": 0.9986
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 2920.0,
+      "end_ms": 3000.0,
+      "confidence": 0.9883
+    },
+    {
+      "token": "l",
+      "start_ms": 3120.0,
+      "end_ms": 3160.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "æ",
+      "start_ms": 3200.0,
+      "end_ms": 3240.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "s",
+      "start_ms": 3280.0,
+      "end_ms": 3360.0,
+      "confidence": 0.9958
+    },
+    {
+      "token": "t",
+      "start_ms": 3360.0,
+      "end_ms": 3440.0,
+      "confidence": 0.9866
+    },
+    {
+      "token": "w",
+      "start_ms": 3480.0,
+      "end_ms": 3520.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "i",
+      "start_ms": 3560.0,
+      "end_ms": 3600.0,
+      "confidence": 0.9899
+    },
+    {
+      "token": "k",
+      "start_ms": 3640.0,
+      "end_ms": 3680.0,
+      "confidence": 0.9479
+    },
+    {
+      "token": "ɛ̃",
+      "start_ms": 3720.0,
+      "end_ms": 3760.0,
+      "confidence": 0.4297
+    },
+    {
+      "token": "n",
+      "start_ms": 3800.0,
+      "end_ms": 3840.0,
+      "confidence": 0.9974
+    },
+    {
+      "token": "t",
+      "start_ms": 3880.0,
+      "end_ms": 3920.0,
+      "confidence": 0.6661
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "author": "genam_teyanna",
+  "id": "ref_006"
+}

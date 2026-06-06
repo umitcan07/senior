@@ -121,7 +121,7 @@
 | `id`               | uuid         | Primary key                  |
 | `analysis_id`      | uuid         | FK → `analyses.id`           |
 | `storage_key`      | varchar(500) | S3/R2 key for alignment data |
-| `alignment_method` | varchar(20)  | Enum: "mfa", "wav2textgrid"  |
+| `alignment_method` | enum         | `mfa` / `wav2textgrid` (V1-only, historical) · `powsm_ctc` (V2) |
 | `created_at`       | timestamp    | Record creation time         |
 
 ### `user_preferences`
@@ -227,7 +227,8 @@ CREATE TYPE recording_method AS ENUM ('upload', 'record');
 CREATE TYPE quality_status AS ENUM ('accept', 'warning', 'reject');
 
 -- Alignment method
-CREATE TYPE alignment_method AS ENUM ('mfa', 'wav2textgrid');
+-- 'mfa' and 'wav2textgrid' are V1-only, kept for historical rows; V2 writes 'powsm_ctc'.
+CREATE TYPE alignment_method AS ENUM ('mfa', 'wav2textgrid', 'powsm_ctc');
 
 -- Error type for phoneme_errors and word_errors
 CREATE TYPE error_type AS ENUM ('substitute', 'insert', 'delete');
@@ -244,5 +245,56 @@ CREATE TYPE text_type AS ENUM (
   'common_phrase'
 );
 ```
+
+---
+
+## Migrations (Drizzle) — rules
+
+`app/src/db/schema.ts` is the **single source of truth**. The migration files and
+`meta/` snapshots are a generated, ordered record of how the live DB reached that
+state. Keep them in sync — drift here is how we ended up with the orphaned
+`0009_chief_tiger_shark` migration (its columns were applied to the DB via a bare
+`db:push` but its journal entry was never committed).
+
+**Workflow for every schema change**
+
+1. Edit `app/src/db/schema.ts`.
+2. Run `pnpm db:generate` (from `app/`).
+3. **Inspect the generated SQL.** If it contains changes you did not intend, STOP —
+   `schema.ts` has drifted from the snapshots/DB. Reconcile first; do not commit a
+   migration that drops or alters columns you didn't mean to touch.
+4. Commit, in **one commit**, the schema change **plus** all three generated files:
+   - `app/drizzle/NNNN_<name>.sql`
+   - `app/drizzle/meta/NNNN_snapshot.json`
+   - `app/drizzle/meta/_journal.json` (the appended entry)
+5. **The deploy applies migrations with `db:migrate`** — Fly's `release_command`
+   runs `scripts/migrate.ts` against the single Neon DB (the `development` branch,
+   used for local **and** prod). So merging to `main` runs your migration on the
+   live DB; it **must apply cleanly**. Test first with `pnpm db:migrate` locally (or
+   a scratch Neon branch for risky changes). `db:push` is quick local schema-sync
+   only — it does **not** write journal/`__drizzle_migrations` entries, so never use
+   it against the shared DB.
+
+**Hard rules**
+
+- **Never apply DDL to the shared DB by hand (`ALTER …`) or via `db:push`.** It
+  desyncs the journal / `__drizzle_migrations`, so the next `db:migrate` on deploy
+  fails with `already exists`. Both the `0009_chief_tiger_shark` orphan *and* a
+  manually-added `powsm_ctc` enum value broke deploys exactly this way.
+- **Migrations must apply cleanly under `db:migrate`.** If an object might already
+  exist from out-of-band history, write it idempotently — `ADD VALUE IF NOT EXISTS`,
+  `ADD COLUMN IF NOT EXISTS`. The *only* allowed edit to an existing migration is
+  making a not-yet-deployed one idempotent.
+- **Migrations are otherwise append-only.** Never edit or delete an applied
+  `NNNN_*.sql` or `meta/NNNN_snapshot.json`.
+- **Don't hand-edit `_journal.json`** except to repair an already-existing drift you
+  fully understand — and call it out in the commit message when you do.
+- Adding an enum value is non-destructive (`ALTER TYPE … ADD VALUE`); **dropping**
+  columns/values is destructive — do it as its own deliberate, reviewed migration.
+
+> Cleanup backlog: `phoneme_errors`/`word_errors` carry legacy V1 columns
+> `target_position` / `actual_position` (added by `0009_chief_tiger_shark`, unused by
+> V2 code). They're kept in `schema.ts` so it matches the live DB; drop them later via
+> a dedicated migration if desired.
 
 ---

@@ -1,11 +1,12 @@
 """
 Core assessment logic for pronunciation evaluation.
-Uses POWSM PR (Phone Recognition) and MFA for time alignment.
+Uses POWSM PR (Phone Recognition). Phone-level time alignment is provided by
+POWSM CTC forced alignment (E3 / #19); V1's forced-aligner + heuristic-timestamp
+path was removed in E1 (#11), so assess() emits no timestamps until E3 lands.
 """
 import sys
 import os
 import tempfile
-import subprocess
 import urllib.request
 import shutil
 from typing import Dict, List, Optional, Tuple
@@ -188,163 +189,6 @@ def check_signal_quality(audio: np.ndarray, sample_rate: int) -> Dict:
     }
 
 
-# ============================================================================
-# TIMESTAMP ESTIMATION (when MFA is not available)
-# ============================================================================
-
-def estimate_phoneme_timestamps(
-    phonemes: List[str],
-    audio_duration: float,
-    speech_start: float = 0.0,
-    speech_end: Optional[float] = None,
-) -> List[Dict]:
-    """
-    Estimate timestamps for phonemes when MFA is not available.
-    
-    Uses proportional distribution based on phoneme complexity:
-    - Vowels and diphthongs: longer duration (weight 1.5)
-    - Consonants: shorter duration (weight 1.0)
-    - Stops and affricates: very short (weight 0.7)
-    
-    Args:
-        phonemes: List of IPA phoneme strings
-        audio_duration: Total audio duration in seconds
-        speech_start: Estimated speech start time (default 0.0)
-        speech_end: Estimated speech end time (default: audio_duration)
-    
-    Returns:
-        List of dicts with 'phone', 'start', 'end' keys
-    """
-    if not phonemes:
-        return []
-    
-    if speech_end is None:
-        speech_end = audio_duration
-    
-    speech_duration = speech_end - speech_start
-    
-    # Phoneme duration weights based on type
-    vowels = set("aɑæɐeɛəɜiɪoɔuʊʌyœøɨʉɯɤɵɞ")
-    diphthongs = {"aɪ", "eɪ", "ɔɪ", "aʊ", "oʊ", "ɪə", "eə", "ʊə"}
-    stops = set("pbtdkgʔ")
-    affricates = {"tʃ", "dʒ", "ts", "dz"}
-    nasals = set("mnŋɲɱ")
-    approximants = set("wjɹlɾɻ")
-    fricatives = set("fvθðszʃʒhxɣçʁχħʕ")
-    
-    # Calculate weights for each phoneme
-    weights = []
-    for p in phonemes:
-        p_lower = p.lower()
-        
-        if p_lower in diphthongs or len(p) > 1 and any(c in vowels for c in p):
-            # Diphthongs and complex vowels
-            weights.append(1.8)
-        elif p_lower in vowels or any(c in vowels for c in p_lower):
-            # Simple vowels
-            weights.append(1.5)
-        elif p_lower in affricates:
-            # Affricates (two-part sounds)
-            weights.append(1.2)
-        elif p_lower in nasals or any(c in nasals for c in p_lower):
-            # Nasals
-            weights.append(1.1)
-        elif p_lower in approximants or any(c in approximants for c in p_lower):
-            # Approximants
-            weights.append(1.0)
-        elif p_lower in fricatives or any(c in fricatives for c in p_lower):
-            # Fricatives
-            weights.append(0.9)
-        elif p_lower in stops or any(c in stops for c in p_lower):
-            # Stops (very short)
-            weights.append(0.7)
-        else:
-            # Default weight
-            weights.append(1.0)
-    
-    # Normalize weights to sum to speech duration
-    total_weight = sum(weights)
-    if total_weight == 0:
-        total_weight = len(phonemes)
-        weights = [1.0] * len(phonemes)
-    
-    # Calculate timestamps
-    alignments = []
-    current_time = speech_start
-    
-    for i, (phoneme, weight) in enumerate(zip(phonemes, weights)):
-        duration = (weight / total_weight) * speech_duration
-        
-        alignments.append({
-            "phone": phoneme,
-            "start": round(current_time, 3),
-            "end": round(current_time + duration, 3),
-            "estimated": True,  # Flag that this is estimated, not from MFA
-        })
-        
-        current_time += duration
-    
-    return alignments
-
-
-def estimate_speech_boundaries(audio: np.ndarray, sample_rate: int) -> Tuple[float, float]:
-    """
-    Estimate speech start and end times from audio using energy analysis.
-    
-    Args:
-        audio: Audio samples as numpy array
-        sample_rate: Sample rate in Hz
-    
-    Returns:
-        Tuple of (speech_start, speech_end) in seconds
-    """
-    # Ensure mono
-    if len(audio.shape) > 1:
-        audio = np.mean(audio, axis=1)
-    
-    duration = len(audio) / sample_rate
-    
-    # Frame-based energy analysis
-    frame_size = int(0.025 * sample_rate)  # 25ms
-    hop_size = int(0.010 * sample_rate)    # 10ms
-    
-    num_frames = max(1, (len(audio) - frame_size) // hop_size + 1)
-    frame_energies = []
-    frame_times = []
-    
-    for i in range(num_frames):
-        start = i * hop_size
-        end = min(start + frame_size, len(audio))
-        frame = audio[start:end]
-        energy = np.sqrt(np.mean(frame ** 2))
-        frame_energies.append(energy)
-        frame_times.append(start / sample_rate)
-    
-    if not frame_energies:
-        return 0.0, duration
-    
-    frame_energies = np.array(frame_energies)
-    frame_times = np.array(frame_times)
-    
-    # Threshold: 10% of max energy
-    threshold = np.max(frame_energies) * 0.1
-    
-    # Find first frame above threshold
-    speech_frames = np.where(frame_energies > threshold)[0]
-    
-    if len(speech_frames) == 0:
-        return 0.0, duration
-    
-    speech_start = frame_times[speech_frames[0]]
-    speech_end = frame_times[speech_frames[-1]] + frame_size / sample_rate
-    
-    # Add small buffer
-    speech_start = max(0.0, speech_start - 0.05)
-    speech_end = min(duration, speech_end + 0.05)
-    
-    return speech_start, speech_end
-
-
 def parse_ipa_phonemes(ipa_phonemes: str) -> List[str]:
     """
     Parse IPA phonemes from POWSM format (e.g., "/h//ɛ//l//o//ʊ/").
@@ -365,15 +209,8 @@ def parse_ipa_phonemes(ipa_phonemes: str) -> List[str]:
     return phonemes
 
 
-def powsm_to_mfa_format(powsm_ipa: str) -> str:
-    """Convert POWSM format to MFA space-separated format."""
-    phones = parse_ipa_phonemes(powsm_ipa)
-    return ' '.join(phones)
-
-
 # Singleton model instances (loaded once on worker startup)
 _pr_model = None
-_g2p_model = None
 _asr_model = None
 _device = None
 
@@ -438,25 +275,28 @@ def get_device():
 
 def get_models(device: Optional[str] = None):
     """
-    Load and cache POWSM models for PR, G2P, and ASR tasks.
-    
+    Load and cache POWSM models for PR and ASR tasks.
+
+    V2 references carry precomputed IPA (E4), so the on-demand G2P model was
+    dropped in E1 (#12).
+
     Args:
         device: Device to load models on ("cuda" or "cpu"). If None, auto-detect.
-        
+
     Returns:
-        Tuple of (pr_model, g2p_model, asr_model)
+        Tuple of (pr_model, asr_model)
     """
-    global _pr_model, _g2p_model, _asr_model
-    
+    global _pr_model, _asr_model
+
     # Auto-detect device if not specified
     if device is None:
         device = get_device()
-    
-    if _pr_model is None or _g2p_model is None or _asr_model is None:
+
+    if _pr_model is None or _asr_model is None:
         from espnet2.bin.s2t_inference import Speech2Text
-        
+
         print(f"DEBUG: Loading POWSM models on device: {device}")
-        
+
         # PR model (Phone Recognition: Audio → IPA)
         # The Turkish LoRA adapter was fine-tuned with lang_sym="<unk>", so the PR
         # model must use the same symbol when the adapter is attached. Fall back to
@@ -487,10 +327,10 @@ def get_models(device: Optional[str] = None):
             task_sym="<asr>",
             beam_size=5,  # Increase from default 3 for better accuracy
         )
-        
+
         print(f"DEBUG: POWSM models loaded successfully on {device}")
-    
-    return _pr_model, _g2p_model, _asr_model
+
+    return _pr_model, _asr_model
 
 
 def extract_ipa_from_audio(audio_uri: str, device: Optional[str] = None) -> str:
@@ -528,7 +368,7 @@ def extract_ipa_from_audio(audio_uri: str, device: Optional[str] = None) -> str:
         print(f"DEBUG: Audio stats - min: {speech.min():.4f}, max: {speech.max():.4f}, mean: {speech.mean():.4f}, std: {speech.std():.4f}")
         
         # Get PR model
-        pr_model, _, _ = get_models(device)
+        pr_model, _ = get_models(device)
         
         # Run PR inference
         inference_start = time.time()
@@ -595,7 +435,13 @@ def download_audio(audio_uri: str) -> Tuple[str, str]:
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
         
-        with urllib.request.urlopen(audio_uri, context=ctx) as response, open(temp_path, 'wb') as out_file:
+        # Cloudflare (e.g. files.nounce.pro) blocks the default "Python-urllib"
+        # User-Agent with a 403, so send a browser-like UA.
+        req = urllib.request.Request(
+            audio_uri,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; NounceWorker/1.0)"},
+        )
+        with urllib.request.urlopen(req, context=ctx) as response, open(temp_path, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
             
         file_size = os.path.getsize(temp_path)
@@ -608,217 +454,6 @@ def download_audio(audio_uri: str) -> Tuple[str, str]:
         raise e
 
 
-def run_mfa_alignment(
-    audio_file: str,
-    transcription: str,
-    temp_base: str,
-    mfa_command: str = "mfa",
-    env: Optional[dict] = None,
-    dictionary_id: str = "english_us_mfa",
-    acoustic_id: str = "english_mfa",
-) -> Dict:
-    """
-    Run MFA alignment for a given transcription and return alignments.
-    
-    MFA models and dictionaries are cached in MFA_ROOT_DIRECTORY (network volume if available).
-    """
-    """
-    Run MFA alignment for a given transcription and return alignments.
-    
-    Args:
-        audio_file: Path to audio file
-        transcription: Text transcription to align
-        temp_base: Base directory for temporary files
-        mfa_command: MFA command to use (default: "mfa")
-        env: Environment variables dict (optional)
-        dictionary_id: MFA dictionary ID (default: "english_us_mfa")
-        acoustic_id: MFA acoustic model ID (default: "english_mfa")
-    
-    Returns:
-        Dictionary with:
-        - alignments: List[Dict] with phone, start, end
-        - quality: Dict with quality metrics
-    """
-    if not transcription:
-        return {
-            "alignments": [],
-            "quality": {"quality_score": 0.0, "warnings": ["empty_transcription"]},
-        }
-    
-    corpus_dir = os.path.join(temp_base, "corpus")
-    output_dir = os.path.join(temp_base, "output")
-    os.makedirs(corpus_dir, exist_ok=True)
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Copy audio to corpus directory
-    audio_basename = os.path.splitext(os.path.basename(audio_file))[0]
-    audio_in_corpus = os.path.join(corpus_dir, f"{audio_basename}.wav")
-    shutil.copy(audio_file, audio_in_corpus)
-    
-    # Write transcription file
-    transcription_file = os.path.join(corpus_dir, f"{audio_basename}.txt")
-    with open(transcription_file, 'w') as f:
-        f.write(transcription)
-    
-    # Run MFA align
-    # Use temp directory in temp_base for MFA temporary files
-    mfa_temp_dir = os.path.join(temp_base, "mfa_temp")
-    os.makedirs(mfa_temp_dir, exist_ok=True)
-    
-    cmd = [
-        mfa_command,
-        "align",
-        corpus_dir,
-        dictionary_id,
-        acoustic_id,
-        output_dir,
-        "--clean",
-        "--beam",
-        "400",
-        "--retry_beam",
-        "1600",
-        "--temp_directory",
-        mfa_temp_dir,
-    ]
-    
-    env_dict = env.copy() if env else os.environ.copy()
-    
-    # Set MFA root directory (use network volume if available)
-    # MFA_ROOT_DIR stores dictionaries, acoustic models, and configuration
-    network_volume_path = "/runpod-volume"
-    if os.path.exists(network_volume_path):
-        mfa_root_dir = os.path.join(network_volume_path, ".cache", "mfa")
-        os.makedirs(mfa_root_dir, exist_ok=True)
-        env_dict["MFA_ROOT_DIR"] = mfa_root_dir
-        print(f"DEBUG: Using network volume for MFA root directory at {mfa_root_dir}")
-    else:
-        # Use default MFA root location (~/Documents/MFA)
-        mfa_root_dir = os.path.expanduser("~/Documents/MFA")
-        env_dict["MFA_ROOT_DIR"] = mfa_root_dir
-        print(f"DEBUG: Using default MFA root directory at {mfa_root_dir}")
-    
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            env=env_dict,
-            timeout=300,  # 5 minute timeout
-        )
-        
-        # Parse TextGrid output
-        textgrid_path = os.path.join(output_dir, f"{audio_basename}.TextGrid")
-        alignments = []
-        
-        if os.path.exists(textgrid_path):
-            alignments = parse_textgrid(textgrid_path)
-        
-        return {
-            "alignments": alignments,
-            "quality": {
-                "quality_score": 1.0 if alignments else 0.0,
-                "warnings": [] if alignments else ["no_alignments"],
-            },
-            "stdout": result.stdout,
-            "stderr": result.stderr,
-            "returncode": result.returncode,
-        }
-    except subprocess.TimeoutExpired:
-        return {
-            "alignments": [],
-            "quality": {"quality_score": 0.0, "warnings": ["timeout"]},
-        }
-    except Exception as e:
-        print(f"ERROR: MFA alignment failed: {e}")
-        return {
-            "alignments": [],
-            "quality": {"quality_score": 0.0, "warnings": [str(e)]},
-        }
-
-
-def parse_textgrid(textgrid_path: str) -> List[Dict]:
-    """
-    Parse TextGrid file and extract phone alignments.
-    
-    Args:
-        textgrid_path: Path to TextGrid file
-    
-    Returns:
-        List of dicts with 'phone', 'start', 'end' keys
-    """
-    alignments = []
-    try:
-        # Try using textgrid library first (more reliable)
-        try:
-            from textgrid import TextGrid
-            tg = TextGrid.fromFile(textgrid_path)
-            for tier in tg.tiers:
-                if tier.name.lower() in ["phones", "phone"]:
-                    for interval in tier:
-                        if interval.mark.strip():
-                            alignments.append({
-                                "phone": interval.mark.strip(),
-                                "start": interval.minTime,
-                                "end": interval.maxTime,
-                            })
-                    break
-            return alignments
-        except ImportError:
-            # Fallback to manual parsing if textgrid library not available
-            pass
-        
-        # Manual TextGrid parser (fallback)
-        with open(textgrid_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        
-        # Find phone tier
-        in_phone_tier = False
-        i = 0
-        
-        while i < len(lines):
-            line = lines[i].strip()
-            
-            if 'name = "phones"' in line or 'name = "Phones"' in line:
-                in_phone_tier = True
-                # Skip to intervals
-                while i < len(lines) and 'intervals [' not in lines[i]:
-                    i += 1
-                continue
-            
-            if in_phone_tier and 'intervals [' in line:
-                # Parse interval
-                if i + 3 < len(lines):
-                    start_line = lines[i + 1].strip()
-                    end_line = lines[i + 2].strip()
-                    text_line = lines[i + 3].strip()
-                    
-                    if 'xmin' in start_line and 'xmax' in end_line and 'text' in text_line:
-                        try:
-                            start = float(start_line.split('=')[1].strip())
-                            end = float(end_line.split('=')[1].strip())
-                            phone = text_line.split('=')[1].strip().strip('"')
-                            
-                            if phone and phone != '':
-                                alignments.append({
-                                    "phone": phone,
-                                    "start": start,
-                                    "end": end,
-                                })
-                        except (ValueError, IndexError):
-                            pass
-                        i += 4
-                        continue
-            
-            i += 1
-        
-        return alignments
-    except Exception as e:
-        print(f"ERROR: Failed to parse TextGrid: {e}")
-        import traceback
-        traceback.print_exc()
-        return []
-
-
 def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, device: Optional[str] = None) -> Dict:
     """
     Assess pronunciation by comparing actual vs target IPA.
@@ -826,15 +461,16 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     Args:
         audio_uri: URI to audio file
         target_text: Target text (ground truth transcript)
-        target_ipa: Optional target IPA (if not provided, will generate with G2P)
+        target_ipa: Target IPA (required). V2 references carry precomputed IPA;
+            the on-demand G2P fallback was removed in E1 (#12).
         device: Device to run inference on ("cuda" or "cpu"). If None, auto-detect.
-    
+
     Returns:
         Dictionary with:
         - actual_ipa: str (detected IPA from PR)
-        - target_ipa: str (target IPA from G2P)
+        - target_ipa: str (precomputed reference IPA)
         - score: float (0.0-1.0)
-        - errors: List[Dict] (errors with timestamps from MFA)
+        - errors: List[Dict] (timestamps are None until POWSM CTC alignment lands in E3)
     """
     import time
     
@@ -854,30 +490,19 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
     print(f"DEBUG: Detected {len(actual_phonemes)} phones from PR")
     print(f"DEBUG: Actual phonemes list: {actual_phonemes[:20]}..." if len(actual_phonemes) > 20 else f"DEBUG: Actual phonemes list: {actual_phonemes}")
     
-    # Step 2: Generate target pronunciation from text using G2P
-    print("DEBUG: Step 2: Grapheme-to-Phoneme (G2P)...")
+    # Step 2: Target pronunciation comes from the precomputed reference IPA.
+    # The on-demand G2P-from-text path was removed in E1 (#12); V2 references
+    # always carry precomputed IPA (E4).
+    print("DEBUG: Step 2: Using precomputed target IPA...")
     if target_ipa is None:
-        # Download audio for G2P (audio-guided)
-        temp_path, _ = download_audio(audio_uri)
-        try:
-            speech, rate = librosa.load(temp_path, sr=16000, mono=True)
-            _, g2p_model, _ = get_models(device)
-            result_g2p = g2p_model(speech, text_prev=target_text)
-            target_ipa_phonemes = result_g2p[0][0]
-            if "<notimestamps>" in target_ipa_phonemes:
-                target_ipa_phonemes = target_ipa_phonemes.split("<notimestamps>")[1].strip()
-            else:
-                target_ipa_phonemes = target_ipa_phonemes.strip()
-        finally:
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
-    else:
-        target_ipa_phonemes = target_ipa
-    
+        raise ValueError(
+            "target_ipa is required: V2 references carry precomputed IPA "
+            "(the G2P fallback was removed in E1 / #12)"
+        )
+    target_ipa_phonemes = target_ipa
+
     target_phonemes = parse_ipa_phonemes(target_ipa_phonemes)
-    print(f"DEBUG: Target {len(target_phonemes)} phones from G2P")
+    print(f"DEBUG: Target {len(target_phonemes)} phones from precomputed IPA")
     print(f"DEBUG: Raw target IPA: '{target_ipa_phonemes[:100]}...' if len(target_ipa_phonemes) > 100 else f'DEBUG: Raw target IPA: '{target_ipa_phonemes}'")
     
     # Step 3: Run edit distance to find errors
@@ -897,16 +522,12 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         signal_quality = check_signal_quality(speech, rate)
         print(f"DEBUG: Signal quality score: {signal_quality['quality_score']}, warnings: {signal_quality['warnings']}")
         
-        # Estimate speech boundaries for better timestamp estimation
-        speech_start, speech_end = estimate_speech_boundaries(speech, rate)
-        print(f"DEBUG: Estimated speech boundaries: {speech_start:.2f}s - {speech_end:.2f}s")
-        
         # Run ASR
         print("DEBUG: Step 5b: Running ASR...")
         print(f"DEBUG: ASR input audio stats - shape: {speech.shape}, duration: {len(speech)/rate:.2f}s, sample rate: {rate}Hz")
         print(f"DEBUG: ASR input audio stats - min: {speech.min():.4f}, max: {speech.max():.4f}, mean: {speech.mean():.4f}, std: {speech.std():.4f}")
         
-        _, _, asr_model = get_models(device)
+        _, asr_model = get_models(device)
         
         # Use target text as context to improve ASR accuracy
         # This helps the model better recognize words, especially at the start
@@ -1015,76 +636,25 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         except:
             pass
     
-    # Step 5: MFA alignment or timestamp estimation
-    print("DEBUG: Step 6: Alignment/Timestamp estimation...")
-    estimated_alignments = []
-    mfa_alignments = []
-    use_mfa = False
-    
-    # Check if MFA is available
-    mfa_command = "mfa"
-    mfa_paths = [
-        "mfa",  # In PATH
-        "/opt/conda/envs/mfa/bin/mfa",  # MFA conda environment
-        "/opt/conda/envs/worker/bin/mfa",  # Worker conda environment
-        "/opt/conda/bin/mfa",  # Base conda
-    ]
-    
-    for mfa_path in mfa_paths:
-        try:
-            result = subprocess.run([mfa_path, "version"], capture_output=True, timeout=5)
-            if result.returncode == 0:
-                use_mfa = True
-                mfa_command = mfa_path
-                print(f"DEBUG: MFA is available at {mfa_command}")
-                break
-        except:
-            continue
-    
-    if use_mfa:
-        # Use MFA for precise alignment
-        temp_path, _ = download_audio(audio_uri)
-        try:
-            with tempfile.TemporaryDirectory() as temp_base:
-                actual_transcription = powsm_to_mfa_format(actual_ipa_phonemes)
-                actual_result = run_mfa_alignment(
-                    audio_file=temp_path,
-                    transcription=actual_transcription,
-                    temp_base=temp_base,
-                    mfa_command=mfa_command,
-                )
-                mfa_alignments = actual_result.get("alignments", [])
-                print(f"DEBUG: MFA aligned {len(mfa_alignments)} phones")
-        finally:
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
-    else:
-        # Use proportional timestamp estimation
-        print("DEBUG: MFA not available, using proportional timestamp estimation")
-        estimated_alignments = estimate_phoneme_timestamps(
-            actual_phonemes,
-            audio_duration,
-            speech_start=speech_start,
-            speech_end=speech_end,
-        )
-        print(f"DEBUG: Estimated timestamps for {len(estimated_alignments)} phones")
-    
-    # Use whichever alignments are available
-    alignments = mfa_alignments if mfa_alignments else estimated_alignments
-    
-    # Map errors to timestamps
+    # Step 6: Phone-level alignment.
+    # V1's forced-aligner and the proportional heuristic-timestamp fallback were
+    # removed in E1 (#11). Real per-phone timings now come from POWSM CTC forced
+    # alignment, implemented in E3 (#19). Until then assess() emits no timings.
+    print("DEBUG: Step 6: Alignment skipped (POWSM CTC alignment lands in E3 / #19)")
+    alignments = []
+
+    # Map errors (timestamps are None until E3 wires in POWSM CTC alignment)
     errors = []
     for op in operations:
         op_type = op[0]
         position = op[1]
-        
+
         error_dict = {
             "type": op_type,
-            "position": position
+            "position": position,
+            "timestamp": None,
         }
-        
+
         if op_type == "substitute":
             error_dict["expected"] = op[2] if len(op) > 2 else None
             error_dict["actual"] = actual_phonemes[position] if position < len(actual_phonemes) else None
@@ -1092,36 +662,7 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
             error_dict["expected"] = op[2] if len(op) > 2 else None
         elif op_type == "delete":
             error_dict["actual"] = actual_phonemes[position] if position < len(actual_phonemes) else None
-        
-        # Get timestamp from alignments
-        # Note: 'delete' errors (User Deletion) use Target Index for position, so we cannot 
-        # look up timestamp in Actual Alignments (which aligns to Actual Index).
-        # For now, we omit timestamp for deletions.
-        if op_type != "delete" and alignments and position < len(alignments):
-            alignment = alignments[position]
-            error_dict["timestamp"] = {
-                "start": alignment.get("start", 0.0),
-                "end": alignment.get("end", 0.0),
-                "estimated": alignment.get("estimated", not use_mfa),
-            }
-        else:
-            # Fallback: proportional estimate based on position
-            if actual_phonemes:
-                progress = position / len(actual_phonemes)
-                start_time = speech_start + progress * (speech_end - speech_start)
-                phone_duration = (speech_end - speech_start) / max(1, len(actual_phonemes))
-                error_dict["timestamp"] = {
-                    "start": round(start_time, 3),
-                    "end": round(start_time + phone_duration, 3),
-                    "estimated": True,
-                }
-            else:
-                error_dict["timestamp"] = {
-                    "start": 0.0,
-                    "end": 0.0,
-                    "estimated": True,
-                }
-        
+
         errors.append(error_dict)
     
     # Calculate score using accuracy-based approach
@@ -1185,6 +726,6 @@ def assess(audio_uri: str, target_text: str, target_ipa: Optional[str] = None, d
         "word_errors": word_errors,
         "signal_quality": signal_quality,
         "alignments": alignments,
-        "alignment_method": "mfa" if use_mfa else "estimated",
+        "alignment_method": None,  # set to "powsm_ctc" once E3 (#19) implements alignment
     }
 

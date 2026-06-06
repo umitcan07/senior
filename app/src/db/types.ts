@@ -68,6 +68,16 @@ export type NewAssessmentJob = InferInsertModel<typeof schema.assessmentJobs>;
 export type GenerationMethod =
 	(typeof schema.generationMethodEnum.enumValues)[number];
 export type IpaMethod = (typeof schema.ipaMethodEnum.enumValues)[number];
+export type Dialect = (typeof schema.dialectEnum.enumValues)[number];
+
+// One cached POWSMAligner free_alignment segment (shape of each element in
+// reference_speeches.phone_timings_json). Phones are bare IPA (no slashes).
+export type PhoneTiming = {
+	token: string;
+	start_ms: number;
+	end_ms: number;
+	confidence: number;
+};
 export type RecordingMethod =
 	(typeof schema.recordingMethodEnum.enumValues)[number];
 export type QualityStatus =
@@ -79,4 +89,3 @@ export type TextDifficulty =
 	(typeof schema.textDifficultyEnum.enumValues)[number];
 export type TextType = (typeof schema.textTypeEnum.enumValues)[number];
 export type JobStatus = (typeof schema.jobStatusEnum.enumValues)[number];
-

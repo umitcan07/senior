@@ -5,9 +5,7 @@ import {
 	RiArrowUpDownLine,
 	RiClipboardLine,
 	RiDeleteBinLine,
-	RiLoader2Line,
 	RiMoreLine,
-	RiTranslate2,
 } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
@@ -28,7 +26,6 @@ import {
 import { Fragment, useState } from "react";
 import { AddReferenceDialog } from "@/components/admin/add-reference-dialog";
 import { AdminLayout } from "@/components/layout/admin-layout";
-import { WaveformPlayer } from "@/components/ui/waveform-player";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -55,17 +52,19 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { WaveformPlayer } from "@/components/ui/waveform-player";
 import type { ReferenceSpeechWithRelations } from "@/db/reference";
 import type { PracticeText } from "@/db/text";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
 import { serverGetAuthors } from "@/lib/author";
+import { formatAccent } from "@/lib/dialect";
+import { formatIpaClean } from "@/lib/ipa";
 import {
 	formatDuration,
 	serverDeleteReference,
 	serverGetReferences,
 } from "@/lib/reference";
-import { formatIpaClean } from "@/lib/ipa";
 import { serverGetPracticeTexts } from "@/lib/text";
 
 export const Route = createFileRoute("/admin/references")({
@@ -73,12 +72,9 @@ export const Route = createFileRoute("/admin/references")({
 	pendingComponent: ReferencesSkeleton,
 });
 
-
 // Columns
 function createColumns(
 	onDelete: (ref: ReferenceSpeechWithRelations) => void,
-	onGenerateIpa: (ref: ReferenceSpeechWithRelations) => void,
-	ipaGeneratingIds: Set<string>,
 	onCopyIpa: () => void,
 ): ColumnDef<ReferenceSpeechWithRelations>[] {
 	return [
@@ -144,7 +140,7 @@ function createColumns(
 						<span className="font-medium">{author.name}</span>
 						{author.accent && (
 							<span className="text-muted-foreground text-xs">
-								{author.accent}
+								{formatAccent(author.accent)}
 							</span>
 						)}
 					</div>
@@ -207,16 +203,6 @@ function createColumns(
 			},
 			cell: ({ row }) => {
 				const ref = row.original;
-				const isGenerating = ipaGeneratingIds.has(ref.id);
-
-				if (isGenerating) {
-					return (
-						<div className="flex items-center gap-1.5 text-blue-600">
-							<RiLoader2Line className="h-3 w-3 animate-spin" />
-							<span className="text-xs">Generating...</span>
-						</div>
-					);
-				}
 
 				if (!ref.ipaTranscription) {
 					return (
@@ -233,9 +219,9 @@ function createColumns(
 						<PopoverTrigger asChild>
 							<button
 								type="button"
-								className="flex flex-col gap-0.5 text-left hover:opacity-80 transition-opacity"
+								className="flex flex-col gap-0.5 text-left transition-opacity hover:opacity-80"
 							>
-								<span className="max-w-48 truncate font-ipa text-xl text-muted-foreground">
+								<span className="max-w-48 truncate font-ipa text-muted-foreground text-xl">
 									{formattedIpa}
 								</span>
 							</button>
@@ -243,7 +229,9 @@ function createColumns(
 						<PopoverContent className="w-96" align="start">
 							<div className="flex flex-col gap-3">
 								<div className="flex items-center justify-between">
-									<span className="text-sm font-semibold">IPA Transcription</span>
+									<span className="font-semibold text-sm">
+										IPA Transcription
+									</span>
 									<Button
 										variant="ghost"
 										size="sm"
@@ -262,7 +250,7 @@ function createColumns(
 									</Button>
 								</div>
 								<div className="rounded-md bg-muted p-3">
-									<p className="font-ipa text-xl break-all">{formattedIpa}</p>
+									<p className="break-all font-ipa text-xl">{formattedIpa}</p>
 								</div>
 							</div>
 						</PopoverContent>
@@ -288,14 +276,6 @@ function createColumns(
 								<DropdownMenuLabel>Actions</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
-									onClick={() => onGenerateIpa(ref)}
-									disabled={ipaGeneratingIds.has(ref.id)}
-								>
-									<RiTranslate2 className="mr-2 h-4 w-4" />
-									{ref.ipaTranscription ? "Regenerate IPA" : "Generate IPA"}
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem
 									onClick={() => onDelete(ref)}
 									className="text-destructive"
 								>
@@ -316,8 +296,6 @@ interface ReferencesDataTableProps {
 	data: ReferenceSpeechWithRelations[];
 	onDelete: (ref: ReferenceSpeechWithRelations) => void;
 	onDeleteSelected: (rows: ReferenceSpeechWithRelations[]) => void;
-	onGenerateIpa: (ref: ReferenceSpeechWithRelations) => void;
-	ipaGeneratingIds: Set<string>;
 	textFilter: string | null;
 	onTextFilterChange: (textId: string | null) => void;
 	texts: PracticeText[];
@@ -328,8 +306,6 @@ function ReferencesDataTable({
 	data,
 	onDelete,
 	onDeleteSelected,
-	onGenerateIpa,
-	ipaGeneratingIds,
 	textFilter,
 	onTextFilterChange,
 	texts,
@@ -347,7 +323,7 @@ function ReferencesDataTable({
 		? data.filter((r) => r.textId === textFilter)
 		: data;
 
-	const columns = createColumns(onDelete, onGenerateIpa, ipaGeneratingIds, onCopyIpa);
+	const columns = createColumns(onDelete, onCopyIpa);
 
 	const table = useReactTable({
 		data: filteredData,
@@ -413,9 +389,9 @@ function ReferencesDataTable({
 										{header.isPlaceholder
 											? null
 											: flexRender(
-												header.column.columnDef.header,
-												header.getContext(),
-											)}
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
 									</TableHead>
 								))}
 							</TableRow>
@@ -447,15 +423,21 @@ function ReferencesDataTable({
 													{row.original.ipaTranscription && (
 														<div className="flex flex-col gap-2">
 															<div className="flex items-center justify-between">
-																<span className="text-sm font-semibold">IPA Transcription</span>
+																<span className="font-semibold text-sm">
+																	IPA Transcription
+																</span>
 																<Button
 																	variant="ghost"
 																	size="sm"
 																	className="h-7 px-2"
 																	onClick={async () => {
 																		try {
-																			const formattedIpa = formatIpaClean(row.original.ipaTranscription!);
-																			await navigator.clipboard.writeText(formattedIpa);
+																			const formattedIpa = formatIpaClean(
+																				row.original.ipaTranscription!,
+																			);
+																			await navigator.clipboard.writeText(
+																				formattedIpa,
+																			);
 																			onCopyIpa();
 																		} catch {
 																			// Clipboard API not available
@@ -466,9 +448,11 @@ function ReferencesDataTable({
 																	Copy
 																</Button>
 															</div>
-															<div className="rounded-md bg-background border p-3">
-																<p className="font-mono text-sm break-all">
-																	{formatIpaClean(row.original.ipaTranscription)}
+															<div className="rounded-md border bg-background p-3">
+																<p className="break-all font-mono text-sm">
+																	{formatIpaClean(
+																		row.original.ipaTranscription,
+																	)}
 																</p>
 															</div>
 														</div>
@@ -547,9 +531,6 @@ function ReferencesPage() {
 	} = useRequireAdmin();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
 	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-	const [ipaGeneratingIds, setIpaGeneratingIds] = useState<Set<string>>(
-		new Set(),
-	);
 	const queryClient = useQueryClient();
 	const getReferencesFn = useServerFn(serverGetReferences);
 	const getTextsFn = useServerFn(serverGetPracticeTexts);
@@ -680,65 +661,6 @@ function ReferencesPage() {
 		});
 	};
 
-	const handleGenerateIpa = async (ref: ReferenceSpeechWithRelations) => {
-		try {
-			setIpaGeneratingIds((prev) => new Set(prev).add(ref.id));
-
-			const response = await fetch("/api/admin/ipa-generation", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ referenceSpeechId: ref.id }),
-			});
-
-			const result = await response.json();
-
-			if (result.success) {
-				toast({
-					title: "IPA generation started",
-					description: "The IPA transcription is being generated. This may take a moment.",
-				});
-
-				// Poll for completion (simple implementation)
-				const pollInterval = setInterval(async () => {
-					await queryClient.invalidateQueries({ queryKey: ["references"] });
-				}, 3000);
-
-				// Stop polling after 30 seconds
-				setTimeout(() => {
-					clearInterval(pollInterval);
-					setIpaGeneratingIds((prev) => {
-						const next = new Set(prev);
-						next.delete(ref.id);
-						return next;
-					});
-					queryClient.invalidateQueries({ queryKey: ["references"] });
-				}, 30000);
-			} else {
-				setIpaGeneratingIds((prev) => {
-					const next = new Set(prev);
-					next.delete(ref.id);
-					return next;
-				});
-				toast({
-					title: "IPA generation failed",
-					description: result.error || "Failed to start IPA generation",
-					variant: "destructive",
-				});
-			}
-		} catch {
-			setIpaGeneratingIds((prev) => {
-				const next = new Set(prev);
-				next.delete(ref.id);
-				return next;
-			});
-			toast({
-				title: "IPA generation failed",
-				description: "An error occurred while starting IPA generation",
-				variant: "destructive",
-			});
-		}
-	};
-
 	return (
 		<AdminLayout
 			title="Reference Speeches"
@@ -762,8 +684,6 @@ function ReferencesPage() {
 							data={references}
 							onDelete={handleDelete}
 							onDeleteSelected={handleDeleteSelected}
-							onGenerateIpa={handleGenerateIpa}
-							ipaGeneratingIds={ipaGeneratingIds}
 							textFilter={selectedTextId}
 							onTextFilterChange={setSelectedTextId}
 							texts={texts}

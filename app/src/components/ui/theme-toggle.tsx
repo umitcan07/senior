@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { RiMoonLine, RiSunLine } from "@remixicon/react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 

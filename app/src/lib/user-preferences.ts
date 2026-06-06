@@ -35,7 +35,7 @@ export const serverGetPreferredAuthorId = createServerFn({
 			const authResult = await auth();
 			isAuthenticated = authResult.isAuthenticated ?? false;
 			userId = authResult.userId ?? null;
-		} catch (authError) {
+		} catch (_authError) {
 			// Auth context not available
 			return null;
 		}
@@ -54,47 +54,48 @@ export const serverGetPreferredAuthorId = createServerFn({
 
 // Server Functions
 
-export const serverGetUserPreferences = createServerFn({ method: "GET" })
-	.handler(async (): Promise<ApiResponse<UserPreferences | null>> => {
+export const serverGetUserPreferences = createServerFn({
+	method: "GET",
+}).handler(async (): Promise<ApiResponse<UserPreferences | null>> => {
+	try {
+		// Get authenticated userId from Clerk - require authentication
+		let isAuthenticated = false;
+		let userId: string | null = null;
 		try {
-			// Get authenticated userId from Clerk - require authentication
-			let isAuthenticated = false;
-			let userId: string | null = null;
-			try {
-				const authResult = await auth();
-				isAuthenticated = authResult.isAuthenticated ?? false;
-				userId = authResult.userId ?? null;
-			} catch (authError) {
-				// Auth context not available
-				return createErrorResponse(
-					ErrorCode.AUTH_ERROR,
-					"User is not authenticated",
-					undefined,
-					401,
-				);
-			}
-
-			if (!isAuthenticated || !userId) {
-				return createErrorResponse(
-					ErrorCode.AUTH_ERROR,
-					"User is not authenticated",
-					undefined,
-					401,
-				);
-			}
-
-			const result = await getUserPreferences(userId);
-			return createSuccessResponse(result);
-		} catch (error) {
-			console.error("Get user preferences error:", error);
+			const authResult = await auth();
+			isAuthenticated = authResult.isAuthenticated ?? false;
+			userId = authResult.userId ?? null;
+		} catch (_authError) {
+			// Auth context not available
 			return createErrorResponse(
-				ErrorCode.DATABASE_ERROR,
-				"Failed to fetch user preferences",
+				ErrorCode.AUTH_ERROR,
+				"User is not authenticated",
 				undefined,
-				500,
+				401,
 			);
 		}
-	});
+
+		if (!isAuthenticated || !userId) {
+			return createErrorResponse(
+				ErrorCode.AUTH_ERROR,
+				"User is not authenticated",
+				undefined,
+				401,
+			);
+		}
+
+		const result = await getUserPreferences(userId);
+		return createSuccessResponse(result);
+	} catch (error) {
+		console.error("Get user preferences error:", error);
+		return createErrorResponse(
+			ErrorCode.DATABASE_ERROR,
+			"Failed to fetch user preferences",
+			undefined,
+			500,
+		);
+	}
+});
 
 export const serverUpdateUserPreferences = createServerFn({ method: "POST" })
 	.inputValidator(UpdateUserPreferencesSchema)
@@ -107,7 +108,7 @@ export const serverUpdateUserPreferences = createServerFn({ method: "POST" })
 				const authResult = await auth();
 				isAuthenticated = authResult.isAuthenticated ?? false;
 				userId = authResult.userId ?? null;
-			} catch (authError) {
+			} catch (_authError) {
 				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,

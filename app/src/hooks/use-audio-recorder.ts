@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type RecordingState = "idle" | "requesting" | "recording" | "stopped" | "error";
+export type RecordingState =
+	| "idle"
+	| "requesting"
+	| "recording"
+	| "stopped"
+	| "error";
 
 export interface UseAudioRecorderOptions {
 	onStart?: () => void;
@@ -206,14 +211,20 @@ export function useAudioRecorder(
 			onStart?.();
 		} catch (err) {
 			const error =
-				err instanceof Error
-					? err
-					: new Error("Failed to access microphone");
+				err instanceof Error ? err : new Error("Failed to access microphone");
 			setError(error.message);
 			setState("error");
 			onError?.(error);
 		}
-	}, [mimeType, audioBitsPerSecond, timeslice, onStart, onStop, onError, audioUrl]);
+	}, [
+		mimeType,
+		audioBitsPerSecond,
+		timeslice,
+		onStart,
+		onStop,
+		onError,
+		audioUrl,
+	]);
 
 	const stopRecording = useCallback(() => {
 		if (mediaRecorderRef.current && state === "recording") {
@@ -256,4 +267,3 @@ export function useAudioRecorder(
 		mediaStream,
 	};
 }
-

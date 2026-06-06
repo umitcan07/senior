@@ -1,0 +1,10 @@
+# Extra deps for the offline dev/verify harness (mod/dev/), NOT for the production worker.
+# Install once into the running dev worker (the image doesn't ship these):
+#   docker compose -f docker-compose.dev.yml exec worker-assessment \
+#     pip install -r /worker/dev/requirements-dev.txt
+#
+# openai-whisper is the ASR backend verify.py uses for clean English transcripts (automap +
+# asr). It runs on the container's existing PyTorch/CUDA 11.8 (faster-whisper's ctranslate2
+# wants CUDA 12, so we use openai-whisper instead). Set VERIFY_ASR=powsm to fall back to
+# POWSM's built-in ASR and skip this dependency.
+openai-whisper

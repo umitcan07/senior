@@ -15,7 +15,7 @@ services:
     environment:
       # Maps ENDPOINT_ID -> WORKER_URL
       # These IDs must match what your Frontend/App sends to /v2/{ID}/run
-      - 'WORKER_MAP={"pronunciation-assessment": "http://worker-assessment:8000", "ipa-generation": "http://worker-generation:8000"}'
+      - 'WORKER_MAP={"pronunciation-assessment": "http://worker-assessment:8000"}'
     networks:
       - runpod-net
 
@@ -36,33 +36,28 @@ services:
       # Optional: Mount code for hot-reloading if your handler supports it (RunPod SDK might not auto-reload)
       - ./mod/assessment:/worker/assessment
       - ./mod/shared:/worker/shared
-      - ./mod/alignment:/worker/alignment
+      - ./mod/alignment.py:/worker/alignment.py
+      - ./mod/precompute_references.py:/worker/precompute_references.py
+      - ./mod/dev:/worker/dev
+      # split_audio.py runs in-container too (ffmpeg is in the image, no host install needed).
+      - ./scripts:/worker/scripts
+      # Audio fixtures + manifest for the offline verify harness. Read-write so
+      # `verify.py align-refs --save` can write golden *.expected.json back to the host,
+      # and so split_audio.py can write cut clips into data/.
+      - ./data:/data
     networks:
       - runpod-net
     # No ports exposed to host needed, only proxy talks to it.
     # But exposing 8001 for debugging might be useful.
     ports:
       - "8001:8000"
-
-  # -----------------------------------------------------
-  # 3. IPA Generation Worker (The G2P Utility)
-  # -----------------------------------------------------
-  worker-generation:
-    build:
-      context: ./mod
-      dockerfile: ipa_generation/Dockerfile
-    environment:
-      - RUNPOD_DEBUG=true
-      - RUNPOD_PORT=8000
-      - RUNPOD_API_HOST=0.0.0.0
-    command: python3 ipa_generation/handler.py --rp_serve_api --rp_api_host 0.0.0.0
-    volumes:
-      - ./mod/ipa_generation:/worker/ipa_generation
-      - ./mod/shared:/worker/shared
-    networks:
-      - runpod-net
-    ports:
-      - "8002:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 networks:
   runpod-net:

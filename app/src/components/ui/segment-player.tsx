@@ -146,9 +146,9 @@ export function SegmentPlayer({
 	// Calculate segment progress
 	const segmentProgress = endSec
 		? Math.max(
-			0,
-			Math.min(100, ((currentTime - startSec) / segmentDuration) * 100),
-		)
+				0,
+				Math.min(100, ((currentTime - startSec) / segmentDuration) * 100),
+			)
 		: 0;
 	const segmentCurrentTime = Math.max(0, currentTime - startSec);
 
@@ -197,12 +197,7 @@ export function SegmentPlayer({
 
 	// Default variant - styled similar to WaveformPlayer but with visual differences
 	return (
-		<div
-			className={cn(
-				"rounded-xl border",
-				className,
-			)}
-		>
+		<div className={cn("rounded-xl border", className)}>
 			<div className="flex items-start justify-between gap-4">
 				{label && (
 					<div className="mb-3 flex items-center gap-2 text-muted-foreground text-sm">

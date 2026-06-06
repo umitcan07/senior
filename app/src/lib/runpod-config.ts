@@ -17,7 +17,6 @@ let _config: {
 	apiKey: string;
 	endpoints: {
 		assessment: string;
-		generation: string;
 	};
 } | null = null;
 
@@ -31,8 +30,6 @@ export function getRunPodConfig() {
 				assessment:
 					process.env.RUNPOD_ASSESSMENT_ENDPOINT_ID ??
 					"pronunciation-assessment",
-				generation:
-					process.env.RUNPOD_GENERATION_ENDPOINT_ID ?? "ipa-generation",
 			},
 		};
 	}

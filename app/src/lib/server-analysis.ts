@@ -7,7 +7,10 @@ import {
 	getPhonemeErrorsByAnalysisId,
 	getWordErrorsByAnalysisId,
 } from "@/db/analysis";
-import { getLatestAssessmentJob, type AssessmentJob } from "@/db/assessment-job";
+import {
+	type AssessmentJob,
+	getLatestAssessmentJob,
+} from "@/db/assessment-job";
 import { getUserRecordingById } from "@/db/recording";
 import { getReferenceSpeechById } from "@/db/reference";
 import type {
@@ -58,7 +61,9 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 			}
 
 			// Get user recording to verify ownership
-			const userRecording = await getUserRecordingById(analysis.userRecordingId);
+			const userRecording = await getUserRecordingById(
+				analysis.userRecordingId,
+			);
 			if (!userRecording) {
 				return createSuccessResponse(null);
 			}
@@ -70,7 +75,7 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 				const authResult = await auth();
 				isAuthenticated = authResult.isAuthenticated ?? false;
 				userId = authResult.userId ?? null;
-			} catch (authError) {
+			} catch (_authError) {
 				// Auth context not available
 				return createErrorResponse(
 					ErrorCode.AUTH_ERROR,
@@ -99,12 +104,13 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 				);
 			}
 
-			const [phonemeErrors, wordErrors, assessmentJob, reference] = await Promise.all([
-				getPhonemeErrorsByAnalysisId(analysis.id),
-				getWordErrorsByAnalysisId(analysis.id),
-				getLatestAssessmentJob(analysis.id),
-				getReferenceSpeechById(analysis.referenceSpeechId),
-			]);
+			const [phonemeErrors, wordErrors, assessmentJob, reference] =
+				await Promise.all([
+					getPhonemeErrorsByAnalysisId(analysis.id),
+					getWordErrorsByAnalysisId(analysis.id),
+					getLatestAssessmentJob(analysis.id),
+					getReferenceSpeechById(analysis.referenceSpeechId),
+				]);
 
 			const qualityMetrics = userRecording
 				? await getAudioQualityMetricsByUserRecordingId(userRecording.id)
@@ -137,4 +143,3 @@ export const serverGetAnalysisDetails = createServerFn({ method: "GET" })
 			);
 		}
 	});
-
