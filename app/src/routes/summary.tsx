@@ -305,7 +305,7 @@ function AttemptItem({ attempt }: AttemptItemProps) {
 						attempt.score === null && "bg-muted text-muted-foreground",
 					)}
 				>
-					{attempt.score ?? "—"}
+					{attempt.score !== null ? `${attempt.score}%` : "—"}
 				</div>
 				<div className="min-w-0 flex-1 space-y-1">
 					<p className="truncate font-medium text-base text-foreground/90 transition-colors group-hover:text-primary">
