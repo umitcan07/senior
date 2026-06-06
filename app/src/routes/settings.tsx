@@ -23,6 +23,7 @@ import { Spinner } from "@/components/ui/spinner";
 import type { Author, UserPreferences } from "@/db/types";
 import { useToast } from "@/hooks/use-toast";
 import { serverGetAuthors } from "@/lib/author";
+import { formatAccent } from "@/lib/dialect";
 import type { ApiResponse } from "@/lib/errors";
 import {
 	serverGetPreferredAuthorId,
@@ -124,7 +125,7 @@ function AuthorSelector({
 						<div className="flex flex-col gap-0.5">
 							<span className="font-medium">{author.name}</span>
 							<span className="text-muted-foreground text-xs">
-								{author.accent} • {author.style}
+								{formatAccent(author.accent)} • {author.style}
 							</span>
 						</div>
 					</SelectItem>

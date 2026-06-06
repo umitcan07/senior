@@ -767,7 +767,7 @@ function AccentDifferencesSection() {
 			<SectionTitle
 				title="American vs British English"
 				variant="playful"
-				description="Major pronunciation differences beyond just the 'R' and 'T' sounds. Understanding these helps you target your preferred accent."
+				description="The two accents you practice here are General American (the standard heard in US media) and Received Pronunciation (the standard used in UK broadcasting). Here are the key phonological differences — knowing these helps you understand why a sound feels wrong and which accent to target."
 			/>
 
 			<div className="flex flex-col gap-10">
