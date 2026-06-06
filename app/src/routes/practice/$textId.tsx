@@ -136,6 +136,11 @@ function useRecording(textId: string) {
 	const [countdown, setCountdown] = useState(3);
 	const navigate = useNavigate();
 	const { toast } = useToast();
+	// Track the countdown timer so we can cancel it on reset/unmount and avoid
+	// calling startRecording on an unmounted component.
+	const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+		null,
+	);
 
 	// Store uploaded file separately from recorded audio
 	const [uploadedFileBlob, setUploadedFileBlob] = useState<Blob | null>(null);
@@ -199,18 +204,36 @@ function useRecording(textId: string) {
 		setCountdown(3);
 		setUiState("countdown");
 
+		// Clear any in-flight countdown before starting a new one.
+		if (countdownIntervalRef.current) {
+			clearInterval(countdownIntervalRef.current);
+		}
+
 		let count = 3;
-		const countdownInterval = setInterval(() => {
+		countdownIntervalRef.current = setInterval(() => {
 			count--;
 			if (count > 0) {
 				setCountdown(count);
 			} else {
-				clearInterval(countdownInterval);
+				if (countdownIntervalRef.current) {
+					clearInterval(countdownIntervalRef.current);
+					countdownIntervalRef.current = null;
+				}
 				// Start actual recording AFTER countdown
 				audioRecorder.startRecording();
 			}
 		}, 600);
 	}, [audioRecorder]);
+
+	// Cancel a running countdown if the component unmounts mid-sequence.
+	useEffect(() => {
+		return () => {
+			if (countdownIntervalRef.current) {
+				clearInterval(countdownIntervalRef.current);
+				countdownIntervalRef.current = null;
+			}
+		};
+	}, []);
 
 	// Start recording with countdown - only start countdown after mic permission is granted
 	const startRecording = useCallback(async () => {
@@ -355,6 +378,10 @@ function useRecording(textId: string) {
 	);
 
 	const resetRecording = useCallback(() => {
+		if (countdownIntervalRef.current) {
+			clearInterval(countdownIntervalRef.current);
+			countdownIntervalRef.current = null;
+		}
 		setUiState("idle");
 		setCountdown(3);
 		// Clean up uploaded file
