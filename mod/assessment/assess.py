@@ -268,7 +268,13 @@ def assess_audio(
                 "carry precomputed phones — see E4)"
             )
         reference_phones = parse_ipa_phonemes(reference_ipa)
-    target_ipa = reference_ipa or _ipa_str(reference_phones)
+    # Drop POWSM's "▁" word-boundary marker: it's not a phone. Keeping it
+    # pollutes the diff/PER and leaks a leading "_" into the displayed sequence,
+    # shifting the recognized row out of alignment with the target.
+    reference_phones = [p for p in reference_phones if p != "▁"]
+    # Display the phones we actually score against (keeps TARGET consistent with
+    # the per-phone error highlighting) rather than a separate dictionary string.
+    target_ipa = _ipa_str(reference_phones)
 
     sq = check_signal_quality(audio, sr)
     duration = len(audio) / sr if sr else 0.0
@@ -296,7 +302,9 @@ def assess_audio(
     # --- Recognition + alignment (single CTC encoder pass reused below) -------
     aligner = alignment.get_aligner(device=device)
     aligner_out = aligner.encode(audio)
-    user_segs = aligner.free_alignment(audio)
+    # Drop the "▁" word-boundary segments too, so positions/timestamps stay
+    # aligned with the (▁-free) reference phones above.
+    user_segs = [s for s in aligner.free_alignment(audio) if s.token != "▁"]
     user_phones = [s.token for s in user_segs]
 
     diff = phone_diff(reference_phones, user_phones)  # (ref, user)
