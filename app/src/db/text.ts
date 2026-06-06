@@ -59,11 +59,11 @@ export async function getPracticeTextsWithReferenceCounts(): Promise<
 			updatedAt: practiceTexts.updatedAt,
 			referenceCount: count(referenceSpeeches.id),
 			usCount:
-				sql<number>`count(case when ${authors.accent} = 'US' then 1 end)`.mapWith(
+				sql<number>`count(case when ${referenceSpeeches.dialect} = 'genam' then 1 end)`.mapWith(
 					Number,
 				),
 			ukCount:
-				sql<number>`count(case when ${authors.accent} = 'UK' then 1 end)`.mapWith(
+				sql<number>`count(case when ${referenceSpeeches.dialect} = 'rp' then 1 end)`.mapWith(
 					Number,
 				),
 		})

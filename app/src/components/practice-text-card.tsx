@@ -155,13 +155,15 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 														className="flex items-center gap-1"
 														title={`${DIALECTS.us.label} voices`}
 													>
-														<span>{DIALECTS.us.flag}</span> {text.usCount ?? 0}
+														<span className={`fi fi-${DIALECTS.us.flag}`} />{" "}
+														{text.usCount ?? 0}
 													</div>
 													<div
 														className="flex items-center gap-1"
 														title={`${DIALECTS.uk.label} voices`}
 													>
-														<span>{DIALECTS.uk.flag}</span> {text.ukCount ?? 0}
+														<span className={`fi fi-${DIALECTS.uk.flag}`} />{" "}
+														{text.ukCount ?? 0}
 													</div>
 												</div>
 												{text.bestScore != null && (
@@ -189,7 +191,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											className="flex items-center gap-1.5"
 											title={`${DIALECTS.us.label} voices`}
 										>
-											<span className="text-base">{DIALECTS.us.flag}</span>
+											<span className={`fi fi-${DIALECTS.us.flag} text-base`} />
 											<span className="font-medium text-sm tabular-nums">
 												{text.usCount ?? 0}
 											</span>
@@ -198,7 +200,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 											className="flex items-center gap-1.5"
 											title={`${DIALECTS.uk.label} voices`}
 										>
-											<span className="text-base">{DIALECTS.uk.flag}</span>
+											<span className={`fi fi-${DIALECTS.uk.flag} text-base`} />
 											<span className="font-medium text-sm tabular-nums">
 												{text.ukCount ?? 0}
 											</span>
