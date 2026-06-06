@@ -454,7 +454,8 @@ function useRecording(textId: string) {
 				toast({
 					variant: "destructive",
 					title: "Couldn't read that file",
-					description: "Something went wrong reading the file. Please try again.",
+					description:
+						"Something went wrong reading the file. Please try again.",
 				});
 			}
 
@@ -804,7 +805,10 @@ const ABSTENTION_LABELS: Record<string, { short: string; full: string }> = {
 	uncertain: { short: "Unclear", full: "Couldn't analyze confidently" },
 };
 
-function abstentionLabel(reason?: string | null): { short: string; full: string } {
+function abstentionLabel(reason?: string | null): {
+	short: string;
+	full: string;
+} {
 	return (
 		(reason ? ABSTENTION_LABELS[reason] : undefined) ?? {
 			short: "Skipped",
