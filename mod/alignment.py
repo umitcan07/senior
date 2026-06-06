@@ -4,6 +4,14 @@ POWSMAligner — reusable CTC alignment module for POWSM phone recognition.
 Provides forced and free alignment of audio to IPA phone sequences using
 the POWSM model's CTC encoder. Used by assess.py (E3), precompute (E4),
 and eval harness (E6).
+
+Optionally loads a Turkish-L1 fine-tuned PEFT LoRA adapter on top of the
+baseline POWSM weights (E5). The adapter targets the multi-headed-attention
+linears (linear_q/k/v/out), which exist in the *encoder*, so the fine-tuned
+weights affect model.encode() / ctc.log_softmax() — the CTC path this aligner
+uses for free/forced alignment and GOP — not just the seq2seq decoder. Gated by
+``adapter_dir`` / ``POWSM_ADAPTER_DIR``; defaults to the baked-in adapter under
+``mod/assessment/adapter`` when present.
 """
 
 import dataclasses
@@ -56,17 +64,24 @@ _aligner: Optional["POWSMAligner"] = None
 
 
 def get_aligner(
-    model_tag: str | None = None, device: str | None = None
+    model_tag: str | None = None,
+    device: str | None = None,
+    adapter_dir: str | None = None,
 ) -> "POWSMAligner":
     global _aligner
     if _aligner is None:
-        _aligner = POWSMAligner(model_tag=model_tag, device=device)
+        _aligner = POWSMAligner(
+            model_tag=model_tag, device=device, adapter_dir=adapter_dir
+        )
     return _aligner
 
 
 class POWSMAligner:
     def __init__(
-        self, model_tag: str | None = None, device: str | None = None
+        self,
+        model_tag: str | None = None,
+        device: str | None = None,
+        adapter_dir: str | None = None,
     ):
         import torch
         from espnet2.bin.s2t_inference import Speech2Text
@@ -75,18 +90,39 @@ class POWSMAligner:
             "POWSM_MODEL_TAG", "espnet/powsm"
         )
 
+        # Turkish-L1 fine-tuned LoRA adapter (E5). Resolution order:
+        #   explicit arg > POWSM_ADAPTER_DIR env > baked-in mod/assessment/adapter.
+        # Set POWSM_ADAPTER_DIR="" to force the baseline POWSM model.
+        self.adapter_dir = self._resolve_adapter_dir(adapter_dir)
+
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = device
 
-        log.info("Loading %s on %s", self.model_tag, self.device)
+        # The adapter was fine-tuned with lang_sym="<unk>", task_sym="<pr>"; match it
+        # when active. (lang/task syms only prime the decoder prompt — the CTC encoder
+        # path this aligner uses is prompt-independent — but we mirror training for
+        # provenance and to stay safe if the decode path is ever added.)
+        lang_sym = "<unk>" if self.adapter_dir else "<eng>"
+
+        log.info(
+            "Loading %s on %s (lang_sym=%s, adapter=%s)",
+            self.model_tag,
+            self.device,
+            lang_sym,
+            self.adapter_dir or "none",
+        )
         self.s2t = Speech2Text.from_pretrained(
             self.model_tag,
             device=self.device,
-            lang_sym="<eng>",
+            lang_sym=lang_sym,
             task_sym="<pr>",
         )
-        self.model = self.s2t.s2t_model
+
+        if self.adapter_dir:
+            self._attach_lora(self.adapter_dir)
+        else:
+            self.model = self.s2t.s2t_model
 
         assert self.model.ctc.ctc_type == "builtin", (
             f"Expected builtin CTC, got {self.model.ctc.ctc_type}"
@@ -108,6 +144,43 @@ class POWSMAligner:
         assert self.frame_sec == 0.04, (
             f"Expected frame_sec=0.04, got {self.frame_sec}"
         )
+
+    @staticmethod
+    def _resolve_adapter_dir(explicit: str | None) -> str | None:
+        if explicit is not None:
+            cand = explicit
+        elif "POWSM_ADAPTER_DIR" in os.environ:
+            cand = os.environ["POWSM_ADAPTER_DIR"]  # may be "" to force baseline
+        else:
+            cand = os.path.join(
+                os.path.dirname(__file__), "assessment", "adapter"
+            )
+        cand = cand.strip() if isinstance(cand, str) else cand
+        if not cand:
+            return None
+        if not os.path.isdir(cand):
+            log.warning(
+                "POWSM adapter dir %r not found; using baseline model", cand
+            )
+            return None
+        return cand
+
+    def _attach_lora(self, adapter_dir: str) -> None:
+        """Wrap the POWSM model with the PEFT LoRA adapter, in place.
+
+        PEFT injects the LoRA modules directly into the target linears of the base
+        model, so model.encode() / ctc.log_softmax() pick up the fine-tuned weights.
+        The aligner never runs beam search, so (unlike the old assess.py loader) no
+        decoder/CTC scorer surgery is needed. We keep ``self.model`` pointed at the
+        plain ESPnetS2TModel (via get_base_model) so the existing .encode/.ctc calls
+        avoid PeftModel attribute-forwarding edge cases.
+        """
+        from peft import PeftModel
+
+        peft_model = PeftModel.from_pretrained(self.s2t.s2t_model, adapter_dir)
+        self.s2t.s2t_model = peft_model
+        self.model = peft_model.get_base_model()
+        log.info("Attached LoRA adapter from %s", adapter_dir)
 
     def _pad_20s(self, audio: np.ndarray) -> np.ndarray:
         max_samples = TARGET_SR * PAD_SECONDS
