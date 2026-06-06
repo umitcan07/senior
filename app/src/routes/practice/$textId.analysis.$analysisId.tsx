@@ -951,7 +951,7 @@ function AnalysisPage() {
 							<div className="space-y-1">
 								<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
 									{isPending && !jobSubmitted
-										? "We're analyzing your speech"
+										? "Your recording is saved"
 										: "We're analyzing your speech"}
 								</h1>
 							</div>
