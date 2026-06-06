@@ -7,3 +7,5 @@ espnet-model-zoo==0.1.7
 runpod>=1.0.0
 soundfile
 requests
+# Silero VAD for no-speech abstention (E3.1 / #18). CPU-only, runs in tens of ms.
+silero-vad
