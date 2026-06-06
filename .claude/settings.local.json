@@ -22,7 +22,8 @@
       "Bash(pdflatex report-v3.tex)",
       "Bash(/c/Users/faruq/miniconda3/Library/bin/tectonic report-v3.tex)",
       "Bash(pip show:*)",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(gh issue *)"
     ]
   }
 }
