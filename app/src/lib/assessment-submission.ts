@@ -114,19 +114,27 @@ export async function submitAssessmentJob(
 		// Get audio URL for user recording
 		const audioUri = getPublicUrl(userRecording.storageKey);
 
-		// Build RunPod input
+		// Build RunPod input (contract #22): reference-based, aligner-only. We pass
+		// the precomputed reference phones/IPA so the worker stays stateless (no DB
+		// access in mod/) and never re-aligns the reference. Prefer the cached
+		// phone_timings_json tokens; fall back to the IPA string.
+		const referencePhones =
+			referenceSpeech.phoneTimingsJson?.map((p) => p.token) ?? undefined;
+
 		const runpodInput: {
 			audio_uri: string;
-			target_text: string;
-			target_ipa?: string;
+			reference_id: string;
+			reference_phones?: string[];
+			reference_ipa?: string;
 		} = {
 			audio_uri: audioUri,
-			target_text: referenceSpeech.textContent,
+			reference_id: referenceSpeech.id,
 		};
-
-		// Include target IPA if available (avoids redundant G2P computation)
+		if (referencePhones && referencePhones.length > 0) {
+			runpodInput.reference_phones = referencePhones;
+		}
 		if (referenceSpeech.ipaTranscription) {
-			runpodInput.target_ipa = referenceSpeech.ipaTranscription;
+			runpodInput.reference_ipa = referenceSpeech.ipaTranscription;
 		}
 
 		// Submit job to RunPod
