@@ -14,7 +14,11 @@ export interface DialectInfo {
 	code: Dialect;
 	/** DB enum value stored in `reference_speeches.dialect`. */
 	dbCode: DialectDbCode;
-	/** Country flag emoji. */
+	/**
+	 * ISO 3166-1 alpha-2 country code (lowercase), used as the `flag-icons`
+	 * CSS class suffix: `<span className={`fi fi-${d.flag}`} />`.
+	 * Emoji flags are not used — they render as letter pairs on Windows.
+	 */
 	flag: string;
 	/** Compact label for chips / space-constrained UI, e.g. "American English". */
 	short: string;
@@ -26,14 +30,14 @@ export const DIALECTS: Record<Dialect, DialectInfo> = {
 	us: {
 		code: "us",
 		dbCode: "genam",
-		flag: "🇺🇸",
+		flag: "us",
 		short: "American English",
 		label: "American English (General American)",
 	},
 	uk: {
 		code: "uk",
 		dbCode: "rp",
-		flag: "🇬🇧",
+		flag: "gb",
 		short: "British English",
 		label: "British English (Received Pronunciation)",
 	},
