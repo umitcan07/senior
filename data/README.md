@@ -34,23 +34,47 @@ data/
 
 ## Add an author's audio
 
-The order takes are one continuous file (sentences + words). The recommended path maps them by
-content, so it tolerates comma pauses, retakes, and missing/extra utterances.
-
 > One-time setup: the verify harness uses Whisper for clean ASR. Install it into the dev worker:
 > `docker compose -f docker-compose.dev.yml exec worker-assessment pip install -r /worker/dev/requirements-dev.txt`
 > (See `mod/dev/requirements-dev.txt`. Set `VERIFY_ASR=powsm` to skip it and use POWSM's weaker ASR.)
 
-### 1. automap (recommended)
+### Test_user (learner recordings — 25 sentences only)
 
-Over-segments by silence, ASRs every piece (Whisper), then maps pieces → the known prompt order by
-text overlap (DP). It **auto-merges** pause-split prompts (comma sentences), **skips** extra
-utterances (retakes/junk), and **prefers one clean utterance** per prompt — robust to imperfect pauses.
+Drop the raw take anywhere as `data/test_recordings/<id>.<ext>` (m4a, wav, mp3 all work). Add the
+author to `data/authors.json` with `kind=test_user`, then:
+
+```
+# 1. start the worker (first time may need --build)
+python scripts/runpod.py --detach
+
+# 2. install Whisper once per container image
+docker compose -f docker-compose.dev.yml exec worker-assessment \
+  pip install -r /worker/dev/requirements-dev.txt
+
+# 3. segment + ASR-verify in one shot (writes labels and cuts 25 clips)
+docker compose -f docker-compose.dev.yml exec worker-assessment python3 \
+  /worker/dev/verify.py automap --author <id> \
+  --raw /data/test_recordings/<id>.<ext> --cut
+```
+
+Output lands in `data/test_recordings/<id>/ref_001.wav … ref_025.wav` (16 kHz mono PCM WAV).
+The label file is saved to `data/labels/<id>.txt` for provenance and Audacity re-cuts.
+Commit both directories; do **not** commit the raw take (it stays untracked / gitignored via `raw/`).
+
+Overlap % printed per clip is the Whisper word-overlap against the known prompt. Values ≥ 80% are
+fine for a non-native speaker; lower usually means Whisper mis-spelt a short word (audio is OK).
+
+### Reference voice (native talent — 25 sentences + 43 learn words)
+
+The order takes are one continuous file (sentences + words). The recommended path maps them by
+content, so it tolerates comma pauses, retakes, and missing/extra utterances.
 
 ```
 docker compose -f docker-compose.dev.yml exec worker-assessment python3 \
-  /worker/dev/verify.py automap --author genam_jordan --cut
+  /worker/dev/verify.py automap --author <id> --cut
 ```
+
+(Looks for `data/fiverr/<id>.wav` by default; pass `--raw` to override.)
 
 Prints each prompt with recognized text + a word-overlap % (`??` below threshold is usually just a
 short word/homophone Whisper mis-spells — `too`→"two", `ten`→"10"; audio is fine), writes
