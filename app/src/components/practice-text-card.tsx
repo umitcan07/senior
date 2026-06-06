@@ -1,5 +1,4 @@
 import {
-	RiArrowRightLine,
 	RiBookOpenLine,
 	RiBriefcaseLine,
 	RiChatQuoteLine,
@@ -122,7 +121,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 							<TableHead className="hidden w-32 text-right lg:table-cell">
 								Score
 							</TableHead>
-							<TableHead className="w-20 sm:w-24" />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -240,13 +238,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 									) : (
 										<span className="text-muted-foreground/50 text-sm">—</span>
 									)}
-								</TableCell>
-								<TableCell className="text-right">
-									<RiArrowRightLine
-										size={16}
-										aria-hidden="true"
-										className="ml-auto text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
-									/>
 								</TableCell>
 							</TableRow>
 						))}
