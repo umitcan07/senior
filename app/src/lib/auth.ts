@@ -142,7 +142,6 @@ export async function requireAdmin(request: Request) {
 export function useRequireAdmin() {
 	const { isSignedIn, user, isLoaded } = useUser();
 
-	// Wait for Clerk to load user data
 	if (!isLoaded) {
 		return { isAdmin: false, isAuthenticated: false, isLoading: true };
 	}

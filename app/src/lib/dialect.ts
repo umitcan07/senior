@@ -1,36 +1,73 @@
 // Accent / dialect display metadata.
 //
-// We only ever support two accents. The DB (`reference_speeches.dialect`)
-// stores just the codes `'us'` / `'uk'`; all human-readable naming lives here
-// in the app layer. This is the single source of truth for accent labels and
-// flags — don't hardcode "US"/"UK"/"AmE"/"BrE" strings elsewhere.
+// We support two accents. The DB (`reference_speeches.dialect`) stores the
+// codes `'genam'` / `'rp'`; all human-readable naming lives here in the app
+// layer. This is the single source of truth for accent labels and flags —
+// don't hardcode accent strings elsewhere.
 
 export type Dialect = "us" | "uk";
 
+/** Dialect codes as stored in the DB `dialectEnum` ("genam" | "rp"). */
+export type DialectDbCode = "genam" | "rp";
+
 export interface DialectInfo {
 	code: Dialect;
-	/** Country flag emoji. */
+	/** DB enum value stored in `reference_speeches.dialect`. */
+	dbCode: DialectDbCode;
+	/**
+	 * ISO 3166-1 alpha-2 country code (lowercase), used as the `flag-icons`
+	 * CSS class suffix: `<span className={`fi fi-${d.flag}`} />`.
+	 * Emoji flags are not used — they render as letter pairs on Windows.
+	 */
 	flag: string;
-	/** Compact label for chips / space-constrained UI, e.g. "GenAm". */
+	/** Compact label for chips / space-constrained UI, e.g. "American English". */
 	short: string;
-	/** Full human-readable accent name, e.g. "English (GenAm)". */
+	/** Full label including the technical term, e.g. "American English (General American)". */
 	label: string;
 }
 
 export const DIALECTS: Record<Dialect, DialectInfo> = {
 	us: {
 		code: "us",
-		flag: "🇺🇸",
-		short: "GenAm",
-		label: "English (GenAm)",
+		dbCode: "genam",
+		flag: "us",
+		short: "American English",
+		label: "American English (General American)",
 	},
 	uk: {
 		code: "uk",
-		flag: "🇬🇧",
-		short: "RP",
-		label: "British (RP)",
+		dbCode: "rp",
+		flag: "gb",
+		short: "British English",
+		label: "British English (Received Pronunciation)",
 	},
 };
+
+const DB_CODE_MAP: Record<DialectDbCode, Dialect> = {
+	genam: "us",
+	rp: "uk",
+};
+
+/** Map a DB dialect code to its DialectInfo. Returns null for unknown/null input. */
+export function dialectFromDbCode(
+	code: DialectDbCode | string | null | undefined,
+): DialectInfo | null {
+	if (!code) return null;
+	const appCode = DB_CODE_MAP[code as DialectDbCode];
+	return appCode ? DIALECTS[appCode] : null;
+}
+
+/**
+ * Map a freeform `authors.accent` string (e.g. "General American") to its
+ * short display label. Falls back to the raw value when unknown.
+ */
+export function formatAccent(accent: string | null | undefined): string {
+	if (!accent) return "";
+	const found = DIALECT_LIST.find(
+		(d) => d.label.includes(accent) || d.short === accent,
+	);
+	return found ? found.short : accent;
+}
 
 /** Stable iteration order for selectors / toggles. */
 export const DIALECT_LIST: DialectInfo[] = [DIALECTS.us, DIALECTS.uk];

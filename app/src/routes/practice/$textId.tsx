@@ -46,6 +46,7 @@ import {
 import type { Author, ReferenceSpeech } from "@/db/types";
 import { useGuestTrial } from "@/hooks/use-guest-trial";
 import { uploadAudioRecording } from "@/lib/audio-upload";
+import { dialectFromDbCode } from "@/lib/dialect";
 import type { ApiResponse } from "@/lib/errors";
 import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
@@ -526,7 +527,8 @@ function ReferenceVoice({
 													variant="secondary"
 													className="h-5 shrink-0 px-1.5 font-normal text-[10px]"
 												>
-													{selectedReference.author.accent}
+													{dialectFromDbCode(selectedReference.dialect)
+														?.short ?? selectedReference.author.accent}
 												</Badge>
 											</div>
 											{selectedReference.durationMs && (
@@ -570,7 +572,8 @@ function ReferenceVoice({
 														{ref.author.name}
 													</div>
 													<span className="shrink-0 text-muted-foreground text-xs">
-														{ref.author.accent}
+														{dialectFromDbCode(ref.dialect)?.short ??
+															ref.author.accent}
 													</span>
 												</div>
 												{isSelected && (
@@ -618,7 +621,8 @@ function ReferenceVoice({
 												{ref.author.name}
 											</div>
 											<span className="shrink-0 text-muted-foreground text-xs">
-												{ref.author.accent}
+												{dialectFromDbCode(ref.dialect)?.short ??
+													ref.author.accent}
 											</span>
 										</div>
 									</button>

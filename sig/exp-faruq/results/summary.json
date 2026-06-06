@@ -1,0 +1,21 @@
+{
+  "total_assessments": 3,
+  "avg_errors": 61.0,
+  "results": [
+    {
+      "speaker": "umit12",
+      "sentence_id": "12",
+      "total_errors": 67
+    },
+    {
+      "speaker": "yusuf12",
+      "sentence_id": "12",
+      "total_errors": 66
+    },
+    {
+      "speaker": "umit14",
+      "sentence_id": "14",
+      "total_errors": 50
+    }
+  ]
+}

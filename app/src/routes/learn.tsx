@@ -724,7 +724,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 			<div className="grid grid-cols-2 gap-4 pt-2 text-base">
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5 text-muted-foreground text-sm uppercase tracking-wider">
-						<span className="text-lg">{DIALECTS.us.flag}</span>{" "}
+						<span className={`fi fi-${DIALECTS.us.flag} text-lg`} />
 						{DIALECTS.us.short}
 					</div>
 					<p className="text-muted-foreground text-sm leading-relaxed">
@@ -734,7 +734,7 @@ function AccentDifferenceCard({ item }: { item: AccentDifference }) {
 
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5 text-muted-foreground text-sm uppercase tracking-wider">
-						<span className="text-lg">{DIALECTS.uk.flag}</span>{" "}
+						<span className={`fi fi-${DIALECTS.uk.flag} text-lg`} />
 						{DIALECTS.uk.short}
 					</div>
 					<p className="text-muted-foreground text-sm leading-relaxed">
@@ -767,7 +767,7 @@ function AccentDifferencesSection() {
 			<SectionTitle
 				title="American vs British English"
 				variant="playful"
-				description="Major pronunciation differences beyond just the 'R' and 'T' sounds. Understanding these helps you target your preferred accent."
+				description="The two accents you practice here are General American (the standard heard in US media) and Received Pronunciation (the standard used in UK broadcasting). Here are the key phonological differences — knowing these helps you understand why a sound feels wrong and which accent to target."
 			/>
 
 			<div className="flex flex-col gap-10">
@@ -951,7 +951,9 @@ function LearningPage() {
 														value={s.id}
 														className="flex-1 gap-1 text-xs sm:flex-initial"
 													>
-														<span>{DIALECTS[s.dialect].flag}</span>
+														<span
+															className={`fi fi-${DIALECTS[s.dialect].flag}`}
+														/>
 														{s.name}
 													</TabsTrigger>
 												))}

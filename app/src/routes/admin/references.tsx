@@ -58,6 +58,7 @@ import type { PracticeText } from "@/db/text";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAdmin } from "@/lib/auth";
 import { serverGetAuthors } from "@/lib/author";
+import { formatAccent } from "@/lib/dialect";
 import { formatIpaClean } from "@/lib/ipa";
 import {
 	formatDuration,
@@ -139,7 +140,7 @@ function createColumns(
 						<span className="font-medium">{author.name}</span>
 						{author.accent && (
 							<span className="text-muted-foreground text-xs">
-								{author.accent}
+								{formatAccent(author.accent)}
 							</span>
 						)}
 					</div>
