@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/waveform-player";
 import type { Author, ReferenceSpeech } from "@/db/types";
 import { useGuestTrial } from "@/hooks/use-guest-trial";
+import { useToast } from "@/hooks/use-toast";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { dialectFromDbCode } from "@/lib/dialect";
 import type { ApiResponse } from "@/lib/errors";
@@ -134,6 +135,7 @@ function useRecording(textId: string) {
 	const [uiState, setUiState] = useState<RecordingState>("idle");
 	const [countdown, setCountdown] = useState(3);
 	const navigate = useNavigate();
+	const { toast } = useToast();
 
 	// Store uploaded file separately from recorded audio
 	const [uploadedFileBlob, setUploadedFileBlob] = useState<Blob | null>(null);
@@ -230,10 +232,16 @@ function useRecording(textId: string) {
 			// Now start countdown, which will call audioRecorder.startRecording when done
 			runCountdown();
 		} catch (_err) {
-			// Permission denied or error - reset to idle state
+			// Permission denied or error - reset to idle state and tell the user
 			setUiState("idle");
+			toast({
+				variant: "destructive",
+				title: "Microphone access needed",
+				description:
+					"We couldn't access your microphone. Allow microphone access in your browser settings, then try again — or upload an audio file instead.",
+			});
 		}
-	}, [runCountdown]);
+	}, [runCountdown, toast]);
 
 	// Stop recording
 	const stopRecording = useCallback(() => {
@@ -316,11 +324,23 @@ function useRecording(textId: string) {
 						});
 					}, 500);
 				} else {
-					setUiState("idle");
+					setUiState("preview");
+					toast({
+						variant: "destructive",
+						title: "Submission failed",
+						description:
+							"We couldn't submit your recording for analysis. Your audio is still here — please try again.",
+					});
 				}
 			} catch (err) {
 				console.error("Submission error:", err);
-				setUiState("idle");
+				setUiState("preview");
+				toast({
+					variant: "destructive",
+					title: "Submission failed",
+					description:
+						"Something went wrong while uploading. Check your connection and try again.",
+				});
 			}
 		},
 		[
@@ -330,6 +350,7 @@ function useRecording(textId: string) {
 			audioRecorder.recordingTime,
 			uploadedFileBlob,
 			uploadedFileDuration,
+			toast,
 		],
 	);
 
@@ -353,12 +374,24 @@ function useRecording(textId: string) {
 			// Validate type
 			if (!file.type.startsWith("audio/")) {
 				setUiState("idle");
+				e.target.value = "";
+				toast({
+					variant: "destructive",
+					title: "Unsupported file",
+					description: "Please choose an audio file (e.g. .wav, .mp3, .m4a).",
+				});
 				return;
 			}
 
 			// Validate size (10MB limit)
 			if (file.size > 10 * 1024 * 1024) {
 				setUiState("idle");
+				e.target.value = "";
+				toast({
+					variant: "destructive",
+					title: "File too large",
+					description: "Audio files must be 10 MB or smaller.",
+				});
 				return;
 			}
 
@@ -391,15 +424,26 @@ function useRecording(textId: string) {
 					setUploadedFileBlob(null);
 					setUploadedFileDuration(0);
 					setUiState("idle");
+					toast({
+						variant: "destructive",
+						title: "Couldn't read that file",
+						description:
+							"This audio file looks corrupted or uses an unsupported format. Try a different recording.",
+					});
 				};
 			} catch {
 				setUiState("idle");
+				toast({
+					variant: "destructive",
+					title: "Couldn't read that file",
+					description: "Something went wrong reading the file. Please try again.",
+				});
 			}
 
 			// Reset file input so the same file can be selected again
 			e.target.value = "";
 		},
-		[uploadedFileUrl],
+		[uploadedFileUrl, toast],
 	);
 
 	return {
