@@ -317,15 +317,6 @@ function useRecording(textId: string) {
 					: Number.isFinite(audioRecorder.recordingTime)
 						? Math.max(1, Math.round(audioRecorder.recordingTime * 1000))
 						: 1000;
-				console.log("Submitting recording:", {
-					textId,
-					referenceId,
-					durationMs,
-					recordingTime: uploadedFileBlob
-						? uploadedFileDuration
-						: audioRecorder.recordingTime,
-					source: uploadedFileBlob ? "upload" : "record",
-				});
 
 				const response = await uploadAudioRecording({
 					data: {
