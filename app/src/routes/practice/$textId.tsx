@@ -787,6 +787,32 @@ interface RecentAttemptsProps {
 	textId: string;
 }
 
+// Short, human-readable labels for the abstention reasons (#38) so the
+// recent-attempts list conveys *why* a take was skipped without relying on a
+// hover-only title (which is invisible on touch devices).
+const ABSTENTION_LABELS: Record<string, { short: string; full: string }> = {
+	no_speech: { short: "No speech", full: "No speech was detected" },
+	low_audio_quality: { short: "Too noisy", full: "Recording was too noisy" },
+	duration_out_of_range: {
+		short: "Bad length",
+		full: "Recording length was out of range",
+	},
+	wrong_sentence: {
+		short: "Didn't match",
+		full: "Didn't match the sentence",
+	},
+	uncertain: { short: "Unclear", full: "Couldn't analyze confidently" },
+};
+
+function abstentionLabel(reason?: string | null): { short: string; full: string } {
+	return (
+		(reason ? ABSTENTION_LABELS[reason] : undefined) ?? {
+			short: "Skipped",
+			full: "This recording was skipped",
+		}
+	);
+}
+
 function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 	if (attempts.length === 0) return null;
 
@@ -878,9 +904,9 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 											<Badge
 												variant="secondary"
 												className="h-5 bg-muted/50 text-[10px] text-muted-foreground"
-												title={attempt.abstentionReason ?? undefined}
+												title={abstentionLabel(attempt.abstentionReason).full}
 											>
-												Skipped
+												{abstentionLabel(attempt.abstentionReason).short}
 											</Badge>
 										) : (
 											statusBadge
