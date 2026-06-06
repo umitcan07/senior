@@ -18,7 +18,14 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { pageVariants } from "@/components/ui/animations";
 import { Badge } from "@/components/ui/badge";
@@ -454,6 +461,42 @@ function ReferenceVoice({
 		}
 	}
 
+	// A single sliding highlight box that CSS-translates between phones — smooth
+	// motion instead of toggling each token's background on/off.
+	const phonesRef = useRef<HTMLParagraphElement>(null);
+	const [highlight, setHighlight] = useState<{
+		x: number;
+		y: number;
+		w: number;
+		h: number;
+	} | null>(null);
+	const measureHighlight = useCallback(() => {
+		const container = phonesRef.current;
+		if (!container || activePhoneIdx < 0) {
+			setHighlight(null);
+			return;
+		}
+		const el = container.children[activePhoneIdx] as HTMLElement | undefined;
+		if (!el) {
+			setHighlight(null);
+			return;
+		}
+		setHighlight({
+			x: el.offsetLeft,
+			y: el.offsetTop,
+			w: el.offsetWidth,
+			h: el.offsetHeight,
+		});
+	}, [activePhoneIdx]);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when the phone set (timings) changes, not just on index change
+	useLayoutEffect(() => {
+		measureHighlight();
+	}, [measureHighlight, timings]);
+	useEffect(() => {
+		window.addEventListener("resize", measureHighlight);
+		return () => window.removeEventListener("resize", measureHighlight);
+	}, [measureHighlight]);
+
 	if (references.length === 0) {
 		return null;
 	}
@@ -612,28 +655,39 @@ function ReferenceVoice({
 						</Badge>
 					</div>
 					{timings && timings.length > 0 ? (
-						<p className="flex flex-wrap items-center gap-x-0.5 font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide">
-							{timings.map((t, i) =>
-								t.token === "▁" ? (
-									<span
-										key={`${t.start_ms}-${i}`}
-										className="inline-block w-2"
-									/>
-								) : (
-									<span
-										key={`${t.start_ms}-${i}`}
-										className={cn(
-											"rounded px-0.5 transition-colors duration-100",
-											i === activePhoneIdx
-												? "bg-primary/25 text-foreground"
-												: "text-foreground/80",
-										)}
-									>
-										{t.token}
-									</span>
-								),
-							)}
-						</p>
+						<div className="relative">
+							<div
+								aria-hidden
+								className="pointer-events-none absolute top-0 left-0 rounded bg-primary/25 transition-[transform,width,height] duration-200 ease-out"
+								style={
+									highlight
+										? {
+												transform: `translate(${highlight.x}px, ${highlight.y}px)`,
+												width: highlight.w,
+												height: highlight.h,
+												opacity: 1,
+											}
+										: { opacity: 0 }
+								}
+							/>
+							<p
+								ref={phonesRef}
+								className="relative flex flex-wrap items-center gap-x-0.5 font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide"
+							>
+								{timings.map((t, i) =>
+									t.token === "▁" ? (
+										<span
+											key={`${t.start_ms}-${i}`}
+											className="inline-block w-2"
+										/>
+									) : (
+										<span key={`${t.start_ms}-${i}`} className="rounded px-0.5">
+											{t.token}
+										</span>
+									),
+								)}
+							</p>
+						</div>
 					) : (
 						<p className="font-ipa text-foreground/80 text-xl leading-relaxed tracking-wide">
 							{formatIpaForDisplay(selectedReference.ipaTranscription)}
