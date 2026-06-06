@@ -1,34 +1,14 @@
-import {
-	RiArrowDownLine,
-	RiBookOpenLine,
-	RiBriefcaseLine,
-	RiChatQuoteLine,
-	RiFilter3Line,
-	RiLeafLine,
-	RiMicLine,
-	RiSearch2Line,
-	RiStackLine,
-} from "@remixicon/react";
+import { RiArrowDownLine, RiSearch2Line } from "@remixicon/react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import {
-	categoryGradientVariants,
 	categoryLabels,
 	PracticeTextTable,
 } from "@/components/practice-text-card";
 import { Button } from "@/components/ui/button";
-import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from "@/components/ui/drawer";
 import { EmptyState } from "@/components/ui/empty-state";
 import { InlineLink } from "@/components/ui/inline-link";
 import { Input } from "@/components/ui/input";
@@ -43,7 +23,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TextType } from "@/db/types";
 import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
-import { cn } from "@/lib/utils";
 import {
 	getWordCountCategory,
 	useTextFilterStore,
@@ -62,46 +41,6 @@ const categoryTypes: Array<TextType | "all"> = [
 	"common_phrase",
 ];
 
-interface CategoryCardProps {
-	type: TextType | "all";
-	isSelected: boolean;
-	onClick: () => void;
-}
-
-function CategoryCard({ type, isSelected, onClick }: CategoryCardProps) {
-	// Map types to Remixicon icons
-	const Icon =
-		{
-			all: RiStackLine,
-			daily: RiLeafLine,
-			professional: RiBriefcaseLine,
-			academic: RiBookOpenLine,
-			phonetic_challenge: RiMicLine,
-			common_phrase: RiChatQuoteLine,
-		}[type] || RiStackLine;
-
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			aria-pressed={isSelected}
-			className={cn(
-				"group relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-3 transition-all duration-200",
-				"focus:outline-none focus-visible:outline-none",
-				categoryGradientVariants({ type }),
-				isSelected
-					? "ring-2 ring-white/50 ring-offset-2 ring-offset-background"
-					: "opacity-70 hover:scale-[1.02] hover:opacity-100 active:scale-[0.98]",
-			)}
-		>
-			<Icon className="size-5 shrink-0 text-white/80" strokeWidth={1.5} />
-			<span className="truncate font-medium text-sm text-white leading-tight tracking-tight">
-				{categoryLabels[type]}
-			</span>
-		</button>
-	);
-}
-
 export const Route = createFileRoute("/practice/")({
 	component: PracticePage,
 });
@@ -109,28 +48,13 @@ export const Route = createFileRoute("/practice/")({
 function PracticePageSkeleton() {
 	return (
 		<MainLayout>
-			<PageContainer>
+			<PageContainer maxWidth="lg">
 				<div className="flex flex-col gap-10">
-					{/* Filters Skeleton */}
-					<div className="flex flex-col gap-10">
-						<div className="hidden md:flex md:flex-row md:items-end md:justify-between">
-							<div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end md:flex-1">
-								<Skeleton className="h-10 max-w-md flex-1" />
-								<Skeleton className="h-10 w-[140px]" />
-							</div>
-						</div>
-						<div className="flex flex-col gap-2">
-							<Skeleton className="h-4 w-20" />
-							<div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
-								{Array.from({ length: 6 }).map((_, i) => (
-									<Skeleton key={i} className="h-12 w-full" />
-								))}
-							</div>
-						</div>
-						<div className="flex flex-col gap-2">
-							<Skeleton className="h-4 w-20" />
-							<Skeleton className="h-10 w-full" />
-						</div>
+					{/* Filters Skeleton — single row */}
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+						<Skeleton className="h-10 flex-1" />
+						<Skeleton className="h-10 w-full sm:w-[150px]" />
+						<Skeleton className="h-10 w-full sm:w-[150px]" />
 					</div>
 
 					{/* Content Skeleton */}
@@ -254,140 +178,61 @@ function PracticePage() {
 
 	return (
 		<MainLayout>
-			<PageContainer>
+			<PageContainer maxWidth="lg">
 				<div className="flex flex-col gap-10">
 					{allTexts.length > 0 && (
 						<>
 							{/* Filters Section */}
 							<section className="flex flex-col gap-10">
-								{/* Desktop: Inline filters */}
-								<div className="hidden md:flex md:flex-row md:items-end md:justify-between">
-									<div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end md:flex-1">
-										<div className="relative max-w-md flex-1">
-											<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
-											<Input
-												type="search"
-												placeholder="Search texts..."
-												className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
-												value={searchQuery}
-												onChange={(e) => {
-													setSearchQuery(e.target.value);
-													setVisibleCount(ITEMS_PER_PAGE);
-												}}
-											/>
-										</div>
-										<Select
-											value={wordCountFilter}
-											onValueChange={(v) => {
-												setWordCountFilter(v as WordCountCategory);
+								{/* Filters — single row: search + category + length */}
+								<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+									<div className="relative flex-1">
+										<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
+										<Input
+											type="search"
+											placeholder="Search texts..."
+											className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
+											value={searchQuery}
+											onChange={(e) => {
+												setSearchQuery(e.target.value);
 												setVisibleCount(ITEMS_PER_PAGE);
 											}}
-										>
-											<SelectTrigger className="w-[140px] border-border/40 bg-muted/40">
-												<SelectValue placeholder="Length" />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="all">Any Length</SelectItem>
-												<SelectItem value="short">Short (&lt;15)</SelectItem>
-												<SelectItem value="medium">Medium (15-30)</SelectItem>
-												<SelectItem value="long">Long (30+)</SelectItem>
-											</SelectContent>
-										</Select>
+										/>
 									</div>
-								</div>
-
-								<div className="flex flex-col gap-2">
-									<h3 className="font-medium text-muted-foreground text-sm">
-										Category
-									</h3>
-									<div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
-										{categoryTypes.map((type) => (
-											<CategoryCard
-												key={type}
-												type={type}
-												isSelected={typeFilter === type}
-												onClick={() => handleTypeFilterChange(type)}
-											/>
-										))}
-									</div>
-								</div>
-
-								{/* Mobile: Filter button + drawer */}
-								<div className="md:hidden">
-									<Drawer>
-										<DrawerTrigger asChild>
-											<Button variant="outline" className="w-full gap-2">
-												<RiFilter3Line size={16} />
-												Filters
-												{(searchQuery || wordCountFilter !== "all") && (
-													<span className="ml-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-														{(searchQuery ? 1 : 0) +
-															(wordCountFilter !== "all" ? 1 : 0)}
-													</span>
-												)}
-											</Button>
-										</DrawerTrigger>
-										<DrawerContent aria-describedby={undefined}>
-											<DrawerHeader>
-												<DrawerTitle>Filters</DrawerTitle>
-											</DrawerHeader>
-											<div className="flex flex-col gap-4 px-4 pb-6">
-												<div className="flex flex-col gap-2">
-													<label
-														htmlFor="drawer-search"
-														className="font-medium text-muted-foreground text-sm"
-													>
-														Search
-													</label>
-													<div className="relative">
-														<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
-														<Input
-															id="drawer-search"
-															type="search"
-															placeholder="Search texts..."
-															className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
-															value={searchQuery}
-															onChange={(e) => {
-																setSearchQuery(e.target.value);
-																setVisibleCount(ITEMS_PER_PAGE);
-															}}
-														/>
-													</div>
-												</div>
-												<div className="flex flex-col gap-2">
-													<span className="font-medium text-muted-foreground text-sm">
-														Length
-													</span>
-													<Select
-														value={wordCountFilter}
-														onValueChange={(v) => {
-															setWordCountFilter(v as WordCountCategory);
-															setVisibleCount(ITEMS_PER_PAGE);
-														}}
-													>
-														<SelectTrigger className="w-full border-border/40 bg-muted/40">
-															<SelectValue placeholder="Length" />
-														</SelectTrigger>
-														<SelectContent>
-															<SelectItem value="all">Any Length</SelectItem>
-															<SelectItem value="short">
-																Short (&lt;15)
-															</SelectItem>
-															<SelectItem value="medium">
-																Medium (15-30)
-															</SelectItem>
-															<SelectItem value="long">Long (30+)</SelectItem>
-														</SelectContent>
-													</Select>
-												</div>
-											</div>
-											<DrawerFooter>
-												<DrawerClose asChild>
-													<Button>Apply Filters</Button>
-												</DrawerClose>
-											</DrawerFooter>
-										</DrawerContent>
-									</Drawer>
+									<Select
+										value={typeFilter}
+										onValueChange={(v) =>
+											handleTypeFilterChange(v as TextType | "all")
+										}
+									>
+										<SelectTrigger className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]">
+											<SelectValue placeholder="Category" />
+										</SelectTrigger>
+										<SelectContent>
+											{categoryTypes.map((type) => (
+												<SelectItem key={type} value={type}>
+													{categoryLabels[type]}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<Select
+										value={wordCountFilter}
+										onValueChange={(v) => {
+											setWordCountFilter(v as WordCountCategory);
+											setVisibleCount(ITEMS_PER_PAGE);
+										}}
+									>
+										<SelectTrigger className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]">
+											<SelectValue placeholder="Length" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="all">Any Length</SelectItem>
+											<SelectItem value="short">Short (&lt;15)</SelectItem>
+											<SelectItem value="medium">Medium (15-30)</SelectItem>
+											<SelectItem value="long">Long (30+)</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 							</section>
 						</>
