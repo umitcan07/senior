@@ -1,0 +1,232 @@
+{
+  "author": "genam_jordan",
+  "dialect": "genam",
+  "id": "ref_025",
+  "text": "Don't forget to call your mother back tomorrow, okay?",
+  "ipa_transcription": "o ʊ̃ n t f ə˞ ɡ ɛ t tʰ u kʰ ɔ l j ɔ ɹ m ʌ ð ə˞ p æ k tʰ u m ɑ ɹ o ʊ o ʊ kʰ e ɪ",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 120.0,
+      "confidence": 0.9955
+    },
+    {
+      "token": "o",
+      "start_ms": 120.0,
+      "end_ms": 160.0,
+      "confidence": 0.9843
+    },
+    {
+      "token": "ʊ̃",
+      "start_ms": 160.0,
+      "end_ms": 240.0,
+      "confidence": 0.6349
+    },
+    {
+      "token": "n",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.8604
+    },
+    {
+      "token": "t",
+      "start_ms": 280.0,
+      "end_ms": 320.0,
+      "confidence": 0.9398
+    },
+    {
+      "token": "f",
+      "start_ms": 320.0,
+      "end_ms": 360.0,
+      "confidence": 0.9691
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9968
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 400.0,
+      "end_ms": 480.0,
+      "confidence": 0.953
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 480.0,
+      "end_ms": 520.0,
+      "confidence": 0.9981
+    },
+    {
+      "token": "t",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9899
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "u",
+      "start_ms": 640.0,
+      "end_ms": 680.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 760.0,
+      "end_ms": 800.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "l",
+      "start_ms": 800.0,
+      "end_ms": 880.0,
+      "confidence": 0.9736
+    },
+    {
+      "token": "j",
+      "start_ms": 880.0,
+      "end_ms": 960.0,
+      "confidence": 0.9729
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1000.0,
+      "end_ms": 1040.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "m",
+      "start_ms": 1040.0,
+      "end_ms": 1120.0,
+      "confidence": 0.8483
+    },
+    {
+      "token": "ʌ",
+      "start_ms": 1120.0,
+      "end_ms": 1160.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ð",
+      "start_ms": 1200.0,
+      "end_ms": 1240.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 1240.0,
+      "end_ms": 1320.0,
+      "confidence": 0.9418
+    },
+    {
+      "token": "p",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "æ",
+      "start_ms": 1440.0,
+      "end_ms": 1480.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "k",
+      "start_ms": 1520.0,
+      "end_ms": 1560.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 1640.0,
+      "end_ms": 1680.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "u",
+      "start_ms": 1720.0,
+      "end_ms": 1760.0,
+      "confidence": 0.9902
+    },
+    {
+      "token": "m",
+      "start_ms": 1760.0,
+      "end_ms": 1840.0,
+      "confidence": 0.9769
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9945
+    },
+    {
+      "token": "o",
+      "start_ms": 1960.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9825
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 2040.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9964
+    },
+    {
+      "token": "o",
+      "start_ms": 2360.0,
+      "end_ms": 2400.0,
+      "confidence": 0.9864
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 2400.0,
+      "end_ms": 2480.0,
+      "confidence": 0.8037
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 2520.0,
+      "end_ms": 2560.0,
+      "confidence": 0.7435
+    },
+    {
+      "token": "e",
+      "start_ms": 2560.0,
+      "end_ms": 2600.0,
+      "confidence": 0.9775
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2640.0,
+      "end_ms": 2680.0,
+      "confidence": 0.5478
+    }
+  ],
+  "model_tag": "espnet/powsm"
+}

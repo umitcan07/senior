@@ -1,0 +1,304 @@
+{
+  "author": "genam_jordan",
+  "dialect": "genam",
+  "id": "ref_013",
+  "text": "He found a nice little apartment downtown, close to his office.",
+  "ipa_transcription": "h i f a ʊ̃ n d ə n a ɪ s l ɪ t ə l ə p ɑ ɹ t m ə n t t a ʊ̃ n t a ʊ̃ n kʰ l o ʊ s tʰ u h ɪ z ɔ f ə s",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 80.0,
+      "confidence": 1.0
+    },
+    {
+      "token": "h",
+      "start_ms": 80.0,
+      "end_ms": 120.0,
+      "confidence": 0.9973
+    },
+    {
+      "token": "i",
+      "start_ms": 120.0,
+      "end_ms": 160.0,
+      "confidence": 0.9829
+    },
+    {
+      "token": "f",
+      "start_ms": 200.0,
+      "end_ms": 240.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "a",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ʊ̃",
+      "start_ms": 280.0,
+      "end_ms": 320.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "n",
+      "start_ms": 320.0,
+      "end_ms": 360.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "d",
+      "start_ms": 360.0,
+      "end_ms": 440.0,
+      "confidence": 0.8101
+    },
+    {
+      "token": "ə",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.992
+    },
+    {
+      "token": "n",
+      "start_ms": 520.0,
+      "end_ms": 600.0,
+      "confidence": 0.8288
+    },
+    {
+      "token": "a",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.9912
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 640.0,
+      "end_ms": 680.0,
+      "confidence": 0.9983
+    },
+    {
+      "token": "s",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "l",
+      "start_ms": 800.0,
+      "end_ms": 880.0,
+      "confidence": 0.989
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 880.0,
+      "end_ms": 920.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "t",
+      "start_ms": 920.0,
+      "end_ms": 1000.0,
+      "confidence": 0.9836
+    },
+    {
+      "token": "ə",
+      "start_ms": 1000.0,
+      "end_ms": 1040.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "l",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ə",
+      "start_ms": 1160.0,
+      "end_ms": 1200.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "p",
+      "start_ms": 1240.0,
+      "end_ms": 1280.0,
+      "confidence": 0.9943
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 1.0
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 1.0
+    },
+    {
+      "token": "t",
+      "start_ms": 1400.0,
+      "end_ms": 1480.0,
+      "confidence": 0.9622
+    },
+    {
+      "token": "m",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ə",
+      "start_ms": 1520.0,
+      "end_ms": 1560.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "n",
+      "start_ms": 1560.0,
+      "end_ms": 1600.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "t",
+      "start_ms": 1600.0,
+      "end_ms": 1640.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "t",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9738
+    },
+    {
+      "token": "a",
+      "start_ms": 1720.0,
+      "end_ms": 1800.0,
+      "confidence": 0.7187
+    },
+    {
+      "token": "ʊ̃",
+      "start_ms": 1800.0,
+      "end_ms": 1840.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "n",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "t",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.962
+    },
+    {
+      "token": "a",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ʊ̃",
+      "start_ms": 2040.0,
+      "end_ms": 2080.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "n",
+      "start_ms": 2120.0,
+      "end_ms": 2160.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 2480.0,
+      "end_ms": 2520.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "l",
+      "start_ms": 2560.0,
+      "end_ms": 2600.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "o",
+      "start_ms": 2600.0,
+      "end_ms": 2640.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 2640.0,
+      "end_ms": 2720.0,
+      "confidence": 0.9975
+    },
+    {
+      "token": "s",
+      "start_ms": 2720.0,
+      "end_ms": 2760.0,
+      "confidence": 0.8408
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 2840.0,
+      "end_ms": 2880.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "u",
+      "start_ms": 2880.0,
+      "end_ms": 2920.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "h",
+      "start_ms": 2960.0,
+      "end_ms": 3000.0,
+      "confidence": 0.9982
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 3000.0,
+      "end_ms": 3040.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "z",
+      "start_ms": 3080.0,
+      "end_ms": 3120.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 3160.0,
+      "end_ms": 3200.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "f",
+      "start_ms": 3280.0,
+      "end_ms": 3360.0,
+      "confidence": 0.9869
+    },
+    {
+      "token": "ə",
+      "start_ms": 3400.0,
+      "end_ms": 3440.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "s",
+      "start_ms": 3480.0,
+      "end_ms": 3520.0,
+      "confidence": 0.9999
+    }
+  ],
+  "model_tag": "espnet/powsm"
+}
