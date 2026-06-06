@@ -5,6 +5,7 @@
     "genam_katherine": { "kind": "reference", "dialect": "genam", "name": "Katherine", "accent": "General American", "source": "fiverr" },
     "genam_teyanna": { "kind": "reference", "dialect": "genam", "name": "Teyanna", "accent": "General American", "source": "fiverr" },
     "rp_jon": { "kind": "reference", "dialect": "rp", "name": "Jon", "accent": "Received Pronunciation", "source": "fiverr" },
-    "umit": { "kind": "test_user", "l1": "tr", "name": "Umit" }
+    "umit": { "kind": "test_user", "l1": "tr", "name": "Umit" },
+    "erem": { "kind": "test_user", "l1": "tr", "name": "Erem" }
   }
 }
