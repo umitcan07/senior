@@ -56,6 +56,10 @@ export interface WaveformPlayerProps {
 	phoneRegions?: PhoneRegion[];
 	onRegionClick?: (startMs: number, endMs: number, type: string) => void;
 	onTimeUpdate?: (seconds: number) => void;
+	// Imperatively seek + play a window (e.g. a clicked phone). Bump `nonce` to
+	// replay the same region. A small pad is added so very short phones are
+	// audible in context.
+	playRegion?: { startMs: number; endMs: number; nonce: number };
 	compact?: boolean;
 	className?: string;
 	defaultSpeed?: number;
@@ -64,12 +68,16 @@ export interface WaveformPlayerProps {
 	label?: string;
 }
 
+// Padding added on each side of a clicked segment so a ~40ms phone is audible.
+const SEGMENT_PAD_S = 0.15;
+
 function WaveformPlayerContent({
 	src,
 	errorRegions = [],
 	phoneRegions = [],
 	onRegionClick,
 	onTimeUpdate,
+	playRegion,
 	compact = false,
 	className,
 	defaultSpeed = 1,
@@ -185,6 +193,16 @@ function WaveformPlayerContent({
 			wavesurfer.setPlaybackRate(playbackSpeed);
 		}
 	}, [wavesurfer, isReady, playbackSpeed]);
+
+	// Play a requested region (clicked phone/error) in-context on this waveform.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: replay is keyed on playRegion.nonce
+	useEffect(() => {
+		if (!wavesurfer || !isReady || !playRegion) return;
+		const dur = wavesurfer.getDuration() || playRegion.endMs / 1000;
+		const start = Math.max(0, playRegion.startMs / 1000 - SEGMENT_PAD_S);
+		const end = Math.min(dur, playRegion.endMs / 1000 + SEGMENT_PAD_S);
+		wavesurfer.play(start, end);
+	}, [wavesurfer, isReady, playRegion?.nonce]);
 
 	// Update current time and duration
 	useEffect(() => {

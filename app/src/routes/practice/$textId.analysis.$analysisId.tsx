@@ -26,7 +26,6 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SegmentPlayer } from "@/components/ui/segment-player";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -791,9 +790,12 @@ function AnalysisPage() {
 	} = Route.useLoaderData();
 	const navigate = useNavigate();
 	const { user } = useUser();
-	const [activeSegment, setActiveSegment] = useState<{
-		start: number;
-		end: number;
+	// A clicked phone/error to replay in-context on the "Your Recording"
+	// waveform. `nonce` lets the same segment be replayed on repeat clicks.
+	const [playRegion, setPlayRegion] = useState<{
+		startMs: number;
+		endMs: number;
+		nonce: number;
 	} | null>(null);
 
 	// Poll for analysis status updates if analysis is pending or processing
@@ -845,7 +847,11 @@ function AnalysisPage() {
 		: undefined;
 
 	const handlePlaySegment = useCallback((startMs: number, endMs: number) => {
-		setActiveSegment({ start: startMs, end: endMs });
+		setPlayRegion((prev) => ({
+			startMs,
+			endMs,
+			nonce: (prev?.nonce ?? 0) + 1,
+		}));
 	}, []);
 
 	// Compute error regions for the waveform player (in seconds)
@@ -1165,27 +1171,10 @@ function AnalysisPage() {
 								label={userLabel}
 								phoneRegions={userPhoneRegions}
 								errorRegions={errorRegions}
+								playRegion={playRegion ?? undefined}
 							/>
 						</div>
 					</motion.div>
-
-					{/* Active Segment Player */}
-					{activeSegment && audioSrc && (
-						<motion.div
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-						>
-							<SegmentPlayer
-								src={audioSrc}
-								startMs={activeSegment.start}
-								endMs={activeSegment.end}
-								label="Playing selected segment"
-								defaultSpeed={0.75}
-								onClose={() => setActiveSegment(null)}
-							/>
-						</motion.div>
-					)}
 
 					{analysis.abstentionReason ? (
 						/* Non-happy path: show a banner instead of a (misleading) score. */
