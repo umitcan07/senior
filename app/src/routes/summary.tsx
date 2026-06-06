@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import {
 	Pagination,
 	PaginationContent,
+	PaginationEllipsis,
 	PaginationItem,
 	PaginationLink,
 	PaginationNext,
@@ -245,6 +246,25 @@ function FilterBar({
 	);
 }
 
+// Build a compact page list with ellipsis so the control doesn't grow into a
+// huge row of buttons when a user has many attempts.
+function paginationRange(
+	current: number,
+	total: number,
+): Array<number | "ellipsis"> {
+	if (total <= 7) {
+		return Array.from({ length: total }, (_, i) => i + 1);
+	}
+	const pages: Array<number | "ellipsis"> = [1];
+	const start = Math.max(2, current - 1);
+	const end = Math.min(total - 1, current + 1);
+	if (start > 2) pages.push("ellipsis");
+	for (let i = start; i <= end; i++) pages.push(i);
+	if (end < total - 1) pages.push("ellipsis");
+	pages.push(total);
+	return pages;
+}
+
 // ATTEMPT LIST ITEM
 
 interface AttemptItemProps {
@@ -390,17 +410,23 @@ function AttemptList({
 							/>
 						</PaginationItem>
 
-						{Array.from({ length: totalPages }).map((_, i) => (
-							<PaginationItem key={i}>
-								<PaginationLink
-									isActive={currentPage === i + 1}
-									onClick={() => onPageChange(i + 1)}
-									className="cursor-pointer"
-								>
-									{i + 1}
-								</PaginationLink>
-							</PaginationItem>
-						))}
+						{paginationRange(currentPage, totalPages).map((page, i) =>
+							page === "ellipsis" ? (
+								<PaginationItem key={`ellipsis-${i}`}>
+									<PaginationEllipsis />
+								</PaginationItem>
+							) : (
+								<PaginationItem key={page}>
+									<PaginationLink
+										isActive={currentPage === page}
+										onClick={() => onPageChange(page)}
+										className="cursor-pointer"
+									>
+										{page}
+									</PaginationLink>
+								</PaginationItem>
+							),
+						)}
 
 						<PaginationItem>
 							<PaginationNext
