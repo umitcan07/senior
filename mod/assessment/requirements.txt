@@ -7,5 +7,9 @@ espnet-model-zoo==0.1.7
 runpod>=1.0.0
 soundfile
 requests
-# LoRA adapter loading for the fine-tuned Turkish PR model
+# LoRA adapter loading for the fine-tuned Turkish PR model.
+# Pin transformers to 4.x: peft 0.13.2 and espnet 202412 are both built against
+# the transformers 4.x API. Without this pin pip pulls transformers 5.x, which
+# breaks peft's import (BloomPreTrainedModel lazy-import error).
+transformers==4.46.3
 peft==0.13.2
