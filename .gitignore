@@ -13,3 +13,5 @@ node_modules
 # and goldens are tracked; the big sources are not.
 data/raw/
 data/fiverr/
+
+Corpus Files/
