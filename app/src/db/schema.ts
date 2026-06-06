@@ -1,4 +1,5 @@
 import {
+	boolean,
 	decimal,
 	index,
 	integer,
@@ -240,6 +241,11 @@ export const analyses = pgTable(
 		wordScore: decimal("word_score", { precision: 5, scale: 4 }),
 		jobId: varchar("job_id", { length: 255 }),
 		status: analysisStatusEnum("status").default("pending").notNull(),
+		// Non-null when the worker abstained from scoring (E3.3 / #20): one of
+		// no_speech | low_audio_quality | duration_out_of_range | wrong_sentence |
+		// uncertain. Score columns are left NULL in this case; the UI shows a
+		// banner (#38). status stays "completed".
+		abstentionReason: text("abstention_reason"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
@@ -298,6 +304,12 @@ export const phonemeErrors = pgTable(
 		actual: varchar("actual", { length: 10 }),
 		timestampStartMs: integer("timestamp_start_ms"),
 		timestampEndMs: integer("timestamp_end_ms"),
+		// Per-phone Goodness-of-Pronunciation from POWSM CTC (E2.3 / #16):
+		// gopScore = mean logP(target) − mean best-competitor logP (can be
+		// negative); entropy in nats; uncertain = entropy over threshold.
+		gopScore: decimal("gop_score", { precision: 6, scale: 3 }),
+		entropy: decimal("entropy", { precision: 6, scale: 3 }),
+		uncertain: boolean("uncertain").default(false),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
