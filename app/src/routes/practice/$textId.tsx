@@ -900,7 +900,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 												"bg-red-500/10 text-red-600",
 										)}
 									>
-										{attempt.score}%
+										{Math.round(attempt.score!)}%
 									</span>
 								) : (
 									<div className="flex w-20 items-center justify-center">

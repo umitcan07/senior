@@ -207,10 +207,8 @@ function FilterBar({
 					<SelectContent>
 						<SelectItem value="all">All texts</SelectItem>
 						{texts.map((text) => (
-							<SelectItem key={text.id} value={text.id}>
-								{text.content.length > 30
-									? `${text.content.slice(0, 30)}…`
-									: text.content}
+							<SelectItem key={text.id} value={text.id} className="max-w-80">
+								<span className="block truncate">{text.content}</span>
 							</SelectItem>
 						))}
 					</SelectContent>

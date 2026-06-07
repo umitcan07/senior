@@ -189,6 +189,7 @@ function PracticePage() {
 									<div className="relative flex-1">
 										<RiSearch2Line className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
 										<Input
+											aria-label="Search practice texts"
 											type="search"
 											placeholder="Search texts..."
 											className="h-10 border-border/40 bg-muted/40 pl-9 transition-colors focus-visible:bg-background"
@@ -205,7 +206,10 @@ function PracticePage() {
 											handleTypeFilterChange(v as TextType | "all")
 										}
 									>
-										<SelectTrigger className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]">
+										<SelectTrigger
+											aria-label="Filter by category"
+											className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]"
+										>
 											<SelectValue placeholder="Category" />
 										</SelectTrigger>
 										<SelectContent>
@@ -223,14 +227,17 @@ function PracticePage() {
 											setVisibleCount(ITEMS_PER_PAGE);
 										}}
 									>
-										<SelectTrigger className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]">
+										<SelectTrigger
+											aria-label="Filter by word length"
+											className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]"
+										>
 											<SelectValue placeholder="Length" />
 										</SelectTrigger>
 										<SelectContent>
 											<SelectItem value="all">Any Length</SelectItem>
-											<SelectItem value="short">Short (&lt;15)</SelectItem>
-											<SelectItem value="medium">Medium (15-30)</SelectItem>
-											<SelectItem value="long">Long (30+)</SelectItem>
+											<SelectItem value="short">Short (&lt;14)</SelectItem>
+											<SelectItem value="medium">Medium (14-27)</SelectItem>
+											<SelectItem value="long">Long (28+)</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
