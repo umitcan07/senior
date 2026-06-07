@@ -26,6 +26,7 @@ import { Route as ApiAssessmentRouteImport } from './routes/api/assessment'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
 import { Route as AdminReferencesRouteImport } from './routes/admin/references'
+import { Route as AdminJobsRouteImport } from './routes/admin/jobs'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
@@ -122,6 +123,11 @@ const AdminReferencesRoute = AdminReferencesRouteImport.update({
   path: '/admin/references',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminJobsRoute = AdminJobsRouteImport.update({
+  id: '/admin/jobs',
+  path: '/admin/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/admin/users': typeof AdminUsersRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/admin/users': typeof AdminUsersRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/admin/users': typeof AdminUsersRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/authors'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/references'
     | '/admin/text'
     | '/admin/users'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/authors'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/references'
     | '/admin/text'
     | '/admin/users'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/authors'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/references'
     | '/admin/text'
     | '/admin/users'
@@ -363,6 +375,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuthorsRoute: typeof AdminAuthorsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminJobsRoute: typeof AdminJobsRoute
   AdminReferencesRoute: typeof AdminReferencesRoute
   AdminTextRoute: typeof AdminTextRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -497,6 +510,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReferencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/jobs': {
+      id: '/admin/jobs'
+      path: '/admin/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AdminJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/admin/dashboard'
@@ -620,6 +640,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuthorsRoute: AdminAuthorsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminJobsRoute: AdminJobsRoute,
   AdminReferencesRoute: AdminReferencesRoute,
   AdminTextRoute: AdminTextRoute,
   AdminUsersRoute: AdminUsersRoute,
