@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import {
+	categoryGradientVariants,
 	categoryLabels,
 	PracticeTextTable,
 } from "@/components/practice-text-card";
@@ -23,6 +24,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TextType } from "@/db/types";
 import { serverGetPracticeTextsWithAttemptStats } from "@/lib/text";
+import { cn } from "@/lib/utils";
 import {
 	getWordCountCategory,
 	useTextFilterStore,
@@ -208,13 +210,19 @@ function PracticePage() {
 									>
 										<SelectTrigger
 											aria-label="Filter by category"
-											className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]"
+											className="h-10 w-full border-border/40 bg-muted/40 sm:w-[150px]"
 										>
 											<SelectValue placeholder="Category" />
 										</SelectTrigger>
 										<SelectContent>
 											{categoryTypes.map((type) => (
 												<SelectItem key={type} value={type}>
+													<span
+														className={cn(
+															"size-2.5 shrink-0 rounded-full",
+															categoryGradientVariants({ type }),
+														)}
+													/>
 													{categoryLabels[type]}
 												</SelectItem>
 											))}
@@ -229,7 +237,7 @@ function PracticePage() {
 									>
 										<SelectTrigger
 											aria-label="Filter by word length"
-											className="h-10 w-full border-border/40 bg-muted/40 *:data-[slot=select-value]:ml-auto sm:w-[150px]"
+											className="h-10 w-full border-border/40 bg-muted/40 sm:w-[150px]"
 										>
 											<SelectValue placeholder="Length" />
 										</SelectTrigger>
