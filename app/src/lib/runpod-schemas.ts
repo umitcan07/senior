@@ -9,8 +9,11 @@ import { z } from "zod";
 export const RunPodStatusSchema = z.enum([
 	"IN_QUEUE",
 	"IN_PROGRESS",
+	"RUNNING", // docs alias for IN_PROGRESS
 	"COMPLETED",
 	"FAILED",
+	"CANCELLED",
+	"TIMED_OUT",
 ]);
 
 export type RunPodStatus = z.infer<typeof RunPodStatusSchema>;
@@ -156,10 +159,13 @@ export function mapRunPodStatusToDb(
 		case "IN_QUEUE":
 			return "in_queue";
 		case "IN_PROGRESS":
+		case "RUNNING":
 			return "in_progress";
 		case "COMPLETED":
 			return "completed";
 		case "FAILED":
+		case "CANCELLED":
+		case "TIMED_OUT":
 			return "failed";
 	}
 }

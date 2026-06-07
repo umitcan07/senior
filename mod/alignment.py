@@ -10,8 +10,7 @@ baseline POWSM weights (E5). The adapter targets the multi-headed-attention
 linears (linear_q/k/v/out), which exist in the *encoder*, so the fine-tuned
 weights affect model.encode() / ctc.log_softmax() — the CTC path this aligner
 uses for free/forced alignment and GOP — not just the seq2seq decoder. Gated by
-``adapter_dir`` / ``POWSM_ADAPTER_DIR``; defaults to the baked-in adapter under
-``mod/assessment/adapter`` when present.
+``adapter_dir`` / ``POWSM_ADAPTER_DIR``; defaults to the baseline model (no adapter).
 """
 
 import dataclasses
@@ -150,11 +149,9 @@ class POWSMAligner:
         if explicit is not None:
             cand = explicit
         elif "POWSM_ADAPTER_DIR" in os.environ:
-            cand = os.environ["POWSM_ADAPTER_DIR"]  # may be "" to force baseline
+            cand = os.environ["POWSM_ADAPTER_DIR"]  # set to non-empty path to enable adapter
         else:
-            cand = os.path.join(
-                os.path.dirname(__file__), "assessment", "adapter"
-            )
+            return None  # baseline model by default
         cand = cand.strip() if isinstance(cand, str) else cand
         if not cand:
             return None
