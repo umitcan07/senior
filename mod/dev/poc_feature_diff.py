@@ -397,9 +397,287 @@ def step_learner():
         print(f"    feature: {' '.join(f'{op}({r}->{u})' if op!='match' else r for op,r,u in fr)}")
 
 
+# =========================================================================== #
+# Aggregate results — single grounded source for every number cited in the report.
+# Writes poc_cache/results.json (machine, full per-item) + doc/e7.6_poc_results.md
+# (committed, the aggregate tables). Re-run to regenerate.
+# =========================================================================== #
+CLOSE_THRESHOLD = 3
+SCALE = 2.0
+DOC_RESULTS = os.path.join(ROOT, "doc", "e7.6_poc_results.md")
+
+
+def _op_totals(rows):
+    s, i, d, m = counts(rows)
+    return {"sub": s, "ins": i, "del": d, "match": m}
+
+
+def _compare(items):
+    """items: list of (key, ref, usr). Aggregate binary (before) vs feature (after)."""
+    cost = make_feature_cost(scale=SCALE)
+    bt = {"sub": 0, "ins": 0, "del": 0, "match": 0, "edit_cost": 0.0}
+    ft = {"sub": 0, "ins": 0, "del": 0, "match": 0, "edit_cost": 0.0, "close_sub": 0, "hard_sub": 0}
+    changed = 0
+    hist = {}
+    rows_out = []
+    for key, ref, usr in items:
+        bc, br = align(ref, usr, binary_cost)
+        fc, fr = align(ref, usr, cost)
+        b, f = _op_totals(br), _op_totals(fr)
+        for k in ("sub", "ins", "del", "match"):
+            bt[k] += b[k]
+            ft[k] += f[k]
+        bt["edit_cost"] += bc
+        ft["edit_cost"] += fc
+        close = hard = 0
+        for op, r, u in fr:
+            if op == "sub":
+                h = hamming(r, u)
+                dd = h[0] if h else 99
+                hist[dd] = hist.get(dd, 0) + 1
+                if dd <= CLOSE_THRESHOLD:
+                    close += 1
+                else:
+                    hard += 1
+        ft["close_sub"] += close
+        ft["hard_sub"] += hard
+        ch = [(o, r, u) for o, r, u in br] != [(o, r, u) for o, r, u in fr]
+        changed += 1 if ch else 0
+        rows_out.append({"key": list(key), "binary": b,
+                         "feature": {**f, "close_sub": close, "hard_sub": hard}, "changed": ch})
+    bt["edit_cost"] = round(bt["edit_cost"], 1)
+    ft["edit_cost"] = round(ft["edit_cost"], 1)
+    return {"n": len(items), "binary": bt, "feature": ft, "changed": changed,
+            "insdel_binary": bt["ins"] + bt["del"], "insdel_feature": ft["ins"] + ft["del"],
+            "sub_delta_hist": {str(k): v for k, v in sorted(hist.items())}, "rows": rows_out}
+
+
+def _coverage(inv):
+    covered = [t for t in inv if vec(t) is not None]
+    unc = sorted([t for t in inv if vec(t) is None], key=lambda t: -inv[t])
+    return {"unique": len(inv), "unique_covered": len(covered),
+            "occ": sum(inv.values()), "occ_covered": sum(inv[t] for t in covered),
+            "uncovered": unc}
+
+
+def _selftest_data():
+    cost = make_feature_cost(scale=SCALE)
+    cases = [("identical", "s", "s"), ("nasalization ɛ/ɛ̃", "ɛ", "ɛ̃"),
+             ("velarized l/ɫ (norm)", "l", "ɫ"), ("close vowels ɪ/i", "ɪ", "i"),
+             ("voicing s/z", "s", "z"), ("TR-L1 θ/s", "θ", "s"), ("TR-L1 w/v", "w", "v"),
+             ("very different p/i", "p", "i"), ("ɑ̃/ɔ̃ (comment#2)", "ɑ̃", "ɔ̃"),
+             ("ɛ̃/ɪ̃ (comment#2)", "ɛ̃", "ɪ̃")]
+    out = []
+    for label, a, b in cases:
+        h = hamming(a, b)
+        out.append({"case": label, "pair": f"{a}/{b}", "dfeat": (h[0] if h else None),
+                    "sub_cost": round(cost(a, b), 3),
+                    "differing": (differing_features(a, b) if h else None)})
+    return out
+
+
+def _s4_data():
+    cost = make_feature_cost(scale=SCALE)
+    contrasts = [("θ→t think", "θ", "t"), ("θ→s think", "θ", "s"), ("ð→d this", "ð", "d"),
+                 ("ð→z this", "ð", "z"), ("w→v wine/vine", "w", "v"), ("ŋ→n sing", "ŋ", "n"),
+                 ("ɹ→ɾ red", "ɹ", "ɾ"), ("æ→a bat", "æ", "a"), ("æ→ɛ bat/bet", "æ", "ɛ"),
+                 ("ə→a about", "ə", "a"), ("ɪ→i ship/sheep", "ɪ", "i"), ("ʊ→u full/fool", "ʊ", "u"),
+                 ("ʌ→a but", "ʌ", "a")]
+    out, close = [], 0
+    for label, a, b in contrasts:
+        h = hamming(a, b)
+        minor = bool(h and h[0] <= CLOSE_THRESHOLD)
+        close += 1 if minor else 0
+        out.append({"contrast": label, "pair": f"{a}/{b}", "dfeat": (h[0] if h else None),
+                    "sub_cost": round(cost(a, b), 3), "feature_close": minor,
+                    "differing": (differing_features(a, b) if h else None)})
+    return {"contrasts": out, "close_count": close, "total": len(contrasts)}
+
+
+def _fidelity(items):
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "mod"))
+        import phone_diff as pd
+    except Exception as e:  # noqa: BLE001
+        return {"available": False, "error": str(e)}
+    checked = mismatch = 0
+    for _key, ref, usr in items:
+        _, br = align(ref, usr, binary_cost)
+        mine = [(o, r, u) for o, r, u in br]
+        prod = [(a["op"], a["ref"], a["user"]) for a in pd.phone_diff(ref, usr)["alignment"]]
+        checked += 1
+        mismatch += 1 if mine != prod else 0
+    return {"available": True, "checked": checked, "identical": checked - mismatch, "mismatch": mismatch}
+
+
+def emit_results():
+    section("EMIT AGGREGATE RESULTS")
+    goldens = load_goldens()
+    inv_native = Counter()
+    for ph in goldens.values():
+        inv_native.update(ph)
+    authors = sorted({a for a, _ in goldens})
+    refids = sorted({r for _, r in goldens})
+    native_items = []
+    for rid in refids:
+        present = [a for a in authors if (a, rid) in goldens]
+        for x in range(len(present)):
+            for y in range(x + 1, len(present)):
+                native_items.append(((rid, present[x], present[y]),
+                                     goldens[(present[x], rid)], goldens[(present[y], rid)]))
+    results = {"meta": {"scale": SCALE, "close_threshold": CLOSE_THRESHOLD,
+                        "feature_count": len(_names()), "norm_map": NORM_MAP},
+               "coverage": {"native": _coverage(inv_native)},
+               "self_tests": _selftest_data(),
+               "s4": _s4_data(),
+               "native_tier": _compare(native_items)}
+
+    path = os.path.join(CACHE_DIR, "learner_phones.json")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            learner = json.load(f)
+        meta = learner.pop("_meta", {})
+        items, per_spk_items, inv_learn = [], {}, Counter()
+        for spk, refs in learner.items():
+            per_spk_items[spk] = []
+            for rid, rec in refs.items():
+                ref = [p for p in rec["ref_phones"] if p != WB]
+                usr = [p for p in rec["user_phones"] if p != WB]
+                items.append(((spk, rid), ref, usr))
+                per_spk_items[spk].append(((spk, rid), ref, usr))
+                inv_learn.update(ref)
+                inv_learn.update(usr)
+        learner_agg = _compare(items)
+        per_spk = {}
+        for spk, its in per_spk_items.items():
+            c = _compare(its)
+            c.pop("rows", None)
+            per_spk[spk] = c
+        results["meta"]["model"] = meta
+        results["coverage"]["learner_plus_ref"] = _coverage(inv_learn)
+        results["coverage"]["learner_new_tokens"] = sorted(
+            [t for t in inv_learn if t not in inv_native], key=lambda t: -inv_learn[t])
+        results["learner_tier"] = {**learner_agg, "per_speaker": per_spk,
+                                   "fidelity": _fidelity(items)}
+    else:
+        print(f"(no learner cache at {path} — emitting Tier 1 only)")
+
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(os.path.join(CACHE_DIR, "results.json"), "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    _write_results_md(results)
+    print(f"wrote {os.path.join(CACHE_DIR, 'results.json')}")
+    print(f"wrote {DOC_RESULTS}")
+    return results
+
+
+def _tbl(headers, rows):
+    out = ["| " + " | ".join(headers) + " |", "|" + "|".join(["---"] * len(headers)) + "|"]
+    for r in rows:
+        out.append("| " + " | ".join(str(c) for c in r) + " |")
+    return "\n".join(out)
+
+
+def _ba_table(agg):
+    """before(binary) vs after(feature) op-composition table for one tier."""
+    b, f = agg["binary"], agg["feature"]
+    return _tbl(["metric", "binary (before)", "feature (after)"], [
+        ["substitutions", b["sub"], f"{f['sub']} ({f['close_sub']} close Δ≤{CLOSE_THRESHOLD}, {f['hard_sub']} hard)"],
+        ["insertions", b["ins"], f["ins"]],
+        ["deletions", b["del"], f["del"]],
+        ["insertions+deletions", agg["insdel_binary"], agg["insdel_feature"]],
+        ["total edit cost", b["edit_cost"], f["edit_cost"]],
+        [f"items w/ changed alignment", f"0 / {agg['n']}", f"{agg['changed']} / {agg['n']}"],
+    ])
+
+
+def _write_results_md(r):
+    m = r["meta"]
+    L = [f"# E7.6 POC — aggregate results (issue #57)",
+         "",
+         f"**Generated** by `mod/dev/poc_feature_diff.py --emit-results`. Do not hand-edit — re-run to refresh.",
+         f"Feature cost = `{m['scale']} × (Δfeatures / {m['feature_count']})`; \"close\" = Δ ≤ {m['close_threshold']} features. "
+         f"Binary baseline = production `mod/phone_diff.py` (sub=2, ins=del=1).", ""]
+    mdl = m.get("model", {})
+    if mdl:
+        L += [f"Learner/reference phones: POWSM `{mdl.get('model_tag')}`, adapter `{mdl.get('adapter')}`, "
+              f"reference author `{mdl.get('ref_author')}`.", ""]
+
+    L += ["## Coverage (feasibility gate)", ""]
+    cov = r["coverage"]
+    cov_rows = []
+    for name, key in [("native goldens", "native"), ("learner + live reference", "learner_plus_ref")]:
+        c = cov.get(key)
+        if not c:
+            continue
+        cov_rows.append([name, f"{c['unique_covered']}/{c['unique']}",
+                         f"{100*c['unique_covered']/c['unique']:.1f}%",
+                         f"{c['occ_covered']}/{c['occ']}",
+                         f"{100*c['occ_covered']/c['occ']:.2f}%"])
+    L.append(_tbl(["inventory", "unique covered", "%", "occurrences covered", "%"], cov_rows))
+    nt = cov.get("learner_new_tokens", [])
+    if nt:
+        L += ["", f"Learner-side tokens absent from native goldens but still covered ({len(nt)}): "
+              + " ".join(f"`{t}`" for t in nt[:30]) + ("…" if len(nt) > 30 else "")]
+    unc = cov["native"]["uncovered"] + (cov.get("learner_plus_ref", {}).get("uncovered", []))
+    L += ["", f"Uncovered tokens: **{len(unc)}**" + (": " + " ".join(f"`{t}`" for t in unc) if unc else " (NORM_MAP not required for observed data).")]
+
+    L += ["", "## Native-vs-native upper bound (both speakers correct)", ""]
+    L.append(_ba_table(r["native_tier"]))
+
+    if "learner_tier" in r:
+        lt = r["learner_tier"]
+        L += ["", "## Learner data — real Turkish-L1 (before → after)", ""]
+        L.append(_ba_table(lt))
+        L += ["", f"Insertion+deletion pairs collapsed into localized substitutions: "
+              f"**{lt['insdel_binary'] - lt['insdel_feature']}** ({lt['insdel_binary']} → {lt['insdel_feature']}). "
+              f"Alignment changed on **{lt['changed']}/{lt['n']}** clips.", ""]
+        fid = lt.get("fidelity", {})
+        if fid.get("available"):
+            L += [f"Harness fidelity: binary aligner identical to production `phone_diff` on "
+                  f"**{fid['identical']}/{fid['checked']}** clips ({fid['mismatch']} mismatches).", ""]
+        L += ["### Per speaker", ""]
+        ps_rows = []
+        for spk, c in lt["per_speaker"].items():
+            b, f = c["binary"], c["feature"]
+            ps_rows.append([spk, c["n"], f"{b['sub']}/{b['ins']}/{b['del']}",
+                            f"{f['sub']}/{f['ins']}/{f['del']}",
+                            f"{c['insdel_binary']}→{c['insdel_feature']}", f"{c['changed']}/{c['n']}"])
+        L.append(_tbl(["speaker", "clips", "binary sub/ins/del", "feature sub/ins/del", "ins+del", "changed"], ps_rows))
+        L += ["", "### Substitution Δfeature histogram (feature alignment, learner)", ""]
+        hist = lt["sub_delta_hist"]
+        tot = sum(hist.values()) or 1
+        cum = 0
+        h_rows = []
+        for k in sorted(hist, key=lambda x: int(x)):
+            cum += hist[k]
+            h_rows.append([f"Δ={k}", hist[k], f"{100*hist[k]/tot:.0f}%", f"{100*cum/tot:.0f}%"])
+        L.append(_tbl(["Δfeatures", "count", "% of subs", "cumulative %"], h_rows))
+
+    L += ["", "## §4 Turkish-L1 contrasts (severity decision)", ""]
+    s4 = r["s4"]
+    s4_rows = [[c["contrast"], c["pair"], c["dfeat"], c["sub_cost"],
+                "close" if c["feature_close"] else "far",
+                ", ".join(c["differing"]) if c["differing"] else ""] for c in s4["contrasts"]]
+    L.append(_tbl(["contrast", "pair", "Δfeat", "sub_cost", "feature verdict", "differing features"], s4_rows))
+    L += ["", f"**{s4['close_count']}/{s4['total']}** core §4 contrasts are feature-close (Δ≤{CLOSE_THRESHOLD}) — "
+          "a pure feature-distance severity would wrongly downplay them, so a curated §4 override is warranted.", ""]
+
+    L += ["## Feature-cost self-tests", ""]
+    st_rows = [[c["case"], c["pair"], c["dfeat"], c["sub_cost"],
+                ", ".join(c["differing"]) if c["differing"] else ""] for c in r["self_tests"]]
+    L.append(_tbl(["case", "pair", "Δfeat", "sub_cost", "differing features"], st_rows))
+    L.append("")
+    with open(DOC_RESULTS, "w", encoding="utf-8") as f:
+        f.write("\n".join(L))
+
+
 def main():
     if "--emit-learner" in sys.argv:
         emit_learner()
+        return
+    if "--emit-results" in sys.argv:
+        emit_results()
         return
     goldens = load_goldens()
     inv = step_inventory(goldens)
@@ -409,6 +687,7 @@ def main():
     step_s4()
     step_sweep()
     step_learner()
+    emit_results()
     section("DONE")
 
 
