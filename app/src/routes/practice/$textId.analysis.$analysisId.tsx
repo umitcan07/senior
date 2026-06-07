@@ -46,6 +46,7 @@ import type {
 import type { ApiResponse } from "@/lib/errors";
 import { getScoreLevel, scoreColorVariants } from "@/lib/score";
 import { serverGetAnalysisDetails } from "@/lib/server-analysis";
+import { serverGetPracticeTextById } from "@/lib/text";
 import { cn } from "@/lib/utils";
 
 type PreviousAttempt = {
@@ -138,12 +139,25 @@ export const Route = createFileRoute("/practice/$textId/analysis/$analysisId")({
 
 			const mockPreviousAttempts: PreviousAttempt[] = [];
 
+			// Fetch the practice text so the page can show which sentence was read.
+			let text: PracticeText | null = null;
+			try {
+				const textResult = (await serverGetPracticeTextById({
+					data: { id: params.textId },
+				})) as ApiResponse<PracticeText>;
+				if (textResult.success && textResult.data) {
+					text = textResult.data;
+				}
+			} catch {
+				text = null;
+			}
+
 			return {
 				analysis,
 				userRecording,
 				audioQualityMetrics,
 				reference,
-				text: null,
+				text,
 				author,
 				phonemeErrors,
 				wordErrors,
@@ -263,10 +277,9 @@ function ScoreRing({
 // Score Overview with animation
 interface ScoreOverviewProps {
 	overallScore: number;
-	phonemeScore: number | null;
 }
 
-function ScoreOverview({ overallScore, phonemeScore }: ScoreOverviewProps) {
+function ScoreOverview({ overallScore }: ScoreOverviewProps) {
 	const percentage = Math.round(overallScore * 100);
 	const level = getScoreLevel(percentage);
 
@@ -308,17 +321,11 @@ function ScoreOverview({ overallScore, phonemeScore }: ScoreOverviewProps) {
 				</CardHeader>
 				<CardContent className="px-4 py-6">
 					<div className="flex flex-col items-center gap-8">
-						<ScoreRing score={overallScore} size="xl" label="Overall Score" />
-
-						{phonemeScore !== null && (
-							<div className="flex w-full justify-center border-border/40 border-t pt-6">
-								<ScoreRing
-									score={phonemeScore}
-									size="md"
-									label="Phoneme Accuracy"
-								/>
-							</div>
-						)}
+						<ScoreRing
+							score={overallScore}
+							size="xl"
+							label="Pronunciation Score"
+						/>
 					</div>
 				</CardContent>
 			</Card>
@@ -783,6 +790,7 @@ function AnalysisPage() {
 		userRecording,
 		phonemeErrors: initialLoaderPhonemeErrors,
 		textId,
+		text,
 		reference,
 		author,
 		audioQualityMetrics: initialQualityMetrics,
@@ -1147,6 +1155,18 @@ function AnalysisPage() {
 						</div>
 					</motion.div>
 
+					{/* The sentence that was practiced */}
+					{text?.content && (
+						<motion.p
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3, delay: 0.05 }}
+							className="text-pretty font-ipa text-foreground/90 text-lg leading-relaxed md:text-xl"
+						>
+							{text.content}
+						</motion.p>
+					)}
+
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -1217,14 +1237,7 @@ function AnalysisPage() {
 					) : (
 						<>
 							{/* Score Overview */}
-							<ScoreOverview
-								overallScore={Number(analysis.overallScore)}
-								phonemeScore={
-									analysis.phonemeScore !== null
-										? Number(analysis.phonemeScore)
-										: null
-								}
-							/>
+							<ScoreOverview overallScore={Number(analysis.overallScore)} />
 
 							{/* Comparisons - stacked vertically for better readability */}
 							<motion.div
