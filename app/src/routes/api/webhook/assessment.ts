@@ -169,6 +169,11 @@ export const Route = createFileRoute("/api/webhook/assessment")({
 									err.gop_score != null ? err.gop_score.toFixed(3) : null,
 								entropy: err.entropy != null ? err.entropy.toFixed(3) : null,
 								uncertain: err.uncertain ?? false,
+								featureDistance:
+									err.feature_distance != null
+										? err.feature_distance.toFixed(3)
+										: null,
+								featureDelta: err.feature_delta ?? null,
 							}));
 							await insertPhonemeErrors(phonemeErrorRows);
 

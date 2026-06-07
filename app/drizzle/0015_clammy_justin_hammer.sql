@@ -1,0 +1,1 @@
+ALTER TABLE "phoneme_errors" ADD COLUMN "feature_distance" numeric(6, 3);

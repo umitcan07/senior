@@ -104,3 +104,27 @@ def feature_sub_cost(a, b):
         return UNCOVERED_COST
     differing = sum(1 for x, y in zip(va, vb) if x != y)
     return SCALE * (differing / FEATURE_COUNT)
+
+
+# PanPhon numeric feature values -> ternary symbols (matches the POC).
+_SYM = {1: "+", 0: "0", -1: "-"}
+
+
+@functools.lru_cache(maxsize=None)
+def feature_delta(a, b):
+    """The articulatory features that DIFFER between phones ``a`` (reference) and
+    ``b`` (user), as a tuple of ``{"feature", "ref", "user"}`` dicts (PanPhon feature
+    name + ternary ±/0 values). Empty tuple if identical; ``None`` if either phone is
+    uncovered. This is the structured substrate for place/voicing/manner hints (E7.6 /
+    #57) and a future LLM coaching pass — the app maps feature names to plain language.
+    """
+    if a == b:
+        return ()
+    va, vb = _vec(a), _vec(b)
+    if va is None or vb is None:
+        return None
+    return tuple(
+        {"feature": name, "ref": _SYM[x], "user": _SYM[y]}
+        for name, x, y in zip(_table().names, va, vb)
+        if x != y
+    )

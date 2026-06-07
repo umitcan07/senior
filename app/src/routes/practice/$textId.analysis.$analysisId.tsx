@@ -13,6 +13,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DiffViewer } from "@/components/diff-viewer";
+import { FocusAreas } from "@/components/focus-areas";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -924,6 +925,9 @@ function AnalysisPage() {
 										</span>
 									</div>
 								)}
+
+								{/* E7.6 / #57 — coaching focus areas (critical/major contrasts). */}
+								<FocusAreas errors={phonemeErrors ?? []} />
 
 								{analysis.targetPhonemes && (
 									<DiffViewer

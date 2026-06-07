@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import alignment  # mod/alignment.py
 import gop_scoring  # mod/gop_scoring.py
 from phone_diff import phone_diff  # mod/phone_diff.py
+from phone_features import feature_delta, feature_sub_cost  # mod/phone_features.py (E7.6 #57)
 from shared.audio import load_audio
 from vad import has_speech
 
@@ -418,6 +419,18 @@ def assess_audio(
             entropy = fg.entropy if fg is not None else None
             uncertain = fg.uncertain if fg is not None else None
 
+        # Articulatory features for the app-side severity/hint layer (E7.6 / #57).
+        # Substitutions only (both phones present): the scalar distance drives
+        # severity, the per-feature delta drives place/voicing/manner hints + a future
+        # LLM pass. None for insert/delete; delta is None too if a phone is uncovered.
+        if e["type"] == "sub":
+            feat_distance = feature_sub_cost(e["expected"], e["actual"])
+            fd = feature_delta(e["expected"], e["actual"])
+            feat_delta = list(fd) if fd is not None else None
+        else:
+            feat_distance = None
+            feat_delta = None
+
         errors.append({
             "type": _LABEL[e["type"]],
             "position": up if up is not None else rp,
@@ -430,6 +443,8 @@ def assess_audio(
             "gop_score": gop_score,
             "entropy": entropy,
             "uncertain": uncertain,
+            "feature_distance": feat_distance,
+            "feature_delta": feat_delta,
         })
 
     # Recognized phones the user actually produced (for the user-recording

@@ -1,5 +1,10 @@
 import { RiInformationLine } from "@remixicon/react";
 import { useEffect, useState } from "react";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	Tooltip,
@@ -16,7 +21,71 @@ import {
 	errorBorderVariants,
 	errorTextVariants,
 } from "@/lib/diff-viewer";
+import {
+	coachingFor,
+	type PhoneCoaching,
+	type Severity,
+	severityRingVariants,
+} from "@/lib/phone-hints";
 import { cn } from "@/lib/utils";
+
+// E7.6 / #57 — short label + color for a substitution's pedagogical severity.
+const SEVERITY_LABEL: Record<Severity, string> = {
+	critical: "Key fix",
+	major: "Worth a look",
+	minor: "",
+	none: "",
+};
+const SEVERITY_TEXT: Record<Severity, string> = {
+	critical: "text-destructive",
+	major: "text-amber-600 dark:text-amber-400",
+	minor: "",
+	none: "",
+};
+
+/** The severity label + coaching hint body, shared by the hover tooltip and the
+ * tap popover. */
+function CoachingBody({ coaching }: { coaching: PhoneCoaching }) {
+	if (!coaching.hint) return null;
+	return (
+		<div className="leading-relaxed">
+			{SEVERITY_LABEL[coaching.severity] && (
+				<div
+					className={cn(
+						"font-semibold text-[11px] uppercase tracking-wide",
+						SEVERITY_TEXT[coaching.severity],
+					)}
+				>
+					{SEVERITY_LABEL[coaching.severity]}
+				</div>
+			)}
+			<div className="mt-0.5 text-foreground/90">{coaching.hint}</div>
+		</div>
+	);
+}
+
+/** Persistent, tappable coaching indicator for the most important substitutions
+ * (critical). A Popover so the hint is reachable on touch screens (the hover tooltip
+ * isn't). Renders nothing for non-critical or hint-less errors. */
+function HintDot({ coaching }: { coaching: PhoneCoaching }) {
+	if (!coaching.hint || coaching.severity !== "critical") return null;
+	return (
+		<Popover>
+			<PopoverTrigger asChild>
+				<button
+					type="button"
+					aria-label="Pronunciation tip"
+					className="-top-1 -right-1 absolute inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive font-bold text-[9px] text-white leading-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40"
+				>
+					i
+				</button>
+			</PopoverTrigger>
+			<PopoverContent side="top" className="max-w-xs text-xs">
+				<CoachingBody coaching={coaching} />
+			</PopoverContent>
+		</Popover>
+	);
+}
 
 // Three diff visualizations, all driven by the aligned `cells` model.
 type DiffMode = "stacked" | "strike" | "blocks";
@@ -92,23 +161,30 @@ function Hover({
 	side,
 	phone,
 	playable,
+	coaching,
 	children,
 }: {
 	side: Role;
 	phone?: string | null;
 	playable?: boolean;
+	coaching?: PhoneCoaching | null;
 	children: React.ReactNode;
 }) {
 	return (
 		<TooltipProvider>
 			<Tooltip>
 				<TooltipTrigger asChild>{children}</TooltipTrigger>
-				<TooltipContent side="top" className="text-xs">
+				<TooltipContent side="top" className="max-w-xs text-xs">
 					<span className="font-medium">
 						{side === "reference" ? "Reference" : "Your"}
 					</span>
 					{phone && <span className="ml-1.5 font-ipa">/{phone}/</span>}
 					{playable && <span className="ml-1.5 text-primary">▶ Play</span>}
+					{coaching?.hint && (
+						<div className="mt-1.5 border-border/40 border-t pt-1.5">
+							<CoachingBody coaching={coaching} />
+						</div>
+					)}
 				</TooltipContent>
 			</Tooltip>
 		</TooltipProvider>
@@ -125,6 +201,7 @@ interface BoxProps {
 	className?: string;
 	bordered?: boolean;
 	rounded?: boolean;
+	coaching?: PhoneCoaching | null;
 }
 
 /** A single phone tile. Colored by tone; the "your" side plays its segment. */
@@ -138,6 +215,7 @@ function Box({
 	className,
 	bordered = true,
 	rounded = true,
+	coaching,
 }: BoxProps) {
 	const colorCls =
 		tone === "equal"
@@ -173,7 +251,7 @@ function Box({
 	}
 
 	return (
-		<Hover side={side} phone={text} playable={canPlay}>
+		<Hover side={side} phone={text} playable={canPlay} coaching={coaching}>
 			<button
 				type="button"
 				disabled={!canPlay}
@@ -219,9 +297,17 @@ function StackedView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 							className={cn(s, "min-w-7")}
 						/>
 					);
-				if (cell.kind === "substitute")
+				if (cell.kind === "substitute") {
+					const coaching = coachingFor(cell.error);
 					return (
-						<span key={key} className="flex flex-col gap-0.5">
+						<span
+							key={key}
+							className={cn(
+								"relative flex flex-col gap-0.5 rounded-md",
+								severityRingVariants({ severity: coaching.severity }),
+							)}
+						>
+							<HintDot coaching={coaching} />
 							<Box
 								text={cell.actual}
 								tone="substitute"
@@ -229,6 +315,7 @@ function StackedView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 								error={cell.error}
 								audioSrc={audioSrc}
 								onSegmentClick={onSegmentClick}
+								coaching={coaching}
 								className={cn(s, "min-w-7")}
 							/>
 							<Box
@@ -239,6 +326,7 @@ function StackedView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 							/>
 						</span>
 					);
+				}
 				return (
 					<Box
 						key={key}
@@ -278,40 +366,50 @@ function StrikeView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 				if (cell.kind === "substitute") {
 					const ts = getTimestamps(cell.error);
 					const canPlay = !!ts && !!audioSrc && !!onSegmentClick;
+					const coaching = coachingFor(cell.error);
 					return (
-						<span
-							key={key}
-							className={cn(
-								"inline-flex items-stretch overflow-hidden rounded-md border font-medium",
-								errorBorderVariants({ errorType: "substitute" }),
-								errorBgVariants({ errorType: "substitute" }),
-								errorTextVariants({ errorType: "substitute" }),
-							)}
-						>
-							<Hover side="reference" phone={cell.expected}>
-								<span className={cn(s, "flex items-center px-1.5 py-0.5")}>
-									{cell.expected}
-								</span>
-							</Hover>
-							<span aria-hidden className="w-px bg-destructive/40" />
-							<Hover side="your" phone={cell.actual} playable={canPlay}>
-								<button
-									type="button"
-									disabled={!canPlay}
-									onClick={() =>
-										canPlay && ts && onSegmentClick?.(ts.start, ts.end)
-									}
-									className={cn(
-										s,
-										"flex items-center px-1.5 py-0.5 outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40",
-										canPlay
-											? "cursor-pointer hover:brightness-110"
-											: "cursor-default",
-									)}
+						// Outer wrapper is NOT overflow-hidden so the HintDot isn't clipped.
+						<span key={key} className="relative inline-flex">
+							<HintDot coaching={coaching} />
+							<span
+								className={cn(
+									"inline-flex items-stretch overflow-hidden rounded-md border font-medium",
+									errorBorderVariants({ errorType: "substitute" }),
+									errorBgVariants({ errorType: "substitute" }),
+									errorTextVariants({ errorType: "substitute" }),
+									severityRingVariants({ severity: coaching.severity }),
+								)}
+							>
+								<Hover side="reference" phone={cell.expected}>
+									<span className={cn(s, "flex items-center px-1.5 py-0.5")}>
+										{cell.expected}
+									</span>
+								</Hover>
+								<span aria-hidden className="w-px bg-destructive/40" />
+								<Hover
+									side="your"
+									phone={cell.actual}
+									playable={canPlay}
+									coaching={coaching}
 								>
-									{cell.actual}
-								</button>
-							</Hover>
+									<button
+										type="button"
+										disabled={!canPlay}
+										onClick={() =>
+											canPlay && ts && onSegmentClick?.(ts.start, ts.end)
+										}
+										className={cn(
+											s,
+											"flex items-center px-1.5 py-0.5 outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40",
+											canPlay
+												? "cursor-pointer hover:brightness-110"
+												: "cursor-default",
+										)}
+									>
+										{cell.actual}
+									</button>
+								</Hover>
+							</span>
 						</span>
 					);
 				}
@@ -373,6 +471,11 @@ function BlocksView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 					onSegmentClick={onSegmentClick}
 					bordered={false}
 					rounded={false}
+					coaching={
+						sideRole === "your" && error && tone === "substitute"
+							? coachingFor(error)
+							: null
+					}
 					className={cn(s, cellCls)}
 				/>
 			);

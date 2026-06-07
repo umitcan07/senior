@@ -87,6 +87,22 @@ const AssessPhonemeErrorSchema = z.object({
 	gop_score: z.number().nullable().optional(),
 	entropy: z.number().nullable().optional(),
 	uncertain: z.boolean().nullable().optional(),
+	// Articulatory feature distance (0–2) for the severity/hint layer (E7.6 / #57).
+	// Populated for substitutions only; null for insert/delete and older workers.
+	feature_distance: z.number().nullable().optional(),
+	// The specific articulatory features that differ (place/voicing/manner/…) — the
+	// substrate for category hints + a future LLM coaching pass. Null for ins/del,
+	// uncovered phones, and older workers.
+	feature_delta: z
+		.array(
+			z.object({
+				feature: z.string(),
+				ref: z.string(),
+				user: z.string(),
+			}),
+		)
+		.nullable()
+		.optional(),
 });
 export type AssessPhonemeError = z.infer<typeof AssessPhonemeErrorSchema>;
 
