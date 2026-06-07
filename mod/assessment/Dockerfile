@@ -34,6 +34,7 @@ COPY assessment/ /worker/assessment/
 COPY alignment.py /worker/alignment.py
 COPY gop_scoring.py /worker/gop_scoring.py
 COPY phone_diff.py /worker/phone_diff.py
+COPY phone_features.py /worker/phone_features.py
 
 # Install dependencies
 RUN python3 -m pip install --no-cache-dir -r assessment/requirements.txt
