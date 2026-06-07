@@ -5,8 +5,8 @@
 
 ![Nounce Project Cover Image](app/public/og-image.png)
 
-> **Author**: Ümit Can Evleksiz  
-> **Advisors**: Lale Akarun, Murat Saraçlar
+> **Authors**: Ümit Can Evleksiz, Ömer Faruk Bayram  
+> **Advisors**: Lale Akarun, Murat Saraçlar  
 > **Institution**: Boğaziçi University, Computer Engineering  
 > **Project Type**: Senior Project
 
@@ -65,7 +65,7 @@ See [LICENSE](license) file for details.
 
 ## Contributing
 
-This is an academic senior project. For questions or collaboration, please contact Ümit Can Evleksiz (umit.evleksiz@std.bogazici.edu.tr).
+This is an academic senior project. For questions or collaboration, please contact Ümit Can Evleksiz (umit.evleksiz@std.bogazici.edu.tr) or Ömer Faruk Bayram (omerfaruk.bayram@std.bogazici.edu.tr).
 
 ---
 
