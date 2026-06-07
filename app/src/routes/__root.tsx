@@ -142,34 +142,34 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<ClerkProvider>
-				<head>
-					<HeadContent />
-					<script
-						// biome-ignore lint/security/noDangerouslySetInnerHtml: Theme initialization script is safe and necessary for SSR
-						dangerouslySetInnerHTML={{
-							__html: `
-							(function() {
-								const theme = localStorage.getItem('${THEME_STORAGE_KEY}') || 'system';
-								const isDark = theme === 'dark' || 
-									(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-								if (isDark) {
-									document.documentElement.classList.add('dark');
-								}
-							})();
-						`,
-						}}
-					/>
-				</head>
-				<body>
+			<head>
+				<HeadContent />
+				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: Theme initialization script is safe and necessary for SSR
+					dangerouslySetInnerHTML={{
+						__html: `
+						(function() {
+							const theme = localStorage.getItem('${THEME_STORAGE_KEY}') || 'system';
+							const isDark = theme === 'dark' ||
+								(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+							if (isDark) {
+								document.documentElement.classList.add('dark');
+							}
+						})();
+					`,
+					}}
+				/>
+			</head>
+			<body>
+				<ClerkProvider>
 					<ThemeInitializer />
 					<ThemeProvider>
 						{children}
 						<Toaster />
 					</ThemeProvider>
-					<Scripts />
-				</body>
-			</ClerkProvider>
+				</ClerkProvider>
+				<Scripts />
+			</body>
 		</html>
 	);
 }
