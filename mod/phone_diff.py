@@ -1,10 +1,16 @@
 """Phone-level diff for pronunciation assessment (E2.2 / issue #15).
 
-Thin wrapper over the Wagner-Fischer edit distance in
-``mod/assessment/edit_distance.py``. Given a reference phone sequence (what
-should have been said) and a user phone sequence (what the recognizer heard),
-returns per-phone ``errors``, a full ``alignment`` (including matches) and a
-phone error rate (``per``).
+Wagner-Fischer alignment of a user phone sequence against a reference. Given a
+reference phone sequence (what should have been said) and a user phone sequence
+(what the recognizer heard), returns per-phone ``errors``, a full ``alignment``
+(including matches) and a phone error rate (``per``).
+
+The substitution cost is an articulatory **feature distance**
+(``phone_features.feature_sub_cost``, E7.6 / #57) rather than a flat 2, so
+articulatorily-close phones align as cheap substitutions instead of being torn
+into spurious insert/delete pairs (see ``doc/e7.6_panphon_feasibility.md``).
+insert/delete stay at cost 1; the feature cost is scaled so its max equals
+``ins + del = 2``, leaving far-phone alignment unchanged.
 
 Phones are bare IPA tokens *without* POWSM's ``/.../`` slashes — strip those
 upstream (see ``app/src/lib/ipa.ts`` ``parsePhonemes``) before calling here.
@@ -15,47 +21,74 @@ enum use long labels ``substitute|insert|delete`` and a single ``position``
 field. Reconciling the two contracts is E3's job when it swaps the endpoint over.
 """
 
-# Reuse the exact cost model so phone_diff's traceback matches edit_operations'
-# behavior (insert=1, delete=1, substitute=2). edit_distance.py is left untouched
-# so its legacy callers in assess.py keep working until E3 lands.
-from assessment.edit_distance import OPERATION_COSTS
+# insert/delete cost = 1 (kept consistent with edit_distance.py's legacy callers).
+# The substitution cost is no longer the flat 2: it comes from an articulatory
+# feature distance (E7.6 / #57, see phone_features.feature_sub_cost) so close phones
+# align cheaply. feature_sub_cost is scaled so its max == 2 == ins+del, preserving the
+# far-phone balance, and the binary cost stays available via the sub_cost_fn argument.
+_INS_DEL_COST = 1.0
+# Costs are now fractional floats, so traceback can't use exact `==` against a path
+# sum (float addition isn't associative); compare within a tolerance instead.
+_TOL = 1e-9
 
-# Map edit_distance's long op names to the short labels issue #15 specifies.
+# Short op labels per issue #15 (assess.py maps these to long DB labels).
 _INSERT = "ins"
 _DELETE = "del"
 _SUBSTITUTE = "sub"
 _MATCH = "match"
 
 
-def _align(ref_phones, user_phones):
+def _binary_sub_cost(_ref_tok, _user_tok):
+    """The original flat substitution cost (= 2). Kept for tests and as the
+    panphon-free regression baseline; pass it as ``sub_cost_fn`` to reproduce the
+    pre-E7.6 binary alignment exactly."""
+    return 2.0
+
+
+def _align(ref_phones, user_phones, sub_cost_fn=None):
     """Wagner-Fischer alignment of user_phones against ref_phones.
 
     Returns a list of rows ``(op, ref_idx, user_idx, ref_tok, user_tok)`` in
-    sequence order, where unused indices/tokens are ``None``. Ops use the same
-    cost model and the same tie-break order (substitute -> insert -> delete) as
-    ``edit_operations``, so the two stay consistent.
+    sequence order, where unused indices/tokens are ``None``. The tie-break order
+    (match -> substitute -> insert -> delete) is unchanged from the binary aligner,
+    so ops stay consistent; only the substitution *cost* is now feature-weighted.
+
+    Args:
+        sub_cost_fn: ``(ref_tok, user_tok) -> float`` substitution cost. Defaults to
+            ``phone_features.feature_sub_cost`` (imported lazily so this module stays
+            importable without panphon). Pass ``_binary_sub_cost`` for the flat-2
+            behavior.
 
     Op semantics (speaker's perspective, matching edit_distance.py):
     - ``ins``: extra phone in user, not in ref.
     - ``del``: phone missing from user that ref expected.
     - ``sub``: ref phone realized as a different user phone.
     """
+    if sub_cost_fn is None:
+        # Lazy import: keeps `import phone_diff` working on the dev worker / in
+        # binary-only paths that don't have panphon installed.
+        from phone_features import feature_sub_cost
+
+        sub_cost_fn = feature_sub_cost
+
     m, n = len(user_phones), len(ref_phones)  # rows = user, cols = ref
-    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    dp = [[0.0] * (n + 1) for _ in range(m + 1)]
 
     for i in range(m + 1):
-        dp[i][0] = i * OPERATION_COSTS["insert"]
+        dp[i][0] = i * _INS_DEL_COST
     for j in range(n + 1):
-        dp[0][j] = j * OPERATION_COSTS["delete"]
+        dp[0][j] = j * _INS_DEL_COST
 
     for i in range(1, m + 1):
         for j in range(1, n + 1):
             if user_phones[i - 1] == ref_phones[j - 1]:
-                dp[i][j] = dp[i - 1][j - 1]
+                dp[i][j] = dp[i - 1][j - 1]  # exact match -> never calls sub_cost_fn
             else:
-                insert_cost = dp[i - 1][j] + OPERATION_COSTS["insert"]
-                delete_cost = dp[i][j - 1] + OPERATION_COSTS["delete"]
-                substitute_cost = dp[i - 1][j - 1] + OPERATION_COSTS["substitute"]
+                insert_cost = dp[i - 1][j] + _INS_DEL_COST
+                delete_cost = dp[i][j - 1] + _INS_DEL_COST
+                substitute_cost = dp[i - 1][j - 1] + sub_cost_fn(
+                    ref_phones[j - 1], user_phones[i - 1]
+                )
                 dp[i][j] = min(insert_cost, delete_cost, substitute_cost)
 
     rows = []
@@ -68,15 +101,19 @@ def _align(ref_phones, user_phones):
         elif (
             i > 0
             and j > 0
-            and dp[i][j] == dp[i - 1][j - 1] + OPERATION_COSTS["substitute"]
+            and abs(
+                dp[i][j]
+                - (dp[i - 1][j - 1] + sub_cost_fn(ref_phones[j - 1], user_phones[i - 1]))
+            )
+            < _TOL
         ):
             rows.append((_SUBSTITUTE, j - 1, i - 1, ref_phones[j - 1], user_phones[i - 1]))
             i -= 1
             j -= 1
-        elif i > 0 and dp[i][j] == dp[i - 1][j] + OPERATION_COSTS["insert"]:
+        elif i > 0 and abs(dp[i][j] - (dp[i - 1][j] + _INS_DEL_COST)) < _TOL:
             rows.append((_INSERT, None, i - 1, None, user_phones[i - 1]))
             i -= 1
-        elif j > 0 and dp[i][j] == dp[i][j - 1] + OPERATION_COSTS["delete"]:
+        elif j > 0 and abs(dp[i][j] - (dp[i][j - 1] + _INS_DEL_COST)) < _TOL:
             rows.append((_DELETE, j - 1, None, ref_phones[j - 1], None))
             j -= 1
         else:
