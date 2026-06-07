@@ -1,4 +1,5 @@
 import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
+import type { ChallengeAggregate } from "@/lib/phone-profile";
 import { db } from "./index";
 import {
 	analyses,
@@ -27,10 +28,9 @@ export type AttemptStats = {
 	weeklyProgress: number;
 };
 
-export type CommonError = {
-	phoneme: string;
-	count: number;
-};
+/** Half-life (days) for recency weighting of the challenge profile: an error from this
+ * many days ago counts half as much toward "what to work on now". */
+export const RECENCY_HALFLIFE_DAYS = 14;
 
 /**
  * Get user attempts with text information
@@ -183,17 +183,43 @@ export async function getUserAttemptStats(
 }
 
 /**
- * Get common phoneme errors for a user
- * Aggregates phoneme errors from all completed analyses
+ * Recency-weighted phoneme challenge profile for a user (E7.6 / #57).
+ *
+ * Unlike the old "common errors" query (which grouped by target phone and dropped
+ * insertions), this groups by the full (errorType, expected, actual) tuple so the
+ * caller can split the three edit-distance modes:
+ *   - substitute → directional contrast pair (carries featureDistance/featureDelta),
+ *   - delete     → a dropped target phone,
+ *   - insert     → an added phone (epenthesis), which the old query hid entirely.
+ *
+ * Scoped to scored attempts only (completed AND not abstained). Each group carries a
+ * recency weight — Σ of an exponential decay with RECENCY_HALFLIFE_DAYS — so sounds the
+ * learner has recently stopped missing fade out. featureDelta is deterministic per
+ * (expected, actual), so the latest row's delta is a faithful representative.
+ *
+ * Severity, hints and category labels are applied app-side by
+ * `buildPronunciationProfile` (Architecture B) — this layer only does the grouping.
  */
-export async function getCommonPhonemeErrors(
+export async function getPhonemeChallengeProfile(
 	userId: string,
-	limit: number = 10,
-): Promise<CommonError[]> {
-	const results = await db
+): Promise<ChallengeAggregate[]> {
+	const rows = await db
 		.select({
-			phoneme: phonemeErrors.expected,
+			errorType: phonemeErrors.errorType,
+			expected: phonemeErrors.expected,
+			actual: phonemeErrors.actual,
 			count: sql<number>`COUNT(*)::int`,
+			// Exponential recency decay: 0.5 ^ (age_days / half-life), summed per group.
+			recencyWeight: sql<number>`COALESCE(SUM(POWER(0.5, (EXTRACT(EPOCH FROM now()) - EXTRACT(EPOCH FROM ${analyses.createdAt})) / 86400.0 / ${RECENCY_HALFLIFE_DAYS})), 0)::float8`,
+			avgDistance: sql<string | null>`AVG(${phonemeErrors.featureDistance})`,
+			// Latest row's feature delta — deterministic per (expected, actual) pair.
+			sampleDelta: sql<Array<{
+				feature: string;
+				ref: string;
+				user: string;
+			}> | null>`(array_agg(${phonemeErrors.featureDelta} ORDER BY ${analyses.createdAt} DESC))[1]`,
+			uncertainCount: sql<number>`SUM(CASE WHEN ${phonemeErrors.uncertain} THEN 1 ELSE 0 END)::int`,
+			lastSeen: sql<string>`MAX(${analyses.createdAt})`,
 		})
 		.from(phonemeErrors)
 		.innerJoin(analyses, eq(phonemeErrors.analysisId, analyses.id))
@@ -202,19 +228,26 @@ export async function getCommonPhonemeErrors(
 			and(
 				eq(userRecordings.userId, userId),
 				eq(analyses.status, "completed"),
-				sql`${phonemeErrors.expected} IS NOT NULL`,
+				sql`${analyses.abstentionReason} IS NULL`,
 			),
 		)
-		.groupBy(phonemeErrors.expected)
-		.orderBy(desc(sql`COUNT(*)`))
-		.limit(limit);
+		.groupBy(
+			phonemeErrors.errorType,
+			phonemeErrors.expected,
+			phonemeErrors.actual,
+		);
 
-	return results
-		.filter((r) => r.phoneme !== null)
-		.map((r) => ({
-			phoneme: r.phoneme!,
-			count: r.count,
-		}));
+	return rows.map((r) => ({
+		errorType: r.errorType,
+		expected: r.expected,
+		actual: r.actual,
+		count: r.count,
+		recencyWeight: Number(r.recencyWeight) || 0,
+		avgDistance: r.avgDistance,
+		sampleDelta: r.sampleDelta ?? null,
+		uncertainCount: r.uncertainCount,
+		lastSeen: new Date(r.lastSeen),
+	}));
 }
 
 /**

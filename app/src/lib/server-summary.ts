@@ -2,8 +2,7 @@ import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
-	type CommonError,
-	getCommonPhonemeErrors,
+	getPhonemeChallengeProfile,
 	getTextsWithAttempts,
 	getUserAttemptStats,
 	getUserAttempts,
@@ -15,6 +14,10 @@ import {
 	createSuccessResponse,
 	ErrorCode,
 } from "./errors";
+import {
+	buildPronunciationProfile,
+	type PronunciationProfile,
+} from "./phone-profile";
 
 export type SummaryData = {
 	attempts: UserAttempt[];
@@ -24,7 +27,7 @@ export type SummaryData = {
 		averageScore: number;
 		weeklyProgress: number;
 	};
-	commonErrors: CommonError[];
+	profile: PronunciationProfile;
 	texts: Array<{ id: string; content: string }>;
 };
 
@@ -61,17 +64,17 @@ export const serverGetSummary = createServerFn({ method: "GET" }).handler(
 				);
 			}
 
-			const [attempts, stats, commonErrors, texts] = await Promise.all([
+			const [attempts, stats, aggregates, texts] = await Promise.all([
 				getUserAttempts(userId),
 				getUserAttemptStats(userId),
-				getCommonPhonemeErrors(userId, 10),
+				getPhonemeChallengeProfile(userId),
 				getTextsWithAttempts(userId),
 			]);
 
 			return createSuccessResponse({
 				attempts,
 				stats,
-				commonErrors,
+				profile: buildPronunciationProfile(aggregates),
 				texts,
 			});
 		} catch (error) {
