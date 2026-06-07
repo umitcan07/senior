@@ -1,5 +1,4 @@
 import {
-	RiArrowRightLine,
 	RiBookOpenLine,
 	RiBriefcaseLine,
 	RiChatQuoteLine,
@@ -10,7 +9,6 @@ import {
 import { Link } from "@tanstack/react-router";
 import { cva } from "class-variance-authority";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
 	Table,
 	TableBody,
@@ -123,7 +121,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 							<TableHead className="hidden w-32 text-right lg:table-cell">
 								Score
 							</TableHead>
-							<TableHead className="w-20 sm:w-24" />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -131,7 +128,7 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 							<TableRow
 								key={text.id}
 								className={cn(
-									"group",
+									"group relative cursor-pointer",
 									// Subtle left border for attempted texts
 									text.bestScore != null && "border-l-2 border-l-primary/30",
 								)}
@@ -146,7 +143,14 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 												</span>
 											</div>
 											<p className="line-clamp-2 break-words font-medium text-foreground/90 text-sm sm:text-base">
-												{text.content}
+												<Link
+													to="/practice/$textId"
+													params={{ textId: text.id }}
+													className="rounded-sm transition-colors after:absolute after:inset-0 group-hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+													aria-label={`Practice: ${text.content}`}
+												>
+													{text.content}
+												</Link>
 											</p>
 											{/* Show score inline on mobile */}
 											<div className="flex items-center gap-3 text-muted-foreground text-xs md:hidden">
@@ -234,22 +238,6 @@ export function PracticeTextTable({ texts }: PracticeTextTableProps) {
 									) : (
 										<span className="text-muted-foreground/50 text-sm">—</span>
 									)}
-								</TableCell>
-								<TableCell className="text-right">
-									<Button
-										asChild
-										size="default"
-										className="h-9 w-9 px-0 opacity-100 transition-opacity duration-300 sm:h-9 sm:w-auto sm:px-3 sm:opacity-0 sm:group-hover:opacity-100"
-									>
-										<Link
-											to="/practice/$textId"
-											params={{ textId: text.id }}
-											className="flex items-center gap-2"
-										>
-											<span className="hidden sm:inline">Practice</span>
-											<RiArrowRightLine size={16} />
-										</Link>
-									</Button>
 								</TableCell>
 							</TableRow>
 						))}

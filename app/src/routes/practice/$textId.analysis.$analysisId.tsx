@@ -951,7 +951,7 @@ function AnalysisPage() {
 							<div className="space-y-1">
 								<h1 className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text font-display font-semibold text-transparent text-xl tracking-tight md:text-2xl">
 									{isPending && !jobSubmitted
-										? "We're analyzing your speech"
+										? "Your recording is saved"
 										: "We're analyzing your speech"}
 								</h1>
 							</div>
@@ -965,11 +965,17 @@ function AnalysisPage() {
 						>
 							<Card
 								className={
-									isPending && !jobSubmitted ? "border-amber-500/20" : undefined
+									isPollingTimedOut || (isPending && !jobSubmitted)
+										? "border-amber-500/20"
+										: undefined
 								}
 							>
 								<CardContent className="flex flex-col items-center justify-center gap-4 py-12">
-									{jobSubmitted ? (
+									{isPollingTimedOut ? (
+										<div className="flex size-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-500">
+											<RiTimeLine size={24} />
+										</div>
+									) : jobSubmitted ? (
 										<Spinner className="size-8" />
 									) : (
 										<div className="flex size-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-500">
@@ -978,20 +984,41 @@ function AnalysisPage() {
 									)}
 									<div className="flex flex-col items-center gap-2 text-center">
 										<h3 className="font-semibold text-lg">
-											{isPending && !jobSubmitted
-												? "Waiting to Start"
-												: isPending
-													? "Queued for Processing"
-													: "Processing Your Recording"}
+											{isPollingTimedOut
+												? "This is taking longer than expected"
+												: isPending && !jobSubmitted
+													? "Waiting to Start"
+													: isPending
+														? "Queued for Processing"
+														: "Processing Your Recording"}
 										</h3>
 										<p className="max-w-md text-muted-foreground text-sm">
-											{isPending && !jobSubmitted
-												? "The AI service is not currently available. Your recording is saved and will be analyzed when the service comes online."
-												: isPending
-													? "Your recording is in the queue and will be processed shortly."
-													: "Analyzing your pronunciation. This usually takes 5-10 seconds."}
+											{isPollingTimedOut
+												? "Your recording is still being processed. It's saved, so you can refresh to check again or come back later."
+												: isPending && !jobSubmitted
+													? "The AI service is not currently available. Your recording is saved and will be analyzed when the service comes online."
+													: isPending
+														? "Your recording is in the queue and will be processed shortly."
+														: "Analyzing your pronunciation. This usually takes 5-10 seconds."}
 										</p>
 									</div>
+									{isPollingTimedOut && (
+										<div className="flex flex-col gap-3 pt-2 sm:flex-row">
+											<Button
+												onClick={() => {
+													setIsPollingTimedOut(false);
+													window.location.reload();
+												}}
+											>
+												Refresh
+											</Button>
+											<Button variant="outline" asChild>
+												<Link to="/practice/$textId" params={{ textId }}>
+													Back to practice
+												</Link>
+											</Button>
+										</div>
+									)}
 								</CardContent>
 							</Card>
 						</motion.div>

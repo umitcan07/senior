@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/waveform-player";
 import type { Author, ReferenceSpeech } from "@/db/types";
 import { useGuestTrial } from "@/hooks/use-guest-trial";
+import { useToast } from "@/hooks/use-toast";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { dialectFromDbCode } from "@/lib/dialect";
 import type { ApiResponse } from "@/lib/errors";
@@ -134,6 +135,12 @@ function useRecording(textId: string) {
 	const [uiState, setUiState] = useState<RecordingState>("idle");
 	const [countdown, setCountdown] = useState(3);
 	const navigate = useNavigate();
+	const { toast } = useToast();
+	// Track the countdown timer so we can cancel it on reset/unmount and avoid
+	// calling startRecording on an unmounted component.
+	const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+		null,
+	);
 
 	// Store uploaded file separately from recorded audio
 	const [uploadedFileBlob, setUploadedFileBlob] = useState<Blob | null>(null);
@@ -197,18 +204,36 @@ function useRecording(textId: string) {
 		setCountdown(3);
 		setUiState("countdown");
 
+		// Clear any in-flight countdown before starting a new one.
+		if (countdownIntervalRef.current) {
+			clearInterval(countdownIntervalRef.current);
+		}
+
 		let count = 3;
-		const countdownInterval = setInterval(() => {
+		countdownIntervalRef.current = setInterval(() => {
 			count--;
 			if (count > 0) {
 				setCountdown(count);
 			} else {
-				clearInterval(countdownInterval);
+				if (countdownIntervalRef.current) {
+					clearInterval(countdownIntervalRef.current);
+					countdownIntervalRef.current = null;
+				}
 				// Start actual recording AFTER countdown
 				audioRecorder.startRecording();
 			}
 		}, 600);
 	}, [audioRecorder]);
+
+	// Cancel a running countdown if the component unmounts mid-sequence.
+	useEffect(() => {
+		return () => {
+			if (countdownIntervalRef.current) {
+				clearInterval(countdownIntervalRef.current);
+				countdownIntervalRef.current = null;
+			}
+		};
+	}, []);
 
 	// Start recording with countdown - only start countdown after mic permission is granted
 	const startRecording = useCallback(async () => {
@@ -230,10 +255,16 @@ function useRecording(textId: string) {
 			// Now start countdown, which will call audioRecorder.startRecording when done
 			runCountdown();
 		} catch (_err) {
-			// Permission denied or error - reset to idle state
+			// Permission denied or error - reset to idle state and tell the user
 			setUiState("idle");
+			toast({
+				variant: "destructive",
+				title: "Microphone access needed",
+				description:
+					"We couldn't access your microphone. Allow microphone access in your browser settings, then try again — or upload an audio file instead.",
+			});
 		}
-	}, [runCountdown]);
+	}, [runCountdown, toast]);
 
 	// Stop recording
 	const stopRecording = useCallback(() => {
@@ -286,15 +317,6 @@ function useRecording(textId: string) {
 					: Number.isFinite(audioRecorder.recordingTime)
 						? Math.max(1, Math.round(audioRecorder.recordingTime * 1000))
 						: 1000;
-				console.log("Submitting recording:", {
-					textId,
-					referenceId,
-					durationMs,
-					recordingTime: uploadedFileBlob
-						? uploadedFileDuration
-						: audioRecorder.recordingTime,
-					source: uploadedFileBlob ? "upload" : "record",
-				});
 
 				const response = await uploadAudioRecording({
 					data: {
@@ -316,11 +338,23 @@ function useRecording(textId: string) {
 						});
 					}, 500);
 				} else {
-					setUiState("idle");
+					setUiState("preview");
+					toast({
+						variant: "destructive",
+						title: "Submission failed",
+						description:
+							"We couldn't submit your recording for analysis. Your audio is still here — please try again.",
+					});
 				}
 			} catch (err) {
 				console.error("Submission error:", err);
-				setUiState("idle");
+				setUiState("preview");
+				toast({
+					variant: "destructive",
+					title: "Submission failed",
+					description:
+						"Something went wrong while uploading. Check your connection and try again.",
+				});
 			}
 		},
 		[
@@ -330,10 +364,15 @@ function useRecording(textId: string) {
 			audioRecorder.recordingTime,
 			uploadedFileBlob,
 			uploadedFileDuration,
+			toast,
 		],
 	);
 
 	const resetRecording = useCallback(() => {
+		if (countdownIntervalRef.current) {
+			clearInterval(countdownIntervalRef.current);
+			countdownIntervalRef.current = null;
+		}
 		setUiState("idle");
 		setCountdown(3);
 		// Clean up uploaded file
@@ -353,12 +392,24 @@ function useRecording(textId: string) {
 			// Validate type
 			if (!file.type.startsWith("audio/")) {
 				setUiState("idle");
+				e.target.value = "";
+				toast({
+					variant: "destructive",
+					title: "Unsupported file",
+					description: "Please choose an audio file (e.g. .wav, .mp3, .m4a).",
+				});
 				return;
 			}
 
 			// Validate size (10MB limit)
 			if (file.size > 10 * 1024 * 1024) {
 				setUiState("idle");
+				e.target.value = "";
+				toast({
+					variant: "destructive",
+					title: "File too large",
+					description: "Audio files must be 10 MB or smaller.",
+				});
 				return;
 			}
 
@@ -391,15 +442,27 @@ function useRecording(textId: string) {
 					setUploadedFileBlob(null);
 					setUploadedFileDuration(0);
 					setUiState("idle");
+					toast({
+						variant: "destructive",
+						title: "Couldn't read that file",
+						description:
+							"This audio file looks corrupted or uses an unsupported format. Try a different recording.",
+					});
 				};
 			} catch {
 				setUiState("idle");
+				toast({
+					variant: "destructive",
+					title: "Couldn't read that file",
+					description:
+						"Something went wrong reading the file. Please try again.",
+				});
 			}
 
 			// Reset file input so the same file can be selected again
 			e.target.value = "";
 		},
-		[uploadedFileUrl],
+		[uploadedFileUrl, toast],
 	);
 
 	return {
@@ -725,6 +788,35 @@ interface RecentAttemptsProps {
 	textId: string;
 }
 
+// Short, human-readable labels for the abstention reasons (#38) so the
+// recent-attempts list conveys *why* a take was skipped without relying on a
+// hover-only title (which is invisible on touch devices).
+const ABSTENTION_LABELS: Record<string, { short: string; full: string }> = {
+	no_speech: { short: "No speech", full: "No speech was detected" },
+	low_audio_quality: { short: "Too noisy", full: "Recording was too noisy" },
+	duration_out_of_range: {
+		short: "Bad length",
+		full: "Recording length was out of range",
+	},
+	wrong_sentence: {
+		short: "Didn't match",
+		full: "Didn't match the sentence",
+	},
+	uncertain: { short: "Unclear", full: "Couldn't analyze confidently" },
+};
+
+function abstentionLabel(reason?: string | null): {
+	short: string;
+	full: string;
+} {
+	return (
+		(reason ? ABSTENTION_LABELS[reason] : undefined) ?? {
+			short: "Skipped",
+			full: "This recording was skipped",
+		}
+	);
+}
+
 function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 	if (attempts.length === 0) return null;
 
@@ -808,7 +900,7 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 												"bg-red-500/10 text-red-600",
 										)}
 									>
-										{attempt.score}
+										{Math.round(attempt.score!)}%
 									</span>
 								) : (
 									<div className="flex w-20 items-center justify-center">
@@ -816,9 +908,9 @@ function RecentAttempts({ attempts, textId }: RecentAttemptsProps) {
 											<Badge
 												variant="secondary"
 												className="h-5 bg-muted/50 text-[10px] text-muted-foreground"
-												title={attempt.abstentionReason ?? undefined}
+												title={abstentionLabel(attempt.abstentionReason).full}
 											>
-												Skipped
+												{abstentionLabel(attempt.abstentionReason).short}
 											</Badge>
 										) : (
 											statusBadge
