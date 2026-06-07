@@ -39,6 +39,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { SignInPrompt } from "@/components/ui/sign-in-prompt";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	WaveformPlayer,
 	WaveformPlayerInline,
@@ -47,7 +48,12 @@ import type { Author, ReferenceSpeech } from "@/db/types";
 import { useGuestTrial } from "@/hooks/use-guest-trial";
 import { useToast } from "@/hooks/use-toast";
 import { uploadAudioRecording } from "@/lib/audio-upload";
-import { dialectFromDbCode } from "@/lib/dialect";
+import {
+	DIALECT_LIST,
+	DIALECTS,
+	type Dialect,
+	dialectFromDbCode,
+} from "@/lib/dialect";
 import type { ApiResponse } from "@/lib/errors";
 import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
@@ -492,6 +498,28 @@ function formatTime(seconds: number) {
 }
 
 // Reference Voice Section - Prominent and emphasized
+// Persisted dialect filter for the reference-voice selector. Client-only
+// (localStorage); read post-mount to stay SSR-safe — see getSavedDialect usage.
+const DIALECT_PREF_KEY = "nounce_practice_dialect";
+
+function getSavedDialect(): Dialect | null {
+	try {
+		const saved = localStorage.getItem(DIALECT_PREF_KEY);
+		if (saved === "us" || saved === "uk") return saved;
+	} catch {
+		// localStorage unavailable (SSR / private mode)
+	}
+	return null;
+}
+
+function saveDialect(dialect: Dialect) {
+	try {
+		localStorage.setItem(DIALECT_PREF_KEY, dialect);
+	} catch {
+		// ignore
+	}
+}
+
 interface ReferenceVoiceProps {
 	references: (ReferenceSpeech & { author: Author })[];
 	selectedId: string | null;
@@ -505,6 +533,39 @@ function ReferenceVoice({
 }: ReferenceVoiceProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const selectedReference = references.find((ref) => ref.id === selectedId);
+
+	// Dialect filter. Only meaningful when this text has references in more than
+	// one accent; otherwise the toggle is hidden and the full list is shown
+	// unchanged. The active dialect tracks the selected reference so the toggle
+	// and the visible list never disagree; the saved preference biases the
+	// initial selection in the parent (localStorage is client-only).
+	const availableDialects = useMemo(
+		() =>
+			DIALECT_LIST.filter((d) =>
+				references.some((ref) => ref.dialect === d.dbCode),
+			),
+		[references],
+	);
+	const hasDialectFilter = availableDialects.length > 1;
+	const activeDialect =
+		dialectFromDbCode(selectedReference?.dialect)?.code ??
+		availableDialects[0]?.code ??
+		null;
+
+	const visibleReferences = useMemo(() => {
+		if (!hasDialectFilter || !activeDialect) return references;
+		return references.filter(
+			(ref) => ref.dialect === DIALECTS[activeDialect].dbCode,
+		);
+	}, [references, hasDialectFilter, activeDialect]);
+
+	function handleDialectChange(next: Dialect) {
+		saveDialect(next);
+		const nextRef = references.find(
+			(ref) => ref.dialect === DIALECTS[next].dbCode,
+		);
+		if (nextRef && nextRef.id !== selectedId) onSelect(nextRef.id);
+	}
 
 	// Live reference playback position (seconds), driven by the audio player, used
 	// to highlight the current phone in the IPA below.
@@ -569,6 +630,26 @@ function ReferenceVoice({
 		<div className="flex w-full max-w-3xl flex-col gap-4 self-center rounded-3xl p-4 ring-1 ring-muted">
 			{/* Selection area */}
 			<div className="flex flex-col gap-2">
+				{hasDialectFilter && activeDialect && (
+					<Tabs
+						value={activeDialect}
+						onValueChange={(v) => handleDialectChange(v as Dialect)}
+						className="self-start"
+					>
+						<TabsList aria-label="Reference accent" className="h-auto gap-0.5">
+							{availableDialects.map((d) => (
+								<TabsTrigger
+									key={d.code}
+									value={d.code}
+									className="gap-1.5 text-xs"
+								>
+									<span className={`fi fi-${d.flag}`} />
+									{d.short}
+								</TabsTrigger>
+							))}
+						</TabsList>
+					</Tabs>
+				)}
 				{selectedReference ? (
 					<div className="group relative">
 						<Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -613,7 +694,7 @@ function ReferenceVoice({
 
 							<CollapsibleContent className="fade-in zoom-in-95 data-[state=closed]:fade-out data-[state=closed]:zoom-out-95 absolute z-10 mt-2 w-full origin-top rounded-xl border bg-popover p-1 shadow-lg data-[state=closed]:animate-out">
 								<div className="flex flex-col gap-1">
-									{references.map((ref) => {
+									{visibleReferences.map((ref) => {
 										const isSelected = selectedId === ref.id;
 										return (
 											<button
@@ -669,7 +750,7 @@ function ReferenceVoice({
 						</CollapsibleTrigger>
 						<CollapsibleContent className="mt-2 rounded-xl border bg-popover p-1 shadow-lg">
 							<div className="flex flex-col gap-1">
-								{references.map((ref) => (
+								{visibleReferences.map((ref) => (
 									<button
 										key={ref.id}
 										type="button"
@@ -992,21 +1073,41 @@ function GuestRecordPrompt() {
 
 // Main Page
 function PracticeTextPage() {
-	const { text, references, recentAttempts, preferredAuthorId } =
-		Route.useLoaderData();
+	const {
+		text,
+		references: rawReferences,
+		recentAttempts,
+		preferredAuthorId,
+	} = Route.useLoaderData();
+	const references = rawReferences as (ReferenceSpeech & { author: Author })[];
+
+	// Saved dialect filter, resolved on the client (localStorage is unavailable
+	// during SSR) — biases the initial selection so the choice survives reloads.
+	const [savedDialect, setSavedDialect] = useState<Dialect | null>(null);
+	useEffect(() => {
+		setSavedDialect(getSavedDialect());
+	}, []);
 
 	// Smart reference selection:
-	// 1. Find reference by preferred author (if exists for this text)
-	// 2. Fall back to first available reference
+	// 1. Restrict to the saved dialect's references (when this text has any)
+	// 2. Find reference by preferred author within that pool
+	// 3. Fall back to the first available reference
 	const getInitialReferenceId = useMemo(() => {
+		const pool =
+			savedDialect &&
+			references.some((ref) => ref.dialect === DIALECTS[savedDialect].dbCode)
+				? references.filter(
+						(ref) => ref.dialect === DIALECTS[savedDialect].dbCode,
+					)
+				: references;
 		if (preferredAuthorId) {
-			const preferredRef = references.find(
+			const preferredRef = pool.find(
 				(ref) => ref.author?.id === preferredAuthorId,
 			);
 			if (preferredRef) return preferredRef.id;
 		}
-		return references[0]?.id ?? null;
-	}, [preferredAuthorId, references]);
+		return pool[0]?.id ?? null;
+	}, [savedDialect, preferredAuthorId, references]);
 
 	const [selectedReferenceId, setSelectedReferenceId] = useState<string | null>(
 		getInitialReferenceId,
