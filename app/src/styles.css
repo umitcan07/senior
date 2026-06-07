@@ -49,16 +49,21 @@ code {
 		source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-h1, h2, h3, h4, h5, h6 {
-	font-family: "Innovator Grotesk", sans-serif;
-}
+/* In @layer base so Tailwind utilities (e.g. font-ipa, cursor-*) can override
+   these element defaults — unlayered rules otherwise beat layered utilities
+   regardless of specificity (e.g. font-ipa on a <button> phone tile). */
+@layer base {
+	h1, h2, h3, h4, h5, h6 {
+		font-family: "Innovator Grotesk", sans-serif;
+	}
 
-button, [role="button"], a {
-	font-family: "Innovator Grotesk", sans-serif;
-}
+	button, [role="button"], a {
+		font-family: "Innovator Grotesk", sans-serif;
+	}
 
-button:not(:disabled), [role="button"]:not([aria-disabled="true"]) {
-	cursor: pointer;
+	button:not(:disabled), [role="button"]:not([aria-disabled="true"]) {
+		cursor: pointer;
+	}
 }
 
 :root {
