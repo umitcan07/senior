@@ -1,6 +1,7 @@
 import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { getUserRecordingById } from "@/db/recording";
+import { checkAdmin } from "@/lib/auth";
 import { getFromR2 } from "@/lib/r2";
 
 export const Route = createFileRoute("/api/audio/user/$id")({
@@ -32,8 +33,9 @@ export const Route = createFileRoute("/api/audio/user/$id")({
 						return new Response("Unauthorized", { status: 401 });
 					}
 
-					// Verify the recording belongs to the authenticated user
-					if (recording.userId !== userId) {
+					// Verify the recording belongs to the authenticated user (admins can access any)
+					const admin = await checkAdmin();
+					if (recording.userId !== userId && !admin) {
 						return new Response("Forbidden", { status: 403 });
 					}
 
