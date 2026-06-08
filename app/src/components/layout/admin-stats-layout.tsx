@@ -3,6 +3,7 @@ import {
 	RiBarChartLine,
 	RiDashboardLine,
 	RiGroupLine,
+	RiListCheck3,
 } from "@remixicon/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ const navItems = [
 	{ label: "Overview", href: "/admin/dashboard", icon: RiDashboardLine },
 	{ label: "Analytics", href: "/admin/analytics", icon: RiBarChartLine },
 	{ label: "Users", href: "/admin/users", icon: RiGroupLine },
+	{ label: "Jobs", href: "/admin/jobs", icon: RiListCheck3 },
 ];
 
 interface AdminStatsLayoutProps {

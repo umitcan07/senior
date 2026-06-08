@@ -3,6 +3,7 @@ import {
 	RiDashboardLine,
 	RiFileTextLine,
 	RiGroupLine,
+	RiListCheck3,
 	RiMicLine,
 	RiTeamLine,
 } from "@remixicon/react";
@@ -60,6 +61,13 @@ const analyticsSection = [
 		description: "User activity, recordings, and score overview",
 		href: "/admin/users",
 		icon: RiGroupLine,
+	},
+	{
+		title: "Jobs",
+		description:
+			"Latest assessment jobs with audio playback and phoneme diff",
+		href: "/admin/jobs",
+		icon: RiListCheck3,
 	},
 ];
 
