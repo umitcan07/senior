@@ -130,7 +130,7 @@ export const serverGetAdminLatestJobs = createServerFn({
 export const serverGetAdminJobDetails = createServerFn({
 	method: "GET",
 })
-	.validator((data: { analysisId: string }) => data)
+	.inputValidator((data: { analysisId: string }) => data)
 	.handler(async ({ data }): Promise<ApiResponse<AdminJobDetails>> => {
 		try {
 			const details = await getAdminJobDetails(data.analysisId);
