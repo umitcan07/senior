@@ -1,7 +1,7 @@
+import { createClerkClient } from "@clerk/backend";
 import { auth } from "@clerk/tanstack-react-start/server";
 import { createFileRoute } from "@tanstack/react-router";
 import { getUserRecordingById } from "@/db/recording";
-import { checkAdmin } from "@/lib/auth";
 import { getFromR2 } from "@/lib/r2";
 
 export const Route = createFileRoute("/api/audio/user/$id")({
@@ -34,9 +34,15 @@ export const Route = createFileRoute("/api/audio/user/$id")({
 					}
 
 					// Verify the recording belongs to the authenticated user (admins can access any)
-					const admin = await checkAdmin();
-					if (recording.userId !== userId && !admin) {
-						return new Response("Forbidden", { status: 403 });
+					if (recording.userId !== userId) {
+						const clerk = createClerkClient({
+							secretKey: process.env.CLERK_SECRET_KEY,
+						});
+						const user = await clerk.users.getUser(userId);
+						const isAdmin = user.publicMetadata?.role === "app_admin";
+						if (!isAdmin) {
+							return new Response("Forbidden", { status: 403 });
+						}
 					}
 
 					// Get audio file from R2
