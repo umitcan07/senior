@@ -4,7 +4,14 @@ import unittest
 
 try:
     import numpy as np
-    from alignment import PhoneSegment, AlignerOutput, TARGET_SR, PAD_SECONDS
+    from alignment import (
+        AFFRICATE_SPLITS,
+        AlignerOutput,
+        PAD_SECONDS,
+        PhoneSegment,
+        TARGET_SR,
+        split_affricate_ligatures,
+    )
     HAS_DEPS = True
 except ImportError:
     HAS_DEPS = False
@@ -139,6 +146,51 @@ class TestSlashStripping(unittest.TestCase):
 
     def test_bare_phone_unchanged(self):
         self.assertEqual("ɛ".strip("/"), "ɛ")
+
+
+@unittest.skipUnless(HAS_DEPS, "numpy/alignment deps not installed")
+class TestAffricateSplit(unittest.TestCase):
+    def test_splits_ligature_at_midpoint(self):
+        segs = split_affricate_ligatures(
+            [PhoneSegment(token="d͡ʒ", start_ms=100.0, end_ms=200.0, confidence=0.8)]
+        )
+        self.assertEqual(len(segs), 2)
+        self.assertEqual(segs[0].token, "d")
+        self.assertEqual(segs[0].start_ms, 100.0)
+        self.assertEqual(segs[0].end_ms, 150.0)
+        self.assertEqual(segs[1].token, "ʒ")
+        self.assertEqual(segs[1].start_ms, 150.0)
+        self.assertEqual(segs[1].end_ms, 200.0)
+        # confidence carried to both
+        self.assertEqual(segs[0].confidence, 0.8)
+        self.assertEqual(segs[1].confidence, 0.8)
+
+    def test_all_ligatures_split_to_known_components(self):
+        for lig, (a, b) in AFFRICATE_SPLITS.items():
+            segs = split_affricate_ligatures(
+                [PhoneSegment(token=lig, start_ms=0.0, end_ms=80.0, confidence=1.0)]
+            )
+            self.assertEqual([s.token for s in segs], [a, b], f"{lig} -> {a},{b}")
+
+    def test_non_affricate_passes_through_unchanged(self):
+        original = [
+            PhoneSegment(token="d", start_ms=0.0, end_ms=40.0, confidence=0.9),
+            PhoneSegment(token="ʒ", start_ms=40.0, end_ms=80.0, confidence=0.9),
+            PhoneSegment(token="oʊ", start_ms=80.0, end_ms=120.0, confidence=0.7),
+        ]
+        result = split_affricate_ligatures(original)
+        self.assertEqual(result, original)
+
+    def test_output_never_contains_a_ligature(self):
+        segs = split_affricate_ligatures(
+            [
+                PhoneSegment(token="h", start_ms=0.0, end_ms=40.0, confidence=1.0),
+                PhoneSegment(token="t͡ʃ", start_ms=40.0, end_ms=120.0, confidence=0.6),
+                PhoneSegment(token="i", start_ms=120.0, end_ms=160.0, confidence=1.0),
+            ]
+        )
+        self.assertFalse(any(s.token in AFFRICATE_SPLITS for s in segs))
+        self.assertEqual([s.token for s in segs], ["h", "t", "ʃ", "i"])
 
 
 if __name__ == "__main__":

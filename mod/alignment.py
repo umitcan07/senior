@@ -59,6 +59,44 @@ class AlignerOutput:
         }
 
 
+# POWSM's CTC alignment non-deterministically emits affricates either split
+# (``d`` + ``ʒ``) or as a single ligature token (``d͡ʒ``, with the U+0361 tie bar).
+# References are stored split, so a ligature in the hypothesis can't match and
+# inflates the phone diff by ~2 ops per affricate (delete + insert instead of a
+# match). We normalize every aligner output to the split form. See issue #85.
+AFFRICATE_SPLITS: dict[str, tuple[str, str]] = {
+    "d͡ʒ": ("d", "ʒ"),
+    "t͡ʃ": ("t", "ʃ"),
+    "d͡z": ("d", "z"),
+    "t͡s": ("t", "s"),
+}
+
+
+def split_affricate_ligatures(segments: list["PhoneSegment"]) -> list["PhoneSegment"]:
+    """Replace any ligature-affricate ``PhoneSegment`` with its two component
+    phones, splitting the time span at the midpoint and carrying the same
+    confidence to both. Non-affricate segments pass through unchanged."""
+    out: list[PhoneSegment] = []
+    for s in segments:
+        parts = AFFRICATE_SPLITS.get(s.token)
+        if parts is None:
+            out.append(s)
+            continue
+        mid = round((s.start_ms + s.end_ms) / 2, 1)
+        first, second = parts
+        out.append(
+            PhoneSegment(
+                token=first, start_ms=s.start_ms, end_ms=mid, confidence=s.confidence
+            )
+        )
+        out.append(
+            PhoneSegment(
+                token=second, start_ms=mid, end_ms=s.end_ms, confidence=s.confidence
+            )
+        )
+    return out
+
+
 _aligner: Optional["POWSMAligner"] = None
 
 
@@ -278,7 +316,7 @@ class POWSMAligner:
                 )
             )
 
-        return segments
+        return split_affricate_ligatures(segments)
 
     def free_alignment(self, audio: np.ndarray) -> list[PhoneSegment]:
         enc, enc_lens, log_probs = self._encode_audio(audio)
@@ -324,4 +362,4 @@ class POWSMAligner:
                 )
             )
 
-        return segments
+        return split_affricate_ligatures(segments)
