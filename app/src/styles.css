@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../**/*.{tsx,ts,html}";
 
 @import "@clerk/themes/shadcn.css";
 
