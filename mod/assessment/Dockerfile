@@ -45,4 +45,10 @@ ENV PYTHONPATH=/worker
 # Set HuggingFace cache to network volume (if attached, otherwise uses default)
 ENV HF_HOME=/runpod-volume/.cache/huggingface
 
+# Load the Turkish-L1 perceived-label LoRA adapter (l2a_ppl, 2026-06-09, epoch-30)
+# baked at assessment/adapter/. Set POWSM_ADAPTER_DIR="" on the endpoint to fall back
+# to baseline POWSM (e.g. for an A/B). lang_sym matches training (<eng>).
+ENV POWSM_ADAPTER_DIR=/worker/assessment/adapter
+ENV POWSM_LANG_SYM=<eng>
+
 CMD ["python3", "assessment/handler.py"]
