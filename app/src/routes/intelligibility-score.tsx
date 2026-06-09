@@ -79,7 +79,13 @@ function IntelligibilityRatingPage() {
 				: [],
 		[phase, clips, name],
 	);
-	const current = clips.find((c) => c.clip_id === order[idx]);
+	// clamp so a stray out-of-range idx never blanks the screen
+	const safeIdx = order.length
+		? Math.min(Math.max(idx, 0), order.length - 1)
+		: 0;
+	const current = order.length
+		? clips.find((c) => c.clip_id === order[safeIdx])
+		: undefined;
 	const doneCount = Object.keys(ratings).length;
 	const allDone = order.length > 0 && doneCount >= order.length;
 
@@ -117,7 +123,8 @@ function IntelligibilityRatingPage() {
 		};
 		setRatings(next);
 		localStorage.setItem(lsKey(name), JSON.stringify(next));
-		if (idx < order.length - 1) setTimeout(() => setIdx((i) => i + 1), 180);
+		if (idx < order.length - 1)
+			setTimeout(() => setIdx((i) => Math.min(order.length - 1, i + 1)), 180);
 	}
 
 	function setNotes(notes: string) {
@@ -245,7 +252,7 @@ function IntelligibilityRatingPage() {
 						<div className="space-y-4 rounded-2xl border border-border bg-card p-6">
 							<div className="flex items-center justify-between">
 								<span className="rounded-full bg-muted px-2.5 py-0.5 text-muted-foreground text-xs">
-									clip {idx + 1} of {order.length}
+									clip {safeIdx + 1} of {order.length}
 								</span>
 								<span className="text-muted-foreground text-xs">
 									{doneCount} rated
