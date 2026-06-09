@@ -26,14 +26,20 @@
 
 set -euo pipefail
 
+# Always run from the repo root so relative manifest paths resolve.
+cd "$(dirname "$0")/.."
+
 EPOCHS="${EPOCHS:-30}"
 BATCH_SIZE="${BATCH_SIZE:-4}"
 ACCUM_GRAD="${ACCUM_GRAD:-4}"
 LR="${LR:-2e-5}"
 
-FT=/workspace/data/finetune
-EXP=/workspace/exp
-PY=/workspace/scripts/train_adapter.py
+# Overridable so the same script works locally (repo mounted at /workspace) and on
+# a RunPod pod (repo at /root/senior, outputs to the network volume via EXP=...).
+FT="${FT:-data/finetune}"
+EXP="${EXP:-exp}"
+PY="${PY:-scripts/train_adapter.py}"
+mkdir -p "$EXP"
 
 run() {
   local name="$1"; shift
