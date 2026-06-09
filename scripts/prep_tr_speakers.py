@@ -139,9 +139,11 @@ def parse_annotation_file(path: str) -> dict[str, dict[int, list[str]]]:
 
 def write_manifests(entries: list[dict], out_dir: str, name: str) -> None:
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "wav.scp"),  "w", encoding="utf-8") as ws, \
-         open(os.path.join(out_dir, "text"),     "w", encoding="utf-8") as tf, \
-         open(os.path.join(out_dir, "utt2spk"), "w", encoding="utf-8") as us:
+    # newline="\n" forces LF even on Windows, so manifests consumed on Linux
+    # (training container / RunPod) don't carry stray CR bytes.
+    with open(os.path.join(out_dir, "wav.scp"),  "w", encoding="utf-8", newline="\n") as ws, \
+         open(os.path.join(out_dir, "text"),     "w", encoding="utf-8", newline="\n") as tf, \
+         open(os.path.join(out_dir, "utt2spk"), "w", encoding="utf-8", newline="\n") as us:
         for e in sorted(entries, key=lambda x: x["utt_id"]):
             ws.write(f"{e['utt_id']} {e['wav_path']}\n")
             tf.write(f"{e['utt_id']} {e['text']}\n")

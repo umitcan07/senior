@@ -134,9 +134,10 @@ def write_manifest(out_dir: str, split: str, entries: List[dict]) -> None:
     split_dir = os.path.join(out_dir, split)
     os.makedirs(split_dir, exist_ok=True)
 
-    wav_scp   = open(os.path.join(split_dir, "wav.scp"),   "w", encoding="utf-8")
-    text_file = open(os.path.join(split_dir, "text"),      "w", encoding="utf-8")
-    utt2spk   = open(os.path.join(split_dir, "utt2spk"),   "w", encoding="utf-8")
+    # newline="\n" forces LF even on Windows (Linux consumers must not see CR bytes).
+    wav_scp   = open(os.path.join(split_dir, "wav.scp"),   "w", encoding="utf-8", newline="\n")
+    text_file = open(os.path.join(split_dir, "text"),      "w", encoding="utf-8", newline="\n")
+    utt2spk   = open(os.path.join(split_dir, "utt2spk"),   "w", encoding="utf-8", newline="\n")
 
     for e in sorted(entries, key=lambda x: x["utt_id"]):
         wav_scp.write(f"{e['utt_id']} {e['wav_path']}\n")
