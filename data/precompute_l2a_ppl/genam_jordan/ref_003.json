@@ -1,0 +1,143 @@
+{
+  "author": "genam_jordan",
+  "dialect": "genam",
+  "id": "ref_003",
+  "text": "The man sent the cup back to us.",
+  "ipa_transcription": "ð ə m æ̃ n s ɛ̃ n t ð ə kʰ ʌ b p æ k tʰ u ʌ s",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.6656
+    },
+    {
+      "token": "ð",
+      "start_ms": 120.0,
+      "end_ms": 160.0,
+      "confidence": 0.9565
+    },
+    {
+      "token": "ə",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9851
+    },
+    {
+      "token": "m",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "æ̃",
+      "start_ms": 280.0,
+      "end_ms": 320.0,
+      "confidence": 0.9778
+    },
+    {
+      "token": "n",
+      "start_ms": 360.0,
+      "end_ms": 440.0,
+      "confidence": 0.9773
+    },
+    {
+      "token": "s",
+      "start_ms": 600.0,
+      "end_ms": 680.0,
+      "confidence": 0.7793
+    },
+    {
+      "token": "ɛ̃",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.965
+    },
+    {
+      "token": "n",
+      "start_ms": 760.0,
+      "end_ms": 800.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "t",
+      "start_ms": 840.0,
+      "end_ms": 880.0,
+      "confidence": 0.9934
+    },
+    {
+      "token": "ð",
+      "start_ms": 960.0,
+      "end_ms": 1040.0,
+      "confidence": 0.8016
+    },
+    {
+      "token": "ə",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9942
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 1120.0,
+      "end_ms": 1160.0,
+      "confidence": 0.9896
+    },
+    {
+      "token": "ʌ",
+      "start_ms": 1200.0,
+      "end_ms": 1240.0,
+      "confidence": 0.9066
+    },
+    {
+      "token": "b",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9488
+    },
+    {
+      "token": "p",
+      "start_ms": 1440.0,
+      "end_ms": 1480.0,
+      "confidence": 0.9624
+    },
+    {
+      "token": "æ",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.9976
+    },
+    {
+      "token": "k",
+      "start_ms": 1600.0,
+      "end_ms": 1640.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 1760.0,
+      "end_ms": 1800.0,
+      "confidence": 0.9969
+    },
+    {
+      "token": "u",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "ʌ",
+      "start_ms": 1960.0,
+      "end_ms": 2000.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "s",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9997
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl"
+}

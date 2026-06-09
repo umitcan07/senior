@@ -1,0 +1,203 @@
+{
+  "author": "rp_jon",
+  "dialect": "rp",
+  "id": "ref_020",
+  "text": "He carefully put all the books back on the shelf.",
+  "ipa_transcription": "h i kʰ ɛ ɹ f ə l i pʰ ʊ t ɔ l ð ə p ʊ k s p æ k ɑ̃ n ð ə ʃ ɛ l f",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.99
+    },
+    {
+      "token": "h",
+      "start_ms": 120.0,
+      "end_ms": 160.0,
+      "confidence": 0.9843
+    },
+    {
+      "token": "i",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9728
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 320.0,
+      "end_ms": 360.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 360.0,
+      "end_ms": 440.0,
+      "confidence": 0.9323
+    },
+    {
+      "token": "f",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "ə",
+      "start_ms": 480.0,
+      "end_ms": 520.0,
+      "confidence": 0.997
+    },
+    {
+      "token": "l",
+      "start_ms": 560.0,
+      "end_ms": 640.0,
+      "confidence": 0.9669
+    },
+    {
+      "token": "i",
+      "start_ms": 640.0,
+      "end_ms": 680.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "pʰ",
+      "start_ms": 720.0,
+      "end_ms": 800.0,
+      "confidence": 0.9574
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.9923
+    },
+    {
+      "token": "t",
+      "start_ms": 880.0,
+      "end_ms": 920.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 1000.0,
+      "end_ms": 1040.0,
+      "confidence": 0.9961
+    },
+    {
+      "token": "l",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.9985
+    },
+    {
+      "token": "ð",
+      "start_ms": 1160.0,
+      "end_ms": 1200.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ə",
+      "start_ms": 1240.0,
+      "end_ms": 1280.0,
+      "confidence": 0.9987
+    },
+    {
+      "token": "p",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9925
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 0.9966
+    },
+    {
+      "token": "k",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "s",
+      "start_ms": 1560.0,
+      "end_ms": 1640.0,
+      "confidence": 0.9141
+    },
+    {
+      "token": "p",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9965
+    },
+    {
+      "token": "æ",
+      "start_ms": 1760.0,
+      "end_ms": 1800.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "k",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɑ̃",
+      "start_ms": 1960.0,
+      "end_ms": 2000.0,
+      "confidence": 0.991
+    },
+    {
+      "token": "n",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ð",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "ə",
+      "start_ms": 2120.0,
+      "end_ms": 2160.0,
+      "confidence": 0.9974
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 2320.0,
+      "end_ms": 2360.0,
+      "confidence": 0.9966
+    },
+    {
+      "token": "l",
+      "start_ms": 2400.0,
+      "end_ms": 2440.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "f",
+      "start_ms": 2480.0,
+      "end_ms": 2520.0,
+      "confidence": 0.9281
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl"
+}

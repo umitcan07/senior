@@ -1,0 +1,209 @@
+{
+  "author": "rp_jon",
+  "dialect": "rp",
+  "id": "ref_001",
+  "text": "I left my keys on the kitchen table again.",
+  "ipa_transcription": "a ɪ l ɛ f t m a ɪ kʰ i z ɑ̃ n ð ə kʰ ɪ t ʃ ə n tʰ e ɪ b ə l ə ɡ ɛ̃ n",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.9434
+    },
+    {
+      "token": "a",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "l",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.9974
+    },
+    {
+      "token": "f",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "t",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.9992
+    },
+    {
+      "token": "m",
+      "start_ms": 760.0,
+      "end_ms": 800.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "a",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 880.0,
+      "end_ms": 920.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9933
+    },
+    {
+      "token": "i",
+      "start_ms": 1120.0,
+      "end_ms": 1160.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "z",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9959
+    },
+    {
+      "token": "ɑ̃",
+      "start_ms": 1760.0,
+      "end_ms": 1800.0,
+      "confidence": 0.9854
+    },
+    {
+      "token": "n",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ð",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9987
+    },
+    {
+      "token": "ə",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9974
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9813
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2200.0,
+      "end_ms": 2240.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "t",
+      "start_ms": 2240.0,
+      "end_ms": 2320.0,
+      "confidence": 0.9943
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 2320.0,
+      "end_ms": 2360.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ə",
+      "start_ms": 2440.0,
+      "end_ms": 2480.0,
+      "confidence": 0.6317
+    },
+    {
+      "token": "n",
+      "start_ms": 2480.0,
+      "end_ms": 2520.0,
+      "confidence": 0.9971
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 2640.0,
+      "end_ms": 2680.0,
+      "confidence": 0.9853
+    },
+    {
+      "token": "e",
+      "start_ms": 2760.0,
+      "end_ms": 2800.0,
+      "confidence": 0.9985
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2800.0,
+      "end_ms": 2880.0,
+      "confidence": 0.9697
+    },
+    {
+      "token": "b",
+      "start_ms": 2920.0,
+      "end_ms": 2960.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ə",
+      "start_ms": 2960.0,
+      "end_ms": 3000.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "l",
+      "start_ms": 3040.0,
+      "end_ms": 3080.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ə",
+      "start_ms": 3120.0,
+      "end_ms": 3160.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 3200.0,
+      "end_ms": 3240.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɛ̃",
+      "start_ms": 3280.0,
+      "end_ms": 3320.0,
+      "confidence": 0.9932
+    },
+    {
+      "token": "n",
+      "start_ms": 3400.0,
+      "end_ms": 3440.0,
+      "confidence": 0.9999
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl"
+}
