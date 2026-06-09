@@ -98,11 +98,13 @@ class POWSMAligner:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = device
 
-        # The adapter was fine-tuned with lang_sym="<unk>", task_sym="<pr>"; match it
-        # when active. (lang/task syms only prime the decoder prompt — the CTC encoder
-        # path this aligner uses is prompt-independent — but we mirror training for
-        # provenance and to stay safe if the decode path is ever added.)
-        lang_sym = "<unk>" if self.adapter_dir else "<eng>"
+        # lang/task syms only prime the decoder prompt; the CTC encoder path this aligner
+        # uses is prompt-independent, so this does NOT change phone output. We still mirror
+        # the training value for provenance / a possible future decode path. The 2026-06-09
+        # adapters were trained with lang_sym="<eng>" (scripts/train_adapter.py); the V1
+        # adapter used "<unk>". Default to <eng>; override with POWSM_LANG_SYM if needed.
+        # See doc/adapters.md (Pitfall #1).
+        lang_sym = os.environ.get("POWSM_LANG_SYM", "<eng>")
 
         log.info(
             "Loading %s on %s (lang_sym=%s, adapter=%s)",
