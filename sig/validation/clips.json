@@ -1,0 +1,1104 @@
+{
+  "_note": "Blind intelligibility-rating clips. Underscore keys are hidden from raters (analysis-only). Serve the repo root over HTTP and open sig/validation/rate.html.",
+  "n_clips": 137,
+  "n_learner": 125,
+  "n_anchor": 12,
+  "clips": [
+    {
+      "clip_id": "c0001",
+      "audio": "data/test_recordings/erem/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0002",
+      "audio": "data/test_recordings/erem/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0003",
+      "audio": "data/test_recordings/erem/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0004",
+      "audio": "data/test_recordings/erem/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0005",
+      "audio": "data/test_recordings/erem/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0006",
+      "audio": "data/test_recordings/erem/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0007",
+      "audio": "data/test_recordings/erem/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0008",
+      "audio": "data/test_recordings/erem/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0009",
+      "audio": "data/test_recordings/erem/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0010",
+      "audio": "data/test_recordings/erem/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0011",
+      "audio": "data/test_recordings/erem/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0012",
+      "audio": "data/test_recordings/erem/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0013",
+      "audio": "data/test_recordings/erem/ref_013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "_ref": "ref_013",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0014",
+      "audio": "data/test_recordings/erem/ref_014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "_ref": "ref_014",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0015",
+      "audio": "data/test_recordings/erem/ref_015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "_ref": "ref_015",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0016",
+      "audio": "data/test_recordings/erem/ref_016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "_ref": "ref_016",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0017",
+      "audio": "data/test_recordings/erem/ref_017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "_ref": "ref_017",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0018",
+      "audio": "data/test_recordings/erem/ref_018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "_ref": "ref_018",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0019",
+      "audio": "data/test_recordings/erem/ref_019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "_ref": "ref_019",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0020",
+      "audio": "data/test_recordings/erem/ref_020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "_ref": "ref_020",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0021",
+      "audio": "data/test_recordings/erem/ref_021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "_ref": "ref_021",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0022",
+      "audio": "data/test_recordings/erem/ref_022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "_ref": "ref_022",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0023",
+      "audio": "data/test_recordings/erem/ref_023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "_ref": "ref_023",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0024",
+      "audio": "data/test_recordings/erem/ref_024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "_ref": "ref_024",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0025",
+      "audio": "data/test_recordings/erem/ref_025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "_ref": "ref_025",
+      "_speaker": "erem",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0026",
+      "audio": "data/test_recordings/ibrahim/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0027",
+      "audio": "data/test_recordings/ibrahim/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0028",
+      "audio": "data/test_recordings/ibrahim/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0029",
+      "audio": "data/test_recordings/ibrahim/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0030",
+      "audio": "data/test_recordings/ibrahim/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0031",
+      "audio": "data/test_recordings/ibrahim/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0032",
+      "audio": "data/test_recordings/ibrahim/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0033",
+      "audio": "data/test_recordings/ibrahim/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0034",
+      "audio": "data/test_recordings/ibrahim/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0035",
+      "audio": "data/test_recordings/ibrahim/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0036",
+      "audio": "data/test_recordings/ibrahim/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0037",
+      "audio": "data/test_recordings/ibrahim/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0038",
+      "audio": "data/test_recordings/ibrahim/ref_013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "_ref": "ref_013",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0039",
+      "audio": "data/test_recordings/ibrahim/ref_014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "_ref": "ref_014",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0040",
+      "audio": "data/test_recordings/ibrahim/ref_015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "_ref": "ref_015",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0041",
+      "audio": "data/test_recordings/ibrahim/ref_016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "_ref": "ref_016",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0042",
+      "audio": "data/test_recordings/ibrahim/ref_017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "_ref": "ref_017",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0043",
+      "audio": "data/test_recordings/ibrahim/ref_018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "_ref": "ref_018",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0044",
+      "audio": "data/test_recordings/ibrahim/ref_019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "_ref": "ref_019",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0045",
+      "audio": "data/test_recordings/ibrahim/ref_020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "_ref": "ref_020",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0046",
+      "audio": "data/test_recordings/ibrahim/ref_021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "_ref": "ref_021",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0047",
+      "audio": "data/test_recordings/ibrahim/ref_022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "_ref": "ref_022",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0048",
+      "audio": "data/test_recordings/ibrahim/ref_023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "_ref": "ref_023",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0049",
+      "audio": "data/test_recordings/ibrahim/ref_024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "_ref": "ref_024",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0050",
+      "audio": "data/test_recordings/ibrahim/ref_025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "_ref": "ref_025",
+      "_speaker": "ibrahim",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0051",
+      "audio": "data/test_recordings/omer/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0052",
+      "audio": "data/test_recordings/omer/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0053",
+      "audio": "data/test_recordings/omer/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0054",
+      "audio": "data/test_recordings/omer/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0055",
+      "audio": "data/test_recordings/omer/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0056",
+      "audio": "data/test_recordings/omer/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0057",
+      "audio": "data/test_recordings/omer/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0058",
+      "audio": "data/test_recordings/omer/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0059",
+      "audio": "data/test_recordings/omer/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0060",
+      "audio": "data/test_recordings/omer/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0061",
+      "audio": "data/test_recordings/omer/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0062",
+      "audio": "data/test_recordings/omer/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0063",
+      "audio": "data/test_recordings/omer/ref_013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "_ref": "ref_013",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0064",
+      "audio": "data/test_recordings/omer/ref_014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "_ref": "ref_014",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0065",
+      "audio": "data/test_recordings/omer/ref_015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "_ref": "ref_015",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0066",
+      "audio": "data/test_recordings/omer/ref_016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "_ref": "ref_016",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0067",
+      "audio": "data/test_recordings/omer/ref_017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "_ref": "ref_017",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0068",
+      "audio": "data/test_recordings/omer/ref_018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "_ref": "ref_018",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0069",
+      "audio": "data/test_recordings/omer/ref_019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "_ref": "ref_019",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0070",
+      "audio": "data/test_recordings/omer/ref_020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "_ref": "ref_020",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0071",
+      "audio": "data/test_recordings/omer/ref_021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "_ref": "ref_021",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0072",
+      "audio": "data/test_recordings/omer/ref_022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "_ref": "ref_022",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0073",
+      "audio": "data/test_recordings/omer/ref_023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "_ref": "ref_023",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0074",
+      "audio": "data/test_recordings/omer/ref_024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "_ref": "ref_024",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0075",
+      "audio": "data/test_recordings/omer/ref_025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "_ref": "ref_025",
+      "_speaker": "omer",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0076",
+      "audio": "data/test_recordings/umit/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0077",
+      "audio": "data/test_recordings/umit/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0078",
+      "audio": "data/test_recordings/umit/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0079",
+      "audio": "data/test_recordings/umit/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0080",
+      "audio": "data/test_recordings/umit/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0081",
+      "audio": "data/test_recordings/umit/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0082",
+      "audio": "data/test_recordings/umit/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0083",
+      "audio": "data/test_recordings/umit/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0084",
+      "audio": "data/test_recordings/umit/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0085",
+      "audio": "data/test_recordings/umit/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0086",
+      "audio": "data/test_recordings/umit/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0087",
+      "audio": "data/test_recordings/umit/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0088",
+      "audio": "data/test_recordings/umit/ref_013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "_ref": "ref_013",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0089",
+      "audio": "data/test_recordings/umit/ref_014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "_ref": "ref_014",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0090",
+      "audio": "data/test_recordings/umit/ref_015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "_ref": "ref_015",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0091",
+      "audio": "data/test_recordings/umit/ref_016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "_ref": "ref_016",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0092",
+      "audio": "data/test_recordings/umit/ref_017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "_ref": "ref_017",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0093",
+      "audio": "data/test_recordings/umit/ref_018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "_ref": "ref_018",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0094",
+      "audio": "data/test_recordings/umit/ref_019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "_ref": "ref_019",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0095",
+      "audio": "data/test_recordings/umit/ref_020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "_ref": "ref_020",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0096",
+      "audio": "data/test_recordings/umit/ref_021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "_ref": "ref_021",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0097",
+      "audio": "data/test_recordings/umit/ref_022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "_ref": "ref_022",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0098",
+      "audio": "data/test_recordings/umit/ref_023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "_ref": "ref_023",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0099",
+      "audio": "data/test_recordings/umit/ref_024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "_ref": "ref_024",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0100",
+      "audio": "data/test_recordings/umit/ref_025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "_ref": "ref_025",
+      "_speaker": "umit",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0101",
+      "audio": "data/test_recordings/umut/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0102",
+      "audio": "data/test_recordings/umut/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0103",
+      "audio": "data/test_recordings/umut/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0104",
+      "audio": "data/test_recordings/umut/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0105",
+      "audio": "data/test_recordings/umut/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0106",
+      "audio": "data/test_recordings/umut/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0107",
+      "audio": "data/test_recordings/umut/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0108",
+      "audio": "data/test_recordings/umut/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0109",
+      "audio": "data/test_recordings/umut/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0110",
+      "audio": "data/test_recordings/umut/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0111",
+      "audio": "data/test_recordings/umut/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0112",
+      "audio": "data/test_recordings/umut/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0113",
+      "audio": "data/test_recordings/umut/ref_013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "_ref": "ref_013",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0114",
+      "audio": "data/test_recordings/umut/ref_014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "_ref": "ref_014",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0115",
+      "audio": "data/test_recordings/umut/ref_015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "_ref": "ref_015",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0116",
+      "audio": "data/test_recordings/umut/ref_016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "_ref": "ref_016",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0117",
+      "audio": "data/test_recordings/umut/ref_017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "_ref": "ref_017",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0118",
+      "audio": "data/test_recordings/umut/ref_018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "_ref": "ref_018",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0119",
+      "audio": "data/test_recordings/umut/ref_019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "_ref": "ref_019",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0120",
+      "audio": "data/test_recordings/umut/ref_020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "_ref": "ref_020",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0121",
+      "audio": "data/test_recordings/umut/ref_021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "_ref": "ref_021",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0122",
+      "audio": "data/test_recordings/umut/ref_022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "_ref": "ref_022",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0123",
+      "audio": "data/test_recordings/umut/ref_023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "_ref": "ref_023",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0124",
+      "audio": "data/test_recordings/umut/ref_024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "_ref": "ref_024",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0125",
+      "audio": "data/test_recordings/umut/ref_025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "_ref": "ref_025",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0126",
+      "audio": "data/references/genam_jordan/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "NATIVE_genam_jordan",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0127",
+      "audio": "data/references/genam_katherine/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "NATIVE_genam_katherine",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0128",
+      "audio": "data/references/genam_teyanna/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "NATIVE_genam_teyanna",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0129",
+      "audio": "data/references/rp_jon/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "NATIVE_rp_jon",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0130",
+      "audio": "data/references/genam_jordan/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "NATIVE_genam_jordan",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0131",
+      "audio": "data/references/genam_katherine/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "NATIVE_genam_katherine",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0132",
+      "audio": "data/references/genam_teyanna/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "NATIVE_genam_teyanna",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0133",
+      "audio": "data/references/rp_jon/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "NATIVE_rp_jon",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0134",
+      "audio": "data/references/genam_jordan/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "NATIVE_genam_jordan",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0135",
+      "audio": "data/references/genam_katherine/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "NATIVE_genam_katherine",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0136",
+      "audio": "data/references/genam_teyanna/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "NATIVE_genam_teyanna",
+      "_is_anchor": true
+    },
+    {
+      "clip_id": "c0137",
+      "audio": "data/references/rp_jon/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "NATIVE_rp_jon",
+      "_is_anchor": true
+    }
+  ]
+}
