@@ -8,13 +8,8 @@ export const Route = createFileRoute("/intelligibility-score")({
 
 const ACCESS_CODE = "nounce-fiverr";
 
-const SCALE: { v: number; label: string }[] = [
-	{ v: 1, label: "unintelligible" },
-	{ v: 2, label: "hard" },
-	{ v: 3, label: "okay" },
-	{ v: 4, label: "easy" },
-	{ v: 5, label: "native-like" },
-];
+// 0–10 intelligibility scale (0 = unintelligible, 10 = native-like)
+const SCORES = Array.from({ length: 11 }, (_, i) => i);
 
 interface Clip {
 	clip_id: string;
@@ -189,10 +184,17 @@ function IntelligibilityRatingPage() {
 							<p className="mt-2 text-muted-foreground text-sm leading-relaxed">
 								You'll hear {clips.length || "a few"} short clips of English
 								sentences read aloud, in a random order. For each one, rate how{" "}
-								<b>intelligible / native-like</b> it sounds on a 1–5 scale. It
+								<b>intelligible / native-like the pronunciation</b> is on a{" "}
+								<b>0–10 scale</b> (0 = unintelligible, 10 = native-like). It
 								takes about 5–10 minutes, and your progress is saved on this
 								device. Thank you!
 							</p>
+							<div className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm leading-relaxed">
+								<b>Please judge the English sounds, not the recording.</b> These
+								are informal recordings, so ignore microphone noise, volume,
+								echo, or loudness. Focus only on how accurately the English
+								phones (the consonants and vowels) are pronounced.
+							</div>
 						</div>
 						<div className="space-y-3 rounded-2xl border border-border bg-card p-6">
 							<label className="block text-sm">
@@ -265,29 +267,32 @@ function IntelligibilityRatingPage() {
 								<track kind="captions" />
 							</audio>
 
-							<div className="grid grid-cols-5 gap-2">
-								{SCALE.map((s) => {
-									const sel = ratings[current.clip_id]?.score === s.v;
+							<p className="text-muted-foreground text-xs">
+								Rate the <b>pronunciation of the English sounds</b> — ignore
+								audio quality (mic noise, volume, echo).
+							</p>
+							<div className="grid grid-cols-11 gap-1.5">
+								{SCORES.map((s) => {
+									const sel = ratings[current.clip_id]?.score === s;
 									return (
 										<button
 											type="button"
-											key={s.v}
-											onClick={() => rate(s.v)}
-											className={`rounded-xl border-2 py-3 font-semibold text-lg transition-colors ${
+											key={s}
+											onClick={() => rate(s)}
+											className={`rounded-lg border-2 py-2.5 font-semibold transition-colors ${
 												sel
 													? "border-primary bg-primary/10"
 													: "border-border bg-background hover:border-primary/60"
 											}`}
 										>
-											{s.v}
+											{s}
 										</button>
 									);
 								})}
 							</div>
-							<div className="grid grid-cols-5 gap-2 text-center text-[10px] text-muted-foreground">
-								{SCALE.map((s) => (
-									<span key={s.v}>{s.label}</span>
-								))}
+							<div className="flex justify-between text-[10px] text-muted-foreground">
+								<span>0 · unintelligible</span>
+								<span>10 · native-like</span>
 							</div>
 
 							<textarea
