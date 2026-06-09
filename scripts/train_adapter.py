@@ -200,15 +200,21 @@ def run_epoch(model, loader, optimizer, device, accum_grad, blank_id, train=True
             log_probs = model.ctc.log_softmax(enc)      # [B, T, V]
             log_probs_t = log_probs.transpose(0, 1)     # [T, B, V] for ctc_loss
 
+            # Normalize per target token EXPLICITLY rather than via reduction="mean".
+            # F.ctc_loss(reduction="mean") is inconsistent across torch versions —
+            # some divide by target length (per-token scale ~10 at init), torch 2.1.0
+            # divides by batch only (per-utterance-sum scale ~hundreds). The latter
+            # interacts badly with clip_grad_norm (over-clips, stalls training).
+            # sum / total-tokens is deterministic and matches ESPnet's CTC convention.
             loss = F.ctc_loss(
                 log_probs_t.float(),
                 targets,
                 enc_lens.to(torch.long),
                 target_lengths,
                 blank=blank_id,
-                reduction="mean",
+                reduction="sum",
                 zero_infinity=True,
-            )
+            ) / target_lengths.sum().clamp(min=1)
 
         if train:
             (loss / accum_grad).backward()
