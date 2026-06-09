@@ -242,11 +242,27 @@ function IntelligibilityRatingPage() {
 
 				{phase === "rate" && current && (
 					<div className="space-y-4">
-						<div className="h-1.5 overflow-hidden rounded-full bg-muted">
-							<div
-								className="h-full bg-primary transition-all"
-								style={{ width: `${(100 * doneCount) / order.length}%` }}
-							/>
+						{/* per-clip progress dots — filled when rated, click to jump */}
+						<div className="flex flex-wrap justify-center gap-1.5">
+							{order.map((id, i) => {
+								const rated = id in ratings;
+								const isCurrent = i === safeIdx;
+								return (
+									<button
+										type="button"
+										key={id}
+										onClick={() => setIdx(i)}
+										title={`clip ${i + 1}${rated ? " — rated" : ""}`}
+										className={`flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-medium transition-colors ${
+											rated
+												? "border-primary bg-primary text-primary-foreground"
+												: "border-border bg-muted text-muted-foreground hover:border-primary/60"
+										} ${isCurrent ? "ring-2 ring-ring ring-offset-1 ring-offset-background" : ""}`}
+									>
+										{i + 1}
+									</button>
+								);
+							})}
 						</div>
 
 						<div className="space-y-4 rounded-2xl border border-border bg-card p-6">
