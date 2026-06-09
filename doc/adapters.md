@@ -169,21 +169,61 @@ base and to `l2a_ppl` to see whether the Turkish data earned its place — speak
 - Weights live in releases / volume / R2, never in git (`model_versioning.md`).
 - A LOSO fold is only valid on its own held-out speaker (§Validation).
 
-## Report (fill in after eval)
+## Report
 
-> Eval not yet run. Populate this section from the eval matrix above.
+Eval ran 2026-06-10 on the training pod (A5000), git `20ad79e`, via `scripts/eval_adapters.py`
+(epoch-30 `best/` checkpoints). Raw artifacts in `artifacts/eval/` (gitignored): `summary.json`,
+`raw/*.csv`, `figs/*.png`, `eval_report.md`. **These are the epoch-30 numbers; a 60-epoch
+re-train (`l2a_*_long`) is in flight because dev loss had not plateaued — update if it sharpens.**
 
-| Model | TR-PER | Sub-recall (θ→t/s, w→v, ɹ→ɾ, ŋ→n) | Native FPR | Notes |
-|---|---|---|---|---|
-| base | | | | |
-| l2a_cpl | | | | expect: normalization, schwa over-confidence |
-| l2a_ppl | | | | expect: recovers substitution signal |
-| l2a_ppl_dora | | | | vs l2a_ppl at equal rank |
-| l2a_ppl_tr (LOSO mean ± range) | | | | per-speaker on held-out fold |
+### Turkish held-out set (4 speakers, 53 utts) — gate metrics
 
-**Decision:** _which model ships, and why (gate: beats base on PER+recall, no native-FPR
-regression)._
+| Model | TR-PER | Sub-recall | Native FPR | Schwa-collapse | Notes |
+|---|---|---|---|---|---|
+| base | 0.435 | 0.033 | 0.003 | 0.090 | ships (see decision) |
+| l2a_cpl | 0.427 | 0.016 | 0.007 | 0.081 | ≈ base; no real change |
+| l2a_ppl | 0.420 | 0.025 | 0.008 | 0.088 | best non-fold PER |
+| l2a_ppl_dora | 0.419 | 0.025 | 0.008 | 0.088 | ≈ ppl (DoRA≈LoRA) |
+| l2a_ppl_tr (LOSO mean ± range) | 0.421 (0.402–0.455) | 0.026 | 0.009 | — | fold k on held-out speaker k only |
+
+> **TR sub-recall and native FPR are tiny-sample / noisy** — TR sub-recall is 2–4 true events out
+> of ~122; native FPR is a handful of phones over 100 clips. Do not over-read them. PER is the
+> robust TR number; the clean thesis signal is the L2-ARCTIC arm below.
+
+LOSO folds (held-out speaker, the speaker-independent number): erem 0.402, omer 0.455, umit 0.422,
+ibrahim 0.406. Adding 3 TR speakers helps slightly on average (0.421 < base 0.435) but with high
+between-speaker variance (omer regresses).
+
+### L2-ARCTIC cpl-vs-ppl (the thesis, held-out dev split, 600 utts, 4 L1 groups)
+
+Annotated CPL **and** PPL on identical audio (no proxy). Deviation recall = fraction of annotated
+canonical→produced substitutions the model reproduces.
+
+| Model | PER vs PPL | PER vs CPL | Deviation recall |
+|---|---|---|---|
+| base | 0.240 | 0.181 | 0.173 |
+| l2a_cpl | 0.238 | 0.179 | **0.173** (= base) |
+| l2a_ppl | 0.227 | 0.172 | 0.186 |
+| l2a_ppl_dora | 0.227 | 0.172 | 0.188 |
+
+**Finding (directionally confirms the thesis, modest magnitude):**
+- **Canonical supervision is a no-op.** `l2a_cpl` ≈ base on every metric (deviation recall
+  identical to 4 d.p.). Base already emits canonical-leaning phones, so training on canonical
+  labels teaches nothing and cannot build a deviation detector.
+- **Perceived supervision helps, consistently.** `l2a_ppl` beats base on PER-vs-PPL and deviation
+  recall in **all 4 L1 groups** (Hindi/Mandarin/Spanish/Vietnamese) — small (recall 0.173→0.186)
+  but uniform, so it is signal, not noise.
+- **DoRA ≈ LoRA** at equal rank (0.188 vs 0.186).
+- Magnitude is bounded by training budget: dev loss was still falling at the 30-epoch cap
+  (adapters under-trained) — hence the 60-epoch re-train.
+
+**Decision (epoch-30): base `espnet/powsm` ships.** No adapter cleanly clears the promotion gate
+(beat base on TR PER **and** sub-recall, no native-FPR regression): adapters improve TR PER but
+TR sub-recall/native-FPR moves are within noise and nominally regress. The adapters stand as the
+controlled ablation backing the annotation thesis (perceived > canonical ≈ base for deviation
+detection). The deployed architecture does not depend on the adapter. **Revisit after `l2a_*_long`.**
 
 **Reference dev losses** (provenance only — *not* comparable across adapters): `l2a_cpl` reached
 dev≈0.59 (canonical, easy); `l2a_ppl_tr_fold4` best dev=0.7609. Captured from `train_all.log` /
-`folds.log` on the pod.
+`folds.log` on the pod. Note: every `best/` is the **final (epoch-30)** checkpoint — dev loss never
+plateaued, confirming under-training rather than a checkpoint-selection artifact.
