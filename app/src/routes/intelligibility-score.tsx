@@ -253,7 +253,7 @@ function IntelligibilityRatingPage() {
 										key={id}
 										onClick={() => setIdx(i)}
 										title={`clip ${i + 1}${rated ? " — rated" : ""}`}
-										className={`flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-medium transition-colors ${
+										className={`flex h-7 w-7 items-center justify-center rounded-full border font-medium text-[10px] transition-colors ${
 											rated
 												? "border-primary bg-primary text-primary-foreground"
 												: "border-border bg-muted text-muted-foreground hover:border-primary/60"
