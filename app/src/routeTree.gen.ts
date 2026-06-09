@@ -15,6 +15,7 @@ import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as IntelligibilityScoreRouteImport } from './routes/intelligibility-score'
 import { Route as ErrorRouteImport } from './routes/error'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
@@ -66,6 +67,11 @@ const LearnRoute = LearnRouteImport.update({
 const JobsRoute = JobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntelligibilityScoreRoute = IntelligibilityScoreRouteImport.update({
+  id: '/intelligibility-score',
+  path: '/intelligibility-score',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorRoute = ErrorRouteImport.update({
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/intelligibility-score': typeof IntelligibilityScoreRoute
   '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/intelligibility-score': typeof IntelligibilityScoreRoute
   '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/intelligibility-score': typeof IntelligibilityScoreRoute
   '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/intelligibility-score'
     | '/jobs'
     | '/learn'
     | '/login'
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/intelligibility-score'
     | '/jobs'
     | '/learn'
     | '/login'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/intelligibility-score'
     | '/jobs'
     | '/learn'
     | '/login'
@@ -366,6 +378,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
   ErrorRoute: typeof ErrorRoute
+  IntelligibilityScoreRoute: typeof IntelligibilityScoreRoute
   JobsRoute: typeof JobsRoute
   LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs'
       preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intelligibility-score': {
+      id: '/intelligibility-score'
+      path: '/intelligibility-score'
+      fullPath: '/intelligibility-score'
+      preLoaderRoute: typeof IntelligibilityScoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error': {
@@ -631,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
   ErrorRoute: ErrorRoute,
+  IntelligibilityScoreRoute: IntelligibilityScoreRoute,
   JobsRoute: JobsRoute,
   LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
