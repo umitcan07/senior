@@ -17,7 +17,7 @@ Usage:
 
 import argparse
 import json
-import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -29,29 +29,41 @@ def main() -> None:
     ap.add_argument("--manifest", default="sig/validation/clips.json")
     ap.add_argument("--out", default="app/public/intelligibility")
     ap.add_argument("--bitrate", default="96k")
+    ap.add_argument("--format", choices=["mp3", "wav"], default="mp3",
+                    help="mp3 needs ffmpeg (smaller, for big sets); wav just copies "
+                         "the source (no ffmpeg, fine for a few speakers)")
+    ap.add_argument("--clean", action="store_true",
+                    help="delete existing *.mp3/*.wav in --out first (avoid stale clips)")
     args = ap.parse_args()
 
     src = json.loads((REPO / args.manifest).read_text(encoding="utf-8"))
     out = REPO / args.out
     out.mkdir(parents=True, exist_ok=True)
+    if args.clean:
+        for ext in ("*.mp3", "*.wav"):
+            for f in out.glob(ext):
+                f.unlink()
 
     public = []
     missing = 0
     for c in src["clips"]:
         wav = REPO / c["audio"]
-        mp3 = out / f"{c['clip_id']}.mp3"
+        dst = out / f"{c['clip_id']}.{args.format}"
         if not wav.exists():
             print(f"  [miss] {c['clip_id']}: {wav}")
             missing += 1
             continue
-        subprocess.run(
-            ["ffmpeg", "-y", "-i", str(wav), "-ar", "16000", "-ac", "1",
-             "-b:a", args.bitrate, str(mp3)],
-            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        )
+        if args.format == "wav":
+            shutil.copyfile(wav, dst)
+        else:
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(wav), "-ar", "16000", "-ac", "1",
+                 "-b:a", args.bitrate, str(dst)],
+                check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
         public.append({
             "clip_id": c["clip_id"],
-            "file": f"{c['clip_id']}.mp3",
+            "file": dst.name,
             "sentence": c["sentence"],
             "is_anchor": c["_is_anchor"],
         })
