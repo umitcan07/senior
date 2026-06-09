@@ -16,3 +16,10 @@ data/fiverr/
 
 Corpus Files/
 l2arctic_release_v5.0
+
+# RunPod API key (secret — never commit)
+.runpod.key
+
+# Local training scratch: HF model cache + adapter checkpoints (regenerable)
+.hf_cache/
+exp/
