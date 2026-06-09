@@ -1,0 +1,233 @@
+{
+  "author": "rp_jon",
+  "dialect": "rp",
+  "id": "ref_011",
+  "text": "Could you please pass me the salt and the bottle of water?",
+  "ipa_transcription": "k ʊ d j u pʰ l i z pʰ æ s m i ð ə s ɔ l t ə n d ð ə p ɑ t ə l ʌ v w ɔ t ə˞",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.9978
+    },
+    {
+      "token": "k",
+      "start_ms": 200.0,
+      "end_ms": 240.0,
+      "confidence": 0.9932
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9986
+    },
+    {
+      "token": "d",
+      "start_ms": 280.0,
+      "end_ms": 360.0,
+      "confidence": 0.8849
+    },
+    {
+      "token": "j",
+      "start_ms": 360.0,
+      "end_ms": 440.0,
+      "confidence": 0.9539
+    },
+    {
+      "token": "u",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.9959
+    },
+    {
+      "token": "pʰ",
+      "start_ms": 560.0,
+      "end_ms": 600.0,
+      "confidence": 0.9898
+    },
+    {
+      "token": "l",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "i",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "z",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "pʰ",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.998
+    },
+    {
+      "token": "æ",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9983
+    },
+    {
+      "token": "s",
+      "start_ms": 1160.0,
+      "end_ms": 1240.0,
+      "confidence": 0.8391
+    },
+    {
+      "token": "m",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "i",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 0.9967
+    },
+    {
+      "token": "ð",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.9987
+    },
+    {
+      "token": "ə",
+      "start_ms": 1520.0,
+      "end_ms": 1560.0,
+      "confidence": 0.994
+    },
+    {
+      "token": "s",
+      "start_ms": 1640.0,
+      "end_ms": 1720.0,
+      "confidence": 0.7569
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 1720.0,
+      "end_ms": 1760.0,
+      "confidence": 0.9664
+    },
+    {
+      "token": "l",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "t",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "ə",
+      "start_ms": 2320.0,
+      "end_ms": 2360.0,
+      "confidence": 0.998
+    },
+    {
+      "token": "n",
+      "start_ms": 2400.0,
+      "end_ms": 2440.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "d",
+      "start_ms": 2440.0,
+      "end_ms": 2520.0,
+      "confidence": 0.7727
+    },
+    {
+      "token": "ð",
+      "start_ms": 2520.0,
+      "end_ms": 2560.0,
+      "confidence": 0.9983
+    },
+    {
+      "token": "ə",
+      "start_ms": 2560.0,
+      "end_ms": 2600.0,
+      "confidence": 0.998
+    },
+    {
+      "token": "p",
+      "start_ms": 2640.0,
+      "end_ms": 2680.0,
+      "confidence": 0.9831
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 2720.0,
+      "end_ms": 2760.0,
+      "confidence": 0.9936
+    },
+    {
+      "token": "t",
+      "start_ms": 2800.0,
+      "end_ms": 2840.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ə",
+      "start_ms": 2880.0,
+      "end_ms": 2920.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "l",
+      "start_ms": 2920.0,
+      "end_ms": 2960.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "ʌ",
+      "start_ms": 3000.0,
+      "end_ms": 3040.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "v",
+      "start_ms": 3080.0,
+      "end_ms": 3120.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "w",
+      "start_ms": 3160.0,
+      "end_ms": 3200.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 3240.0,
+      "end_ms": 3280.0,
+      "confidence": 0.9983
+    },
+    {
+      "token": "t",
+      "start_ms": 3360.0,
+      "end_ms": 3400.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 3440.0,
+      "end_ms": 3480.0,
+      "confidence": 0.9992
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl"
+}

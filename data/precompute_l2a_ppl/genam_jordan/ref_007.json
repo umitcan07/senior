@@ -1,0 +1,155 @@
+{
+  "author": "genam_jordan",
+  "dialect": "genam",
+  "id": "ref_007",
+  "text": "These cheap seats are not very big.",
+  "ipa_transcription": "ð i z tʰ ʃ i p s i t s ɑ ɹ n ɑ t v ɛ ɹ i p ɪ ɡ",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.9662
+    },
+    {
+      "token": "ð",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "i",
+      "start_ms": 200.0,
+      "end_ms": 240.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "z",
+      "start_ms": 280.0,
+      "end_ms": 360.0,
+      "confidence": 0.8695
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 400.0,
+      "end_ms": 440.0,
+      "confidence": 0.9907
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "i",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9628
+    },
+    {
+      "token": "p",
+      "start_ms": 560.0,
+      "end_ms": 600.0,
+      "confidence": 0.9904
+    },
+    {
+      "token": "s",
+      "start_ms": 720.0,
+      "end_ms": 760.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "i",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.9953
+    },
+    {
+      "token": "t",
+      "start_ms": 880.0,
+      "end_ms": 920.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "s",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.9947
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.988
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1120.0,
+      "end_ms": 1200.0,
+      "confidence": 0.9084
+    },
+    {
+      "token": "n",
+      "start_ms": 1280.0,
+      "end_ms": 1360.0,
+      "confidence": 0.993
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 1360.0,
+      "end_ms": 1440.0,
+      "confidence": 0.9906
+    },
+    {
+      "token": "t",
+      "start_ms": 1440.0,
+      "end_ms": 1480.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "v",
+      "start_ms": 1560.0,
+      "end_ms": 1600.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 1640.0,
+      "end_ms": 1680.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 1720.0,
+      "end_ms": 1760.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "i",
+      "start_ms": 1800.0,
+      "end_ms": 1840.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "p",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9913
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9941
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9994
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl"
+}
