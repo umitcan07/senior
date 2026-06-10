@@ -177,7 +177,7 @@ Connectionist Temporal Classification (CTC) \cite{graves2006connectionist} is wi
 
 \section{Forced Alignment and Assessment}
 
-The Montreal Forced Aligner (MFA) \cite{mcauliffe2017montreal} is an industry-standard tool for phoneme-level time alignment, supporting English out-of-the-box. Pronunciation assessment employs metrics such as Phoneme Error Rate (PER) and goodness of pronunciation (GOP) scores \cite{witt2000phone} to evaluate speech quality.
+The Montreal Forced Aligner (MFA) \cite{mcauliffe2017montreal} is an industry-standard tool for phoneme-level time alignment, supporting English out-of-the-box, and was used in the CMPE491 prototype. In the present work, however, time alignment is performed with POWSM's own CTC forced alignment rather than MFA, which keeps recognition and alignment on a single phone inventory (Chapter~6). Pronunciation assessment employs metrics such as Phoneme Error Rate (PER) and goodness of pronunciation (GOP) scores \cite{witt2000phone} to evaluate speech quality.
 
 \section{L2 Speech Corpora and the Annotation Gap}
 \label{sec:data-gap}
@@ -549,7 +549,7 @@ The main application codebase is located in the \texttt{app/} directory \cite{gi
     \item \texttt{user\_recordings} - User-submitted audio recordings with metadata
     \item \texttt{audio\_quality\_metrics} - Quality assessment results (SNR, silence ratio, clipping ratio)
     \item \texttt{analyses} - Pronunciation assessment results with phoneme and word-level scores
-    \item \texttt{alignments} - Phone-level time alignment data (TextGrid files)
+    \item \texttt{alignments} - Legacy phone-level alignment table (V1; V2 stores phone timings directly on \texttt{reference\_speeches} and \texttt{analyses})
     \item \texttt{phoneme\_errors} and \texttt{word\_errors} - Normalized error data for aggregation
     \item \texttt{jobs} and \texttt{ipa\_generation\_jobs} - Asynchronous job tracking for RunPod endpoints
     \item \texttt{user\_preferences} - User settings and preferences
@@ -738,7 +738,7 @@ The complete web application is functional and deployed, providing users with a 
     \item \textbf{User Authentication:} Secure authentication through Clerk with support for email/password and social sign-in (Google, GitHub)
     \item \textbf{Practice Text Management:} Full CRUD operations for practice texts with filtering by difficulty and category
     \item \textbf{Audio Recording:} Browser-based recording with real-time waveform visualization and audio upload support
-    \item \textbf{Reference Speech System:} Management of target pronunciations with TTS integration (ElevenLabs) and native speaker uploads
+    \item \textbf{Reference Speech System:} Management of target pronunciations as human native recordings (General American and Received Pronunciation), with a learner-facing dialect toggle (the prototype's TTS generation was retired)
     \item \textbf{Pronunciation Assessment:} End-to-end workflow from recording to detailed analysis results
     \item \textbf{Progress Tracking:} User history, statistics, and error analysis with aggregation capabilities
     \item \textbf{Admin Interface:} Complete administrative tools for content and system management
@@ -764,7 +764,7 @@ The machine learning assessment pipeline is fully integrated:
     \item \textbf{POWSM Integration:} Successfully integrated POWSM \cite{powsm} models for Phone Recognition (PR) and Grapheme-to-Phoneme (G2P) tasks
     \item \textbf{Phonetic Transcription:} Accurate IPA transcription from audio using state-of-the-art models
     \item \textbf{Error Detection:} Phoneme-level error classification (substitution, insertion, deletion) with edit distance algorithms
-    \item \textbf{Time Alignment:} MFA integration for phone-level timestamp generation
+    \item \textbf{Time Alignment:} POWSM CTC forced alignment for phone-level timestamps (replacing the prototype's MFA)
     \item \textbf{Score Calculation:} Pronunciation accuracy scoring based on error rates
 \end{itemize}
 
@@ -837,7 +837,7 @@ Several technical challenges were successfully addressed during implementation:
 
 \textbf{Asynchronous Processing:} Managing long-running ML inference tasks required a job queue system. The implementation uses RunPod's serverless architecture with status tracking and webhook callbacks for result delivery.
 
-\textbf{Time Alignment:} Integrating MFA for phone-level timestamps required careful handling of transcription formats and TextGrid parsing. The system supports both MFA-based alignment and fallback timestamp estimation.
+\textbf{Time Alignment:} Phone-level timestamps come directly from POWSM's CTC forced alignment, computed on the same encoder used for recognition. This replaced the prototype's MFA/TextGrid pipeline and its heuristic fallback timestamps, removing a separate tool, a separate phone inventory, and a class of alignment mismatches.
 
 \section{Performance and Scalability}
 
@@ -883,7 +883,7 @@ The project demonstrates several technical achievements:
 
 \textbf{Full-Stack Architecture:} Developed a production-ready full-stack application using modern technologies (TanStack Start, React, TypeScript, Drizzle ORM) with a focus on type safety, scalability, and maintainability. The architecture demonstrates best practices in separation of concerns, error handling, and user experience design.
 
-\textbf{ML Pipeline:} Implemented a complete machine learning pipeline combining phonetic transcription, forced alignment (MFA), and error detection algorithms. The pipeline processes audio recordings asynchronously and provides detailed analysis results with phone-level timestamps.
+\textbf{ML Pipeline:} Implemented a complete machine learning pipeline combining POWSM CTC phonetic transcription and forced alignment, audio-quality abstention, articulatory feature-vector difference, and GOP scoring. The pipeline processes audio recordings asynchronously and provides detailed analysis results with real CTC phone-level timestamps.
 
 \textbf{Database Design:} Designed and implemented a comprehensive database schema supporting user recordings, analyses, error tracking, and progress data. The schema enables efficient querying and aggregation for analytics and reporting.
 
@@ -916,7 +916,7 @@ Nounce is designed exclusively for English to streamline initial development and
 
 \subsection{Future Directions}
 
-\textbf{Future Directions for Turkish-Native Speakers:} Fine-tuning the model to capture the nuances of people who use Turkish as their native language would improve accuracy for the target user population. This would involve collecting and curating training data from Turkish L1 speakers and adapting the model to better recognize common pronunciation patterns and errors specific to this population.
+\textbf{Scaling the Turkish-L1 adaptation:} This work already fine-tuned POWSM for Turkish-native speakers and showed that perceived-label adaptation improves mispronunciation detection (Section~\ref{sec:finetuning-results}). The clearest next step is to scale the perceived-annotated Turkish data well beyond the current small set---the chief bottleneck being expert phonetic annotation in the model's convention---and to reduce the native-speech drift introduced by longer fine-tuning. Broadening the human-rating validation (more raters and speakers) is the other resource-bound priority, since it is what most directly substantiates the system's pedagogical claims.
 
 \textbf{Language Expansion:} Nounce is designed exclusively for English to streamline initial development and ensure high-quality pronunciation assessment. Future development can expand support to additional languages, but this requires significant model adaptation, dictionary resources, and acoustic model training for each target language.
 
