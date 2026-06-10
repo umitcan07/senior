@@ -258,6 +258,8 @@ We test this with a controlled, same-data, opposite-supervision ablation on the 
 
 Because dev loss is not comparable across different label distributions, models are compared only on held-out behaviour: phone error rate (PER) and substitution recall on a Turkish-native held-out set, deviation recall on L2-ARCTIC, and a native false-positive (drift) rate that a deployable adapter must not inflate. Each adapter was trained for 30 epochs and, after observing that dev loss had not plateaued, re-trained for 60 epochs (\texttt{l2a\_*\_long}); the longer schedule is what sharpens the result (Section~\ref{sec:finetuning-results}). All training and evaluation code, and the adapter artifacts, are available in the project repository \cite{github2024senior}.
 
+\textbf{Compute.} Parameter-efficient adaptation keeps the experiment within modest, mostly self-hosted hardware. Data preparation, local development, and the lighter evaluation passes ran on a consumer GPU (NVIDIA GeForce RTX~4060~Ti, 8\,GB); the full adapter sweep and the held-out evaluation matrix ran on a rented RunPod GPU pod when more memory or throughput was needed. The production inference path is unchanged from training: the same fine-tuned adapter is served on the existing RunPod \emph{serverless} GPU endpoint, which scales to zero between requests, so on-demand assessment carries no idle cost.
+
 Alongside this controlled ablation, we scaled the same perceived-label recipe to the full L2-ARCTIC corpus, applying the approach at its largest setting. This run follows the same annotation philosophy---we train exclusively on the perceived (PPL) surface, resolving L2-ARCTIC's \texttt{CPL,PPL,tag} error templates to the sequence a listener actually heard, and never touch the canonical forced-alignment tier---and reuse the same adapter recipe (LoRA, rank~$32$, $\alpha{=}64$, attention projections only). It differs from the ablation above in three deliberate ways: it uses all six L1 groups under a speaker-disjoint, L1-balanced split (twelve speakers train, six validation, six test, for roughly nine hundred held-out utterances), trains for $25$ epochs, and scores raw phone error rate against the perceived labels without the diacritic-folding step. The intent is to test whether the same perceived-label recipe holds on a held-out population an order of magnitude larger than the controlled dev split. The two runs use different splits and metrics, so Section~\ref{sec:finetuning-results} reports them on their own terms rather than on a single shared number.
 
 \section{Development Methodology}
@@ -274,7 +276,7 @@ For local development, a custom RunPod serverless simulator was implemented to r
 
 \textbf{Proxy Server:} A FastAPI-based proxy server (\texttt{mod/dev/runpod\_proxy.py}) that mimics the RunPod Cloud API, providing endpoints for job submission (\texttt{POST /v2/\{endpoint\_id\}/run}) and status polling (\texttt{GET /v2/\{endpoint\_id\}/status/\{job\_id\}}). The proxy maintains in-memory job state and manages worker queues per endpoint.
 
-\textbf{Worker Containers:} Docker containers for assessment and IPA generation workers, running the same code as production endpoints but accessible locally via Docker Compose networking.
+\textbf{Worker Containers:} A Docker container for the assessment worker, running the same code as the production endpoint but accessible locally via Docker Compose networking.
 
 \textbf{Job Processing:} Background async worker loops pull jobs from per-endpoint queues, ensuring sequential processing that mimics single GPU pod behavior. The simulator handles retries, timeouts, and webhook delivery, providing a faithful representation of RunPod's serverless architecture.
 
@@ -566,7 +568,7 @@ Reference pronunciations are human native recordings in both General American an
 
 \subsection{Machine Learning Services}
 
-The machine learning pipeline is implemented as separate RunPod serverless endpoints in the \texttt{mod/} directory:
+The machine learning pipeline is implemented as a \emph{single} RunPod serverless endpoint in the \texttt{mod/} directory---the prototype's second (G2P/IPA-generation) endpoint was removed (Section~\ref{sec:v1-vs-v2}), leaving one assessment worker for the entire inference path:
 
 \textbf{Assessment Endpoint:} The pronunciation assessment service (\texttt{mod/assessment/}) is built around POWSM \cite{powsm} and its CTC encoder, and replaces several prototype components:
 \begin{itemize}
@@ -577,7 +579,7 @@ The machine learning pipeline is implemented as separate RunPod serverless endpo
     \item \textbf{Goodness-of-Pronunciation (GOP):} per-phone GOP and entropy are computed directly from the CTC posteriors, supporting confidence-aware, colour-coded feedback.
 \end{itemize}
 
-Because the reference phones are precomputed and supplied with each request, the GPU worker is stateless (it never re-aligns the reference). The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays.
+Because the reference phones are precomputed and supplied with each request, the GPU worker is stateless (it never re-aligns the reference). We build that reference data ourselves and ingest it into the database directly: for every reference utterance we run the assessment model offline to produce its IPA phone sequence and frame-level phone timings, pair these with the human native recording, and write the result into the reference table (consumed at request time via the application's data-access layer, never recomputed on the GPU). This self-curated, model-matched reference set is what lets a single stateless endpoint serve the whole pipeline---there is no live G2P or alignment service to call. The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays.
 
 \textbf{Decommissioned G2P endpoint.} The prototype ran a separate Grapheme-to-Phoneme endpoint (\texttt{mod/ipa\_generation/}) to derive target IPA from text. This was removed in the present version: reference phones are computed once, offline, with the assessment model's own alignment, eliminating a second model load and a cross-model phone-inventory mismatch that had inflated error counts.
 
