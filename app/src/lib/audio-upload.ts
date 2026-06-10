@@ -1,7 +1,7 @@
 import { auth } from "@clerk/tanstack-react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { insertAnalysis } from "@/db/analysis";
+import { countAnalysesForUser, insertAnalysis } from "@/db/analysis";
 import { insertUserRecording } from "@/db/recording";
 import { submitAssessmentJob } from "./assessment-submission";
 import {
@@ -10,6 +10,7 @@ import {
 	createSuccessResponse,
 	ErrorCode,
 } from "./errors";
+import { isGuestUserId, MAX_GUEST_ANALYSES } from "./guest-auth";
 import { uploadToR2 } from "./r2";
 
 const UploadAudioSchema = z.object({
@@ -60,6 +61,20 @@ export const uploadAudioRecording = createServerFn({ method: "POST" })
 			}
 
 			console.log(`[Server] attribution recording to user: ${userId}`);
+
+			// Guest free-trial limit (server-authoritative; localStorage is UI-only).
+			// Enforced before creating any rows so a blocked attempt leaves no orphans.
+			if (await isGuestUserId(userId)) {
+				const used = await countAnalysesForUser(userId);
+				if (used >= MAX_GUEST_ANALYSES) {
+					return createErrorResponse(
+						ErrorCode.GUEST_LIMIT_REACHED,
+						"You've used all your free tries. Sign up to keep practicing.",
+						{ used, limit: MAX_GUEST_ANALYSES },
+						402,
+					);
+				}
+			}
 
 			const fileExtension = data.mimeType.split("/")[1] || "webm";
 			const storageKey = `users/${userId}/recordings/${crypto.randomUUID()}.${fileExtension}`;

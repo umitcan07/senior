@@ -3,11 +3,33 @@ import {
 	SignedOut,
 	SignInButton,
 	UserButton,
+	useUser,
 } from "@clerk/tanstack-react-start";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NounceLogo } from "@/components/ui/nounce";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { UpgradeAccountDialog } from "@/components/upgrade-account-dialog";
+
+/** Signed-in slot: guests get a "Save progress" CTA (they're technically signed in
+ * but anonymous); real accounts get the normal UserButton. */
+function SignedInSlot() {
+	const { user } = useUser();
+	const [upgradeOpen, setUpgradeOpen] = useState(false);
+	const isGuest = user?.publicMetadata?.guest === true;
+
+	if (!isGuest) return <UserButton />;
+
+	return (
+		<>
+			<Button size="sm" variant="default" onClick={() => setUpgradeOpen(true)}>
+				Save progress
+			</Button>
+			<UpgradeAccountDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+		</>
+	);
+}
 
 export default function HeaderUser() {
 	return (
@@ -19,16 +41,16 @@ export default function HeaderUser() {
 					</Link>
 					<div className="flex items-center gap-2">
 						<ThemeToggle />
-						<div className="w-7">
-							<SignedIn>
-								<UserButton />
-							</SignedIn>
-							<SignedOut>
+						<SignedIn>
+							<SignedInSlot />
+						</SignedIn>
+						<SignedOut>
+							<div className="w-7">
 								<Button variant="default" size="sm" asChild>
 									<SignInButton />
 								</Button>
-							</SignedOut>
-						</div>
+							</div>
+						</SignedOut>
 					</div>
 				</div>
 			</div>

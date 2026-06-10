@@ -8,6 +8,8 @@ export enum ErrorCode {
 	EXTERNAL_API_ERROR = "EXTERNAL_API_ERROR",
 	INTERNAL_ERROR = "INTERNAL_ERROR",
 	UNKNOWN_ERROR = "UNKNOWN_ERROR",
+	// Guest hit the free-analysis trial limit — client should prompt to sign up.
+	GUEST_LIMIT_REACHED = "GUEST_LIMIT_REACHED",
 }
 
 export interface ApiError {

@@ -38,17 +38,18 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { LiveWaveform } from "@/components/ui/live-waveform";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
-import { SignInPrompt } from "@/components/ui/sign-in-prompt";
 import {
 	WaveformPlayer,
 	WaveformPlayerInline,
 } from "@/components/ui/waveform-player";
+import { UpgradeAccountDialog } from "@/components/upgrade-account-dialog";
 import type { Author, ReferenceSpeech } from "@/db/types";
+import { useGuestSession } from "@/hooks/use-guest-session";
 import { useGuestTrial } from "@/hooks/use-guest-trial";
 import { useToast } from "@/hooks/use-toast";
 import { uploadAudioRecording } from "@/lib/audio-upload";
 import { dialectFromDbCode } from "@/lib/dialect";
-import type { ApiResponse } from "@/lib/errors";
+import { type ApiResponse, ErrorCode } from "@/lib/errors";
 import { formatIpaForDisplay } from "@/lib/ipa";
 import { formatDuration, serverGetReferencesForText } from "@/lib/reference";
 import { getScoreLevel } from "@/lib/score";
@@ -131,7 +132,7 @@ type RecordingState =
 
 const MAX_RECORDING_TIME = 20; // seconds
 
-function useRecording(textId: string) {
+function useRecording(textId: string, onGuestLimit?: () => void) {
 	const [uiState, setUiState] = useState<RecordingState>("idle");
 	const [countdown, setCountdown] = useState(3);
 	const navigate = useNavigate();
@@ -318,7 +319,7 @@ function useRecording(textId: string) {
 						? Math.max(1, Math.round(audioRecorder.recordingTime * 1000))
 						: 1000;
 
-				const response = await uploadAudioRecording({
+				const response = (await uploadAudioRecording({
 					data: {
 						textId,
 						referenceId,
@@ -326,7 +327,7 @@ function useRecording(textId: string) {
 						mimeType: audioBlob.type,
 						duration: durationMs,
 					},
-				});
+				})) as ApiResponse<{ analysisId: string }>;
 
 				if (response.success) {
 					setUiState("analyzing");
@@ -337,6 +338,9 @@ function useRecording(textId: string) {
 							params: { textId, analysisId: response.data.analysisId },
 						});
 					}, 500);
+				} else if (response.error.code === ErrorCode.GUEST_LIMIT_REACHED) {
+					setUiState("preview");
+					onGuestLimit?.();
 				} else {
 					setUiState("preview");
 					toast({
@@ -365,6 +369,7 @@ function useRecording(textId: string) {
 			uploadedFileBlob,
 			uploadedFileDuration,
 			toast,
+			onGuestLimit,
 		],
 	);
 
@@ -979,20 +984,66 @@ function PracticeTextLayout() {
 	return <PracticeTextPage />;
 }
 
-function GuestRecordPrompt() {
+/** Idle record/upload controls for a signed-out visitor. The first action silently
+ * establishes a Clerk guest session (no sign-up), then proceeds with the normal flow;
+ * once the session is active Clerk re-renders into the full SignedIn record UI. */
+function GuestRecordControls({
+	selectedReferenceId,
+	recording,
+	guest,
+}: {
+	selectedReferenceId: string | null;
+	recording: ReturnType<typeof useRecording>;
+	guest: ReturnType<typeof useGuestSession>;
+}) {
 	const { remaining, maxFree } = useGuestTrial();
+	const disabled = !selectedReferenceId || guest.pending;
+
 	return (
-		<SignInPrompt
-			title="Sign in to start practicing"
-			description="Record your pronunciation and get instant feedback on every sound."
-			className="w-full max-w-md border-0 bg-transparent px-0 py-8"
-		>
-			{remaining > 0 && (
-				<p className="text-muted-foreground text-xs">
-					{remaining} of {maxFree} free tries available
-				</p>
-			)}
-		</SignInPrompt>
+		<div className="flex w-full max-w-md flex-col items-center gap-3">
+			<div className="flex w-full gap-3">
+				<Button
+					size="lg"
+					disabled={disabled}
+					onClick={async () => {
+						if (await guest.ensure()) recording.startRecording();
+					}}
+					className="flex-1 gap-2"
+				>
+					<RiMicLine size={18} />
+					{guest.pending
+						? "Starting…"
+						: selectedReferenceId
+							? "Record"
+							: "Select voice first"}
+				</Button>
+
+				<div className="relative flex-1">
+					<input
+						type="file"
+						accept="audio/*"
+						className="absolute inset-0 cursor-pointer opacity-0"
+						disabled={disabled}
+						onChange={async (e) => {
+							if (!e.target.files || e.target.files.length === 0) return;
+							if (await guest.ensure()) recording.handleFileUpload(e);
+						}}
+					/>
+					<Button
+						variant="outline"
+						size="lg"
+						className="w-full gap-2"
+						disabled={disabled}
+					>
+						<RiUploadLine size={18} />
+						Upload
+					</Button>
+				</div>
+			</div>
+			<p className="text-muted-foreground text-xs">
+				No sign-up needed · {remaining} of {maxFree} free tries
+			</p>
+		</div>
 	);
 }
 
@@ -1023,7 +1074,9 @@ function PracticeTextPage() {
 		setSelectedReferenceId(getInitialReferenceId);
 	}, [getInitialReferenceId]);
 	const navigate = useNavigate();
-	const recording = useRecording(text?.id ?? "");
+	const guest = useGuestSession();
+	const [upgradeOpen, setUpgradeOpen] = useState(false);
+	const recording = useRecording(text?.id ?? "", () => setUpgradeOpen(true));
 
 	if (!text) {
 		return (
@@ -1362,7 +1415,11 @@ function PracticeTextPage() {
 									</SignedIn>
 
 									<SignedOut>
-										<GuestRecordPrompt />
+										<GuestRecordControls
+											selectedReferenceId={selectedReferenceId}
+											recording={recording}
+											guest={guest}
+										/>
 									</SignedOut>
 								</div>
 							</div>
@@ -1375,6 +1432,7 @@ function PracticeTextPage() {
 					</div>
 				</PageContainer>
 			</motion.div>
+			<UpgradeAccountDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
 		</MainLayout>
 	);
 }

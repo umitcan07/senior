@@ -1,9 +1,10 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "./index";
 import {
 	analyses,
 	audioQualityMetrics,
 	phonemeErrors,
+	userRecordings,
 	wordErrors,
 } from "./schema";
 import type {
@@ -23,6 +24,20 @@ export async function insertAnalysis(
 ): Promise<Analysis> {
 	const [result] = await db.insert(analyses).values(analysis).returning();
 	return result;
+}
+
+/**
+ * Count all analyses belonging to a user (joined via their recordings). Used to
+ * enforce the guest free-trial limit server-side, so clearing localStorage can't
+ * bypass it. Counts every analysis row the user has created (incl. failed/abstained).
+ */
+export async function countAnalysesForUser(userId: string): Promise<number> {
+	const [row] = await db
+		.select({ value: count() })
+		.from(analyses)
+		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
+		.where(eq(userRecordings.userId, userId));
+	return row?.value ?? 0;
 }
 
 export async function getAnalysisById(id: string): Promise<Analysis | null> {
