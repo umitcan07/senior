@@ -114,6 +114,10 @@ MODELS = [
     ("l2a_cpl", "l2a_cpl/best", "all"),
     ("l2a_ppl", "l2a_ppl/best", "all"),
     ("l2a_ppl_dora", "l2a_ppl_dora/best", "all"),
+    # 60-epoch re-train of the core cpl-vs-ppl ablation (the 30-epoch set was
+    # under-trained; release adapters-2026-06-10-long). L2-ARCTIC-only.
+    ("l2a_cpl_long", "l2a_cpl_long/best", "all"),
+    ("l2a_ppl_long", "l2a_ppl_long/best", "all"),
     ("l2a_ppl_tr_fold1", "l2a_ppl_tr_fold1/best", "loso_fold1"),
     ("l2a_ppl_tr_fold2", "l2a_ppl_tr_fold2/best", "loso_fold2"),
     ("l2a_ppl_tr_fold3", "l2a_ppl_tr_fold3/best", "loso_fold3"),
@@ -771,7 +775,8 @@ def main() -> None:
     l2a_set: list[dict] = []
     if not args.skip_l2arctic and ensure_l2arctic_manifests(ftune, str(l2a_root)):
         l2a_set = load_l2arctic_set(ftune, "dev")
-    L2A_MODELS = {"base", "l2a_cpl", "l2a_ppl", "l2a_ppl_dora"}  # cpl-vs-ppl, not the TR folds
+    L2A_MODELS = {"base", "l2a_cpl", "l2a_ppl", "l2a_ppl_dora",
+                  "l2a_cpl_long", "l2a_ppl_long"}  # cpl-vs-ppl, not the TR folds
 
     print(f"[data] TR all={len(all_utts)} utts, LOSO folds={ {k: len(v) for k, v in fold_utts.items()} }, "
           f"canonical sentences={len(canon)}, native clips={len(native)}, "
