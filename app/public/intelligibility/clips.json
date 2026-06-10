@@ -1,0 +1,155 @@
+{
+  "n_clips": 25,
+  "clips": [
+    {
+      "clip_id": "c0001",
+      "file": "c0001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0002",
+      "file": "c0002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0003",
+      "file": "c0003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0004",
+      "file": "c0004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0005",
+      "file": "c0005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0006",
+      "file": "c0006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0007",
+      "file": "c0007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0008",
+      "file": "c0008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0009",
+      "file": "c0009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0010",
+      "file": "c0010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0011",
+      "file": "c0011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0012",
+      "file": "c0012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0013",
+      "file": "c0013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0014",
+      "file": "c0014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0015",
+      "file": "c0015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0016",
+      "file": "c0016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0017",
+      "file": "c0017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0018",
+      "file": "c0018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0019",
+      "file": "c0019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0020",
+      "file": "c0020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0021",
+      "file": "c0021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0022",
+      "file": "c0022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0023",
+      "file": "c0023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0024",
+      "file": "c0024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "is_anchor": false
+    },
+    {
+      "clip_id": "c0025",
+      "file": "c0025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "is_anchor": false
+    }
+  ]
+}

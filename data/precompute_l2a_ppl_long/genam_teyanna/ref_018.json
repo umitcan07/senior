@@ -1,0 +1,257 @@
+{
+  "author": "genam_teyanna",
+  "dialect": "genam",
+  "id": "ref_018",
+  "text": "Let's meet at that new little place near the park around noon.",
+  "ipa_transcription": "l ɛ t s m i t æ t ð æ t n u l ɪ t ə l pʰ l e ɪ s n ɪ ɹ ð ə pʰ ɑ ɹ k ə˞ a ʊ n d n ũ n",
+  "phone_timings": [
+    {
+      "token": "l",
+      "start_ms": 120.0,
+      "end_ms": 160.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9868
+    },
+    {
+      "token": "t",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9946
+    },
+    {
+      "token": "s",
+      "start_ms": 320.0,
+      "end_ms": 360.0,
+      "confidence": 0.9938
+    },
+    {
+      "token": "m",
+      "start_ms": 400.0,
+      "end_ms": 440.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "i",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.9807
+    },
+    {
+      "token": "t",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9914
+    },
+    {
+      "token": "æ",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.4827
+    },
+    {
+      "token": "t",
+      "start_ms": 640.0,
+      "end_ms": 680.0,
+      "confidence": 0.9729
+    },
+    {
+      "token": "ð",
+      "start_ms": 720.0,
+      "end_ms": 760.0,
+      "confidence": 0.997
+    },
+    {
+      "token": "æ",
+      "start_ms": 760.0,
+      "end_ms": 800.0,
+      "confidence": 0.9963
+    },
+    {
+      "token": "t",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.993
+    },
+    {
+      "token": "n",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "u",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9943
+    },
+    {
+      "token": "l",
+      "start_ms": 1200.0,
+      "end_ms": 1240.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1240.0,
+      "end_ms": 1280.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "t",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.997
+    },
+    {
+      "token": "ə",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "l",
+      "start_ms": 1400.0,
+      "end_ms": 1440.0,
+      "confidence": 0.9911
+    },
+    {
+      "token": "pʰ",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.7669
+    },
+    {
+      "token": "l",
+      "start_ms": 1560.0,
+      "end_ms": 1600.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "e",
+      "start_ms": 1600.0,
+      "end_ms": 1640.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1640.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9849
+    },
+    {
+      "token": "s",
+      "start_ms": 1760.0,
+      "end_ms": 1800.0,
+      "confidence": 0.9974
+    },
+    {
+      "token": "n",
+      "start_ms": 1880.0,
+      "end_ms": 1920.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9985
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "ð",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "ə",
+      "start_ms": 2120.0,
+      "end_ms": 2160.0,
+      "confidence": 0.9953
+    },
+    {
+      "token": "pʰ",
+      "start_ms": 2200.0,
+      "end_ms": 2240.0,
+      "confidence": 0.9299
+    },
+    {
+      "token": "ɑ",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 1.0
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 2280.0,
+      "end_ms": 2360.0,
+      "confidence": 0.9475
+    },
+    {
+      "token": "k",
+      "start_ms": 2400.0,
+      "end_ms": 2440.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 2520.0,
+      "end_ms": 2560.0,
+      "confidence": 0.914
+    },
+    {
+      "token": "a",
+      "start_ms": 2600.0,
+      "end_ms": 2680.0,
+      "confidence": 0.9598
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 2680.0,
+      "end_ms": 2720.0,
+      "confidence": 0.7489
+    },
+    {
+      "token": "n",
+      "start_ms": 2720.0,
+      "end_ms": 2760.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "d",
+      "start_ms": 2760.0,
+      "end_ms": 2840.0,
+      "confidence": 0.8887
+    },
+    {
+      "token": "n",
+      "start_ms": 2960.0,
+      "end_ms": 3000.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ũ",
+      "start_ms": 3040.0,
+      "end_ms": 3080.0,
+      "confidence": 0.9097
+    },
+    {
+      "token": "n",
+      "start_ms": 3160.0,
+      "end_ms": 3200.0,
+      "confidence": 0.9992
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl_long"
+}

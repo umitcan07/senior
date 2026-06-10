@@ -10,8 +10,7 @@ baseline POWSM weights (E5). The adapter targets the multi-headed-attention
 linears (linear_q/k/v/out), which exist in the *encoder*, so the fine-tuned
 weights affect model.encode() / ctc.log_softmax() — the CTC path this aligner
 uses for free/forced alignment and GOP — not just the seq2seq decoder. Gated by
-``adapter_dir`` / ``POWSM_ADAPTER_DIR``; defaults to the baked-in adapter under
-``mod/assessment/adapter`` when present.
+``adapter_dir`` / ``POWSM_ADAPTER_DIR``; defaults to the baseline model (no adapter).
 """
 
 import dataclasses
@@ -60,6 +59,44 @@ class AlignerOutput:
         }
 
 
+# POWSM's CTC alignment non-deterministically emits affricates either split
+# (``d`` + ``ʒ``) or as a single ligature token (``d͡ʒ``, with the U+0361 tie bar).
+# References are stored split, so a ligature in the hypothesis can't match and
+# inflates the phone diff by ~2 ops per affricate (delete + insert instead of a
+# match). We normalize every aligner output to the split form. See issue #85.
+AFFRICATE_SPLITS: dict[str, tuple[str, str]] = {
+    "d͡ʒ": ("d", "ʒ"),
+    "t͡ʃ": ("t", "ʃ"),
+    "d͡z": ("d", "z"),
+    "t͡s": ("t", "s"),
+}
+
+
+def split_affricate_ligatures(segments: list["PhoneSegment"]) -> list["PhoneSegment"]:
+    """Replace any ligature-affricate ``PhoneSegment`` with its two component
+    phones, splitting the time span at the midpoint and carrying the same
+    confidence to both. Non-affricate segments pass through unchanged."""
+    out: list[PhoneSegment] = []
+    for s in segments:
+        parts = AFFRICATE_SPLITS.get(s.token)
+        if parts is None:
+            out.append(s)
+            continue
+        mid = round((s.start_ms + s.end_ms) / 2, 1)
+        first, second = parts
+        out.append(
+            PhoneSegment(
+                token=first, start_ms=s.start_ms, end_ms=mid, confidence=s.confidence
+            )
+        )
+        out.append(
+            PhoneSegment(
+                token=second, start_ms=mid, end_ms=s.end_ms, confidence=s.confidence
+            )
+        )
+    return out
+
+
 _aligner: Optional["POWSMAligner"] = None
 
 
@@ -99,11 +136,13 @@ class POWSMAligner:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = device
 
-        # The adapter was fine-tuned with lang_sym="<unk>", task_sym="<pr>"; match it
-        # when active. (lang/task syms only prime the decoder prompt — the CTC encoder
-        # path this aligner uses is prompt-independent — but we mirror training for
-        # provenance and to stay safe if the decode path is ever added.)
-        lang_sym = "<unk>" if self.adapter_dir else "<eng>"
+        # lang/task syms only prime the decoder prompt; the CTC encoder path this aligner
+        # uses is prompt-independent, so this does NOT change phone output. We still mirror
+        # the training value for provenance / a possible future decode path. The 2026-06-09
+        # adapters were trained with lang_sym="<eng>" (scripts/train_adapter.py); the V1
+        # adapter used "<unk>". Default to <eng>; override with POWSM_LANG_SYM if needed.
+        # See doc/adapters.md (Pitfall #1).
+        lang_sym = os.environ.get("POWSM_LANG_SYM", "<eng>")
 
         log.info(
             "Loading %s on %s (lang_sym=%s, adapter=%s)",
@@ -150,11 +189,9 @@ class POWSMAligner:
         if explicit is not None:
             cand = explicit
         elif "POWSM_ADAPTER_DIR" in os.environ:
-            cand = os.environ["POWSM_ADAPTER_DIR"]  # may be "" to force baseline
+            cand = os.environ["POWSM_ADAPTER_DIR"]  # set to non-empty path to enable adapter
         else:
-            cand = os.path.join(
-                os.path.dirname(__file__), "assessment", "adapter"
-            )
+            return None  # baseline model by default
         cand = cand.strip() if isinstance(cand, str) else cand
         if not cand:
             return None
@@ -240,20 +277,15 @@ class POWSMAligner:
             vocab=list(self.token_list),
         )
 
-    def forced_alignment(
-        self, audio: np.ndarray, canonical_ipa: list[str]
-    ) -> list[PhoneSegment]:
+    def _forced_segments(self, log_probs, enc_lens, ids: list[int]) -> list[PhoneSegment]:
+        """Forced-align spans from already-computed CTC log_probs (no extra encode)."""
         import torch
         import torchaudio.functional as AF
-
-        ids = self._tokenize_ipa(canonical_ipa)
-        _, enc_lens, log_probs = self._encode_audio(audio)
 
         targets = torch.tensor([ids], dtype=torch.int32, device=self.device)
         target_lengths = torch.tensor(
             [len(ids)], dtype=torch.int32, device=self.device
         )
-
         align_path, align_scores = AF.forced_align(
             log_probs.float(),
             targets,
@@ -261,15 +293,13 @@ class POWSMAligner:
             target_lengths,
             blank=self.blank_id,
         )
-
         spans = AF.merge_tokens(align_path[0], align_scores[0].exp())
 
         segments = []
         for s in spans:
             if s.token == self.blank_id:
                 continue
-            tok = self.token_list[s.token]
-            bare = tok.strip("/")
+            bare = self.token_list[s.token].strip("/")
             segments.append(
                 PhoneSegment(
                     token=bare,
@@ -278,8 +308,31 @@ class POWSMAligner:
                     confidence=round(float(s.score), 4),
                 )
             )
+        return split_affricate_ligatures(segments)
 
-        return segments
+    def forced_alignment(
+        self, audio: np.ndarray, canonical_ipa: list[str]
+    ) -> list[PhoneSegment]:
+        ids = self._tokenize_ipa(canonical_ipa)
+        _, enc_lens, log_probs = self._encode_audio(audio)
+        return self._forced_segments(log_probs, enc_lens, ids)
+
+    def encode_and_forced_alignment(
+        self, audio: np.ndarray, canonical_ipa: list[str]
+    ) -> tuple[AlignerOutput, list[PhoneSegment]]:
+        """Single encoder pass shared by GOP (needs the AlignerOutput logprobs) and
+        forced alignment (needs the spans) — avoids encoding the same audio twice."""
+        ids = self._tokenize_ipa(canonical_ipa)
+        _, enc_lens, log_probs = self._encode_audio(audio)
+        n_frames = int(enc_lens[0])
+        out = AlignerOutput(
+            logprobs=log_probs[0, :n_frames].cpu().numpy(),
+            n_frames=n_frames,
+            frame_stride_ms=self.frame_sec * 1000,
+            blank_id=self.blank_id,
+            vocab=list(self.token_list),
+        )
+        return out, self._forced_segments(log_probs, enc_lens, ids)
 
     def free_alignment(self, audio: np.ndarray) -> list[PhoneSegment]:
         enc, enc_lens, log_probs = self._encode_audio(audio)
@@ -325,4 +378,4 @@ class POWSMAligner:
                 )
             )
 
-        return segments
+        return split_affricate_ligatures(segments)

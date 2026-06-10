@@ -1,0 +1,27 @@
+{
+  "clip": "erem/ref_015",
+  "speaker": "erem",
+  "ref_id": "ref_015",
+  "reference_author": "genam_katherine",
+  "reference_model": "l2a_ppl_long",
+  "result": {
+    "status": "abstained",
+    "abstention": {
+      "reason": "wrong_sentence",
+      "detail": {
+        "per": 0.913
+      }
+    },
+    "signal_quality": {
+      "is_acceptable": true,
+      "quality_score": 1.0,
+      "rms_db": -19.4,
+      "clipping_ratio": 0.0001,
+      "silence_ratio": 0.42,
+      "snr_estimate_db": 37.2,
+      "duration_seconds": 3.24,
+      "warnings": [],
+      "suggestions": []
+    }
+  }
+}

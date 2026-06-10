@@ -62,6 +62,15 @@ def main() -> None:
 
     aligner = get_aligner(model_tag=args.model)
     model_tag = aligner.model_tag
+    # Provenance: which adapter (if any) produced these phones. The phones differ
+    # per model, so the assess diff is only valid against same-model references.
+    adapter_dir = getattr(aligner, "adapter_dir", None)
+    model_version = (
+        os.path.basename(os.path.dirname(adapter_dir.rstrip("/")))
+        if adapter_dir
+        else model_tag
+    )
+    log.info("model_tag=%s adapter=%s model_version=%s", model_tag, adapter_dir, model_version)
 
     total = skipped = errors = written = 0
 
@@ -114,6 +123,7 @@ def main() -> None:
                 "ipa_transcription": ipa_transcription,
                 "phone_timings": phone_timings,
                 "model_tag": model_tag,
+                "model_version": model_version,
             }
 
             with open(out_path, "w") as f:

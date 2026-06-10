@@ -1,0 +1,208 @@
+{
+  "_note": "Blind intelligibility-rating clips. Underscore keys are hidden from raters (analysis-only). Serve the repo root over HTTP and open sig/validation/rate.html.",
+  "n_clips": 25,
+  "n_learner": 25,
+  "n_anchor": 0,
+  "clips": [
+    {
+      "clip_id": "c0001",
+      "audio": "data/test_recordings/umut/ref_001.wav",
+      "sentence": "I left my keys on the kitchen table again.",
+      "_ref": "ref_001",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0002",
+      "audio": "data/test_recordings/umut/ref_002.wav",
+      "sentence": "She wants to visit her family next month, maybe around the holidays.",
+      "_ref": "ref_002",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0003",
+      "audio": "data/test_recordings/umut/ref_003.wav",
+      "sentence": "The man sent the cup back to us.",
+      "_ref": "ref_003",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0004",
+      "audio": "data/test_recordings/umut/ref_004.wav",
+      "sentence": "They moved into a much bigger house just last spring.",
+      "_ref": "ref_004",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0005",
+      "audio": "data/test_recordings/umut/ref_005.wav",
+      "sentence": "We saw three deer near the river while walking early this morning.",
+      "_ref": "ref_005",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0006",
+      "audio": "data/test_recordings/umut/ref_006.wav",
+      "sentence": "My brother bought a shiny new red car last weekend.",
+      "_ref": "ref_006",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0007",
+      "audio": "data/test_recordings/umut/ref_007.wav",
+      "sentence": "These cheap seats are not very big.",
+      "_ref": "ref_007",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0008",
+      "audio": "data/test_recordings/umut/ref_008.wav",
+      "sentence": "She always drinks her morning coffee black, without any sugar.",
+      "_ref": "ref_008",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0009",
+      "audio": "data/test_recordings/umut/ref_009.wav",
+      "sentence": "Could you please turn off the lights before bed?",
+      "_ref": "ref_009",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0010",
+      "audio": "data/test_recordings/umut/ref_010.wav",
+      "sentence": "She really enjoys speaking both English and a little French.",
+      "_ref": "ref_010",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0011",
+      "audio": "data/test_recordings/umut/ref_011.wav",
+      "sentence": "Could you please pass me the salt and the bottle of water?",
+      "_ref": "ref_011",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0012",
+      "audio": "data/test_recordings/umut/ref_012.wav",
+      "sentence": "The weather looks lovely, so I think we'll go for a long walk later.",
+      "_ref": "ref_012",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0013",
+      "audio": "data/test_recordings/umut/ref_013.wav",
+      "sentence": "He found a nice little apartment downtown, close to his office.",
+      "_ref": "ref_013",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0014",
+      "audio": "data/test_recordings/umut/ref_014.wav",
+      "sentence": "I think we should leave a little early to beat the traffic.",
+      "_ref": "ref_014",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0015",
+      "audio": "data/test_recordings/umut/ref_015.wav",
+      "sentence": "I'd love to grab a coffee after work.",
+      "_ref": "ref_015",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0016",
+      "audio": "data/test_recordings/umut/ref_016.wav",
+      "sentence": "I completely forgot to bring my umbrella again this morning.",
+      "_ref": "ref_016",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0017",
+      "audio": "data/test_recordings/umut/ref_017.wav",
+      "sentence": "We watched a really good film together on Friday night.",
+      "_ref": "ref_017",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0018",
+      "audio": "data/test_recordings/umut/ref_018.wav",
+      "sentence": "Let's meet at that new little place near the park around noon.",
+      "_ref": "ref_018",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0019",
+      "audio": "data/test_recordings/umut/ref_019.wav",
+      "sentence": "They love walking along the beach together almost every evening.",
+      "_ref": "ref_019",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0020",
+      "audio": "data/test_recordings/umut/ref_020.wav",
+      "sentence": "He carefully put all the books back on the shelf.",
+      "_ref": "ref_020",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0021",
+      "audio": "data/test_recordings/umut/ref_021.wav",
+      "sentence": "I'm not sure who edited the final report.",
+      "_ref": "ref_021",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0022",
+      "audio": "data/test_recordings/umut/ref_022.wav",
+      "sentence": "Please close the window before you leave; it's getting really cold.",
+      "_ref": "ref_022",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0023",
+      "audio": "data/test_recordings/umut/ref_023.wav",
+      "sentence": "Do you want to come over this weekend and help me paint the kitchen?",
+      "_ref": "ref_023",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0024",
+      "audio": "data/test_recordings/umut/ref_024.wav",
+      "sentence": "I usually like to read a good book before I fall asleep.",
+      "_ref": "ref_024",
+      "_speaker": "umut",
+      "_is_anchor": false
+    },
+    {
+      "clip_id": "c0025",
+      "audio": "data/test_recordings/umut/ref_025.wav",
+      "sentence": "Don't forget to call your mother back tomorrow, okay?",
+      "_ref": "ref_025",
+      "_speaker": "umut",
+      "_is_anchor": false
+    }
+  ]
+}

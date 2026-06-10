@@ -15,3 +15,9 @@ silero-vad
 # breaks peft's import (BloomPreTrainedModel lazy-import error).
 transformers==4.46.3
 peft==0.13.2
+# Articulatory feature table for the feature-weighted phone diff (E7.6 / #57,
+# mod/phone_features.py). CPU-only, pure-Python + a small bundled IPA CSV; the cost
+# is a memoized pure function so there's no per-request latency. On Linux the worker
+# image builds it cleanly; the Windows dev host needs the --no-deps install in
+# mod/dev/requirements-dev.txt.
+panphon

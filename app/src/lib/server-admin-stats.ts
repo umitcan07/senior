@@ -1,5 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
+	type AdminJobDetails,
+	type AdminJobRow,
+	type AnalysesOverTimePoint,
+	getAdminJobDetails,
+	getAdminLatestJobs,
 	getAnalysesOverTime,
 	getOverviewStats,
 	getProcessingTimeStats,
@@ -7,7 +12,6 @@ import {
 	getTopPhonemeConfusions,
 	getTopPhonemeErrors,
 	getUserActivityList,
-	type AnalysesOverTimePoint,
 	type OverviewStats,
 	type PhonemeConfusion,
 	type PhonemeErrorStat,
@@ -105,3 +109,41 @@ export const serverGetUserActivity = createServerFn({
 		);
 	}
 });
+
+export const serverGetAdminLatestJobs = createServerFn({
+	method: "GET",
+}).handler(async (): Promise<ApiResponse<AdminJobRow[]>> => {
+	try {
+		const jobs = await getAdminLatestJobs(50);
+		return createSuccessResponse(jobs);
+	} catch (error) {
+		console.error("Get admin jobs error:", error);
+		return createErrorResponse(
+			ErrorCode.DATABASE_ERROR,
+			"Failed to retrieve jobs",
+			error instanceof Error ? { originalError: error.message } : undefined,
+			500,
+		);
+	}
+});
+
+export const serverGetAdminJobDetails = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: { analysisId: string }) => data)
+	.handler(async ({ data }): Promise<ApiResponse<AdminJobDetails>> => {
+		try {
+			const details = await getAdminJobDetails(data.analysisId);
+			return createSuccessResponse(details);
+		} catch (error) {
+			console.error("Get admin job details error:", error);
+			return createErrorResponse(
+				ErrorCode.DATABASE_ERROR,
+				"Failed to retrieve job details",
+				error instanceof Error
+					? { originalError: error.message }
+					: undefined,
+				500,
+			);
+		}
+	});

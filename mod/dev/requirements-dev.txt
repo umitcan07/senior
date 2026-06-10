@@ -9,10 +9,12 @@
 # POWSM's built-in ASR and skip this dependency.
 openai-whisper
 
-# panphon: articulatory feature table, used ONLY by the E7.6 feasibility POC
-# (mod/dev/poc_feature_diff.py, issue #57) — NOT by the production diff. In the Linux dev
-# worker `pip install panphon` works as-is. On a Windows host the editdistance/pandas-CSV
-# build can be blocked by Application Control; the POC needs only FeatureTable, so there you
-# can `pip install --no-deps panphon numpy pandas pyyaml regex unicodecsv munkres setuptools`
+# panphon: articulatory feature table. As of E7.6 (#57) it is a PRODUCTION dependency
+# (mod/phone_features.py — declared in mod/assessment/requirements.txt) and is also used
+# by the feasibility POC (mod/dev/poc_feature_diff.py). Listed here too so the offline
+# dev/verify harness can compute feature costs on a host. In the Linux dev worker
+# `pip install panphon` works as-is. On a Windows host the editdistance/pandas-CSV build
+# can be blocked by Application Control; only FeatureTable is needed, so there you can
+# `pip install --no-deps panphon numpy pandas pyyaml regex unicodecsv munkres setuptools`
 # and run python with `-X utf8` (panphon opens its IPA CSV without an explicit encoding).
 panphon

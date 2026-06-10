@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { MainLayout, PageContainer } from "@/components/layout/main-layout";
+import { PronunciationProfile } from "@/components/pronunciation-profile";
 import { pageVariants } from "@/components/ui/animations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { ShimmeringText } from "@/components/ui/shimmering-text";
 import { SignInPrompt } from "@/components/ui/sign-in-prompt";
+import type { PronunciationProfile as Profile } from "@/lib/phone-profile";
 import { getScoreLevel } from "@/lib/score";
 import { serverGetSummary } from "@/lib/server-summary";
 import { cn, formatRelativeTime } from "@/lib/utils";
@@ -48,7 +50,7 @@ type SummaryLoaderData = {
 		averageScore: number;
 		weeklyProgress: number;
 	};
-	commonErrors: Array<{ phoneme: string; count: number }>;
+	profile: Profile;
 	texts: Array<{ id: string; content: string }>;
 };
 
@@ -70,7 +72,12 @@ export const Route = createFileRoute("/summary")({
 					averageScore: 0,
 					weeklyProgress: 0,
 				},
-				commonErrors: [],
+				profile: {
+					toMaster: [],
+					added: [],
+					categories: [],
+					totals: { toMaster: 0, added: 0 },
+				},
 				texts: [],
 			};
 		}
@@ -141,38 +148,6 @@ function StatsSummary({ stats }: StatsSummaryProps) {
 					</span>
 				</CardContent>
 			</Card>
-		</div>
-	);
-}
-
-// COMMON ERRORS
-
-interface CommonErrorsProps {
-	errors: Array<{ phoneme: string; count: number }>;
-}
-
-function CommonErrors({ errors }: CommonErrorsProps) {
-	if (errors.length === 0) return null;
-
-	return (
-		<div className="flex flex-col gap-3">
-			<h3 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
-				Most Challenging Sounds
-			</h3>
-			<div className="flex flex-wrap gap-2">
-				{errors.map((error) => (
-					<div
-						key={error.phoneme}
-						className="flex items-center gap-2 rounded-full border border-border/40 bg-muted/20 px-3 py-1.5 transition-colors hover:bg-muted/40"
-					>
-						<span className="font-ipa text-lg">{error.phoneme}</span>
-						<span className="text-muted-foreground text-xs">{error.count}</span>
-					</div>
-				))}
-			</div>
-			<p className="text-muted-foreground text-xs">
-				Focus on these sounds to improve your pronunciation accuracy.
-			</p>
 		</div>
 	);
 }
@@ -494,7 +469,7 @@ function GuestFeed() {
 // MAIN PAGE
 
 function FeedPage() {
-	const { attempts, stats, commonErrors, texts } = Route.useLoaderData();
+	const { attempts, stats, profile, texts } = Route.useLoaderData();
 	const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<"date" | "score">("date");
 	const [currentPage, setCurrentPage] = useState(1);
@@ -541,15 +516,16 @@ function FeedPage() {
 									<StatsSummary stats={stats} />
 								</section>
 
-								{/* Common Errors */}
-								{commonErrors.length > 0 && (
+								{/* Pronunciation Profile (E7.6 / #57) — sounds you under-produce
+								    vs. sounds you add, recency-weighted. */}
+								{(profile.toMaster.length > 0 || profile.added.length > 0) && (
 									<section className="flex flex-col gap-8">
 										<SectionTitle
-											title="Needs Improvement"
-											description="Focus on these sounds to improve your pronunciation accuracy."
+											title="Pronunciation Profile"
+											description="What to focus on next, weighted toward your recent attempts."
 											variant="playful"
 										/>
-										<CommonErrors errors={commonErrors} />
+										<PronunciationProfile profile={profile} />
 									</section>
 								)}
 

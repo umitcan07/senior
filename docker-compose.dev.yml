@@ -39,6 +39,7 @@ services:
       - ./mod/alignment.py:/worker/alignment.py
       - ./mod/gop_scoring.py:/worker/gop_scoring.py
       - ./mod/phone_diff.py:/worker/phone_diff.py
+      - ./mod/phone_features.py:/worker/phone_features.py
       - ./mod/precompute_references.py:/worker/precompute_references.py
       - ./mod/dev:/worker/dev
       # split_audio.py runs in-container too (ffmpeg is in the image, no host install needed).

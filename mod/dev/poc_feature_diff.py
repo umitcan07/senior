@@ -404,12 +404,26 @@ def step_learner():
 # =========================================================================== #
 CLOSE_THRESHOLD = 3
 SCALE = 2.0
+# Mirrors mod/assessment/assess.py: PER above this == "wrong sentence" abstention, and
+# score = (n_ref - subs - dels)/n_ref (insertions don't count). The feature aligner moves
+# both numbers slightly, so we report the shift + flag any clip that crosses the gate.
+WRONG_SENTENCE_PER = 0.7
 DOC_RESULTS = os.path.join(ROOT, "doc", "e7.6_poc_results.md")
 
 
 def _op_totals(rows):
     s, i, d, m = counts(rows)
     return {"sub": s, "ins": i, "del": d, "match": m}
+
+
+def _score_per(totals, n_ref):
+    """assess.py's score + PER from op counts. score ignores insertions (per assess.py);
+    per counts every error once."""
+    if not n_ref:
+        return 1.0, 0.0
+    score = max(0.0, (n_ref - totals["sub"] - totals["del"]) / n_ref)
+    per = (totals["sub"] + totals["ins"] + totals["del"]) / n_ref
+    return score, per
 
 
 def _compare(items):
@@ -420,6 +434,8 @@ def _compare(items):
     changed = 0
     hist = {}
     rows_out = []
+    score_b_sum = score_f_sum = 0.0
+    per_crossings = []  # clips that change wrong-sentence-gate verdict under feature cost
     for key, ref, usr in items:
         bc, br = align(ref, usr, binary_cost)
         fc, fr = align(ref, usr, cost)
@@ -443,12 +459,26 @@ def _compare(items):
         ft["hard_sub"] += hard
         ch = [(o, r, u) for o, r, u in br] != [(o, r, u) for o, r, u in fr]
         changed += 1 if ch else 0
-        rows_out.append({"key": list(key), "binary": b,
-                         "feature": {**f, "close_sub": close, "hard_sub": hard}, "changed": ch})
+        n_ref = len(ref)
+        b_score, b_per = _score_per(b, n_ref)
+        f_score, f_per = _score_per(f, n_ref)
+        score_b_sum += b_score
+        score_f_sum += f_score
+        if (b_per > WRONG_SENTENCE_PER) != (f_per > WRONG_SENTENCE_PER):
+            per_crossings.append({"key": list(key),
+                                  "binary_per": round(b_per, 3), "feature_per": round(f_per, 3)})
+        rows_out.append({"key": list(key), "binary": {**b, "score": round(b_score, 4), "per": round(b_per, 4)},
+                         "feature": {**f, "close_sub": close, "hard_sub": hard,
+                                     "score": round(f_score, 4), "per": round(f_per, 4)},
+                         "changed": ch})
     bt["edit_cost"] = round(bt["edit_cost"], 1)
     ft["edit_cost"] = round(ft["edit_cost"], 1)
-    return {"n": len(items), "binary": bt, "feature": ft, "changed": changed,
+    n = len(items)
+    return {"n": n, "binary": bt, "feature": ft, "changed": changed,
             "insdel_binary": bt["ins"] + bt["del"], "insdel_feature": ft["ins"] + ft["del"],
+            "score_binary_mean": round(score_b_sum / n, 4) if n else None,
+            "score_feature_mean": round(score_f_sum / n, 4) if n else None,
+            "per_crossings": per_crossings,
             "sub_delta_hist": {str(k): v for k, v in sorted(hist.items())}, "rows": rows_out}
 
 
@@ -495,19 +525,30 @@ def _s4_data():
 
 
 def _fidelity(items):
+    """Confirm this POC's aligner reproduces production `phone_diff` exactly, so the
+    'after' numbers above are what actually ships. As of E7.6 (#57) production
+    `phone_diff` IS feature-weighted, so we compare the POC's feature path against the
+    production default (the operative check), and the POC's binary path against
+    production's binary `_align` (structural fidelity, unchanged by the cost swap)."""
     try:
         sys.path.insert(0, os.path.join(ROOT, "mod"))
         import phone_diff as pd
     except Exception as e:  # noqa: BLE001
         return {"available": False, "error": str(e)}
-    checked = mismatch = 0
+    cost = make_feature_cost(scale=SCALE)
+    checked = mismatch = bin_mismatch = 0
     for _key, ref, usr in items:
-        _, br = align(ref, usr, binary_cost)
-        mine = [(o, r, u) for o, r, u in br]
+        _, fr = align(ref, usr, cost)
+        mine = [(o, r, u) for o, r, u in fr]
         prod = [(a["op"], a["ref"], a["user"]) for a in pd.phone_diff(ref, usr)["alignment"]]
         checked += 1
         mismatch += 1 if mine != prod else 0
-    return {"available": True, "checked": checked, "identical": checked - mismatch, "mismatch": mismatch}
+        # binary path: POC binary vs production _align with its binary cost.
+        _, br = align(ref, usr, binary_cost)
+        prod_bin = [(o, r, u) for o, _ri, _ui, r, u in pd._align(ref, usr, pd._binary_sub_cost)]
+        bin_mismatch += 1 if [(o, r, u) for o, r, u in br] != prod_bin else 0
+    return {"available": True, "checked": checked, "identical": checked - mismatch,
+            "mismatch": mismatch, "binary_mismatch": bin_mismatch}
 
 
 def emit_results():
@@ -632,10 +673,20 @@ def _write_results_md(r):
         L += ["", f"Insertion+deletion pairs collapsed into localized substitutions: "
               f"**{lt['insdel_binary'] - lt['insdel_feature']}** ({lt['insdel_binary']} → {lt['insdel_feature']}). "
               f"Alignment changed on **{lt['changed']}/{lt['n']}** clips.", ""]
+        xs = lt.get("per_crossings", [])
+        L += [f"Score impact (mean; insertions don't count toward score, per `assess.py`): "
+              f"binary **{lt.get('score_binary_mean')}** → feature **{lt.get('score_feature_mean')}**. "
+              f"Clips crossing the {WRONG_SENTENCE_PER} wrong-sentence PER gate under the new cost: "
+              f"**{len(xs)}**"
+              + ("" if not xs else " — " + ", ".join(
+                  f"{c['key'][0]}/{c['key'][1]} ({c['binary_per']}→{c['feature_per']})" for c in xs))
+              + ".", ""]
         fid = lt.get("fidelity", {})
         if fid.get("available"):
-            L += [f"Harness fidelity: binary aligner identical to production `phone_diff` on "
-                  f"**{fid['identical']}/{fid['checked']}** clips ({fid['mismatch']} mismatches).", ""]
+            L += [f"Harness fidelity: POC feature aligner identical to production `phone_diff` "
+                  f"(now feature-weighted) on **{fid['identical']}/{fid['checked']}** clips "
+                  f"({fid['mismatch']} mismatches); POC binary path matches production's binary "
+                  f"`_align` with {fid.get('binary_mismatch', 0)} mismatches.", ""]
         L += ["### Per speaker", ""]
         ps_rows = []
         for spk, c in lt["per_speaker"].items():
@@ -712,7 +763,7 @@ def emit_learner():
     print(f"model_tag={getattr(aligner,'model_tag',None)} adapter={getattr(aligner,'adapter_dir',None)}")
     goldens = load_goldens()
     REF_AUTHOR = os.environ.get("POC_REF_AUTHOR", "genam_katherine")
-    speakers = ["erem", "omer", "umit"]
+    speakers = ["erem", "omer", "umit", "ibrahim"]
     ref_live_cache = {}  # rid -> live ref phones (align each reference clip once)
     out = {"_meta": {"ref_author": REF_AUTHOR,
                      "adapter": getattr(aligner, "adapter_dir", None),

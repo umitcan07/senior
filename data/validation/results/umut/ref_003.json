@@ -1,0 +1,31 @@
+{
+  "clip": "umut/ref_003",
+  "speaker": "umut",
+  "ref_id": "ref_003",
+  "reference_author": "genam_katherine",
+  "reference_model": "l2a_ppl_long",
+  "result": {
+    "status": "abstained",
+    "abstention": {
+      "reason": "wrong_sentence",
+      "detail": {
+        "per": 0.762
+      }
+    },
+    "signal_quality": {
+      "is_acceptable": true,
+      "quality_score": 0.8,
+      "rms_db": -20.5,
+      "clipping_ratio": 0.0,
+      "silence_ratio": 0.59,
+      "snr_estimate_db": 48.9,
+      "duration_seconds": 3.11,
+      "warnings": [
+        "excessive_silence"
+      ],
+      "suggestions": [
+        "Try to fill more of the recording with speech"
+      ]
+    }
+  }
+}

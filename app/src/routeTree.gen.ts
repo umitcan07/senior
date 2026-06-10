@@ -15,6 +15,7 @@ import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as IntelligibilityScoreRouteImport } from './routes/intelligibility-score'
 import { Route as ErrorRouteImport } from './routes/error'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,6 +27,7 @@ import { Route as ApiAssessmentRouteImport } from './routes/api/assessment'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTextRouteImport } from './routes/admin/text'
 import { Route as AdminReferencesRouteImport } from './routes/admin/references'
+import { Route as AdminJobsRouteImport } from './routes/admin/jobs'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminAuthorsRouteImport } from './routes/admin/authors'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
@@ -65,6 +67,11 @@ const LearnRoute = LearnRouteImport.update({
 const JobsRoute = JobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntelligibilityScoreRoute = IntelligibilityScoreRouteImport.update({
+  id: '/intelligibility-score',
+  path: '/intelligibility-score',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorRoute = ErrorRouteImport.update({
@@ -120,6 +127,11 @@ const AdminTextRoute = AdminTextRouteImport.update({
 const AdminReferencesRoute = AdminReferencesRouteImport.update({
   id: '/admin/references',
   path: '/admin/references',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminJobsRoute = AdminJobsRouteImport.update({
+  id: '/admin/jobs',
+  path: '/admin/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -178,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/intelligibility-score': typeof IntelligibilityScoreRoute
   '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
@@ -187,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/admin/users': typeof AdminUsersRoute
@@ -207,6 +221,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/intelligibility-score': typeof IntelligibilityScoreRoute
   '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
@@ -215,6 +230,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/admin/users': typeof AdminUsersRoute
@@ -236,6 +252,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/error': typeof ErrorRoute
+  '/intelligibility-score': typeof IntelligibilityScoreRoute
   '/jobs': typeof JobsRoute
   '/learn': typeof LearnRoute
   '/login': typeof LoginRoute
@@ -245,6 +262,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/authors': typeof AdminAuthorsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/references': typeof AdminReferencesRoute
   '/admin/text': typeof AdminTextRoute
   '/admin/users': typeof AdminUsersRoute
@@ -267,6 +285,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/intelligibility-score'
     | '/jobs'
     | '/learn'
     | '/login'
@@ -276,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/authors'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/references'
     | '/admin/text'
     | '/admin/users'
@@ -296,6 +316,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/intelligibility-score'
     | '/jobs'
     | '/learn'
     | '/login'
@@ -304,6 +325,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/authors'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/references'
     | '/admin/text'
     | '/admin/users'
@@ -324,6 +346,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/error'
+    | '/intelligibility-score'
     | '/jobs'
     | '/learn'
     | '/login'
@@ -333,6 +356,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/authors'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/references'
     | '/admin/text'
     | '/admin/users'
@@ -354,6 +378,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
   ErrorRoute: typeof ErrorRoute
+  IntelligibilityScoreRoute: typeof IntelligibilityScoreRoute
   JobsRoute: typeof JobsRoute
   LearnRoute: typeof LearnRoute
   LoginRoute: typeof LoginRoute
@@ -363,6 +388,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuthorsRoute: typeof AdminAuthorsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminJobsRoute: typeof AdminJobsRoute
   AdminReferencesRoute: typeof AdminReferencesRoute
   AdminTextRoute: typeof AdminTextRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -418,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs'
       preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intelligibility-score': {
+      id: '/intelligibility-score'
+      path: '/intelligibility-score'
+      fullPath: '/intelligibility-score'
+      preLoaderRoute: typeof IntelligibilityScoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error': {
@@ -495,6 +528,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/references'
       fullPath: '/admin/references'
       preLoaderRoute: typeof AdminReferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/jobs': {
+      id: '/admin/jobs'
+      path: '/admin/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AdminJobsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/dashboard': {
@@ -611,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
   ErrorRoute: ErrorRoute,
+  IntelligibilityScoreRoute: IntelligibilityScoreRoute,
   JobsRoute: JobsRoute,
   LearnRoute: LearnRoute,
   LoginRoute: LoginRoute,
@@ -620,6 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuthorsRoute: AdminAuthorsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminJobsRoute: AdminJobsRoute,
   AdminReferencesRoute: AdminReferencesRoute,
   AdminTextRoute: AdminTextRoute,
   AdminUsersRoute: AdminUsersRoute,

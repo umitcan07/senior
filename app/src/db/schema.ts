@@ -323,6 +323,16 @@ export const phonemeErrors = pgTable(
 		gopScore: decimal("gop_score", { precision: 6, scale: 3 }),
 		entropy: decimal("entropy", { precision: 6, scale: 3 }),
 		uncertain: boolean("uncertain").default(false),
+		// Articulatory feature distance (0–2, = 2·Δfeatures/24) for the app-side
+		// severity/hint layer (E7.6 / #57). Substitutions only; null otherwise.
+		featureDistance: decimal("feature_distance", { precision: 6, scale: 3 }),
+		// The specific articulatory features that differ on a substitution (PanPhon
+		// name + ternary ref/user values), e.g. [{feature:"voi",ref:"-",user:"+"}].
+		// Drives place/voicing/manner hints + a future LLM coaching pass (E7.6 / #57).
+		featureDelta:
+			jsonb("feature_delta").$type<
+				Array<{ feature: string; ref: string; user: string }>
+			>(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [

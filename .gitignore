@@ -15,3 +15,20 @@ data/raw/
 data/fiverr/
 
 Corpus Files/
+l2arctic_release_v5.0
+
+# RunPod API key (secret — never commit)
+.runpod.key
+
+# Local training scratch: HF model cache + adapter checkpoints (regenerable)
+.hf_cache/
+exp/
+
+# Fine-tune artifacts: LoRA/DoRA adapter weights live off-git (RunPod volume + R2
+# mirror per doc/model_versioning.md); training split defs are regenerable.
+artifacts/
+data/finetune/
+*.tar.zst
+
+# Claude Code harness scratch
+.claude/scheduled_tasks.lock

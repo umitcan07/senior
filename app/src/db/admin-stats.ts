@@ -2,6 +2,7 @@ import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
 	analyses,
+	assessmentJobs,
 	audioQualityMetrics,
 	phonemeErrors,
 	practiceTexts,
@@ -303,4 +304,111 @@ export async function getUserActivityList(): Promise<UserActivity[]> {
 		averageScore: r.averageScore,
 		lastActiveDate: r.lastActiveDate,
 	}));
+}
+
+export type AdminJobRow = {
+	analysisId: string;
+	analysisStatus: string;
+	analysisCreatedAt: Date;
+	overallScore: string | null;
+	targetPhonemes: string | null;
+	recognizedPhonemes: string | null;
+	phonemeDistance: number | null;
+	abstentionReason: string | null;
+	recordingId: string;
+	userId: string;
+	referenceId: string;
+	textContent: string;
+	jobStatus: string | null;
+	jobExternalId: string | null;
+	executionTimeMs: number | null;
+};
+
+export async function getAdminLatestJobs(limit = 50): Promise<AdminJobRow[]> {
+	const rows = await db
+		.select({
+			analysisId: analyses.id,
+			analysisStatus: analyses.status,
+			analysisCreatedAt: analyses.createdAt,
+			overallScore: analyses.overallScore,
+			targetPhonemes: analyses.targetPhonemes,
+			recognizedPhonemes: analyses.recognizedPhonemes,
+			phonemeDistance: analyses.phonemeDistance,
+			abstentionReason: analyses.abstentionReason,
+			recordingId: userRecordings.id,
+			userId: userRecordings.userId,
+			referenceId: referenceSpeeches.id,
+			textContent: practiceTexts.content,
+			jobStatus: assessmentJobs.status,
+			jobExternalId: assessmentJobs.externalJobId,
+			executionTimeMs: assessmentJobs.executionTimeMs,
+		})
+		.from(analyses)
+		.innerJoin(userRecordings, eq(analyses.userRecordingId, userRecordings.id))
+		.innerJoin(
+			referenceSpeeches,
+			eq(analyses.referenceSpeechId, referenceSpeeches.id),
+		)
+		.innerJoin(practiceTexts, eq(referenceSpeeches.textId, practiceTexts.id))
+		.leftJoin(assessmentJobs, eq(assessmentJobs.analysisId, analyses.id))
+		.orderBy(desc(analyses.createdAt))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		analysisId: r.analysisId,
+		analysisStatus: r.analysisStatus,
+		analysisCreatedAt: r.analysisCreatedAt,
+		overallScore: r.overallScore,
+		targetPhonemes: r.targetPhonemes,
+		recognizedPhonemes: r.recognizedPhonemes,
+		phonemeDistance: r.phonemeDistance,
+		abstentionReason: r.abstentionReason,
+		recordingId: r.recordingId,
+		userId: r.userId,
+		referenceId: r.referenceId,
+		textContent: r.textContent,
+		jobStatus: r.jobStatus ?? null,
+		jobExternalId: r.jobExternalId ?? null,
+		executionTimeMs: r.executionTimeMs ?? null,
+	}));
+}
+
+export type AdminJobDetails = {
+	phonemeErrors: Array<{
+		id: string;
+		errorType: string;
+		position: number;
+		expected: string | null;
+		actual: string | null;
+		timestampStartMs: number | null;
+		timestampEndMs: number | null;
+		gopScore: string | null;
+		uncertain: boolean | null;
+		featureDistance: string | null;
+		featureDelta: Array<{ feature: string; ref: string; user: string }> | null;
+	}>;
+};
+
+export async function getAdminJobDetails(
+	analysisId: string,
+): Promise<AdminJobDetails> {
+	const errors = await db
+		.select({
+			id: phonemeErrors.id,
+			errorType: phonemeErrors.errorType,
+			position: phonemeErrors.position,
+			expected: phonemeErrors.expected,
+			actual: phonemeErrors.actual,
+			timestampStartMs: phonemeErrors.timestampStartMs,
+			timestampEndMs: phonemeErrors.timestampEndMs,
+			gopScore: phonemeErrors.gopScore,
+			uncertain: phonemeErrors.uncertain,
+			featureDistance: phonemeErrors.featureDistance,
+			featureDelta: phonemeErrors.featureDelta,
+		})
+		.from(phonemeErrors)
+		.where(eq(phonemeErrors.analysisId, analysisId))
+		.orderBy(phonemeErrors.position);
+
+	return { phonemeErrors: errors };
 }
