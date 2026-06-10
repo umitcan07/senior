@@ -141,8 +141,7 @@ def score_utt(aligner, gop_scoring, audio, words):
     if len(canonical_ipa) < 3 or not groups:
         return [], None
 
-    enc = aligner.encode(audio)
-    segs = aligner.forced_alignment(audio, canonical_ipa)
+    enc, segs = aligner.encode_and_forced_alignment(audio, canonical_ipa)
     if len(segs) != len(canonical_ipa):
         # alignment/target length mismatch (e.g. affricate handling) — skip to stay honest
         return [], None
@@ -229,8 +228,10 @@ def main() -> None:
         try:
             audio, _ = librosa.load(wav_path, sr=alignment.TARGET_SR, mono=True)
             rows, mean_gop = score_utt(aligner, gop_scoring, audio, scores[utt].get("words", []))
-        except Exception as exc:
-            print(f"  [skip] {utt}: {exc}")
+        except (OSError, ValueError, RuntimeError) as exc:
+            # expected per-utt failures (bad/missing audio, OOV target tokens) → skip.
+            # Anything else (real bug in score_utt/gop/aligner) propagates loudly.
+            print(f"  [skip] {utt}: {type(exc).__name__}: {exc}")
             skipped += 1
             continue
         if not rows:
