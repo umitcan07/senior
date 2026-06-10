@@ -1,0 +1,11 @@
+{
+  "n_raters": 1,
+  "raters": [
+    "Jon"
+  ],
+  "n_clips_rated": 25,
+  "n_clips_joined": 24,
+  "spearman_system_vs_human": 0.4544,
+  "inter_rater": "n/a (need >=2 raters)",
+  "speechocean762": "not pulled locally (see pod artifacts/speechocean)"
+}
