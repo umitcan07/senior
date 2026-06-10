@@ -1,23 +1,26 @@
-# Baked assessment adapter — `l2a_ppl`
+# Baked assessment adapter — `l2a_ppl_long`
 
 This directory holds the PEFT LoRA adapter the assessment worker loads at runtime,
 via `ENV POWSM_ADAPTER_DIR=/worker/assessment/adapter` (set in the Dockerfile).
 
 | | |
 |---|---|
-| Adapter | **`l2a_ppl`** (perceived-label, L2-ARCTIC PPL targets) |
+| Adapter | **`l2a_ppl_long`** (perceived-label, L2-ARCTIC PPL targets) |
 | Method | LoRA, `r=32`, `alpha=64`, attention-only (`linear_q/k/v/out`) |
-| Checkpoint | `best/` (epoch-30) from the `adapters-2026-06-09` release |
+| Checkpoint | `best/` (epoch-60) from the `adapters-2026-06-10-long` release |
 | Base | `espnet/powsm`, `lang_sym=<eng>`, `task_sym=<pr>` |
-| Trained | 2026-06-09 (see `doc/adapters.md`) |
+| Trained | 2026-06-10, 60-epoch re-train (see `doc/adapters.md`) |
 
 ## Why this one
 
-`l2a_ppl` was the best perceived-label adapter in the eval matrix (`doc/adapters.md`
-§Report): it beats base on L2-ARCTIC deviation recall across all 4 L1 groups and on
-Turkish PER, and `DoRA ≈ LoRA`. The promotion gate was muted (small margins, base
-was the strict pick), so this is deployed as the **fine-tuned showcase / V2 model**;
-set `POWSM_ADAPTER_DIR=""` on the endpoint to revert to baseline POWSM for an A/B.
+`l2a_ppl_long` is the strongest perceived-label adapter in the eval matrix
+(`doc/adapters.md` §Report): at 60 epochs it beats base on **TR-PER (0.392),
+TR sub-recall (0.057 vs 0.033), and L2-ARCTIC deviation recall (0.213 vs 0.173)** —
+the sharpened thesis result (canonical `l2a_cpl_long` drops *below* base; perceived
+clearly helps). The trade-off vs the 30-epoch `l2a_ppl` is higher native-speech
+drift (FPR ~0.024 vs ~0.008); we accept it for the stronger learner-deviation
+detection. Set `POWSM_ADAPTER_DIR=""` on the endpoint to revert to baseline POWSM
+for an A/B.
 
 ## ⚠️ Reference-precompute provenance
 
