@@ -159,7 +159,7 @@ function bucketByDistance(
 
 /** PanPhon feature name → a plain-language category. Several features collapse to one
  * category (e.g. the place features). Anything unmapped is dropped from display. */
-const FEATURE_CATEGORY: Record<string, string> = {
+export const FEATURE_CATEGORY: Record<string, string> = {
 	voi: "voicing",
 	nas: "nasality",
 	round: "lip rounding",
@@ -183,7 +183,7 @@ const FEATURE_CATEGORY: Record<string, string> = {
 };
 
 /** Display order so the summary reads most-salient-first. */
-const CATEGORY_ORDER = [
+export const CATEGORY_ORDER = [
 	"rhoticity",
 	"voicing",
 	"place of articulation",
@@ -200,7 +200,7 @@ const CATEGORY_ORDER = [
 // PanPhon has no single "rhotic" feature, so detect it from the token (the ˞ hook
 // or the rhotic phones) and surface it as its own category.
 const RHOTIC = new Set(["ɹ", "ɾ", "r", "ɚ", "ɝ"]);
-function isRhotic(tok: string | null | undefined): boolean {
+export function isRhotic(tok: string | null | undefined): boolean {
 	return !!tok && (tok.includes("˞") || RHOTIC.has(tok));
 }
 

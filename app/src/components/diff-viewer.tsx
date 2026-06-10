@@ -21,6 +21,7 @@ import {
 	errorBorderVariants,
 	errorTextVariants,
 } from "@/lib/diff-viewer";
+import { type FeatureCard, featureCardsFor } from "@/lib/feature-cards";
 import {
 	coachingFor,
 	type PhoneCoaching,
@@ -64,24 +65,64 @@ function CoachingBody({ coaching }: { coaching: PhoneCoaching }) {
 	);
 }
 
-/** Persistent, tappable coaching indicator for the most important substitutions
- * (critical). A Popover so the hint is reachable on touch screens (the hover tooltip
- * isn't). Renders nothing for non-critical or hint-less errors. */
-function HintDot({ coaching }: { coaching: PhoneCoaching }) {
-	if (!coaching.hint || coaching.severity !== "critical") return null;
+/** One explanation card per differing feature category — what the feature is, what
+ * to physically do (direction-aware), and an example pair to try. */
+function FeatureCards({ cards }: { cards: FeatureCard[] }) {
+	if (cards.length === 0) return null;
+	return (
+		<div className="space-y-2">
+			{cards.map((card) => (
+				<div
+					key={card.category}
+					className="rounded-md border border-border/40 bg-card/60 p-2"
+				>
+					<div className="font-semibold text-[11px] uppercase tracking-wide">
+						{card.category}
+					</div>
+					<div className="mt-0.5 text-muted-foreground">{card.what}</div>
+					<div className="mt-1 text-foreground/90">{card.action}</div>
+					<div className="mt-1 text-muted-foreground">
+						Try: <span className="text-foreground/80">{card.example}</span>
+					</div>
+				</div>
+			))}
+		</div>
+	);
+}
+
+/** Persistent, tappable coaching indicator on a substitution tile. Opens a Popover
+ * (reachable on touch screens, unlike the hover tooltip) with the coaching hint plus
+ * one explanation card per differing articulatory feature (voicing, nasality, …).
+ * Critical errors keep the red dot; other substitutions with feature cards get a
+ * muted one. Renders nothing when there's nothing to explain. */
+function HintDot({
+	coaching,
+	cards,
+}: {
+	coaching: PhoneCoaching;
+	cards: FeatureCard[];
+}) {
+	const critical = !!coaching.hint && coaching.severity === "critical";
+	if (!critical && cards.length === 0) return null;
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
 				<button
 					type="button"
 					aria-label="Pronunciation tip"
-					className="-top-1 -right-1 absolute inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive font-bold text-[9px] text-white leading-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40"
+					className={cn(
+						"-top-1 -right-1 absolute inline-flex h-3.5 w-3.5 items-center justify-center rounded-full font-bold text-[9px] leading-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40",
+						critical
+							? "bg-destructive text-white"
+							: "bg-muted-foreground/70 text-background",
+					)}
 				>
 					i
 				</button>
 			</PopoverTrigger>
-			<PopoverContent side="top" className="max-w-xs text-xs">
+			<PopoverContent side="top" className="max-w-xs space-y-2 text-xs">
 				<CoachingBody coaching={coaching} />
+				<FeatureCards cards={cards} />
 			</PopoverContent>
 		</Popover>
 	);
@@ -307,7 +348,10 @@ function StackedView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 								severityRingVariants({ severity: coaching.severity }),
 							)}
 						>
-							<HintDot coaching={coaching} />
+							<HintDot
+								coaching={coaching}
+								cards={featureCardsFor(cell.error)}
+							/>
 							<Box
 								text={cell.actual}
 								tone="substitute"
@@ -370,7 +414,10 @@ function StrikeView({ cells, type, audioSrc, onSegmentClick }: ViewProps) {
 					return (
 						// Outer wrapper is NOT overflow-hidden so the HintDot isn't clipped.
 						<span key={key} className="relative inline-flex">
-							<HintDot coaching={coaching} />
+							<HintDot
+								coaching={coaching}
+								cards={featureCardsFor(cell.error)}
+							/>
 							<span
 								className={cn(
 									"inline-flex items-stretch overflow-hidden rounded-md border font-medium",
