@@ -3,13 +3,13 @@
   "speaker": "erem",
   "ref_id": "ref_015",
   "reference_author": "genam_katherine",
-  "reference_model": "l2a_ppl",
+  "reference_model": "l2a_ppl_long",
   "result": {
     "status": "abstained",
     "abstention": {
       "reason": "wrong_sentence",
       "detail": {
-        "per": 1.043
+        "per": 0.913
       }
     },
     "signal_quality": {

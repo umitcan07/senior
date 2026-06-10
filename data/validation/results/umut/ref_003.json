@@ -3,7 +3,7 @@
   "speaker": "umut",
   "ref_id": "ref_003",
   "reference_author": "genam_katherine",
-  "reference_model": "l2a_ppl",
+  "reference_model": "l2a_ppl_long",
   "result": {
     "status": "abstained",
     "abstention": {

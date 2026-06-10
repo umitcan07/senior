@@ -1,5 +1,5 @@
 {
-  "adapter": "/workspace/exp/l2a_ppl/best",
+  "adapter": "/workspace/exp/l2a_ppl_long/best",
   "speakers": [
     "erem",
     "ibrahim",
@@ -7,107 +7,107 @@
     "umit",
     "umut"
   ],
-  "scored": 121,
-  "abstained": 4,
+  "scored": 123,
+  "abstained": 2,
   "skipped": 0,
   "errors": 0,
   "clips": [
     {
       "clip": "erem/ref_001",
       "status": "scored",
-      "score": 1.0,
-      "confidence": 0.957834375,
+      "score": 0.96875,
+      "confidence": 0.936453125,
       "abstention": null
     },
     {
       "clip": "erem/ref_002",
       "status": "scored",
       "score": 0.9607843137254902,
-      "confidence": 0.915149019607843,
+      "confidence": 0.8923137254901959,
       "abstention": null
     },
     {
       "clip": "erem/ref_003",
       "status": "scored",
-      "score": 0.42857142857142855,
-      "confidence": 0.477504761904762,
+      "score": 0.5714285714285714,
+      "confidence": 0.5349238095238096,
       "abstention": null
     },
     {
       "clip": "erem/ref_004",
       "status": "scored",
-      "score": 0.9393939393939394,
-      "confidence": 0.9064151515151515,
+      "score": 0.9090909090909091,
+      "confidence": 0.8849515151515152,
       "abstention": null
     },
     {
       "clip": "erem/ref_005",
       "status": "scored",
-      "score": 0.9,
-      "confidence": 0.8729150000000001,
+      "score": 0.875,
+      "confidence": 0.8212425,
       "abstention": null
     },
     {
       "clip": "erem/ref_006",
       "status": "scored",
-      "score": 0.7222222222222222,
-      "confidence": 0.6513944444444444,
+      "score": 0.6944444444444444,
+      "confidence": 0.6477749999999999,
       "abstention": null
     },
     {
       "clip": "erem/ref_007",
       "status": "scored",
-      "score": 0.9565217391304348,
-      "confidence": 0.8429434782608697,
+      "score": 0.782608695652174,
+      "confidence": 0.8479173913043477,
       "abstention": null
     },
     {
       "clip": "erem/ref_008",
       "status": "scored",
-      "score": 0.8837209302325582,
-      "confidence": 0.8731372093023255,
+      "score": 0.8604651162790697,
+      "confidence": 0.827560465116279,
       "abstention": null
     },
     {
       "clip": "erem/ref_009",
       "status": "scored",
-      "score": 0.4,
-      "confidence": 0.39365000000000006,
+      "score": 0.4666666666666667,
+      "confidence": 0.5068033333333334,
       "abstention": null
     },
     {
       "clip": "erem/ref_010",
       "status": "scored",
-      "score": 0.8604651162790697,
-      "confidence": 0.8404232558139534,
+      "score": 0.813953488372093,
+      "confidence": 0.8321581395348839,
       "abstention": null
     },
     {
       "clip": "erem/ref_011",
       "status": "scored",
-      "score": 1.0,
-      "confidence": 0.9328771428571428,
+      "score": 0.9714285714285714,
+      "confidence": 0.8923171428571429,
       "abstention": null
     },
     {
       "clip": "erem/ref_012",
       "status": "scored",
-      "score": 0.8888888888888888,
-      "confidence": 0.7990777777777777,
+      "score": 0.8444444444444444,
+      "confidence": 0.7917288888888889,
       "abstention": null
     },
     {
       "clip": "erem/ref_013",
       "status": "scored",
-      "score": 0.9166666666666666,
-      "confidence": 0.8805729166666666,
+      "score": 0.8958333333333334,
+      "confidence": 0.8628145833333334,
       "abstention": null
     },
     {
       "clip": "erem/ref_014",
       "status": "scored",
-      "score": 0.5,
-      "confidence": 0.5110555555555555,
+      "score": 0.6111111111111112,
+      "confidence": 0.6030555555555553,
       "abstention": null
     },
     {
@@ -120,610 +120,610 @@
     {
       "clip": "erem/ref_016",
       "status": "scored",
-      "score": 0.8888888888888888,
-      "confidence": 0.8158755555555555,
+      "score": 0.9333333333333333,
+      "confidence": 0.8542377777777778,
       "abstention": null
     },
     {
       "clip": "erem/ref_017",
       "status": "scored",
-      "score": 0.918918918918919,
-      "confidence": 0.8793783783783784,
+      "score": 0.8918918918918919,
+      "confidence": 0.8495243243243245,
       "abstention": null
     },
     {
       "clip": "erem/ref_018",
       "status": "scored",
-      "score": 0.975609756097561,
-      "confidence": 0.923221951219512,
+      "score": 0.8780487804878049,
+      "confidence": 0.8601170731707316,
       "abstention": null
     },
     {
       "clip": "erem/ref_019",
       "status": "scored",
-      "score": 0.9302325581395349,
-      "confidence": 0.8742558139534883,
+      "score": 0.9069767441860465,
+      "confidence": 0.8364744186046512,
       "abstention": null
     },
     {
       "clip": "erem/ref_020",
       "status": "scored",
-      "score": 0.9032258064516129,
-      "confidence": 0.8003677419354838,
+      "score": 0.7419354838709677,
+      "confidence": 0.6679354838709678,
       "abstention": null
     },
     {
       "clip": "erem/ref_021",
       "status": "scored",
       "score": 0.75,
-      "confidence": 0.741378125,
+      "confidence": 0.718053125,
       "abstention": null
     },
     {
       "clip": "erem/ref_022",
       "status": "scored",
       "score": 0.8181818181818182,
-      "confidence": 0.8013181818181819,
+      "confidence": 0.7917818181818184,
       "abstention": null
     },
     {
       "clip": "erem/ref_023",
       "status": "scored",
-      "score": 0.9148936170212766,
-      "confidence": 0.8292659574468086,
+      "score": 0.8695652173913043,
+      "confidence": 0.767545652173913,
       "abstention": null
     },
     {
       "clip": "erem/ref_024",
       "status": "scored",
-      "score": 0.8292682926829268,
-      "confidence": 0.8223195121951219,
+      "score": 0.8780487804878049,
+      "confidence": 0.8338731707317073,
       "abstention": null
     },
     {
       "clip": "erem/ref_025",
       "status": "scored",
-      "score": 0.6486486486486487,
-      "confidence": 0.5073945945945946,
+      "score": 0.7297297297297297,
+      "confidence": 0.6193297297297298,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_001",
       "status": "scored",
-      "score": 1.0,
-      "confidence": 0.968328125,
+      "score": 0.96875,
+      "confidence": 0.9210250000000001,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_002",
       "status": "scored",
-      "score": 0.7843137254901961,
-      "confidence": 0.7611019607843135,
+      "score": 0.803921568627451,
+      "confidence": 0.737813725490196,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_003",
       "status": "scored",
-      "score": 0.8571428571428571,
-      "confidence": 0.7567761904761905,
+      "score": 0.7142857142857143,
+      "confidence": 0.6724809523809523,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_004",
       "status": "scored",
-      "score": 0.5757575757575758,
-      "confidence": 0.5303424242424243,
+      "score": 0.7272727272727273,
+      "confidence": 0.6557878787878788,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_005",
       "status": "scored",
-      "score": 0.975,
-      "confidence": 0.8733274999999999,
+      "score": 0.925,
+      "confidence": 0.8430724999999999,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_006",
       "status": "scored",
-      "score": 0.8055555555555556,
-      "confidence": 0.7371166666666666,
+      "score": 0.7777777777777778,
+      "confidence": 0.7080416666666667,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_007",
       "status": "scored",
-      "score": 0.6521739130434783,
-      "confidence": 0.5877260869565218,
+      "score": 0.8695652173913043,
+      "confidence": 0.7213130434782609,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_008",
       "status": "scored",
-      "score": 0.9069767441860465,
-      "confidence": 0.8938325581395348,
+      "score": 0.8837209302325582,
+      "confidence": 0.8607558139534884,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_009",
       "status": "scored",
       "score": 0.9333333333333333,
-      "confidence": 0.8097666666666666,
+      "confidence": 0.8080433333333333,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_010",
       "status": "scored",
-      "score": 0.9534883720930233,
-      "confidence": 0.8874953488372094,
+      "score": 0.9302325581395349,
+      "confidence": 0.844967441860465,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_011",
       "status": "scored",
-      "score": 0.8285714285714286,
-      "confidence": 0.7288771428571429,
+      "score": 0.8,
+      "confidence": 0.7288514285714285,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_012",
       "status": "scored",
       "score": 0.8444444444444444,
-      "confidence": 0.7907088888888888,
+      "confidence": 0.7734311111111112,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_013",
       "status": "scored",
-      "score": 0.9166666666666666,
-      "confidence": 0.8853333333333332,
+      "score": 0.875,
+      "confidence": 0.8033208333333333,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_014",
       "status": "scored",
-      "score": 0.8055555555555556,
-      "confidence": 0.7120333333333333,
+      "score": 0.7777777777777778,
+      "confidence": 0.7314944444444444,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_015",
       "status": "scored",
       "score": 0.8695652173913043,
-      "confidence": 0.824126086956522,
+      "confidence": 0.774091304347826,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_016",
       "status": "scored",
-      "score": 0.6666666666666666,
-      "confidence": 0.6390422222222222,
+      "score": 0.8666666666666667,
+      "confidence": 0.7333711111111111,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_017",
       "status": "scored",
-      "score": 0.8918918918918919,
-      "confidence": 0.8494162162162162,
+      "score": 0.8378378378378378,
+      "confidence": 0.8061135135135136,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_018",
       "status": "scored",
-      "score": 0.926829268292683,
-      "confidence": 0.8595146341463414,
+      "score": 0.8780487804878049,
+      "confidence": 0.8287414634146343,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_019",
       "status": "scored",
-      "score": 1.0,
-      "confidence": 0.9272093023255813,
+      "score": 0.9069767441860465,
+      "confidence": 0.871986046511628,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_020",
       "status": "scored",
-      "score": 0.967741935483871,
-      "confidence": 0.8667161290322581,
+      "score": 0.9032258064516129,
+      "confidence": 0.8346806451612904,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_021",
       "status": "scored",
-      "score": 0.875,
-      "confidence": 0.8481624999999999,
+      "score": 0.84375,
+      "confidence": 0.82725625,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_022",
       "status": "scored",
-      "score": 0.9090909090909091,
-      "confidence": 0.8563159090909089,
+      "score": 0.8636363636363636,
+      "confidence": 0.8172113636363637,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_023",
       "status": "scored",
-      "score": 0.9361702127659575,
-      "confidence": 0.8220744680851064,
+      "score": 0.8478260869565217,
+      "confidence": 0.7469608695652173,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_024",
       "status": "scored",
-      "score": 0.3902439024390244,
-      "confidence": 0.4202170731707317,
+      "score": 0.6585365853658537,
+      "confidence": 0.5938048780487805,
       "abstention": null
     },
     {
       "clip": "ibrahim/ref_025",
       "status": "scored",
-      "score": 0.7567567567567568,
-      "confidence": 0.7244243243243244,
+      "score": 0.8378378378378378,
+      "confidence": 0.7557972972972972,
       "abstention": null
     },
     {
       "clip": "omer/ref_001",
       "status": "scored",
-      "score": 0.9375,
-      "confidence": 0.8935,
+      "score": 0.84375,
+      "confidence": 0.8128187499999999,
       "abstention": null
     },
     {
       "clip": "omer/ref_002",
       "status": "scored",
-      "score": 0.8431372549019608,
-      "confidence": 0.7719666666666667,
+      "score": 0.7843137254901961,
+      "confidence": 0.7194627450980392,
       "abstention": null
     },
     {
       "clip": "omer/ref_003",
       "status": "scored",
-      "score": 0.9047619047619048,
-      "confidence": 0.7543238095238095,
+      "score": 0.7619047619047619,
+      "confidence": 0.7005428571428571,
       "abstention": null
     },
     {
       "clip": "omer/ref_004",
       "status": "scored",
-      "score": 0.5151515151515151,
-      "confidence": 0.4410212121212121,
+      "score": 0.6060606060606061,
+      "confidence": 0.6028848484848484,
       "abstention": null
     },
     {
       "clip": "omer/ref_005",
-      "status": "abstained",
-      "score": null,
-      "confidence": null,
-      "abstention": "wrong_sentence"
+      "status": "scored",
+      "score": 0.525,
+      "confidence": 0.395395,
+      "abstention": null
     },
     {
       "clip": "omer/ref_006",
       "status": "scored",
       "score": 0.6944444444444444,
-      "confidence": 0.6736944444444445,
+      "confidence": 0.6528833333333334,
       "abstention": null
     },
     {
       "clip": "omer/ref_007",
       "status": "scored",
-      "score": 0.5217391304347826,
-      "confidence": 0.458695652173913,
+      "score": 0.5652173913043478,
+      "confidence": 0.4984391304347827,
       "abstention": null
     },
     {
       "clip": "omer/ref_008",
       "status": "scored",
       "score": 0.8604651162790697,
-      "confidence": 0.8211093023255813,
+      "confidence": 0.8052418604651163,
       "abstention": null
     },
     {
       "clip": "omer/ref_009",
-      "status": "abstained",
-      "score": null,
-      "confidence": null,
-      "abstention": "wrong_sentence"
+      "status": "scored",
+      "score": 0.43333333333333335,
+      "confidence": 0.46653333333333336,
+      "abstention": null
     },
     {
       "clip": "omer/ref_010",
       "status": "scored",
-      "score": 0.6744186046511628,
-      "confidence": 0.5308465116279071,
+      "score": 0.7906976744186046,
+      "confidence": 0.6784906976744185,
       "abstention": null
     },
     {
       "clip": "omer/ref_011",
       "status": "scored",
-      "score": 0.8857142857142857,
-      "confidence": 0.770377142857143,
+      "score": 0.8285714285714286,
+      "confidence": 0.7319228571428572,
       "abstention": null
     },
     {
       "clip": "omer/ref_012",
       "status": "scored",
-      "score": 0.7111111111111111,
-      "confidence": 0.6550333333333332,
+      "score": 0.7333333333333333,
+      "confidence": 0.6635222222222223,
       "abstention": null
     },
     {
       "clip": "omer/ref_013",
       "status": "scored",
-      "score": 0.9583333333333334,
-      "confidence": 0.8909583333333334,
+      "score": 0.8333333333333334,
+      "confidence": 0.7794895833333332,
       "abstention": null
     },
     {
       "clip": "omer/ref_014",
       "status": "scored",
       "score": 0.75,
-      "confidence": 0.6452166666666668,
+      "confidence": 0.6424222222222222,
       "abstention": null
     },
     {
       "clip": "omer/ref_015",
       "status": "scored",
-      "score": 0.6956521739130435,
-      "confidence": 0.6056391304347827,
+      "score": 0.6086956521739131,
+      "confidence": 0.5558173913043478,
       "abstention": null
     },
     {
       "clip": "omer/ref_016",
       "status": "scored",
       "score": 0.8444444444444444,
-      "confidence": 0.7583666666666665,
+      "confidence": 0.7909311111111111,
       "abstention": null
     },
     {
       "clip": "omer/ref_017",
       "status": "scored",
-      "score": 0.972972972972973,
-      "confidence": 0.9149621621621622,
+      "score": 0.918918918918919,
+      "confidence": 0.8749945945945946,
       "abstention": null
     },
     {
       "clip": "omer/ref_018",
       "status": "scored",
-      "score": 0.6829268292682927,
-      "confidence": 0.6201439024390244,
+      "score": 0.6585365853658537,
+      "confidence": 0.6328390243902439,
       "abstention": null
     },
     {
       "clip": "omer/ref_019",
       "status": "scored",
-      "score": 0.6976744186046512,
-      "confidence": 0.6970627906976744,
+      "score": 0.7674418604651163,
+      "confidence": 0.7403883720930232,
       "abstention": null
     },
     {
       "clip": "omer/ref_020",
       "status": "scored",
-      "score": 0.45161290322580644,
-      "confidence": 0.45808709677419346,
+      "score": 0.7419354838709677,
+      "confidence": 0.6407419354838708,
       "abstention": null
     },
     {
       "clip": "omer/ref_021",
       "status": "scored",
       "score": 0.5625,
-      "confidence": 0.474178125,
+      "confidence": 0.4585625,
       "abstention": null
     },
     {
       "clip": "omer/ref_022",
       "status": "scored",
-      "score": 0.9090909090909091,
-      "confidence": 0.8259772727272728,
+      "score": 0.8636363636363636,
+      "confidence": 0.7902931818181816,
       "abstention": null
     },
     {
       "clip": "omer/ref_023",
       "status": "scored",
-      "score": 0.6170212765957447,
-      "confidence": 0.5435489361702128,
+      "score": 0.6521739130434783,
+      "confidence": 0.5585717391304348,
       "abstention": null
     },
     {
       "clip": "omer/ref_024",
       "status": "scored",
-      "score": 0.43902439024390244,
-      "confidence": 0.4446390243902439,
+      "score": 0.6829268292682927,
+      "confidence": 0.6095780487804878,
       "abstention": null
     },
     {
       "clip": "omer/ref_025",
       "status": "scored",
-      "score": 0.6756756756756757,
-      "confidence": 0.5788891891891892,
+      "score": 0.7297297297297297,
+      "confidence": 0.6207378378378379,
       "abstention": null
     },
     {
       "clip": "umit/ref_001",
       "status": "scored",
-      "score": 0.90625,
-      "confidence": 0.867159375,
+      "score": 0.84375,
+      "confidence": 0.82995,
       "abstention": null
     },
     {
       "clip": "umit/ref_002",
       "status": "scored",
-      "score": 0.8235294117647058,
-      "confidence": 0.7925960784313724,
+      "score": 0.7843137254901961,
+      "confidence": 0.7468254901960784,
       "abstention": null
     },
     {
       "clip": "umit/ref_003",
       "status": "scored",
-      "score": 0.8095238095238095,
-      "confidence": 0.7030238095238095,
+      "score": 0.7619047619047619,
+      "confidence": 0.6707619047619049,
       "abstention": null
     },
     {
       "clip": "umit/ref_004",
       "status": "scored",
-      "score": 0.8181818181818182,
-      "confidence": 0.7862212121212121,
+      "score": 0.8484848484848485,
+      "confidence": 0.7969030303030302,
       "abstention": null
     },
     {
       "clip": "umit/ref_005",
       "status": "scored",
-      "score": 0.9,
-      "confidence": 0.8167100000000002,
+      "score": 0.85,
+      "confidence": 0.822015,
       "abstention": null
     },
     {
       "clip": "umit/ref_006",
       "status": "scored",
       "score": 0.6944444444444444,
-      "confidence": 0.658886111111111,
+      "confidence": 0.6754916666666667,
       "abstention": null
     },
     {
       "clip": "umit/ref_007",
       "status": "scored",
-      "score": 0.9565217391304348,
-      "confidence": 0.8348739130434781,
+      "score": 0.9130434782608695,
+      "confidence": 0.8577434782608695,
       "abstention": null
     },
     {
       "clip": "umit/ref_008",
       "status": "scored",
-      "score": 0.7906976744186046,
-      "confidence": 0.8276325581395351,
+      "score": 0.7674418604651163,
+      "confidence": 0.7750232558139537,
       "abstention": null
     },
     {
       "clip": "umit/ref_009",
       "status": "scored",
       "score": 0.8666666666666667,
-      "confidence": 0.7472500000000001,
+      "confidence": 0.7845933333333335,
       "abstention": null
     },
     {
       "clip": "umit/ref_010",
       "status": "scored",
-      "score": 0.9069767441860465,
-      "confidence": 0.8485209302325583,
+      "score": 0.8604651162790697,
+      "confidence": 0.8011976744186046,
       "abstention": null
     },
     {
       "clip": "umit/ref_011",
       "status": "scored",
-      "score": 0.7714285714285715,
-      "confidence": 0.7000228571428572,
+      "score": 0.8,
+      "confidence": 0.7141571428571428,
       "abstention": null
     },
     {
       "clip": "umit/ref_012",
       "status": "scored",
-      "score": 0.7777777777777778,
-      "confidence": 0.7591355555555555,
+      "score": 0.8,
+      "confidence": 0.7650066666666668,
       "abstention": null
     },
     {
       "clip": "umit/ref_013",
       "status": "scored",
-      "score": 0.8958333333333334,
-      "confidence": 0.8118520833333335,
+      "score": 0.8333333333333334,
+      "confidence": 0.7836437500000001,
       "abstention": null
     },
     {
       "clip": "umit/ref_014",
       "status": "scored",
-      "score": 0.8333333333333334,
-      "confidence": 0.7769777777777777,
+      "score": 0.7777777777777778,
+      "confidence": 0.7509861111111111,
       "abstention": null
     },
     {
       "clip": "umit/ref_015",
       "status": "scored",
       "score": 0.6956521739130435,
-      "confidence": 0.6633260869565216,
+      "confidence": 0.6633434782608695,
       "abstention": null
     },
     {
       "clip": "umit/ref_016",
       "status": "scored",
       "score": 0.9111111111111111,
-      "confidence": 0.8686844444444445,
+      "confidence": 0.8741511111111109,
       "abstention": null
     },
     {
       "clip": "umit/ref_017",
       "status": "scored",
-      "score": 0.7837837837837838,
-      "confidence": 0.757710810810811,
+      "score": 0.7567567567567568,
+      "confidence": 0.7418297297297297,
       "abstention": null
     },
     {
       "clip": "umit/ref_018",
       "status": "scored",
-      "score": 0.8780487804878049,
-      "confidence": 0.8402853658536587,
+      "score": 0.8292682926829268,
+      "confidence": 0.8216170731707316,
       "abstention": null
     },
     {
       "clip": "umit/ref_019",
       "status": "scored",
-      "score": 0.7441860465116279,
-      "confidence": 0.7225604651162791,
+      "score": 0.6976744186046512,
+      "confidence": 0.6848558139534884,
       "abstention": null
     },
     {
       "clip": "umit/ref_020",
       "status": "scored",
       "score": 0.8709677419354839,
-      "confidence": 0.8369870967741935,
+      "confidence": 0.8379516129032258,
       "abstention": null
     },
     {
       "clip": "umit/ref_021",
       "status": "scored",
       "score": 0.78125,
-      "confidence": 0.75628125,
+      "confidence": 0.7556750000000001,
       "abstention": null
     },
     {
       "clip": "umit/ref_022",
       "status": "scored",
-      "score": 0.7727272727272727,
-      "confidence": 0.737225,
+      "score": 0.75,
+      "confidence": 0.72175,
       "abstention": null
     },
     {
       "clip": "umit/ref_023",
       "status": "scored",
-      "score": 0.8723404255319149,
-      "confidence": 0.8006425531914892,
+      "score": 0.8695652173913043,
+      "confidence": 0.7807108695652174,
       "abstention": null
     },
     {
       "clip": "umit/ref_024",
       "status": "scored",
       "score": 0.8536585365853658,
-      "confidence": 0.8166756097560975,
+      "confidence": 0.8110097560975611,
       "abstention": null
     },
     {
       "clip": "umit/ref_025",
       "status": "scored",
-      "score": 0.6486486486486487,
-      "confidence": 0.6344648648648648,
+      "score": 0.7027027027027027,
+      "confidence": 0.6416675675675675,
       "abstention": null
     },
     {
       "clip": "umut/ref_001",
       "status": "scored",
-      "score": 0.8125,
-      "confidence": 0.7756937500000001,
+      "score": 0.78125,
+      "confidence": 0.752509375,
       "abstention": null
     },
     {
       "clip": "umut/ref_002",
       "status": "scored",
-      "score": 0.803921568627451,
-      "confidence": 0.756121568627451,
+      "score": 0.7843137254901961,
+      "confidence": 0.7408647058823529,
       "abstention": null
     },
     {
@@ -736,155 +736,155 @@
     {
       "clip": "umut/ref_004",
       "status": "scored",
-      "score": 0.8484848484848485,
-      "confidence": 0.7882757575757576,
+      "score": 0.8181818181818182,
+      "confidence": 0.7665666666666667,
       "abstention": null
     },
     {
       "clip": "umut/ref_005",
       "status": "scored",
-      "score": 0.825,
-      "confidence": 0.7795825000000001,
+      "score": 0.8,
+      "confidence": 0.7488825,
       "abstention": null
     },
     {
       "clip": "umut/ref_006",
       "status": "scored",
-      "score": 0.8055555555555556,
-      "confidence": 0.7340305555555555,
+      "score": 0.7222222222222222,
+      "confidence": 0.6784166666666667,
       "abstention": null
     },
     {
       "clip": "umut/ref_007",
       "status": "scored",
       "score": 0.9565217391304348,
-      "confidence": 0.8753826086956521,
+      "confidence": 0.8848521739130435,
       "abstention": null
     },
     {
       "clip": "umut/ref_008",
       "status": "scored",
-      "score": 0.8372093023255814,
-      "confidence": 0.8224255813953488,
+      "score": 0.7906976744186046,
+      "confidence": 0.7718465116279071,
       "abstention": null
     },
     {
       "clip": "umut/ref_009",
       "status": "scored",
-      "score": 0.8,
-      "confidence": 0.7976566666666668,
+      "score": 0.7,
+      "confidence": 0.7065233333333332,
       "abstention": null
     },
     {
       "clip": "umut/ref_010",
       "status": "scored",
-      "score": 0.9069767441860465,
-      "confidence": 0.8418767441860464,
+      "score": 0.9302325581395349,
+      "confidence": 0.8324976744186046,
       "abstention": null
     },
     {
       "clip": "umut/ref_011",
       "status": "scored",
-      "score": 0.8857142857142857,
-      "confidence": 0.81432,
+      "score": 0.8571428571428571,
+      "confidence": 0.7612285714285715,
       "abstention": null
     },
     {
       "clip": "umut/ref_012",
       "status": "scored",
-      "score": 0.8,
-      "confidence": 0.7552733333333335,
+      "score": 0.7777777777777778,
+      "confidence": 0.7366422222222222,
       "abstention": null
     },
     {
       "clip": "umut/ref_013",
       "status": "scored",
-      "score": 0.9166666666666666,
-      "confidence": 0.8810645833333334,
+      "score": 0.875,
+      "confidence": 0.84364375,
       "abstention": null
     },
     {
       "clip": "umut/ref_014",
       "status": "scored",
-      "score": 0.75,
-      "confidence": 0.7127694444444445,
+      "score": 0.7222222222222222,
+      "confidence": 0.6998555555555556,
       "abstention": null
     },
     {
       "clip": "umut/ref_015",
       "status": "scored",
       "score": 0.6521739130434783,
-      "confidence": 0.6262391304347825,
+      "confidence": 0.6258347826086957,
       "abstention": null
     },
     {
       "clip": "umut/ref_016",
       "status": "scored",
-      "score": 0.9111111111111111,
-      "confidence": 0.8681244444444445,
+      "score": 0.8888888888888888,
+      "confidence": 0.8374644444444447,
       "abstention": null
     },
     {
       "clip": "umut/ref_017",
       "status": "scored",
-      "score": 0.7837837837837838,
-      "confidence": 0.7034891891891892,
+      "score": 0.7567567567567568,
+      "confidence": 0.6824945945945945,
       "abstention": null
     },
     {
       "clip": "umut/ref_018",
       "status": "scored",
-      "score": 0.9024390243902439,
-      "confidence": 0.8243682926829268,
+      "score": 0.8292682926829268,
+      "confidence": 0.7837634146341462,
       "abstention": null
     },
     {
       "clip": "umut/ref_019",
       "status": "scored",
       "score": 0.813953488372093,
-      "confidence": 0.7596372093023256,
+      "confidence": 0.7146279069767442,
       "abstention": null
     },
     {
       "clip": "umut/ref_020",
       "status": "scored",
-      "score": 0.8709677419354839,
-      "confidence": 0.810883870967742,
+      "score": 0.8064516129032258,
+      "confidence": 0.7884903225806452,
       "abstention": null
     },
     {
       "clip": "umut/ref_021",
       "status": "scored",
       "score": 0.6875,
-      "confidence": 0.641975,
+      "confidence": 0.64601875,
       "abstention": null
     },
     {
       "clip": "umut/ref_022",
       "status": "scored",
-      "score": 0.7954545454545454,
-      "confidence": 0.7659613636363637,
+      "score": 0.8181818181818182,
+      "confidence": 0.7516818181818183,
       "abstention": null
     },
     {
       "clip": "umut/ref_023",
       "status": "scored",
-      "score": 0.7659574468085106,
-      "confidence": 0.752940425531915,
+      "score": 0.782608695652174,
+      "confidence": 0.7214,
       "abstention": null
     },
     {
       "clip": "umut/ref_024",
       "status": "scored",
       "score": 0.8048780487804879,
-      "confidence": 0.7379634146341463,
+      "confidence": 0.7205341463414634,
       "abstention": null
     },
     {
       "clip": "umut/ref_025",
       "status": "scored",
-      "score": 0.7837837837837838,
-      "confidence": 0.7269027027027027,
+      "score": 0.7027027027027027,
+      "confidence": 0.6845378378378377,
       "abstention": null
     }
   ]
