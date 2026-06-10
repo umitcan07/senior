@@ -1,0 +1,27 @@
+{
+  "clip": "omer/ref_005",
+  "speaker": "omer",
+  "ref_id": "ref_005",
+  "reference_author": "genam_katherine",
+  "reference_model": "l2a_ppl",
+  "result": {
+    "status": "abstained",
+    "abstention": {
+      "reason": "wrong_sentence",
+      "detail": {
+        "per": 0.75
+      }
+    },
+    "signal_quality": {
+      "is_acceptable": true,
+      "quality_score": 1.0,
+      "rms_db": -28.2,
+      "clipping_ratio": 0.0,
+      "silence_ratio": 0.13,
+      "snr_estimate_db": 25.5,
+      "duration_seconds": 3.1,
+      "warnings": [],
+      "suggestions": []
+    }
+  }
+}
