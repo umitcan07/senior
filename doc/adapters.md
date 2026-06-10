@@ -215,13 +215,46 @@ canonical→produced substitutions the model reproduces.
   but uniform, so it is signal, not noise.
 - **DoRA ≈ LoRA** at equal rank (0.188 vs 0.186).
 - Magnitude is bounded by training budget: dev loss was still falling at the 30-epoch cap
-  (adapters under-trained) — hence the 60-epoch re-train.
+  (adapters under-trained) — hence the 60-epoch re-train below.
 
-**Decision (epoch-30): base `espnet/powsm` ships.** No adapter cleanly clears the promotion gate
-(beat base on TR PER **and** sub-recall, no native-FPR regression): adapters improve TR PER but
-TR sub-recall/native-FPR moves are within noise and nominally regress. The adapters stand as the
-controlled ablation backing the annotation thesis (perceived > canonical ≈ base for deviation
-detection). The deployed architecture does not depend on the adapter. **Revisit after `l2a_*_long`.**
+### 60-epoch re-train (`l2a_*_long`, release adapters-2026-06-10-long) — thesis sharpens
+
+Same config, 60 epochs (dev loss was still falling at 30). The contrast **widens ~4×** and the
+strong form of the thesis appears:
+
+| Model | TR-PER | TR sub-recall | native FPR | L2A PER vs PPL | L2A dev-recall |
+|---|---|---|---|---|---|
+| base | 0.435 | 0.033 | 0.003 | 0.240 | 0.173 |
+| l2a_cpl (30ep) | 0.426 | 0.016 | 0.007 | 0.238 | 0.173 (= base) |
+| **l2a_cpl_long (60ep)** | 0.400 | 0.008 | 0.027 | 0.217 | **0.163 (BELOW base)** |
+| l2a_ppl (30ep) | 0.420 | 0.025 | 0.008 | 0.227 | 0.186 |
+| **l2a_ppl_long (60ep)** | **0.392** | **0.057** | 0.024 | **0.205** | **0.213** |
+
+- **Canonical supervision *actively harms*** (the strong claim): `l2a_cpl_long` deviation recall
+  falls **below base** (0.163 < 0.173) — at 30 epochs cpl was a no-op (= base); more canonical
+  training normalizes harder and *loses* produced deviations.
+- **Perceived supervision clearly helps:** `l2a_ppl_long` recall 0.213 (vs base 0.173), and it now
+  beats base on **TR-PER (0.392) and TR sub-recall (0.057 vs 0.033)** — no adapter did at 30 epochs.
+- **Cost:** native FPR rises to ~0.024 (vs 0.003 base) — longer training drifts native-speech
+  output ~3× more than at 30 epochs. This is the deploy trade-off.
+
+### Promotion gate (re-applied @60) + decision
+
+`l2a_ppl_long` beats base on **TR-PER, TR sub-recall, and L2-ARCTIC deviation recall**, but **raises
+native FPR** (0.024 vs 0.003). It clears the detection criteria decisively while failing the strict
+"no native-FPR regression" clause. So:
+- **Thesis result (defense):** report `l2a_*_long` — canonical actively harms vs perceived clearly
+  helps, on identical audio. This is the empirical centerpiece.
+- **Deployment:** trade-off call — `l2a_ppl_long` (best detection, +2.4% native drift) vs
+  `l2a_ppl`@30 (currently live, lower drift) vs base. Currently **`l2a_ppl`@30 is deployed**; swap to
+  `l2a_ppl_long` only if the native-drift cost is acceptable (would require re-bake + reference
+  re-precompute).
+
+### External validation — speechocean762 (#96, full 2500-utt test set, deployed model)
+
+GOP vs expert human phoneme-accuracy: **mean GOP −6.80 / −4.65 / −1.37 for accuracy 0/1/2**
+(monotonic, 47k phones); Spearman ρ_phone **0.213**, ρ_sentence **0.367**. Independent confirmation
+on the standard benchmark that the GOP tracks human judgement (general, Mandarin-L1).
 
 **Reference dev losses** (provenance only — *not* comparable across adapters): `l2a_cpl` reached
 dev≈0.59 (canonical, easy); `l2a_ppl_tr_fold4` best dev=0.7609. Captured from `train_all.log` /
