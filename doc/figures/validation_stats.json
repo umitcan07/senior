@@ -1,0 +1,19 @@
+{
+  "n_raters": 2,
+  "raters": [
+    "Jon",
+    "Jordan"
+  ],
+  "n_clips_rated": 25,
+  "n_clips_joined": 24,
+  "spearman_system_vs_human": 0.3678,
+  "inter_rater": {
+    "Jon~Jordan": {
+      "n": 25,
+      "spearman": 0.1584
+    }
+  },
+  "krippendorff_alpha_interval": 0.1117,
+  "krippendorff_n_units": 25,
+  "speechocean762": "not pulled locally (see pod artifacts/speechocean)"
+}

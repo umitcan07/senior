@@ -699,7 +699,7 @@ The result confirms the hypothesis, and sharpens with training budget. At 30 epo
 
 \subsection{Human-Judgment Validation}
 
-To confirm that the system's pronunciation score tracks human perception, native English raters score each Turkish-learner clip for intelligibility (0--10) through a blind rating interface (Figure~\ref{fig:intelligibility-ui}), and we correlate the mean human rating against the system score via Spearman's $\rho$. On the first rater's submission (24 scored clips), $\rho = 0.45$, a moderate-to-strong positive correlation indicating the system meaningfully tracks human judgment.
+To assess whether the system's pronunciation score tracks human perception, native English raters score each Turkish-learner clip for intelligibility (0--10) through a blind rating interface (Figure~\ref{fig:intelligibility-ui}), and we correlate the mean human rating against the system score via Spearman's $\rho$. With two raters and 24 jointly-scored clips, $\rho = 0.37$ between the system score and the mean human rating---a positive but only moderate association, visible as a loose upward trend in Figure~\ref{fig:scatter-system-human}.
 
 \begin{figure}[H]
 \centering
@@ -711,7 +711,14 @@ To confirm that the system's pronunciation score tracks human perception, native
 \label{fig:intelligibility-ui}
 \end{figure}
 
-\textbf{[TODO: this $\rho = 0.45$ is preliminary (1 rater, 24 clips). Re-run \texttt{sig/analysis/validation.py} after $\geq$2 raters submit; report the final $\rho$, Krippendorff's $\alpha$ inter-rater agreement, and insert the scatter plot \texttt{doc/figures/scatter\_system\_vs\_human.png}.]}
+The two raters themselves agree only weakly, however: their pairwise Spearman correlation is $0.16$ and Krippendorff's $\alpha$ (interval metric) is $0.11$, far below the $0.667$ threshold conventionally taken as a floor for tentative reliability. This is the more important finding of the study in its current form. Intelligibility is a genuinely subjective judgment, and with only two raters over a small clip set the human ``ground truth'' is itself noisy; a system-vs-human correlation cannot exceed what the humans share with each other. We therefore read $\rho = 0.37$ as encouraging but preliminary evidence that the score points in the right direction, not as a validated agreement figure. The clear next step---and the chief bottleneck for substantiating the system's pedagogical claims---is to recruit more raters (so the mean human rating stabilizes and $\alpha$ becomes interpretable) and to broaden the clip set beyond a single speaker. The analysis is fully scripted (\texttt{sig/analysis/validation.py}, pure-stdlib statistics) and re-runs automatically as additional rater submissions land, so this figure is expected to firm up without further engineering.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/scatter_system_vs_human.png}
+\caption[System score vs.\ mean human intelligibility]{System pronunciation score against mean human intelligibility rating (0--10) across the 24 jointly-rated clips. Spearman's $\rho = 0.37$. The loose upward cloud reflects both a real positive association and the weak inter-rater agreement ($\alpha = 0.11$) that bounds it.}
+\label{fig:scatter-system-human}
+\end{figure}
 
 \subsection{External Benchmark Validation (speechocean762)}
 
