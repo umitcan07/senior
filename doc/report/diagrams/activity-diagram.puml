@@ -23,37 +23,34 @@ start
 
 :Record audio via browser;
 
-:Audio quality assessment;
+:Convert to WAV\n(16-bit, 16 kHz, mono);
+:Store audio in object storage;
+:Create recording record in database;
+:Queue ML processing job (single endpoint);
 
-if (Quality acceptable?) then (yes)
-  :Convert to WAV format\n(16-bit, 16kHz, mono);
-  :Store audio in object storage;
-  :Create recording record in database;
-  
-  :Queue ML processing job;
-  
-  partition "ML Processing" {
-    :Load audio file;
-    :Phonetic transcription\n(POWSM/Wav2Vec);
-    :Forced alignment\n(MFA);
-    :Compare with target IPA;
-    :Calculate pronunciation score;
-    :Generate error corrections;
-    :Store alignment data;
-  }
-  
-  :Store analysis results in database;
-  :Update processing status;
-  
-  :Display feedback to user;
+partition "ML Processing (POWSM worker)" {
+  :Load audio file;
+  :Audio-quality gate\n(Silero VAD + SNR);
+  if (Confident? speech / right sentence / clean) then (yes)
+    :Phone Recognition\n(POWSM + LoRA adapter);
+    :CTC forced alignment\n(per-phone timings);
+    :Feature-aware diff vs reference\n(PanPhon distance);
+    :Per-phone GOP + confidence;
+    :Compute scores + feedback;
+  else (no)
+    :Abstain with reason\n(no-speech / noisy /\nwrong-sentence / uncertain);
+  endif
+}
+
+:Store analysis results in database;
+
+if (Abstained?) then (no)
   :Show pronunciation score;
-  :Highlight errors;
-  :Provide educational guidance;
-  
-else (no)
-  :Reject recording;
-  :Display quality error message;
-  :Suggest improvements;
+  :Highlight per-phone errors\n(GOP colouring);
+  :Provide feature-based feedback\n+ educational guidance;
+else (yes)
+  :Display abstention banner;
+  :Suggest re-recording;
 endif
 
 stop

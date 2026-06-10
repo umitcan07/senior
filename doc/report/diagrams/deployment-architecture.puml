@@ -23,14 +23,9 @@ package "Data Layer" {
   component "Storage\n(Cloudflare R2)" as Storage
 }
 
-package "ML Services\n(RunPod)" {
-  component "Assessment\nEndpoint" as Assessment
-  component "IPA Gen\nEndpoint" as IPA
+package "ML Service\n(RunPod serverless)" {
+  component "Assessment\nEndpoint\n(POWSM + LoRA)" as Assessment
   component "Network\nVolume" as NetworkVol
-}
-
-package "External" {
-  component "ElevenLabs\nAPI" as ElevenLabs
 }
 
 ' User interactions
@@ -43,28 +38,22 @@ Backend --> Clerk : Verify
 Backend --> DB : SQL
 Backend --> Storage : Files
 Backend --> Assessment : Jobs
-Backend --> IPA : Jobs
 
-' ML Services
+' ML Service
 Assessment --> NetworkVol : Cache
-IPA --> NetworkVol : Cache
 Assessment --> Storage : Audio
-IPA --> Storage : Audio
 Assessment --> DB : Results
-IPA --> DB : Results
-
-' External services
-Backend --> ElevenLabs : TTS
 
 note bottom of NetworkVol
-  Model caches (POWSM, MFA)
-  Reduces cold-start
+  Caches POWSM + the fine-tuned
+  adapter. Reduces cold-start.
 end note
 
 note bottom of Assessment
-  PR: 3s avg, G2P: 2s avg
-  Cold-start: 30s max
+  Single stateless endpoint: PR,
+  CTC forced alignment, VAD
+  abstention, feature diff, GOP.
+  Scales to zero between requests.
 end note
 
 @enduml
-

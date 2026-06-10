@@ -4,22 +4,18 @@ skinparam componentStyle rectangle
 skinparam dpi 300
 
 package "Local Development Environment" {
-  
+
   component "RunPod Proxy Simulator\n(FastAPI)\nPort 8008" as Proxy {
     database "In-Memory Job Store" as JobStore
     component "Worker Queues\n(Per Endpoint)" as Queues
     component "Background Workers\n(Async Loops)" as Workers
   }
-  
+
   component "Assessment Worker\n(Docker Container)\nPort 8001" as WorkerAssessment {
-    component "POWSM Models\n(PR + G2P)" as Models
-    component "MFA Alignment" as MFA
+    component "POWSM + LoRA\n(Phone Recognition)" as Models
+    component "CTC Forced Alignment" as Align
   }
-  
-  component "IPA Generation Worker\n(Docker Container)\nPort 8002" as WorkerIPA {
-    component "POWSM G2P Model" as G2PModel
-  }
-  
+
   component "Application Server\n(Local Development)" as AppServer
 }
 
@@ -28,10 +24,8 @@ component "Docker Compose\nConfiguration" as DockerCompose {
   note right
     WORKER_MAP environment variable:
     {
-      "pronunciation-assessment": 
-        "http://worker-assessment:8000",
-      "ipa-generation": 
-        "http://worker-generation:8000"
+      "pronunciation-assessment":
+        "http://worker-assessment:8000"
     }
   end note
 }
@@ -41,13 +35,10 @@ AppServer --> Proxy : POST /v2/{endpoint_id}/run
 Proxy --> JobStore : Store Job (IN_QUEUE)
 Proxy --> Queues : Enqueue Job
 Queues --> Workers : Pull Job
-Workers --> WorkerAssessment : POST /runsync (if assessment)
-Workers --> WorkerIPA : POST /runsync (if IPA)
+Workers --> WorkerAssessment : POST /runsync
 WorkerAssessment --> Models : Inference
-WorkerAssessment --> MFA : Alignment
-WorkerIPA --> G2PModel : Inference
+WorkerAssessment --> Align : Alignment
 WorkerAssessment --> Proxy : Return Results
-WorkerIPA --> Proxy : Return Results
 Proxy --> JobStore : Update Status (COMPLETED)
 Proxy --> AppServer : Webhook Callback (if configured)
 
@@ -63,15 +54,13 @@ note right of Proxy
 end note
 
 note right of Workers
-  Background async loops
-  One per endpoint
-  Handles retries and timeouts
+  Background async loops.
+  Handles retries and timeouts.
 end note
 
 note right of Queues
-  Ensures sequential processing
-  Mimics single GPU pod behavior
+  Ensures sequential processing;
+  mimics single GPU pod behaviour.
 end note
 
 @enduml
-

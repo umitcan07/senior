@@ -1,58 +1,136 @@
 @startuml
 !theme plain
 skinparam linetype ortho
+skinparam dpi 300
 
-class User {
-  + userid : INTEGER <<PK>>
+' Entity-relationship diagram for the Nounce (V2) PostgreSQL schema.
+' Source of truth: app/src/db/schema.ts (Drizzle). All PKs are UUID.
+
+class practice_texts {
+  + id : UUID <<PK>>
   --
-  username : STRING
-  email : STRING
-  native_language : STRING
-  github : TEXT
-  google : TEXT
+  content : TEXT
+  difficulty : ENUM
+  type : ENUM
+  word_count : INTEGER
 }
 
-class Text {
-  + textid : INTEGER <<PK>>
+class authors {
+  + id : UUID <<PK>>
   --
-  text : STRING
-  ipa : STRING
+  slug : VARCHAR <<unique>>
+  name : VARCHAR
+  accent : VARCHAR
+  style : VARCHAR
 }
 
-class Recording {
-  + recordingid : INTEGER <<PK>>
+class reference_speeches {
+  + id : UUID <<PK>>
   --
-  userid : INTEGER <<FK>>
-  storagekey : STRING
-  original_filename : STRING
-  duration : REAL
-  file_size : INTEGER
-  processing_status : STRING
+  author_id : UUID <<FK>>
+  text_id : UUID <<FK>>
+  storage_key : VARCHAR
+  generation_method : ENUM
+  dialect : ENUM
+  ipa_transcription : TEXT
+  ipa_method : ENUM
+  phone_timings_json : JSONB
 }
 
-class Analysis {
-  + analysisid : INTEGER <<PK>>
+class user_recordings {
+  + id : UUID <<PK>>
   --
-  recordingid : INTEGER <<FK>>
-  textid : INTEGER <<FK>>
-  target_phonemes : STRING
-  recognized_phonemes : STRING
-  error_corrections : JSON
-  score : REAL
-  feedback : TEXT
-  alignmentid : INTEGER <<FK>>
+  user_id : VARCHAR
+  reference_speech_id : UUID <<FK>>
+  storage_key : VARCHAR
+  recording_method : ENUM
+  duration_ms : INTEGER
 }
 
-class "Alignment Data" as Alignment {
-  + alignmentid : INTEGER <<PK>>
+class audio_quality_metrics {
+  + id : UUID <<PK>>
   --
-  alignment_data_storage_key : STRING
+  user_recording_id : UUID <<FK>>
+  snr_db : DECIMAL
+  noise_ratio : DECIMAL
+  silence_ratio : DECIMAL
+  clipping_ratio : DECIMAL
+  quality_status : ENUM
+}
+
+class analyses {
+  + id : UUID <<PK>>
+  --
+  user_recording_id : UUID <<FK>>
+  reference_speech_id : UUID <<FK>>
+  status : ENUM
+  abstention_reason : TEXT
+  overall_score : DECIMAL
+  target_phonemes : TEXT
+  recognized_phonemes : TEXT
+  phoneme_score : DECIMAL
+  word_score : DECIMAL
+  recognized_phone_timings_json : JSONB
+}
+
+class phoneme_errors {
+  + id : UUID <<PK>>
+  --
+  analysis_id : UUID <<FK>>
+  error_type : ENUM
+  position : INTEGER
+  gop_score : DECIMAL
+  entropy : DECIMAL
+  uncertain : BOOLEAN
+  feature_distance : DECIMAL
+  feature_delta : JSONB
+}
+
+class word_errors {
+  + id : UUID <<PK>>
+  --
+  analysis_id : UUID <<FK>>
+  error_type : ENUM
+  position : INTEGER
+}
+
+class user_preferences {
+  + id : UUID <<PK>>
+  --
+  user_id : VARCHAR <<unique>>
+  preferred_author_id : UUID <<FK>>
+}
+
+class assessment_jobs {
+  + id : UUID <<PK>>
+  --
+  analysis_id : UUID <<FK>>
+  external_job_id : VARCHAR <<unique>>
+  status : ENUM
+  result : JSONB
 }
 
 ' Relationships
-User ||--o{ Recording : "has"
-Recording ||--o{ Analysis : "analyzes"
-Text ||--o{ Analysis : "uses"
-Alignment ||--o{ Analysis : "references"
+authors            ||--o{ reference_speeches : "voices"
+practice_texts     ||--o{ reference_speeches : "scripted as"
+reference_speeches ||--o{ user_recordings    : "practised against"
+reference_speeches ||--o{ analyses           : "compared to"
+user_recordings    ||--|| audio_quality_metrics : "scored for"
+user_recordings    ||--o{ analyses           : "assessed in"
+analyses           ||--o{ phoneme_errors     : "yields"
+analyses           ||--o{ word_errors        : "yields"
+analyses           ||--|| assessment_jobs    : "tracked by"
+authors            ||--o{ user_preferences   : "preferred by"
+
+note bottom of reference_speeches
+  Self-curated: model IPA + phone
+  timings computed offline, ingested
+  with the human native recording.
+end note
+
+note bottom of phoneme_errors
+  GOP + articulatory feature distance
+  (PanPhon) drive colour + feedback.
+end note
 
 @enduml
