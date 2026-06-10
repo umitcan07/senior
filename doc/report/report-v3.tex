@@ -692,10 +692,21 @@ base POWSM & 0.435 & 0.033 & 0.003 & 0.240 & 0.173 \\\hline
 
 The result confirms the hypothesis, and sharpens with training budget. At 30 epochs the canonical adapter is a \emph{no-op}: \texttt{l2a\_cpl} matches the baseline's deviation recall exactly ($0.173$), because the base model already emits canonical-leaning phones and canonical supervision teaches it nothing new. At 60 epochs the canonical adapter \emph{actively harms}: \texttt{l2a\_cpl\_long} deviation recall drops \emph{below} base ($0.163 < 0.173$) as the model normalizes harder and loses produced deviations. The perceived adapter moves in the opposite direction: \texttt{l2a\_ppl\_long} reaches $0.213$ deviation recall and is the only model to beat base on both Turkish PER ($0.392$) and Turkish substitution recall ($0.057$ vs.\ $0.033$). The cpl-vs-ppl gap widens roughly four-fold between the two budgets---identical audio, opposite supervision, diverging behaviour. The cost of the longer schedule is increased native drift (FPR $0.024$ vs.\ $0.003$ for base); \texttt{l2a\_ppl\_long} is deployed as the production model, accepting this drift for materially better learner-deviation detection. The LOSO arm (adding three Turkish speakers) gives a modest, high-variance speaker-independent gain (mean PER $0.421$, range $0.402$--$0.455$).
 
-% TODO: replace the [TODO] figure placeholders below with the rendered PNGs from
-% artifacts/eval/figs/ (copy them into doc/report/images/). cpl_vs_ppl.png and
-% l2arctic_cpl_vs_ppl.png are the headline figures.
-\textbf{[TODO: insert figure \texttt{artifacts/eval/figs/l2arctic\_cpl\_vs\_ppl.png} (per-L1 deviation recall, cpl vs ppl) into \texttt{doc/report/images/}.]}
+Figure~\ref{fig:cpl-vs-ppl} makes the headline contrast visual: at the 60-epoch budget, canonical supervision pulls deviation recall \emph{below} the baseline while perceived supervision pushes it clearly above. Figure~\ref{fig:recall-budget} shows the same metric across both training budgets, where the canonical and perceived adapters---trained on identical audio---visibly diverge as the budget grows.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/l2arctic_cpl_vs_ppl_long.png}
+\caption[Canonical vs.\ perceived supervision, deviation recall]{L2-ARCTIC deviation recall (60 epochs): baseline, the canonical-label adapter (\texttt{l2a\_cpl\_long}), and the perceived-label adapter (\texttt{l2a\_ppl\_long}). Canonical supervision falls below base ($0.163 < 0.173$); perceived supervision rises to $0.213$. Same audio, opposite supervision target.}
+\label{fig:cpl-vs-ppl}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/deviation_recall_by_budget.png}
+\caption[Deviation recall by training budget]{L2-ARCTIC deviation recall at 30 vs.\ 60 epochs. The canonical and perceived adapters separate further as the budget grows---canonical drifting down, perceived up---while the baseline (dashed) is unchanged.}
+\label{fig:recall-budget}
+\end{figure}
 
 \subsection{Human-Judgment Validation}
 
@@ -724,7 +735,14 @@ The two raters themselves agree only weakly, however: their pairwise Spearman co
 
 As an independent, large-scale check, we evaluate the system's Goodness-of-Pronunciation (GOP) score against expert human phoneme-accuracy labels on the standard speechocean762 benchmark \cite{speechocean762} (2{,}500 held-out utterances, 47{,}369 phones, Mandarin-L1). Mean GOP rises monotonically with the human accuracy label ($-6.80$, $-4.65$, $-1.37$ for accuracy $0$, $1$, $2$), and Spearman's $\rho$ is $0.21$ at the phone level and $0.37$ at the sentence level. This confirms, on a recognized public benchmark and a different L1, that the GOP component tracks human pronunciation judgment; it complements (rather than replaces) the Turkish-specific study.
 
-\textbf{[TODO: insert the GOP-vs-accuracy box plot \texttt{artifacts/speechocean/figs/gop\_vs\_accuracy.png}.]}
+The monotonic rise is shown in Figure~\ref{fig:gop-accuracy}: GOP distributions shift upward as the expert accuracy label increases from $0$ to $2$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/gop_vs_accuracy.png}
+\caption[GOP vs.\ expert accuracy on speechocean762]{POWSM Goodness-of-Pronunciation against expert phoneme-accuracy labels on speechocean762 (2{,}500 utterances, 47{,}369 phones). Median GOP rises monotonically with the human accuracy score; phone-level Spearman's $\rho = 0.21$.}
+\label{fig:gop-accuracy}
+\end{figure}
 
 \subsection{Scaling the Perceived-Label Fine-Tune to Full L2-ARCTIC}
 
