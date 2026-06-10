@@ -1,0 +1,99 @@
+\contentsline {chapter}{\numberline {1}INTRODUCTION}{1}{}%
+\contentsline {section}{\numberline {1.1}Broad Impact}{1}{}%
+\contentsline {subsection}{\numberline {1.1.1}Learning Impact}{1}{}%
+\contentsline {subsection}{\numberline {1.1.2}Academic Impact}{1}{}%
+\contentsline {section}{\numberline {1.2}Ethical Considerations}{2}{}%
+\contentsline {subsection}{\numberline {1.2.1}User Speech Data}{2}{}%
+\contentsline {subsection}{\numberline {1.2.2}Prescriptive Approach in Linguistics}{2}{}%
+\contentsline {subsection}{\numberline {1.2.3}Monetization and Accessibility}{2}{}%
+\contentsline {chapter}{\numberline {2}PROJECT DEFINITION AND PLANNING}{3}{}%
+\contentsline {section}{\numberline {2.1}Project Definition}{3}{}%
+\contentsline {subsection}{\numberline {2.1.1}Relationship to the CMPE491 Prototype}{3}{}%
+\contentsline {section}{\numberline {2.2}Project Planning}{4}{}%
+\contentsline {subsection}{\numberline {2.2.1}Project Time and Resource Estimation}{4}{}%
+\contentsline {subsection}{\numberline {2.2.2}Success Criteria}{5}{}%
+\contentsline {subsection}{\numberline {2.2.3}Risk Analysis}{6}{}%
+\contentsline {subsection}{\numberline {2.2.4}Team Work}{7}{}%
+\contentsline {chapter}{\numberline {3}RELATED WORK}{8}{}%
+\contentsline {section}{\numberline {3.1}Speech Foundation Models and Phonetic Transcription}{8}{}%
+\contentsline {section}{\numberline {3.2}CTC-Based Speech Models}{8}{}%
+\contentsline {section}{\numberline {3.3}Forced Alignment and Assessment}{9}{}%
+\contentsline {section}{\numberline {3.4}L2 Speech Corpora and the Annotation Gap}{9}{}%
+\contentsline {section}{\numberline {3.5}Commercial Applications}{11}{}%
+\contentsline {chapter}{\numberline {4}METHODOLOGY}{12}{}%
+\contentsline {section}{\numberline {4.1}Application Architecture}{12}{}%
+\contentsline {subsection}{\numberline {4.1.1}Production Deployment Architecture}{12}{}%
+\contentsline {section}{\numberline {4.2}Machine Learning Approach}{13}{}%
+\contentsline {subsection}{\numberline {4.2.1}POWSM-CTC Variant Evaluation}{14}{}%
+\contentsline {subsection}{\numberline {4.2.2}Fine-Tuning: Perceived vs.\ Canonical Annotation}{14}{}%
+\contentsline {section}{\numberline {4.3}Development Methodology}{16}{}%
+\contentsline {subsection}{\numberline {4.3.1}Local Development and RunPod Simulation}{17}{}%
+\contentsline {chapter}{\numberline {5}REQUIREMENTS SPECIFICATION}{18}{}%
+\contentsline {section}{\numberline {5.1}Functional Requirements}{18}{}%
+\contentsline {subsection}{\numberline {5.1.1}User Authentication and Authorization}{18}{}%
+\contentsline {subsection}{\numberline {5.1.2}Speech Recording and Audio Input}{18}{}%
+\contentsline {subsection}{\numberline {5.1.3}Audio Quality Assessment}{19}{}%
+\contentsline {subsection}{\numberline {5.1.4}Phonetic Analysis and Transcription}{19}{}%
+\contentsline {subsection}{\numberline {5.1.5}Pronunciation Feedback and Assessment}{19}{}%
+\contentsline {subsection}{\numberline {5.1.6}Educational Content and Phonology Guidance}{20}{}%
+\contentsline {subsection}{\numberline {5.1.7}Progress Tracking and History}{20}{}%
+\contentsline {subsection}{\numberline {5.1.8}Data Storage and Management}{20}{}%
+\contentsline {subsection}{\numberline {5.1.9}Asynchronous Processing}{20}{}%
+\contentsline {subsection}{\numberline {5.1.10}User Interface and Experience}{20}{}%
+\contentsline {chapter}{\numberline {6}DESIGN}{22}{}%
+\contentsline {section}{\numberline {6.1}Information Structure}{22}{}%
+\contentsline {subsection}{\numberline {6.1.1}Entity-Relationship Diagram}{22}{}%
+\contentsline {section}{\numberline {6.2}Information Flow}{25}{}%
+\contentsline {subsection}{\numberline {6.2.1}Pronunciation Assessment Workflow}{25}{}%
+\contentsline {section}{\numberline {6.3}System Design}{26}{}%
+\contentsline {subsection}{\numberline {6.3.1}System Architecture Diagram}{26}{}%
+\contentsline {subsection}{\numberline {6.3.2}Deployment Architecture Diagram}{27}{}%
+\contentsline {subsection}{\numberline {6.3.3}RunPod Simulator Architecture Diagram}{28}{}%
+\contentsline {section}{\numberline {6.4}User Interface Design}{29}{}%
+\contentsline {subsection}{\numberline {6.4.1}Application Logo}{29}{}%
+\contentsline {subsection}{\numberline {6.4.2}User Interface Screenshots}{29}{}%
+\contentsline {subsubsection}{Practice Text Selection}{30}{}%
+\contentsline {subsubsection}{Reference Speaker Selection}{31}{}%
+\contentsline {subsubsection}{Analysis Results}{32}{}%
+\contentsline {subsubsection}{Progress Dashboard}{33}{}%
+\contentsline {subsubsection}{Educational Content}{34}{}%
+\contentsline {subsubsection}{Admin Interface}{35}{}%
+\contentsline {chapter}{\numberline {7}IMPLEMENTATION AND TESTING}{38}{}%
+\contentsline {section}{\numberline {7.1}Implementation}{38}{}%
+\contentsline {subsection}{\numberline {7.1.1}Full-Stack Application}{38}{}%
+\contentsline {subsection}{\numberline {7.1.2}Machine Learning Services}{40}{}%
+\contentsline {subsection}{\numberline {7.1.3}Signal Processing and Experiments}{42}{}%
+\contentsline {subsection}{\numberline {7.1.4}Admin Analytics Dashboard}{42}{}%
+\contentsline {subsection}{\numberline {7.1.5}User Progress and Summary Page}{43}{}%
+\contentsline {subsection}{\numberline {7.1.6}Documentation and Deployment}{43}{}%
+\contentsline {section}{\numberline {7.2}Deployment}{44}{}%
+\contentsline {subsection}{\numberline {7.2.1}Production Deployment}{44}{}%
+\contentsline {subsection}{\numberline {7.2.2}Local Development}{44}{}%
+\contentsline {chapter}{\numberline {8}RESULTS}{45}{}%
+\contentsline {section}{\numberline {8.1}POWSM-CTC Evaluation Results}{45}{}%
+\contentsline {section}{\numberline {8.2}Fine-Tuning Evaluation and Validation Study}{46}{}%
+\contentsline {subsection}{\numberline {8.2.1}Annotation-Convention Ablation (Canonical vs.\ Perceived)}{46}{}%
+\contentsline {subsection}{\numberline {8.2.2}Human-Judgment Validation}{48}{}%
+\contentsline {subsection}{\numberline {8.2.3}External Benchmark Validation (speechocean762)}{50}{}%
+\contentsline {subsection}{\numberline {8.2.4}Scaling the Perceived-Label Fine-Tune to Full L2-ARCTIC}{51}{}%
+\contentsline {section}{\numberline {8.3}System Implementation Status}{53}{}%
+\contentsline {subsection}{\numberline {8.3.1}Full-Stack Web Application}{54}{}%
+\contentsline {subsection}{\numberline {8.3.2}Database Schema}{54}{}%
+\contentsline {subsection}{\numberline {8.3.3}Machine Learning Pipeline}{55}{}%
+\contentsline {subsection}{\numberline {8.3.4}Audio Quality Assessment}{55}{}%
+\contentsline {subsection}{\numberline {8.3.5}Deployment Infrastructure}{56}{}%
+\contentsline {section}{\numberline {8.4}Technical Achievements}{56}{}%
+\contentsline {subsection}{\numberline {8.4.1}Architecture and Design}{56}{}%
+\contentsline {subsection}{\numberline {8.4.2}User Experience}{56}{}%
+\contentsline {subsection}{\numberline {8.4.3}Integration Challenges and Solutions}{57}{}%
+\contentsline {section}{\numberline {8.5}Performance and Scalability}{57}{}%
+\contentsline {chapter}{\numberline {9}CONCLUSION}{59}{}%
+\contentsline {section}{\numberline {9.1}Project Summary}{59}{}%
+\contentsline {section}{\numberline {9.2}Technical Contributions}{59}{}%
+\contentsline {section}{\numberline {9.3}Educational Impact}{60}{}%
+\contentsline {section}{\numberline {9.4}Conclusion and Future Work}{61}{}%
+\contentsline {subsection}{\numberline {9.4.1}State of the Platform}{61}{}%
+\contentsline {subsection}{\numberline {9.4.2}Limitations}{61}{}%
+\contentsline {subsection}{\numberline {9.4.3}Future Directions}{61}{}%
+\contentsline {subsection}{\numberline {9.4.4}Ethical Considerations}{63}{}%
+\contentsline {section}{\numberline {9.5}Closing Remarks}{63}{}%

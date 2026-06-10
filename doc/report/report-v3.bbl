@@ -1,0 +1,147 @@
+\begin{thebibliography}{10}
+
+\bibitem{baevski2020wav2vec}
+Alexei Baevski, Yuhao Zhou, Abdelrahman Mohamed, and Michael Auli.
+\newblock wav2vec 2.0: A framework for self-supervised learning of speech
+  representations.
+\newblock {\em Advances in Neural Information Processing Systems},
+  33:12449--12460, 2020.
+
+\bibitem{chen2022wavlm}
+Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu~Wu, et~al.
+\newblock Wavlm: Large-scale self-supervised pre-training for full stack speech
+  processing.
+\newblock {\em IEEE Journal of Selected Topics in Signal Processing},
+  16(6):1505--1518, 2022.
+
+\bibitem{elsaspeak}
+{ELSA Corp}.
+\newblock Elsa speak: Ai-powered english pronunciation coach.
+\newblock \url{https://elsaspeak.com/en/}, 2024.
+\newblock Accessed: November 2025.
+
+\bibitem{github2024app}
+{Evleksiz, {\"U}mit Can and Bayram, {\"O}mer Faruk}.
+\newblock Application source code directory.
+\newblock \url{https://github.com/umitcan07/senior/tree/main/app}, 2024.
+\newblock Full-stack application codebase. Accessed: November 2025.
+
+\bibitem{github2024env}
+{Evleksiz, {\"U}mit Can and Bayram, {\"O}mer Faruk}.
+\newblock Environment configuration.
+\newblock \url{https://github.com/umitcan07/senior/tree/main/app}, 2024.
+\newblock Environment variables and configuration files. Accessed: November
+  2025.
+
+\bibitem{github2024actions}
+{Evleksiz, {\"U}mit Can and Bayram, {\"O}mer Faruk}.
+\newblock Github actions ci/cd workflows.
+\newblock
+  \url{https://github.com/umitcan07/senior/tree/main/.github/workflows}, 2024.
+\newblock Continuous integration and deployment pipelines. Accessed: November
+  2025.
+
+\bibitem{github2024readme}
+{Evleksiz, {\"U}mit Can and Bayram, {\"O}mer Faruk}.
+\newblock Project readme.
+\newblock \url{https://github.com/umitcan07/senior/blob/main/README.md}, 2024.
+\newblock Project documentation and setup instructions. Accessed: November
+  2025.
+
+\bibitem{github2024senior}
+{Evleksiz, {\"U}mit Can and Bayram, {\"O}mer Faruk}.
+\newblock Senior project repository.
+\newblock \url{https://github.com/umitcan07/senior/}, 2024.
+\newblock Boğaziçi University Computer Engineering Senior Project. Accessed:
+  November 2025.
+
+\bibitem{github2024sig}
+{Evleksiz, {\"U}mit Can and Bayram, {\"O}mer Faruk}.
+\newblock Signal processing experiments directory.
+\newblock \url{https://github.com/umitcan07/senior/tree/main/sig/exp}, 2024.
+\newblock Jupyter notebooks for DSP and deep learning experiments. Accessed:
+  November 2025.
+
+\bibitem{graves2006connectionist}
+Alex Graves, Santiago Fern{\'a}ndez, Faustino Gomez, and J{\"u}rgen
+  Schmidhuber.
+\newblock Connectionist temporal classification: Labelling unsegmented sequence
+  data with recurrent neural networks.
+\newblock {\em Proceedings of the International Conference on Machine
+  Learning}, pages 369--376, 2006.
+
+\bibitem{lora}
+Edward~J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean
+  Wang, Lu~Wang, and Weizhu Chen.
+\newblock Lora: Low-rank adaptation of large language models.
+\newblock In {\em International Conference on Learning Representations (ICLR)},
+  2022.
+
+\bibitem{powsm}
+Chin-Jou Li, Kalvin Chang, Shikhar Bharadwaj, Eunjung Yeo, Kwanghee Choi, Jian
+  Zhu, David Mortensen, and Shinji Watanabe.
+\newblock Powsm: A phonetic open whisper-style speech foundation model.
+\newblock 2025.
+
+\bibitem{dora}
+Shih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang~Frank
+  Wang, Kwang-Ting Cheng, and Min-Hung Chen.
+\newblock {DoRA}: Weight-decomposed low-rank adaptation.
+\newblock In {\em International Conference on Machine Learning (ICML)}, 2024.
+
+\bibitem{mcauliffe2017montreal}
+Michael McAuliffe, Michaela Socolof, Sarah Mihuc, Michael Wagner, and Morgan
+  Sonderegger.
+\newblock Montreal forced aligner: Trainable text-speech alignment using kaldi.
+\newblock {\em Proceedings of Interspeech}, pages 498--502, 2017.
+
+\bibitem{panphon}
+David~R. Mortensen, Patrick Littell, Akash Bharadwaj, Kartik Goyal, Chris Dyer,
+  and Lori Levin.
+\newblock {PanPhon}: A resource for mapping {IPA} segments to articulatory
+  feature vectors.
+\newblock In {\em Proceedings of the 26th International Conference on
+  Computational Linguistics (COLING): Technical Papers}, pages 3475--3484,
+  2016.
+
+\bibitem{owsmctc}
+Yifan Peng, Jinchuan Tian, Brian Yan, Dan Berrebbi, Xuankai Chang, Xinjian Li,
+  Jiatong Shi, Siddhant Arora, William Chen, Roshan Sharma, et~al.
+\newblock Owsm-ctc: An open encoder-only speech foundation model for speech
+  recognition, translation, and language identification.
+\newblock In {\em Proceedings of the 62nd Annual Meeting of the Association for
+  Computational Linguistics (ACL)}, pages 10189--10208, 2024.
+
+\bibitem{pronounce2024}
+{Pronounce Inc}.
+\newblock Pronounce ai: Ai-powered speech feedback and pronunciation practice.
+\newblock \url{https://www.getpronounce.com/}, 2024.
+\newblock Accessed: November 2025.
+
+\bibitem{witt2000phone}
+Silke~M. Witt and Steve~J. Young.
+\newblock Phone-level pronunciation scoring and assessment for interactive
+  language learning.
+\newblock {\em Speech Communication}, 30(2-3):95--108, 2000.
+
+\bibitem{speechocean762}
+Junbo Zhang, Zhiwen Zhang, Yongqing Wang, Zhiyong Yan, Qiong Song, Yukai Huang,
+  Ke~Li, Daniel Povey, and Yujun Wang.
+\newblock speechocean762: An open-source non-native english speech corpus for
+  pronunciation assessment.
+\newblock In {\em Proc. Interspeech}, pages 3710--3714, 2021.
+
+\bibitem{l2arctic}
+Guanlong Zhao, Sinem Sonsaat, Alif Silpachai, Ivana Lucic, Evgeny
+  Chukharev-Hudilainen, John Levis, and Ricardo Gutierrez-Osuna.
+\newblock L2-arctic: A non-native english speech corpus.
+\newblock In {\em Proc. Interspeech}, pages 2783--2787, 2018.
+
+\bibitem{zipa}
+Jian Zhu, Farhan Samir, Eleanor Chodroff, and David~R. Mortensen.
+\newblock {ZIPA}: A family of efficient models for multilingual phone
+  recognition.
+\newblock In {\em Proceedings of the 63rd Annual Meeting of the Association for
+  Computational Linguistics (ACL)}, 2025.
+
+\end{thebibliography}
