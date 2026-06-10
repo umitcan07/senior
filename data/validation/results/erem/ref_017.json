@@ -1,0 +1,487 @@
+{
+  "clip": "erem/ref_017",
+  "speaker": "erem",
+  "ref_id": "ref_017",
+  "reference_author": "genam_katherine",
+  "reference_model": "l2a_ppl_long",
+  "result": {
+    "status": "scored",
+    "score": 0.8918918918918919,
+    "confidence": 0.8495243243243245,
+    "actual_ipa": "/b//i//w//ɑ//t//ʃ//t//ə//ɹ//ɪ//l//i//k//ʊ//d//f//ɪ//l//m//tʰ//ə//ɡ//ɛ//ð//ə˞//ɑ̃//n//f//a//ɪ//d//e//ɪ//n//a//ɪ//t/",
+    "target_ipa": "/w//i//w//ɑ//t//ʃ//t//ə//ɹ//ɪ//l//i//k//ʊ//d//f//ɪ//l//m//t//ə//ɡ//ɛ//ð//ə˞//ɑ̃//n//f//ɹ//a//ɪ//d//i//n//a//ɪ//t/",
+    "per": 0.13513513513513514,
+    "errors": [
+      {
+        "type": "substitute",
+        "position": 0,
+        "expected": "w",
+        "actual": "b",
+        "timestamp": {
+          "start": 0.44,
+          "end": 0.52
+        },
+        "gop_score": -4.7224,
+        "entropy": 0.1546,
+        "uncertain": false,
+        "feature_distance": 0.5833333333333334,
+        "feature_delta": [
+          {
+            "feature": "son",
+            "ref": "+",
+            "user": "-"
+          },
+          {
+            "feature": "cons",
+            "ref": "-",
+            "user": "+"
+          },
+          {
+            "feature": "cont",
+            "ref": "+",
+            "user": "-"
+          },
+          {
+            "feature": "ant",
+            "ref": "-",
+            "user": "+"
+          },
+          {
+            "feature": "hi",
+            "ref": "+",
+            "user": "-"
+          },
+          {
+            "feature": "back",
+            "ref": "+",
+            "user": "-"
+          },
+          {
+            "feature": "round",
+            "ref": "+",
+            "user": "-"
+          }
+        ]
+      },
+      {
+        "type": "substitute",
+        "position": 19,
+        "expected": "t",
+        "actual": "tʰ",
+        "timestamp": {
+          "start": 1.96,
+          "end": 2.04
+        },
+        "gop_score": -1.5557,
+        "entropy": 0.3133,
+        "uncertain": false,
+        "feature_distance": 0.08333333333333333,
+        "feature_delta": [
+          {
+            "feature": "sg",
+            "ref": "-",
+            "user": "+"
+          }
+        ]
+      },
+      {
+        "type": "delete",
+        "position": 28,
+        "expected": "ɹ",
+        "actual": null,
+        "timestamp": {
+          "start": 3.12,
+          "end": 3.2
+        },
+        "gop_score": 0.426,
+        "entropy": 1.0776,
+        "uncertain": false,
+        "feature_distance": null,
+        "feature_delta": null
+      },
+      {
+        "type": "insert",
+        "position": 31,
+        "expected": null,
+        "actual": "e",
+        "timestamp": {
+          "start": 3.36,
+          "end": 3.4
+        },
+        "gop_score": null,
+        "entropy": null,
+        "uncertain": null,
+        "feature_distance": null,
+        "feature_delta": null
+      },
+      {
+        "type": "substitute",
+        "position": 32,
+        "expected": "i",
+        "actual": "ɪ",
+        "timestamp": {
+          "start": 3.36,
+          "end": 3.44
+        },
+        "gop_score": -2.8437,
+        "entropy": 0.5506,
+        "uncertain": false,
+        "feature_distance": 0.08333333333333333,
+        "feature_delta": [
+          {
+            "feature": "tense",
+            "ref": "+",
+            "user": "-"
+          }
+        ]
+      }
+    ],
+    "phones": [
+      {
+        "token": "b",
+        "start_ms": 440.0,
+        "end_ms": 480.0,
+        "confidence": 0.9459,
+        "gop_score": 3.0667,
+        "entropy": 0.2521,
+        "uncertain": false
+      },
+      {
+        "token": "i",
+        "start_ms": 520.0,
+        "end_ms": 560.0,
+        "confidence": 0.9688,
+        "gop_score": 3.6523,
+        "entropy": 0.1645,
+        "uncertain": false
+      },
+      {
+        "token": "w",
+        "start_ms": 600.0,
+        "end_ms": 640.0,
+        "confidence": 0.9755,
+        "gop_score": 3.8124,
+        "entropy": 0.1322,
+        "uncertain": false
+      },
+      {
+        "token": "ɑ",
+        "start_ms": 680.0,
+        "end_ms": 720.0,
+        "confidence": 0.9422,
+        "gop_score": 3.5748,
+        "entropy": 0.3084,
+        "uncertain": false
+      },
+      {
+        "token": "t",
+        "start_ms": 760.0,
+        "end_ms": 800.0,
+        "confidence": 0.9828,
+        "gop_score": 4.1328,
+        "entropy": 0.0942,
+        "uncertain": false
+      },
+      {
+        "token": "ʃ",
+        "start_ms": 800.0,
+        "end_ms": 880.0,
+        "confidence": 0.9635,
+        "gop_score": 6.8218,
+        "entropy": 0.1696,
+        "uncertain": false
+      },
+      {
+        "token": "t",
+        "start_ms": 880.0,
+        "end_ms": 960.0,
+        "confidence": 0.7539,
+        "gop_score": 4.9946,
+        "entropy": 0.4584,
+        "uncertain": false
+      },
+      {
+        "token": "ə",
+        "start_ms": 960.0,
+        "end_ms": 1000.0,
+        "confidence": 0.965,
+        "gop_score": 4.6202,
+        "entropy": 0.2167,
+        "uncertain": false
+      },
+      {
+        "token": "ɹ",
+        "start_ms": 1080.0,
+        "end_ms": 1120.0,
+        "confidence": 0.9993,
+        "gop_score": 9.5336,
+        "entropy": 0.0071,
+        "uncertain": false
+      },
+      {
+        "token": "ɪ",
+        "start_ms": 1120.0,
+        "end_ms": 1160.0,
+        "confidence": 0.9894,
+        "gop_score": 4.5918,
+        "entropy": 0.0623,
+        "uncertain": false
+      },
+      {
+        "token": "l",
+        "start_ms": 1240.0,
+        "end_ms": 1280.0,
+        "confidence": 0.9972,
+        "gop_score": 6.0812,
+        "entropy": 0.022,
+        "uncertain": false
+      },
+      {
+        "token": "i",
+        "start_ms": 1280.0,
+        "end_ms": 1320.0,
+        "confidence": 0.998,
+        "gop_score": 7.0542,
+        "entropy": 0.0174,
+        "uncertain": false
+      },
+      {
+        "token": "k",
+        "start_ms": 1400.0,
+        "end_ms": 1440.0,
+        "confidence": 0.8608,
+        "gop_score": 1.8355,
+        "entropy": 0.4182,
+        "uncertain": false
+      },
+      {
+        "token": "ʊ",
+        "start_ms": 1480.0,
+        "end_ms": 1520.0,
+        "confidence": 0.8528,
+        "gop_score": 1.9451,
+        "entropy": 0.5148,
+        "uncertain": false
+      },
+      {
+        "token": "d",
+        "start_ms": 1560.0,
+        "end_ms": 1600.0,
+        "confidence": 0.9851,
+        "gop_score": 4.3395,
+        "entropy": 0.0882,
+        "uncertain": false
+      },
+      {
+        "token": "f",
+        "start_ms": 1640.0,
+        "end_ms": 1680.0,
+        "confidence": 0.9997,
+        "gop_score": 9.7746,
+        "entropy": 0.0042,
+        "uncertain": false
+      },
+      {
+        "token": "ɪ",
+        "start_ms": 1720.0,
+        "end_ms": 1760.0,
+        "confidence": 0.9814,
+        "gop_score": 4.0129,
+        "entropy": 0.0975,
+        "uncertain": false
+      },
+      {
+        "token": "l",
+        "start_ms": 1800.0,
+        "end_ms": 1840.0,
+        "confidence": 0.9893,
+        "gop_score": 4.9329,
+        "entropy": 0.069,
+        "uncertain": false
+      },
+      {
+        "token": "m",
+        "start_ms": 1840.0,
+        "end_ms": 1920.0,
+        "confidence": 0.9463,
+        "gop_score": 7.4659,
+        "entropy": 0.1827,
+        "uncertain": false
+      },
+      {
+        "token": "tʰ",
+        "start_ms": 1960.0,
+        "end_ms": 2000.0,
+        "confidence": 0.7779,
+        "gop_score": 1.2875,
+        "entropy": 0.5745,
+        "uncertain": false
+      },
+      {
+        "token": "ə",
+        "start_ms": 2040.0,
+        "end_ms": 2080.0,
+        "confidence": 0.999,
+        "gop_score": 8.006,
+        "entropy": 0.0104,
+        "uncertain": false
+      },
+      {
+        "token": "ɡ",
+        "start_ms": 2080.0,
+        "end_ms": 2120.0,
+        "confidence": 0.9993,
+        "gop_score": 7.5685,
+        "entropy": 0.0067,
+        "uncertain": false
+      },
+      {
+        "token": "ɛ",
+        "start_ms": 2160.0,
+        "end_ms": 2200.0,
+        "confidence": 0.9991,
+        "gop_score": 7.2725,
+        "entropy": 0.0076,
+        "uncertain": false
+      },
+      {
+        "token": "ð",
+        "start_ms": 2280.0,
+        "end_ms": 2320.0,
+        "confidence": 0.9998,
+        "gop_score": 9.235,
+        "entropy": 0.0019,
+        "uncertain": false
+      },
+      {
+        "token": "ə˞",
+        "start_ms": 2360.0,
+        "end_ms": 2400.0,
+        "confidence": 0.9956,
+        "gop_score": 5.4976,
+        "entropy": 0.0302,
+        "uncertain": false
+      },
+      {
+        "token": "ɑ̃",
+        "start_ms": 2800.0,
+        "end_ms": 2840.0,
+        "confidence": 0.5662,
+        "gop_score": 1.2937,
+        "entropy": 1.3997,
+        "uncertain": false
+      },
+      {
+        "token": "n",
+        "start_ms": 2920.0,
+        "end_ms": 2960.0,
+        "confidence": 0.9613,
+        "gop_score": 3.4959,
+        "entropy": 0.2079,
+        "uncertain": false
+      },
+      {
+        "token": "f",
+        "start_ms": 3040.0,
+        "end_ms": 3080.0,
+        "confidence": 0.9868,
+        "gop_score": 4.8795,
+        "entropy": 0.0916,
+        "uncertain": false
+      },
+      {
+        "token": "a",
+        "start_ms": 3160.0,
+        "end_ms": 3200.0,
+        "confidence": 0.5666,
+        "gop_score": 0.9786,
+        "entropy": 1.4291,
+        "uncertain": false
+      },
+      {
+        "token": "ɪ",
+        "start_ms": 3200.0,
+        "end_ms": 3240.0,
+        "confidence": 0.5595,
+        "gop_score": 0.8192,
+        "entropy": 1.0476,
+        "uncertain": false
+      },
+      {
+        "token": "d",
+        "start_ms": 3320.0,
+        "end_ms": 3360.0,
+        "confidence": 0.9171,
+        "gop_score": 2.6354,
+        "entropy": 0.3449,
+        "uncertain": false
+      },
+      {
+        "token": "e",
+        "start_ms": 3360.0,
+        "end_ms": 3400.0,
+        "confidence": 0.763,
+        "gop_score": 1.2975,
+        "entropy": 0.6937,
+        "uncertain": false
+      },
+      {
+        "token": "ɪ",
+        "start_ms": 3440.0,
+        "end_ms": 3480.0,
+        "confidence": 0.8957,
+        "gop_score": 5.1944,
+        "entropy": 0.3957,
+        "uncertain": false
+      },
+      {
+        "token": "n",
+        "start_ms": 3560.0,
+        "end_ms": 3600.0,
+        "confidence": 0.9993,
+        "gop_score": 8.7317,
+        "entropy": 0.0075,
+        "uncertain": false
+      },
+      {
+        "token": "a",
+        "start_ms": 3640.0,
+        "end_ms": 3680.0,
+        "confidence": 0.999,
+        "gop_score": 8.2779,
+        "entropy": 0.0103,
+        "uncertain": false
+      },
+      {
+        "token": "ɪ",
+        "start_ms": 3680.0,
+        "end_ms": 3720.0,
+        "confidence": 0.9962,
+        "gop_score": 5.754,
+        "entropy": 0.0284,
+        "uncertain": false
+      },
+      {
+        "token": "t",
+        "start_ms": 3760.0,
+        "end_ms": 3800.0,
+        "confidence": 0.9695,
+        "gop_score": 4.2783,
+        "entropy": 0.1823,
+        "uncertain": false
+      }
+    ],
+    "signal_quality": {
+      "is_acceptable": true,
+      "quality_score": 1.0,
+      "rms_db": -16.4,
+      "clipping_ratio": 0.0001,
+      "silence_ratio": 0.42,
+      "snr_estimate_db": 37.3,
+      "duration_seconds": 3.88,
+      "warnings": [],
+      "suggestions": []
+    },
+    "alignment_method": "powsm_ctc_forced"
+  }
+}
