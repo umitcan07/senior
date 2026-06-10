@@ -3,6 +3,16 @@
 \usepackage[utf8x]{inputenc} % To use Unicode (e.g. Turkish) characters
 \renewcommand{\labelenumi}{(\roman{enumi})}
 \usepackage{amsmath, amsthm, amssymb}
+% IPA rendering: the body font (Latin Modern) lacks many IPA glyphs, so route IPA
+% snippets through an IPA-complete Unicode font via fontspec (tectonic = XeTeX).
+% Prefer SIL Charis/Doulos if installed; otherwise fall back to STIX Two Text /
+% Arial Unicode (both ship with macOS and cover the IPA block).
+\usepackage{fontspec}
+\IfFontExistsTF{Charis SIL}{\newfontfamily\ipafont{Charis SIL}}{%
+ \IfFontExistsTF{Doulos SIL}{\newfontfamily\ipafont{Doulos SIL}}{%
+  \IfFontExistsTF{STIX Two Text}{\newfontfamily\ipafont{STIX Two Text}}{%
+   \newfontfamily\ipafont{Arial Unicode MS}}}}
+\newcommand{\ipa}[1]{{\ipafont #1}}
 \usepackage[bottom]{footmisc}
 \usepackage{cite}
 \usepackage{url}
@@ -182,12 +192,14 @@ The Montreal Forced Aligner (MFA) \cite{mcauliffe2017montreal} is an industry-st
 \section{L2 Speech Corpora and the Annotation Gap}
 \label{sec:data-gap}
 
-A model that \emph{detects} mispronunciations must be trained on what the learner actually \emph{produced}, not on the dictionary form of the target word---otherwise it learns to normalize deviations away rather than surface them. This bias originates upstream, in how phonetic foundation models are built: they are trained on \emph{canonical} phonetic transcriptions, and POWSM \cite{powsm} in particular is trained on the IPAPack++ corpus, whose labels are canonical. As is typical of phonetic models, POWSM therefore emits dictionary-form phones by default---precisely the normalizing behaviour a deviation detector must overcome. % TODO: add a citation for IPAPack++ if a suitable reference is available.
+A model that \emph{detects} mispronunciations must be trained on what the learner actually \emph{produced}, not on the dictionary form of the target word---otherwise it learns to normalize deviations away rather than surface them. This bias originates upstream, in how phonetic foundation models are built: they are trained on \emph{canonical} phonetic transcriptions, and POWSM \cite{powsm} in particular is trained on the IPAPack++ corpus, whose labels are largely produced by \emph{automatic} IPA-transcription methods rather than by humans annotating the surface form they hear. POWSM is therefore, by construction, a canonical transcriber: it was never built to capture accent-level differences or mispronunciations, and emits dictionary-form phones by default---precisely the normalizing behaviour a deviation detector must overcome. This is not a shortcoming peculiar to POWSM: to our knowledge \emph{no} openly available base model performs L2 deviation detection out of the box. It remains an active research area, held back as much by data as by modelling, and the commercial systems that approximate it (e.g.\ ELSA Speak \cite{elsaspeak}) rely on proprietary models and undisclosed data. % TODO: add a citation for IPAPack++ if a suitable reference is available.
 This requirement exposes a real gap in publicly available L2-English data. Most resources provide either canonical phoneme transcriptions or holistic proficiency/accuracy \emph{scores}; neither supplies the produced (perceived) phone sequence a deviation detector needs as a supervision target. L2-ARCTIC \cite{l2arctic} is the rare corpus that annotates both canonical (CPL) and perceived (PPL) phones on identical audio---the property our ablation in Section~\ref{sec:finetuning-method} exploits---but it covers Arabic, Hindi, Korean, Mandarin, Spanish, and Vietnamese first languages, with \emph{no Turkish-native speakers}. speechocean762 \cite{speechocean762} contributes expert phoneme-accuracy scores at scale, but again provides scores rather than a produced transcription and contains no Turkish data.
 
-To our knowledge, no public corpus offers perceived phonetic annotation of Turkish-native English speech. Our project's Turkish data originates from a rich and carefully constructed in-house corpus of Turkish-native English speech, kindly contributed by a collaborating linguist.\footnote{Turkish-native English speech corpus contributed by \"O\u{g}r.\ G\"or.\ Dr.\ Kardelen K\i l\i n\c{c}, Eski\c{s}ehir Technical University, School of Foreign Languages. We gratefully acknowledge this contribution.} Our \emph{first} fine-tuning adapter was trained directly on this corpus. It did not improve mispronunciation detection---not for any want of quality in the data, which is rich and linguistically valuable, but because the issue was one of \emph{fit}: its phonetic annotation follows a canonical, dictionary-oriented convention with a diphthong/glide notation that differs from POWSM's own perceived output convention. As our ablation later confirms (Section~\ref{sec:finetuning-method}), training a deviation detector on canonical-style labels reinforces normalization rather than teaching it to surface what the learner produced. This experience is precisely what motivated the annotation-convention focus of the present work.
+To our knowledge, no public corpus offers perceived phonetic annotation of Turkish-native English speech. Our project's Turkish data originates from a rich and carefully constructed in-house corpus of Turkish-native English speech, kindly contributed by a collaborating linguist.\footnote{Turkish-native English speech corpus contributed by \"O\u{g}r.\ G\"or.\ Dr.\ Kardelen K\i l\i n\c{c}, Eski\c{s}ehir Technical University, School of Foreign Languages. We gratefully acknowledge this contribution.} Our \emph{first} fine-tuning adapter was trained directly on this corpus. It did not improve mispronunciation detection---not for any want of quality in the data, which is rich and linguistically valuable, but because the issue was one of \emph{fit}: its annotation follows a canonical, dictionary-oriented convention rather than recording sounds as produced, errors and all.
 
-For the present version we therefore prepared a small set re-annotated with the phones actually produced, in the model's own convention: four Turkish-native speakers reading thirteen sentences (approximately 52 clips). The set is deliberately small---too small to train a model from scratch---so it is used in two complementary roles: mixed with L2-ARCTIC as in-domain fine-tuning data (the leave-one-speaker-out folds of Section~\ref{sec:finetuning-method}), and as the held-out validation set against which both the baseline and fine-tuned models are measured (Section~\ref{sec:finetuning-results}). This dual use lets a small, carefully annotated set do real work despite the absence of a large public Turkish-L2 resource.
+The single most telling symptom concerns the Turkish close back unrounded vowel \ipa{/ɯ/} (written ``\i'' in Turkish orthography---the vowel of \emph{ka\u{g}\i t} or \emph{bask\i}). This sound does not exist in English, yet Turkish speakers routinely substitute it for the reduced English schwa \ipa{/ə/}---in words such as \emph{counter}, \emph{brother}, or \emph{bubble}---or insert it where no vowel belongs; it was, accordingly, among the most frequent sounds in the recordings we annotated. In the contributed corpus, however, it appeared \emph{exactly zero times}: the annotation had mapped every such sound back to its dictionary English vowel. A second, more mechanical mismatch compounded this---phones with more than one accepted IPA spelling were written differently in the corpus than POWSM emits them (for instance the vowel of \emph{my} as \emph{mai} versus \emph{maj}), so identical sounds counted as errors. Training a deviation detector on labels that erase the very deviations it must learn (and that disagree notationally with the model's own output) reinforces normalization rather than teaching it to surface what the learner produced, as our ablation later confirms (Section~\ref{sec:finetuning-method}). This experience is precisely what motivated the annotation-convention focus of the present work.
+
+For the present version we therefore recorded and annotated a small set ourselves, capturing the phones as actually produced in the model's own convention. Four Turkish-native speakers each read twenty-five sentences (one hundred recordings in total), which we ran through both the baseline and our fine-tuned adapter to confirm the regression behaviour reported in Section~\ref{sec:finetuning-results}. The first thirteen sentences per speaker (approximately fifty-two clips) were then transcribed by a linguist into perceived IPA---the labelling that surfaced the \ipa{/ɯ/} substitution and notation mismatches described above. This annotated subset is small---constrained chiefly by the time and cost of expert phonetic annotation rather than by design, and in any case too small to train a model from scratch---so it is used in two complementary roles: mixed with L2-ARCTIC as in-domain fine-tuning data (the leave-one-speaker-out folds of Section~\ref{sec:finetuning-method}), and as the held-out evaluation set against which both the baseline and fine-tuned models are measured (Section~\ref{sec:finetuning-results}). This lets a small, carefully annotated set do real work despite the absence of a large public Turkish-L2 resource.
 
 \section{Commercial Applications}
 
@@ -256,9 +268,13 @@ We test this with a controlled, same-data, opposite-supervision ablation on the 
     \item \texttt{l2a\_ppl\_tr\_fold1--4} --- L2-ARCTIC PPL plus three of the four annotated Turkish speakers, in a Leave-One-Speaker-Out (LOSO) design, to measure speaker-independently whether a small amount of in-domain Turkish data helps.
 \end{itemize}
 
-Because dev loss is not comparable across different label distributions, models are compared only on held-out behaviour: phone error rate (PER) and substitution recall on a Turkish-native held-out set, deviation recall on L2-ARCTIC, and a native false-positive (drift) rate that a deployable adapter must not inflate. Each adapter was trained for 30 epochs and, after observing that dev loss had not plateaued, re-trained for 60 epochs (\texttt{l2a\_*\_long}); the longer schedule is what sharpens the result (Section~\ref{sec:finetuning-results}). All training and evaluation code, and the adapter artifacts, are available in the project repository \cite{github2024senior}.
+\textbf{Data splits.} Three disjoint roles must be kept separate, and conflating them is a common source of inflated results. (i) The \emph{training} set is what the adapter's weights are fit on---L2-ARCTIC perceived (PPL) utterances, plus three of the four Turkish speakers in the LOSO folds. (ii) A separate \emph{validation} split drives \emph{early stopping}: after each epoch the loss is measured on data the optimizer never updates on, and the lowest-validation-loss checkpoint is kept (\texttt{best/}, patience~5). This validation loss governs only \emph{when to stop training}; it is \emph{not} a quality score and is never reported as one---because the canonical and perceived adapters are trained against different label distributions, their validation losses are not even comparable to one another. (iii) The \emph{evaluation} set is a third, held-out partition used only after training is frozen, and produces every number in Section~\ref{sec:finetuning-results}: the Turkish-native held-out set (and, in the LOSO folds, the left-out speaker the adapter never saw) and the held-out L2-ARCTIC partition. No utterance and no speaker is shared between the training set and the evaluation set.
 
-Alongside this controlled ablation, we scaled the same perceived-label recipe to the full L2-ARCTIC corpus, applying the approach at its largest setting. This run follows the same annotation philosophy---we train exclusively on the perceived (PPL) surface, resolving L2-ARCTIC's \texttt{CPL,PPL,tag} error templates to the sequence a listener actually heard, and never touch the canonical forced-alignment tier---and reuse the same adapter recipe (LoRA, rank~$32$, $\alpha{=}64$, attention projections only). It differs from the ablation above in three deliberate ways: it uses all six L1 groups under a speaker-disjoint, L1-balanced split (twelve speakers train, six validation, six test, for roughly nine hundred held-out utterances), trains for $25$ epochs, and scores raw phone error rate against the perceived labels without the diacritic-folding step. The intent is to test whether the same perceived-label recipe holds on a held-out population an order of magnitude larger than the controlled dev split. The two runs use different splits and metrics, so Section~\ref{sec:finetuning-results} reports them on their own terms rather than on a single shared number.
+Because validation loss is not comparable across different label distributions, models are compared only on this held-out evaluation behaviour: phone error rate (PER) and substitution recall on the Turkish-native set, deviation recall on L2-ARCTIC, and a native false-positive (drift) rate that a deployable adapter must not inflate. Each adapter was trained for 30 epochs and, after observing that validation loss had not plateaued, re-trained for 60 epochs (\texttt{l2a\_*\_long}); the longer schedule is what sharpens the result (Section~\ref{sec:finetuning-results}). All training and evaluation code, and the adapter artifacts, are available in the project repository \cite{github2024senior}.
+
+\textbf{Compute.} Parameter-efficient adaptation keeps the experiment within modest, mostly self-hosted hardware. Data preparation, local development, and the lighter evaluation passes ran on a consumer GPU (NVIDIA GeForce RTX~4060~Ti, 8\,GB); the full adapter sweep and the held-out evaluation matrix ran on a rented RunPod GPU pod when more memory or throughput was needed. The production inference path is unchanged from training: the same fine-tuned adapter is served on the existing RunPod \emph{serverless} GPU endpoint, which scales to zero between requests, so on-demand assessment carries no idle cost.
+
+Alongside this controlled ablation, we scaled the same perceived-label recipe to the full L2-ARCTIC corpus, applying the approach at its largest setting. This run follows the same annotation philosophy---we train exclusively on the perceived (PPL) surface, resolving L2-ARCTIC's \texttt{CPL,PPL,tag} error templates to the sequence a listener actually heard, and never touch the canonical forced-alignment tier---and reuse the same adapter recipe (LoRA, rank~$32$, $\alpha{=}64$, attention projections only). It differs from the ablation above in three deliberate ways: it uses all six L1 groups under a speaker-disjoint, L1-balanced split (twelve speakers train, six validation, six test, for roughly nine hundred held-out utterances), trains for $25$ epochs, and scores raw phone error rate against the perceived labels without the diacritic-folding step. The intent is to test whether the same perceived-label recipe holds on a held-out population an order of magnitude larger than the controlled evaluation split. The two runs use different splits and metrics, so Section~\ref{sec:finetuning-results} reports them on their own terms rather than on a single shared number.
 
 \section{Development Methodology}
 
@@ -274,7 +290,7 @@ For local development, a custom RunPod serverless simulator was implemented to r
 
 \textbf{Proxy Server:} A FastAPI-based proxy server (\texttt{mod/dev/runpod\_proxy.py}) that mimics the RunPod Cloud API, providing endpoints for job submission (\texttt{POST /v2/\{endpoint\_id\}/run}) and status polling (\texttt{GET /v2/\{endpoint\_id\}/status/\{job\_id\}}). The proxy maintains in-memory job state and manages worker queues per endpoint.
 
-\textbf{Worker Containers:} Docker containers for assessment and IPA generation workers, running the same code as production endpoints but accessible locally via Docker Compose networking.
+\textbf{Worker Containers:} A Docker container for the assessment worker, running the same code as the production endpoint but accessible locally via Docker Compose networking.
 
 \textbf{Job Processing:} Background async worker loops pull jobs from per-endpoint queues, ensuring sequential processing that mimics single GPU pod behavior. The simulator handles retries, timeouts, and webhook delivery, providing a faithful representation of RunPod's serverless architecture.
 
@@ -443,39 +459,30 @@ The schema supports the complete ML pipeline and assessment workflow, with prope
 
 The Nounce application provides a modern, intuitive user interface built with Shadcn UI and ElevenLabs UI components. The following screenshots demonstrate key features and workflows of the application. All screenshots are captured in dark mode.
 
-\subsubsection{Home Page}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/screen/nounce-ss-home.png}
-\caption{Home Page - Main landing page with feature overview and navigation}
-\label{fig:ui-home}
-\end{figure}
-
 \subsubsection{Practice Text Selection}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/screen/nounce-ss-practice.png}
+\includegraphics[width=\textwidth]{images/screen/v2-practice-1.png}
 \caption{Practice Text Selection - Browse and filter practice texts by difficulty and category}
 \label{fig:ui-practice-selection}
 \end{figure}
 
-\subsubsection{Recording Interface}
+\subsubsection{Reference Speaker Selection}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/screen/nounce-ss-recording.png}
-\caption{Recording Interface - Browser-based audio recording with real-time waveform visualization (dark mode)}
-\label{fig:ui-recording}
+\includegraphics[width=\textwidth]{images/screen/v2-practice-author-select.png}
+\caption{Reference Speaker Selection - Choosing among native reference recordings (General American / Received Pronunciation) for a practice text}
+\label{fig:ui-author-select}
 \end{figure}
 
 \subsubsection{Analysis Results}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/screen/nounce-ss-analysis.png}
-\caption{Analysis Results - Detailed pronunciation feedback with phoneme and word-level error visualization}
+\includegraphics[width=\textwidth]{images/screen/v2-analysis.png}
+\caption{Analysis Results - Per-phone pronunciation feedback with feature-aware error visualization and goodness-of-pronunciation colouring}
 \label{fig:ui-analysis}
 \end{figure}
 
@@ -483,8 +490,8 @@ The Nounce application provides a modern, intuitive user interface built with Sh
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/screen/nounce-ss-summary.png}
-\caption{Progress Dashboard - User statistics and error analysis over time}
+\includegraphics[width=\textwidth]{images/screen/v2-summary-aggregate.png}
+\caption{Progress Dashboard - Aggregated user statistics and most-challenging-sounds analysis over time}
 \label{fig:ui-summary}
 \end{figure}
 
@@ -492,7 +499,7 @@ The Nounce application provides a modern, intuitive user interface built with Sh
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{images/screen/nounce-ss-learn.png}
+\includegraphics[width=\textwidth]{images/screen/v2-learn.png}
 \caption{Educational Content - IPA and English phonology learning materials}
 \label{fig:ui-learn}
 \end{figure}
@@ -501,18 +508,23 @@ The Nounce application provides a modern, intuitive user interface built with Sh
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{admin-img.png}
+\includegraphics[width=\textwidth]{images/screen/v2-admin.png}
 \caption{Admin Interface - Content management for practice texts and reference speeches}
 \label{fig:ui-admin}
 \end{figure}
 
-\subsubsection{Mobile View}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/screen/v2-admin-stats.png}
+\caption{Admin Analytics - Platform-wide metrics: score distribution, activity, and common phoneme errors}
+\label{fig:ui-admin-stats}
+\end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{images/screen/nounce-ss-mobile-view-practice.png}
-\caption{Mobile View - Practice text selection on mobile devices}
-\label{fig:ui-mobile}
+\includegraphics[width=\textwidth]{images/screen/v2-admin-jobs.png}
+\caption{Admin Job Monitoring - Status of asynchronous assessment jobs (completed, pending, processing, failed)}
+\label{fig:ui-admin-jobs}
 \end{figure}
 
 
@@ -566,20 +578,22 @@ Reference pronunciations are human native recordings in both General American an
 
 \subsection{Machine Learning Services}
 
-The machine learning pipeline is implemented as separate RunPod serverless endpoints in the \texttt{mod/} directory:
+The machine learning pipeline is implemented as a \emph{single} RunPod serverless endpoint in the \texttt{mod/} directory---the prototype's second (G2P/IPA-generation) endpoint was removed (Section~\ref{sec:v1-vs-v2}), leaving one assessment worker for the entire inference path:
 
 \textbf{Assessment Endpoint:} The pronunciation assessment service (\texttt{mod/assessment/}) is built around POWSM \cite{powsm} and its CTC encoder, and replaces several prototype components:
 \begin{itemize}
     \item \textbf{Phone recognition:} POWSM CTC free alignment transcribes the IPA phones the learner actually produced, with real frame-level timestamps.
-    \item \textbf{Forced alignment:} the reference phone sequence is force-aligned to the audio, also via POWSM's CTC path. This replaces the prototype's Montreal Forced Aligner and gives a single, consistent phone inventory across recognition and alignment instead of two tools with different inventories.
+    \item \textbf{Forced alignment:} the reference phone sequence is force-aligned to the audio, also via POWSM's CTC path---a CTC aligner whose frame parameters are read from the loaded model rather than hard-coded. This replaces the prototype's Montreal Forced Aligner (which was painful to containerize and dependency-manage) and gives a single, consistent phone inventory across recognition and alignment instead of two tools with different inventories. The CTC stride caps timing precision at $40$\,ms, which usability testing found acceptable for phone-level feedback.
     \item \textbf{Audio-quality abstention:} a Silero voice-activity stage plus signal-quality checks (SNR, clipping) reject no-speech, noisy, or wrong-sentence recordings, returning an explained abstention rather than a misleading score.
-    \item \textbf{Feature-aware difference:} produced and target phones are compared with an articulatory feature-vector distance (PanPhon) rather than exact-match edit distance, so a near-miss (e.g.\ a voicing-only swap) is treated as closer than a gross substitution. The same feature distance drives both the difference visualization and the learner-facing feedback.
+    \item \textbf{Feature-aware difference:} produced and target phones are compared with an articulatory feature-vector distance (PanPhon \cite{panphon}) rather than exact-match edit distance, so a near-miss is treated as closer than a gross substitution. This makes the difference algorithm more consistent and interpretable---it will not, for example, pair a vowel with a distant consonant when a nearby vowel is available, since the feature distance favours the plausible substitution---and it also drives the learner-facing feedback: when the deviation reduces to a single feature, the system can name it (a laxness/tenseness difference, as between \emph{sheep} \ipa{/iː/} and \emph{ship} \ipa{/ɪ/}, or a voicing difference, as between \ipa{/b/} and \ipa{/p/}, where vocal-fold vibration is the only distinguishing feature). The same feature distance powers both the visualization and the explanation.
     \item \textbf{Goodness-of-Pronunciation (GOP):} per-phone GOP and entropy are computed directly from the CTC posteriors, supporting confidence-aware, colour-coded feedback.
 \end{itemize}
 
-Because the reference phones are precomputed and supplied with each request, the GPU worker is stateless (it never re-aligns the reference). The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays.
+Because the reference phones are precomputed and supplied with each request, the GPU worker is stateless (it never re-aligns the reference). We build that reference data ourselves and ingest it into the database directly: for every reference utterance we run the assessment model offline to produce its IPA phone sequence and frame-level phone timings, pair these with the human native recording, and write the result into the reference table (consumed at request time via the application's data-access layer, never recomputed on the GPU). This self-curated, model-matched reference set is what lets a single stateless endpoint serve the whole pipeline---there is no live G2P or alignment service to call. The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays.
 
-\textbf{Decommissioned G2P endpoint.} The prototype ran a separate Grapheme-to-Phoneme endpoint (\texttt{mod/ipa\_generation/}) to derive target IPA from text. This was removed in the present version: reference phones are computed once, offline, with the assessment model's own alignment, eliminating a second model load and a cross-model phone-inventory mismatch that had inflated error counts.
+\textbf{Decommissioned G2P endpoint --- one task (PR) everywhere.} The prototype derived reference phones with a Grapheme-to-Phoneme (G2P) endpoint (\texttt{mod/ipa\_generation/}) while transcribing the learner's audio with Phone Recognition (PR). The two paths were not comparable: G2P is conditioned on the written sentence (the graphemes), not the acoustics, so it produced dictionary-leaning targets, whereas PR transcribes what was actually said; biased toward different conventions, comparing one against the other inflated the false-positive rate. The present version uses \emph{PR for every task}---both the reference and the learner pass through the same recogniser and the same phone inventory---and computes reference phones once, offline, with the assessment model's own alignment. This removes a second model load, eliminates the cross-model bias, and is the change most responsible for the reduced spurious-error rate.
+
+\textbf{Reference audio --- synthetic to human.} The prototype generated reference pronunciations with text-to-speech (ElevenLabs). Beyond the methodological and ethical awkwardness of judging human speech against a synthetic target---a compromise made only under V1's resource limits---acoustic models sometimes produced gibberish IPA when transcribing machine-generated voices, a known failure mode for synthetic audio. For the present version we sourced native speakers online and had them record the twenty-five reference sentences, giving clean, real target audio.
 
 \subsection{Signal Processing and Experiments}
 
@@ -605,6 +619,8 @@ An administrative analytics dashboard was developed to provide platform-wide ins
 \textbf{User Activity Page:} Presents a paginated table of all users with their recording counts, analysis counts, average scores, and last active timestamps, enabling administrators to monitor user engagement.
 
 The dashboard is built using the same technology stack as the rest of the application: Drizzle ORM aggregation queries for data retrieval, TanStack Server Functions for the API layer, and TanStack Query for client-side data fetching and caching.
+
+Separately, and as part of a TÜBİTAK project rather than the CMPE492 deliverable, an instructor / data-scientist panel is in progress: it will let linguists inspect learner recordings alongside the system's automatic phone annotations, suggest corrections, and download the data in bulk. This panel is the operational front end of the expert-in-the-loop data-collection loop discussed in Section~\ref{sec:future-work}; it is not yet complete and is reported here only as in-progress infrastructure for future research.
 
 \subsection{User Progress and Summary Page}
 
@@ -676,7 +692,7 @@ Table~\ref{table:ftAblation} compares the baseline POWSM against the canonical- 
 
 \begin{table}[htbp]
 \vskip\baselineskip
-\caption[Annotation-convention fine-tuning ablation]{Canonical vs.\ perceived fine-tuning, 30 vs.\ 60 epochs. TR = Turkish-native held-out set; L2A = L2-ARCTIC held-out dev set. Native FPR is drift on correct native speech (lower is better).}
+\caption[Annotation-convention fine-tuning ablation]{Canonical vs.\ perceived fine-tuning, 30 vs.\ 60 epochs. TR = Turkish-native held-out set; L2A = held-out L2-ARCTIC evaluation set. Native FPR is drift on correct native speech (lower is better).}
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|c|} \hline
 \textbf{Model} & \textbf{TR-PER} & \textbf{TR sub-rec.} & \textbf{Native FPR} & \textbf{L2A PER/PPL} & \textbf{L2A dev-rec.} \\\hline
@@ -692,36 +708,61 @@ base POWSM & 0.435 & 0.033 & 0.003 & 0.240 & 0.173 \\\hline
 
 The result confirms the hypothesis, and sharpens with training budget. At 30 epochs the canonical adapter is a \emph{no-op}: \texttt{l2a\_cpl} matches the baseline's deviation recall exactly ($0.173$), because the base model already emits canonical-leaning phones and canonical supervision teaches it nothing new. At 60 epochs the canonical adapter \emph{actively harms}: \texttt{l2a\_cpl\_long} deviation recall drops \emph{below} base ($0.163 < 0.173$) as the model normalizes harder and loses produced deviations. The perceived adapter moves in the opposite direction: \texttt{l2a\_ppl\_long} reaches $0.213$ deviation recall and is the only model to beat base on both Turkish PER ($0.392$) and Turkish substitution recall ($0.057$ vs.\ $0.033$). The cpl-vs-ppl gap widens roughly four-fold between the two budgets---identical audio, opposite supervision, diverging behaviour. The cost of the longer schedule is increased native drift (FPR $0.024$ vs.\ $0.003$ for base); \texttt{l2a\_ppl\_long} is deployed as the production model, accepting this drift for materially better learner-deviation detection. The LOSO arm (adding three Turkish speakers) gives a modest, high-variance speaker-independent gain (mean PER $0.421$, range $0.402$--$0.455$).
 
-% TODO: replace the [TODO] figure placeholders below with the rendered PNGs from
-% artifacts/eval/figs/ (copy them into doc/report/images/). cpl_vs_ppl.png and
-% l2arctic_cpl_vs_ppl.png are the headline figures.
-\textbf{[TODO: insert figure \texttt{artifacts/eval/figs/l2arctic\_cpl\_vs\_ppl.png} (per-L1 deviation recall, cpl vs ppl) into \texttt{doc/report/images/}.]}
+Figure~\ref{fig:cpl-vs-ppl} makes the headline contrast visual: at the 60-epoch budget, canonical supervision pulls deviation recall \emph{below} the baseline while perceived supervision pushes it clearly above. Figure~\ref{fig:recall-budget} shows the same metric across both training budgets, where the canonical and perceived adapters---trained on identical audio---visibly diverge as the budget grows.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/l2arctic_cpl_vs_ppl_long.png}
+\caption[Canonical vs.\ perceived supervision, deviation recall]{L2-ARCTIC deviation recall (60 epochs): baseline, the canonical-label adapter (\texttt{l2a\_cpl\_long}), and the perceived-label adapter (\texttt{l2a\_ppl\_long}). Canonical supervision falls below base ($0.163 < 0.173$); perceived supervision rises to $0.213$. Same audio, opposite supervision target.}
+\label{fig:cpl-vs-ppl}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/deviation_recall_by_budget.png}
+\caption[Deviation recall by training budget]{L2-ARCTIC deviation recall at 30 vs.\ 60 epochs. The canonical and perceived adapters separate further as the budget grows---canonical drifting down, perceived up---while the baseline (dashed) is unchanged.}
+\label{fig:recall-budget}
+\end{figure}
 
 \subsection{Human-Judgment Validation}
 
-To confirm that the system's pronunciation score tracks human perception, native English raters score each Turkish-learner clip for intelligibility (0--10) through a blind rating interface (Figure~\ref{fig:intelligibility-ui}), and we correlate the mean human rating against the system score via Spearman's $\rho$. On the first rater's submission (24 scored clips), $\rho = 0.45$, a moderate-to-strong positive correlation indicating the system meaningfully tracks human judgment.
+To assess whether the system's pronunciation score tracks human perception, native English raters score each Turkish-learner clip for intelligibility (0--10) through a blind rating interface (Figure~\ref{fig:intelligibility-ui}), and we correlate the mean human rating against the system score via Spearman's $\rho$. With two raters and 24 jointly-scored clips, $\rho = 0.37$ between the system score and the mean human rating---a positive but only moderate association, visible as a loose upward trend in Figure~\ref{fig:scatter-system-human}.
 
 \begin{figure}[H]
 \centering
 % TODO: capture a screenshot of the /intelligibility-score blind rating page and
-% save it to doc/report/images/screen/nounce-ss-intelligibility.png, then replace
-% the fbox below with: \includegraphics[width=\textwidth]{images/screen/nounce-ss-intelligibility.png}
+% save it to doc/report/images/screen/v2-intelligibility.png, then replace
+% the fbox below with: \includegraphics[width=\textwidth]{images/screen/v2-intelligibility.png}
 \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering \textbf{[TODO: app screenshot]}\\ Blind intelligibility-rating interface (\texttt{/intelligibility-score}): per-clip 0--10 scale, progress dots, audio playback.}}
 \caption{The blind human-rating interface used in the validation study.}
 \label{fig:intelligibility-ui}
 \end{figure}
 
-\textbf{[TODO: this $\rho = 0.45$ is preliminary (1 rater, 24 clips). Re-run \texttt{sig/analysis/validation.py} after $\geq$2 raters submit; report the final $\rho$, Krippendorff's $\alpha$ inter-rater agreement, and insert the scatter plot \texttt{doc/figures/scatter\_system\_vs\_human.png}.]}
+The two raters themselves agree only weakly, however: their pairwise Spearman correlation is $0.16$ and Krippendorff's $\alpha$ (interval metric) is $0.11$, far below the $0.667$ threshold conventionally taken as a floor for tentative reliability. This is the more important finding of the study in its current form. Intelligibility is a genuinely subjective judgment, and with only two raters over a small clip set the human ``ground truth'' is itself noisy; a system-vs-human correlation cannot exceed what the humans share with each other. We therefore read $\rho = 0.37$ as encouraging but preliminary evidence that the score points in the right direction, not as a validated agreement figure. The clear next step---and the chief bottleneck for substantiating the system's pedagogical claims---is to recruit more raters (so the mean human rating stabilizes and $\alpha$ becomes interpretable) and to broaden the clip set beyond a single speaker. The analysis is fully scripted (\texttt{sig/analysis/validation.py}, pure-stdlib statistics) and re-runs automatically as additional rater submissions land, so this figure is expected to firm up without further engineering.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/scatter_system_vs_human.png}
+\caption[System score vs.\ mean human intelligibility]{System pronunciation score against mean human intelligibility rating (0--10) across the 24 jointly-rated clips. Spearman's $\rho = 0.37$. The loose upward cloud reflects both a real positive association and the weak inter-rater agreement ($\alpha = 0.11$) that bounds it.}
+\label{fig:scatter-system-human}
+\end{figure}
 
 \subsection{External Benchmark Validation (speechocean762)}
 
 As an independent, large-scale check, we evaluate the system's Goodness-of-Pronunciation (GOP) score against expert human phoneme-accuracy labels on the standard speechocean762 benchmark \cite{speechocean762} (2{,}500 held-out utterances, 47{,}369 phones, Mandarin-L1). Mean GOP rises monotonically with the human accuracy label ($-6.80$, $-4.65$, $-1.37$ for accuracy $0$, $1$, $2$), and Spearman's $\rho$ is $0.21$ at the phone level and $0.37$ at the sentence level. This confirms, on a recognized public benchmark and a different L1, that the GOP component tracks human pronunciation judgment; it complements (rather than replaces) the Turkish-specific study.
 
-\textbf{[TODO: insert the GOP-vs-accuracy box plot \texttt{artifacts/speechocean/figs/gop\_vs\_accuracy.png}.]}
+The monotonic rise is shown in Figure~\ref{fig:gop-accuracy}: GOP distributions shift upward as the expert accuracy label increases from $0$ to $2$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/gop_vs_accuracy.png}
+\caption[GOP vs.\ expert accuracy on speechocean762]{POWSM Goodness-of-Pronunciation against expert phoneme-accuracy labels on speechocean762 (2{,}500 utterances, 47{,}369 phones). Median GOP rises monotonically with the human accuracy score; phone-level Spearman's $\rho = 0.21$.}
+\label{fig:gop-accuracy}
+\end{figure}
 
 \subsection{Scaling the Perceived-Label Fine-Tune to Full L2-ARCTIC}
 
-The full-corpus perceived-label fine-tune described in Section~\ref{sec:finetuning-method} applies the same convention to a held-out population roughly an order of magnitude larger than the controlled dev split. Evaluated on its own protocol---a six-L1, speaker-disjoint test set ($\approx$900 utterances), greedy decoding, and raw PER against the perceived labels---the adapter lowers phone error rate from a baseline of $0.388$ to $0.192$, a $19.5$~percentage-point reduction that holds in \emph{every one} of the six first-language groups (Table~\ref{table:l2aFullPerL1}). On this protocol the per-phone breakdown moves in the expected direction, with the largest error reductions on exactly the segments that distinguish L2 from native English---the American rhotic ``r'', the reduced schwa, the lax vowels of \emph{bit} and \emph{cat}, and the glide ``w''. Read at face value this is a strong, uniform gain; the qualification below is that the gain does not transfer cleanly to the project's stricter, folding-aware evaluation.
+The full-corpus perceived-label fine-tune described in Section~\ref{sec:finetuning-method} applies the same convention to a held-out population roughly an order of magnitude larger than the controlled evaluation split. Evaluated on its own protocol---a six-L1, speaker-disjoint test set ($\approx$900 utterances), greedy decoding, and raw PER against the perceived labels---the adapter lowers phone error rate from a baseline of $0.388$ to $0.192$, a $19.5$~percentage-point reduction that holds in \emph{every one} of the six first-language groups (Table~\ref{table:l2aFullPerL1}). On this protocol the per-phone breakdown moves in the expected direction, with the largest error reductions on exactly the segments that distinguish L2 from native English---the American rhotic \ipa{/ɹ/} ($705 \rightarrow 161$ errors), the reduced schwa \ipa{/ə/} ($1100 \rightarrow 447$) and the lax vowels \ipa{/ɪ/} ($889 \rightarrow 352$) and \ipa{/æ/} ($394 \rightarrow 148$), and the glide \ipa{/w/} ($641 \rightarrow 167$). Read at face value this is a strong, uniform gain; the qualification below is that the gain does not transfer cleanly to the project's stricter, folding-aware evaluation.
 
 \begin{table}[h]
 \centering
@@ -739,11 +780,11 @@ Vietnamese & 0.459 & 0.218 & $-24.1$ \\\hline
 \end{tabular}
 \end{table}
 
-Table~\ref{table:l2aFullPerL1} is measured on the full-corpus run's own protocol---its $\approx$900-utterance six-L1 test split, greedy decoding, and raw (unfolded) PER against the labels the adapter was trained to emit. To place this adapter on the same axis as the controlled ablation, we also scored it through the project's standard harness (folded phone identity, free recognition, the held-out Turkish set, the 600-utterance L2-ARCTIC dev split, and the native-drift probe), exactly as for \texttt{l2a\_ppl\_long}. On those shared metrics the picture is more nuanced (Table~\ref{table:l2aFullShared}). The full-corpus adapter attains the \emph{highest} deviation recall of any model we trained ($0.362$, more than double the baseline's $0.173$) and the highest Turkish substitution recall ($0.131$); it is unambiguously the most sensitive deviation detector. But that sensitivity comes from transcribing aggressively: on the standard dev split its phone error rate against the perceived labels \emph{rises} above baseline ($0.328$ vs.\ $0.240$), per-phone error counts grow rather than shrink on the dominant vowels (lax-i $273 \rightarrow 951$, the \emph{book} vowel $106 \rightarrow 472$), and---most consequentially for a deployed system---its native false-positive rate reaches $0.203$, meaning it would flag roughly one in five \emph{correctly} pronounced native phones as an error.
+Table~\ref{table:l2aFullPerL1} is measured on the full-corpus run's own protocol---its $\approx$900-utterance six-L1 test split, greedy decoding, and raw (unfolded) PER against the labels the adapter was trained to emit. To place this adapter on the same axis as the controlled ablation, we also scored it through the project's standard harness (folded phone identity, free recognition, the held-out Turkish set, the 600-utterance held-out L2-ARCTIC evaluation split, and the native-drift probe), exactly as for \texttt{l2a\_ppl\_long}. On those shared metrics the picture is more nuanced (Table~\ref{table:l2aFullShared}). The full-corpus adapter attains the \emph{highest} deviation recall of any model we trained ($0.362$, more than double the baseline's $0.173$) and the highest Turkish substitution recall ($0.131$); it is unambiguously the most sensitive deviation detector. But that sensitivity comes from transcribing aggressively: on the held-out evaluation split its phone error rate against the perceived labels \emph{rises} above baseline ($0.328$ vs.\ $0.240$), per-phone error counts grow rather than shrink on the dominant vowels (\ipa{/ɪ/} $273 \rightarrow 951$, \ipa{/ʊ/} $106 \rightarrow 472$), and---most consequentially for a deployed system---its native false-positive rate reaches $0.203$, meaning it would flag roughly one in five \emph{correctly} pronounced native phones as an error.
 
 \begin{table}[h]
 \centering
-\caption[Full-corpus adapter on the shared evaluation axis]{The full-corpus adapter (\texttt{l2a\_ppl\_full}) scored through the project's standard harness, alongside the baseline and the deployed \texttt{l2a\_ppl\_long}, so all three sit on one axis (cf.\ Table~\ref{table:ftAblation}). TR = Turkish-native held-out set; L2A = L2-ARCTIC dev set; native FPR is drift on correct native speech (lower is better).}
+\caption[Full-corpus adapter on the shared evaluation axis]{The full-corpus adapter (\texttt{l2a\_ppl\_full}) scored through the project's standard harness, alongside the baseline and the deployed \texttt{l2a\_ppl\_long}, so all three sit on one axis (cf.\ Table~\ref{table:ftAblation}). TR = Turkish-native held-out set; L2A = held-out L2-ARCTIC evaluation set; native FPR is drift on correct native speech (lower is better).}
 \label{table:l2aFullShared}
 \begin{tabular}{|l|c|c|c|c|c|} \hline
 \textbf{Model} & \textbf{TR-PER} & \textbf{TR sub-rec.} & \textbf{Native FPR} & \textbf{L2A PER/PPL} & \textbf{L2A dev-rec.} \\\hline
@@ -753,7 +794,14 @@ base POWSM & 0.435 & 0.033 & 0.003 & 0.240 & 0.173 \\\hline
 \end{tabular}
 \end{table}
 
-The two evaluations of the same adapter therefore diverge, and the divergence is itself informative. On its own protocol the full-corpus run shows a large, uniform PER improvement; on the shared, folding-aware protocol with a native-drift probe it reads as a high-recall, low-precision detector that over-fires. Both readings are consistent with the central convention claim---perceived-label supervision teaches the model to surface produced deviations rather than normalize them---but they part company on \emph{deployability}. A pronunciation tutor that mislabels a fifth of correct native speech would erode user trust, so the deployed model remains \texttt{l2a\_ppl\_long}, which captures most of the deviation-detection gain (recall $0.213$ vs.\ base $0.173$, and the best Turkish PER of any adapter) at a native false-positive rate an order of magnitude lower ($0.024$ vs.\ $0.203$). The full-corpus adapter is retained as an evaluation reference that maps the recall-versus-precision frontier, not as a production candidate. The practical lesson reinforces the thesis from a new direction: the supervision convention determines \emph{whether} a model detects deviations, but the training budget and corpus breadth govern \emph{how aggressively}---and a usable tutor must sit on the conservative side of that trade-off.
+The two evaluations of the same adapter therefore diverge, and the divergence is itself informative. On its own protocol the full-corpus run shows a large, uniform PER improvement; on the shared, folding-aware protocol with a native-drift probe it reads as a high-recall, low-precision detector that over-fires. Both readings are consistent with the central convention claim---perceived-label supervision teaches the model to surface produced deviations rather than normalize them---but they part company on \emph{deployability}. A pronunciation tutor that mislabels a fifth of correct native speech would erode user trust, so the deployed model remains \texttt{l2a\_ppl\_long}, which captures most of the deviation-detection gain (recall $0.213$ vs.\ base $0.173$, and the best Turkish PER of any adapter) at a native false-positive rate an order of magnitude lower ($0.024$ vs.\ $0.203$). The full-corpus adapter is retained as an evaluation reference that maps the recall-versus-precision frontier, not as a production candidate. The practical lesson reinforces the thesis from a new direction: the supervision convention determines \emph{whether} a model detects deviations, but the training budget and corpus breadth govern \emph{how aggressively}---and a usable tutor must sit on the conservative side of that trade-off. Figure~\ref{fig:frontier} plots this directly: the highest-recall adapter sits well outside the deployable band, while \texttt{l2a\_ppl\_long} captures most of the recall gain at a tolerable drift.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/recall_vs_fpr_frontier.png}
+\caption[Deviation recall vs.\ native drift]{Deviation recall against native false-positive rate for the baseline, the deployed \texttt{l2a\_ppl\_long}, and the full-corpus \texttt{l2a\_ppl\_full}. The shaded band marks a usable native-drift budget (FPR $<0.05$); the highest-recall adapter falls far outside it, which is why the deployed model is the more conservative \texttt{l2a\_ppl\_long}.}
+\label{fig:frontier}
+\end{figure}
 
 \section{System Implementation Status}
 
@@ -944,8 +992,13 @@ The POWSM \cite{powsm} model operates in a hybrid space between phonemic and pho
 Nounce is designed exclusively for English to streamline initial development and ensure high-quality pronunciation assessment. Future development can expand support to additional languages, but this requires significant model adaptation, dictionary resources, and acoustic model training for each target language.
 
 \subsection{Future Directions}
+\label{sec:future-work}
 
-\textbf{Scaling the Turkish-L1 adaptation:} This work already fine-tuned POWSM for Turkish-native speakers and showed that perceived-label adaptation improves mispronunciation detection (Section~\ref{sec:finetuning-results}). The clearest next step is to scale the perceived-annotated Turkish data well beyond the current small set---the chief bottleneck being expert phonetic annotation in the model's convention---and to reduce the native-speech drift introduced by longer fine-tuning. Broadening the human-rating validation (more raters and speakers) is the other resource-bound priority, since it is what most directly substantiates the system's pedagogical claims.
+\textbf{A perceived-annotated L2 corpus---the single most important win:} The recurring constraint throughout this project was not modelling but \emph{data}. Every result in Section~\ref{sec:finetuning-results} rests on the scarcity established in Section~\ref{sec:data-gap}: public L2-English resources supply canonical transcriptions or holistic scores, but almost none supply the \emph{perceived} (produced) phone sequence in a model's own output convention---the one supervision signal a deviation detector actually needs. The clearest, highest-leverage future direction is therefore to build that corpus: L2 English speech, broad in first-language coverage and speaker count, annotated with the phones listeners actually hear. This is the bottleneck the entire approach is gated on; with such a corpus the perceived-label recipe demonstrated here would scale directly, and the small native-speech drift introduced by longer fine-tuning could be controlled with held-out native data. Broadening the human-rating validation (more raters and speakers) is the companion priority, since inter-rater agreement currently bounds what the system-vs-human correlation can show (Section~\ref{sec:finetuning-results}).
+
+\textbf{Per-accent adapters:} Parameter-efficient adaptation makes it cheap to maintain a \emph{family} of small adapters---one per first-language accent (Turkish, Arabic, Mandarin, \ldots)---over a single frozen POWSM backbone, selected at request time by the learner's stated L1. Each adapter need only capture that accent's characteristic substitution patterns; the shared backbone and the serverless deployment keep the cost of hosting many adapters low. This generalizes the present Turkish-specific result into a scalable, accent-aware detector without retraining a model per language.
+
+\textbf{Expert-in-the-loop data collection---an industry-standard flywheel:} The most sustainable path to the corpus above is to gather it through the application itself. With user consent, learner recordings and the system's automatic phone annotations would be surfaced to expert linguists who correct the annotations in the model's convention; the corrected pairs become new perceived-label training data, which improves the adapters, which improves the automatic annotations the experts start from. Turning the product into a labelled-data-collection tool---a human-in-the-loop labelling flywheel---is the standard industry approach to exactly this kind of scarce-annotation problem, and it directly attacks the bottleneck identified above while continuously improving the deployed model. A first step toward this is already under way: as part of a TÜBİTAK project, we are building an instructor / data-scientist panel through which linguists can review learner recordings and the system's automatic annotations, propose corrections, and export the data in bulk. It is not part of the CMPE492 deliverable and is not yet complete, but it is the concrete mechanism by which the Turkish-L2 corpus this field lacks could begin to be assembled.
 
 \textbf{Language Expansion:} Nounce is designed exclusively for English to streamline initial development and ensure high-quality pronunciation assessment. Future development can expand support to additional languages, but this requires significant model adaptation, dictionary resources, and acoustic model training for each target language.
 
