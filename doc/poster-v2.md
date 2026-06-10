@@ -73,8 +73,11 @@ from. We bridge it with **L2-ARCTIC** (canonical + perceived on identical audio)
 a small expert-annotated Turkish set.
 
 ### Visual Placeholder
-[GRAPHIC: canonical vs perceived] Same waveform, two transcripts — the dictionary
-form vs. what a listener actually hears — with the differing phones highlighted.
+[GRAPHIC: canonical vs perceived — **reuse the V1 poster's phone/phoneme diagram**]
+The V1 poster's `one /wʌn/ → [wʌn] [wʌŋ] [wʌn̪]` graphic is already a perfect
+explainer: relabel the dictionary form **canonical** and the realizations
+**perceived**, highlight the differing phones in the red/blue scheme. Visual
+continuity with V1, zero new asset work.
 
 ---
 
@@ -108,6 +111,18 @@ training/eval sweep; the existing **serverless** endpoint (scales to zero) for
 on-demand inference.
 
 **Data layer** — Neon PostgreSQL · Cloudflare R2 · Docker.
+
+### "What changed since the prototype" delta table
+Converts V1's *Limitations* column into V2's narrative spine — exactly what a
+senior-project jury wants to see:
+
+| V1 prototype (CMPE491) | V2 |
+| --- | --- |
+| MFA for timestamps | POWSM CTC forced alignment (one model, one phone inventory) |
+| Two endpoints (G2P + PR) | One stateless worker |
+| Exact-match phone diff | PanPhon articulatory feature distance |
+| Scores any audio | Abstains on no-speech / noise / wrong sentence (VAD + SNR) |
+| Off-the-shelf POWSM | + Turkish-deviation-aware LoRA adapter (deployed) |
 
 ### Visual Placeholder
 [DIAGRAM: System Architecture]
@@ -148,6 +163,13 @@ audio, opposite supervision target."
 [CHART B — inset] `doc/report/figures/deviation_recall_by_budget.png`
 Caption: "The contrast widens from 30 → 60 epochs."
 
+[CHART C — frontier inset] `doc/report/figures/recall_vs_fpr_frontier.png`
+Recall-vs-native-FPR scatter, three points: base (0.173 / 0.003), deployed
+`l2a_ppl_long` (0.213 / 0.024), full-corpus `l2a_ppl_full` (0.362 / 0.203), with a
+shaded "usable region" (FPR < 0.05). One glance explains why the highest-recall
+adapter is *not* the deployed one — a tutor that flags 1-in-5 correct native phones
+erodes trust. Strongest talking-point hook on the poster.
+
 ---
 
 ## Section 5: Validation & Future Work (Column 4)
@@ -162,7 +184,9 @@ weak (Krippendorff α = **0.11**), so the human ground truth itself is noisy wit
 few raters. Reported honestly; more raters is the bottleneck.
 
 **Public benchmark (speechocean762, 47k phones):** GOP rises monotonically with
-expert accuracy, ρ = **0.21** — the score generalizes to a different L1.
+expert accuracy, ρ = **0.21** phone-level, **0.37 sentence-level** — the score
+generalizes to a different L1. (The sentence-level 0.37 mirrors the human study's
+0.37 — memorable symmetry, quote both.)
 
 ### Visual Placeholders
 [CHART: GOP vs accuracy] `doc/report/figures/gop_vs_accuracy.png`
@@ -222,6 +246,21 @@ GitHub: github.com/umitcan07/senior · Live demo: [QR Code]
 > Reuse the cpl-vs-ppl chart colours (perceived = blue, canonical = red) consistently
 > across the poster so the finding reads at a glance.
 
+### Continuity with the V1 poster
+Keep the V1 visual identity so anyone who saw the V1 poster reads the progression
+instantly: nounce wordmark/branding, the `nounce.pro` QR, the red/blue
+(canonical/perceived) accent palette already used in the report charts, and ideally
+the same running example sentence — **"She regularly exercises at the gym."**
+(reference IPA `ʃiɹɛɡjələ˞liɛksə˞saɪzəzætðətʃɪm`) — as the UI screenshot, so the
+phone-level analysis is the visible bridge from V1's app tour to V2's finding. Use
+whatever deviation the live analysis actually produces for the screenshot rather
+than a scripted one.
+
+> Note: the V1 phone-vs-phoneme explainer graphic (the `/wʌn/ → [wʌn] [wʌŋ] …`
+> diagram) is **not a committed repo asset** — it lives in the V1 poster source.
+> Recreate/relabel it (canonical vs perceived, red/blue) in the poster tool; it is
+> not auto-generated like the result charts.
+
 ### Typography
 | Element         | Font           | Size  |
 | --------------- | -------------- | ----- |
@@ -242,8 +281,10 @@ GitHub: github.com/umitcan07/senior · Live demo: [QR Code]
 | Boğaziçi University Logo           | Institutional site                                    |
 | cpl-vs-ppl recall chart (headline) | `doc/report/figures/l2arctic_cpl_vs_ppl_long.png`     |
 | recall-by-budget chart             | `doc/report/figures/deviation_recall_by_budget.png`   |
+| recall-vs-FPR frontier inset       | Create (3 points: base / deployed / full-corpus)      |
 | GOP-vs-accuracy box plot           | `doc/report/figures/gop_vs_accuracy.png`              |
 | system vs human scatter            | `doc/report/figures/scatter_system_vs_human.png`      |
+| phone/phoneme (canonical vs perceived) graphic | Adapt from V1 poster (`one /wʌn/` diagram) |
 | Recording UI screenshot            | `doc/report/images/screen/nounce-ss-recording.png`    |
 | Intelligibility-rating screenshot  | `doc/report/images/screen/nounce-ss-intelligibility.png` |
 | System Architecture Diagram        | Create (Figma/Draw.io)                                |
@@ -259,10 +300,10 @@ GitHub: github.com/umitcan07/senior · Live demo: [QR Code]
 | Problem & Data Gap            | 110   |
 | System & Architecture         | 150   |
 | The Finding                   | 120   |
-| Validation                    | 90    |
+| Validation                    | 100   |
 | Future Work                   | 110   |
 | Footer & References           | 45    |
-| **Total**                     | ~650  |
+| **Total**                     | ~660  |
 
 ✓ Within 300–800 word guideline
 
@@ -284,8 +325,8 @@ labels over identical audio, it improves. The contrast widens with training budg
 
 ### 3. What can I add in the talk?
 - **Live demo**: record speech, show real-time per-phone feedback.
-- **The recall/precision trade-off**: why we deployed the *focused* adapter, not the
-  highest-recall one (native FPR 0.20 vs 0.024).
+- **The recall/precision trade-off**: walk the frontier inset (Chart C) — why we
+  deployed the *focused* adapter, not the highest-recall one (native FPR 0.20 vs 0.024).
 - **Honest validation**: ρ=0.37 with α=0.11 — what weak inter-rater agreement means
   and why more raters is the priority.
 - **The data flywheel**: how an expert-in-the-loop app would solve the corpus

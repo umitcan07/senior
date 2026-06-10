@@ -84,7 +84,38 @@ def fig_recall_budget() -> None:
     plt.close(fig)
 
 
+def fig_recall_vs_fpr_frontier() -> None:
+    """Deviation recall vs native false-positive rate — why the highest-recall
+    adapter is not the deployed one. Points from Table:ftAblation + Table:l2aFullShared."""
+    # (label, native FPR, deviation recall, annotation offset)
+    pts = [
+        ("base", 0.003, 0.173, (8, -4)),
+        ("l2a_ppl_long\n(deployed)", 0.024, 0.213, (10, -2)),
+        ("l2a_ppl_full", 0.203, 0.362, (-12, 8)),
+    ]
+    colors = ["#888888", "#4f81bd", "#c0504d"]
+    fig, ax = plt.subplots(figsize=(6, 4.2))
+    for (label, fpr, rec, off), c in zip(pts, colors):
+        ax.scatter(fpr, rec, s=120, color=c, zorder=3, edgecolor="white", linewidth=1)
+        ax.annotate(label, (fpr, rec), textcoords="offset points", xytext=off,
+                    fontsize=9, ha="left")
+    ax.set_xlabel("native false-positive rate (lower is better)")
+    ax.set_ylabel("L2-ARCTIC deviation recall (higher is better)")
+    ax.set_title("Recall vs native drift: the deployment trade-off")
+    ax.set_xlim(-0.02, 0.24)
+    ax.set_ylim(0.14, 0.40)
+    ax.axvspan(-0.02, 0.05, color="#e8f4e8", zorder=0)  # "usable" band
+    ax.text(0.015, 0.38, "usable\nregion", fontsize=8, color="#3a7d3a", ha="center")
+    fig.tight_layout()
+    for d in OUTS:
+        d.mkdir(parents=True, exist_ok=True)
+        fig.savefig(d / "recall_vs_fpr_frontier.png", dpi=140)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     fig_cpl_vs_ppl_recall()
     fig_recall_budget()
-    print("wrote l2arctic_cpl_vs_ppl_long.png + deviation_recall_by_budget.png to", [str(d) for d in OUTS])
+    fig_recall_vs_fpr_frontier()
+    print("wrote l2arctic_cpl_vs_ppl_long.png + deviation_recall_by_budget.png + recall_vs_fpr_frontier.png to",
+          [str(d) for d in OUTS])
