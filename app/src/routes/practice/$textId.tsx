@@ -428,7 +428,21 @@ function useRecording(textId: string) {
 				const url = URL.createObjectURL(file);
 				setUploadedFileUrl(url);
 
-				// Get duration from audio metadata
+				// Get duration from audio metadata; fall back to Web Audio API
+				// for formats the <audio> element can't decode (e.g. 16 kHz PCM WAV
+				// on Safari). If both fail, proceed with duration=0 — it's display-only.
+				const tryWebAudioDuration = async () => {
+					try {
+						const ctx = new AudioContext();
+						const buf = await file.arrayBuffer();
+						const decoded = await ctx.decodeAudioData(buf);
+						ctx.close();
+						return decoded.duration;
+					} catch {
+						return 0;
+					}
+				};
+
 				const audio = new Audio(url);
 				audio.onloadedmetadata = () => {
 					const duration = audio.duration;
@@ -436,18 +450,10 @@ function useRecording(textId: string) {
 					setUiState("preview");
 				};
 
-				audio.onerror = () => {
-					URL.revokeObjectURL(url);
-					setUploadedFileUrl(null);
-					setUploadedFileBlob(null);
-					setUploadedFileDuration(0);
-					setUiState("idle");
-					toast({
-						variant: "destructive",
-						title: "Couldn't read that file",
-						description:
-							"This audio file looks corrupted or uses an unsupported format. Try a different recording.",
-					});
+				audio.onerror = async () => {
+					const duration = await tryWebAudioDuration();
+					setUploadedFileDuration(duration);
+					setUiState("preview");
 				};
 			} catch {
 				setUiState("idle");
