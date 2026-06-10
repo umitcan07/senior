@@ -1,0 +1,209 @@
+{
+  "author": "genam_katherine",
+  "dialect": "genam",
+  "id": "ref_001",
+  "text": "I left my keys on the kitchen table again.",
+  "ipa_transcription": "a ɪ l ɛ f t m a ɪ kʰ i z ə n ð ə kʰ ɪ t ʃ ə n tʰ e ɪ b ə l ə ɡ ɛ̃ n",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.9781
+    },
+    {
+      "token": "a",
+      "start_ms": 80.0,
+      "end_ms": 160.0,
+      "confidence": 0.7418
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 160.0,
+      "end_ms": 240.0,
+      "confidence": 0.9507
+    },
+    {
+      "token": "l",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 320.0,
+      "end_ms": 360.0,
+      "confidence": 0.9829
+    },
+    {
+      "token": "f",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9987
+    },
+    {
+      "token": "t",
+      "start_ms": 400.0,
+      "end_ms": 480.0,
+      "confidence": 0.782
+    },
+    {
+      "token": "m",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "a",
+      "start_ms": 560.0,
+      "end_ms": 600.0,
+      "confidence": 0.9975
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.9986
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.9465
+    },
+    {
+      "token": "i",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "z",
+      "start_ms": 920.0,
+      "end_ms": 960.0,
+      "confidence": 0.997
+    },
+    {
+      "token": "ə",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.5774
+    },
+    {
+      "token": "n",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.996
+    },
+    {
+      "token": "ð",
+      "start_ms": 1160.0,
+      "end_ms": 1200.0,
+      "confidence": 0.981
+    },
+    {
+      "token": "ə",
+      "start_ms": 1200.0,
+      "end_ms": 1240.0,
+      "confidence": 0.9892
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 1280.0,
+      "end_ms": 1320.0,
+      "confidence": 0.5969
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "t",
+      "start_ms": 1400.0,
+      "end_ms": 1440.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 1440.0,
+      "end_ms": 1520.0,
+      "confidence": 0.6947
+    },
+    {
+      "token": "ə",
+      "start_ms": 1520.0,
+      "end_ms": 1560.0,
+      "confidence": 0.9788
+    },
+    {
+      "token": "n",
+      "start_ms": 1560.0,
+      "end_ms": 1600.0,
+      "confidence": 0.8232
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9038
+    },
+    {
+      "token": "e",
+      "start_ms": 1720.0,
+      "end_ms": 1760.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1760.0,
+      "end_ms": 1840.0,
+      "confidence": 0.9836
+    },
+    {
+      "token": "b",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ə",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "l",
+      "start_ms": 1960.0,
+      "end_ms": 2000.0,
+      "confidence": 0.9997
+    },
+    {
+      "token": "ə",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 2160.0,
+      "end_ms": 2200.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "ɛ̃",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 0.8775
+    },
+    {
+      "token": "n",
+      "start_ms": 2320.0,
+      "end_ms": 2400.0,
+      "confidence": 0.9269
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl_long"
+}

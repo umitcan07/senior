@@ -1,0 +1,185 @@
+{
+  "author": "rp_jon",
+  "dialect": "rp",
+  "id": "ref_009",
+  "text": "Could you please turn off the lights before bed?",
+  "ipa_transcription": "k ʊ d j u p l i z tʰ ə˞ n ɔ f ð ə l a ɪ t s p ɪ f ɔ ɹ b ɛ d",
+  "phone_timings": [
+    {
+      "token": "k",
+      "start_ms": 120.0,
+      "end_ms": 160.0,
+      "confidence": 0.9882
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.9935
+    },
+    {
+      "token": "d",
+      "start_ms": 200.0,
+      "end_ms": 280.0,
+      "confidence": 0.9372
+    },
+    {
+      "token": "j",
+      "start_ms": 280.0,
+      "end_ms": 360.0,
+      "confidence": 0.9818
+    },
+    {
+      "token": "u",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9892
+    },
+    {
+      "token": "p",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.5715
+    },
+    {
+      "token": "l",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "i",
+      "start_ms": 560.0,
+      "end_ms": 600.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "z",
+      "start_ms": 720.0,
+      "end_ms": 760.0,
+      "confidence": 0.9967
+    },
+    {
+      "token": "tʰ",
+      "start_ms": 840.0,
+      "end_ms": 880.0,
+      "confidence": 0.6556
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 920.0,
+      "end_ms": 960.0,
+      "confidence": 0.9955
+    },
+    {
+      "token": "n",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 1160.0,
+      "end_ms": 1200.0,
+      "confidence": 0.9452
+    },
+    {
+      "token": "f",
+      "start_ms": 1200.0,
+      "end_ms": 1240.0,
+      "confidence": 0.9932
+    },
+    {
+      "token": "ð",
+      "start_ms": 1280.0,
+      "end_ms": 1320.0,
+      "confidence": 0.9889
+    },
+    {
+      "token": "ə",
+      "start_ms": 1360.0,
+      "end_ms": 1400.0,
+      "confidence": 0.9687
+    },
+    {
+      "token": "l",
+      "start_ms": 1440.0,
+      "end_ms": 1480.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "a",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1520.0,
+      "end_ms": 1600.0,
+      "confidence": 0.8998
+    },
+    {
+      "token": "t",
+      "start_ms": 1600.0,
+      "end_ms": 1640.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "s",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9947
+    },
+    {
+      "token": "p",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.8983
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1880.0,
+      "end_ms": 1920.0,
+      "confidence": 0.9839
+    },
+    {
+      "token": "f",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 2040.0,
+      "end_ms": 2080.0,
+      "confidence": 0.9924
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 2120.0,
+      "end_ms": 2160.0,
+      "confidence": 0.9922
+    },
+    {
+      "token": "b",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 0.954
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 2320.0,
+      "end_ms": 2360.0,
+      "confidence": 0.7166
+    },
+    {
+      "token": "d",
+      "start_ms": 2480.0,
+      "end_ms": 2520.0,
+      "confidence": 0.8473
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl_long"
+}

@@ -23,10 +23,10 @@
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
-    "linear_k",
-    "linear_q",
+    "linear_out",
     "linear_v",
-    "linear_out"
+    "linear_q",
+    "linear_k"
   ],
   "task_type": null,
   "use_dora": false,
