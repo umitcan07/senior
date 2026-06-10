@@ -22,7 +22,14 @@
       "Bash(pdflatex report-v3.tex)",
       "Bash(/c/Users/faruq/miniconda3/Library/bin/tectonic report-v3.tex)",
       "Bash(pip show:*)",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(curl -s \"https://nounce.pro/intelligibility-score\")",
+      "Bash(curl -s \"https://nounce.pro/assets/styles-_1XmJ_XO.css\")",
+      "Bash(git cherry-pick *)",
+      "Bash(git fetch *)",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('mod/assessment/adapter/adapter_config.json'\\)\\);print\\('r',d.get\\('r'\\),'targets',d.get\\('target_modules'\\)\\)\")",
+      "Bash(xxd /Users/umitcanevleksiz/Documents/Programming/senior/data/test_recordings/umut/ref_001.wav)",
+      "Bash(gh pr *)"
     ]
   }
 }
