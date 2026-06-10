@@ -1,0 +1,203 @@
+{
+  "author": "genam_teyanna",
+  "dialect": "genam",
+  "id": "ref_001",
+  "text": "I left my keys on the kitchen table again.",
+  "ipa_transcription": "a ɪ l ɛ f t m a ɪ kʰ i z ɑ̃ n ð ə k ɪ t ʃ ə n t e ɪ b ə l ə ɡ ɛ̃ n",
+  "phone_timings": [
+    {
+      "token": "a",
+      "start_ms": 120.0,
+      "end_ms": 200.0,
+      "confidence": 0.8587
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 200.0,
+      "end_ms": 240.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "l",
+      "start_ms": 320.0,
+      "end_ms": 400.0,
+      "confidence": 0.9645
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 400.0,
+      "end_ms": 440.0,
+      "confidence": 0.9974
+    },
+    {
+      "token": "f",
+      "start_ms": 480.0,
+      "end_ms": 520.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "t",
+      "start_ms": 560.0,
+      "end_ms": 640.0,
+      "confidence": 0.9707
+    },
+    {
+      "token": "m",
+      "start_ms": 720.0,
+      "end_ms": 800.0,
+      "confidence": 0.8729
+    },
+    {
+      "token": "a",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 840.0,
+      "end_ms": 920.0,
+      "confidence": 0.9331
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.903
+    },
+    {
+      "token": "i",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.9982
+    },
+    {
+      "token": "z",
+      "start_ms": 1280.0,
+      "end_ms": 1320.0,
+      "confidence": 0.9919
+    },
+    {
+      "token": "ɑ̃",
+      "start_ms": 1520.0,
+      "end_ms": 1560.0,
+      "confidence": 0.8408
+    },
+    {
+      "token": "n",
+      "start_ms": 1560.0,
+      "end_ms": 1640.0,
+      "confidence": 0.8112
+    },
+    {
+      "token": "ð",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.987
+    },
+    {
+      "token": "ə",
+      "start_ms": 1720.0,
+      "end_ms": 1760.0,
+      "confidence": 0.9841
+    },
+    {
+      "token": "k",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.8101
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1920.0,
+      "end_ms": 1960.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "t",
+      "start_ms": 1960.0,
+      "end_ms": 2040.0,
+      "confidence": 0.9738
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 2040.0,
+      "end_ms": 2080.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ə",
+      "start_ms": 2120.0,
+      "end_ms": 2160.0,
+      "confidence": 0.9982
+    },
+    {
+      "token": "n",
+      "start_ms": 2200.0,
+      "end_ms": 2240.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "t",
+      "start_ms": 2360.0,
+      "end_ms": 2400.0,
+      "confidence": 0.5938
+    },
+    {
+      "token": "e",
+      "start_ms": 2440.0,
+      "end_ms": 2480.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2480.0,
+      "end_ms": 2560.0,
+      "confidence": 0.9552
+    },
+    {
+      "token": "b",
+      "start_ms": 2560.0,
+      "end_ms": 2640.0,
+      "confidence": 0.9778
+    },
+    {
+      "token": "ə",
+      "start_ms": 2640.0,
+      "end_ms": 2680.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "l",
+      "start_ms": 2720.0,
+      "end_ms": 2760.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "ə",
+      "start_ms": 3080.0,
+      "end_ms": 3120.0,
+      "confidence": 0.9987
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 3160.0,
+      "end_ms": 3240.0,
+      "confidence": 0.9192
+    },
+    {
+      "token": "ɛ̃",
+      "start_ms": 3240.0,
+      "end_ms": 3280.0,
+      "confidence": 0.6372
+    },
+    {
+      "token": "n",
+      "start_ms": 3360.0,
+      "end_ms": 3400.0,
+      "confidence": 0.9999
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl_long"
+}

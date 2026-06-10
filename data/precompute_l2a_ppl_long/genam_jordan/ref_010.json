@@ -1,0 +1,281 @@
+{
+  "author": "genam_jordan",
+  "dialect": "genam",
+  "id": "ref_010",
+  "text": "She really enjoys speaking both English and a little French.",
+  "ipa_transcription": "ʃ i ɹ ɪ l i ɛ̃ n d ʒ ɔ ɪ s s p i k ɪ ŋ p o ʊ θ ɛ ŋ ɡ l ɪ ʃ ə n d ə l ɪ t ə l f ɹ ɛ n t ʃ",
+  "phone_timings": [
+    {
+      "token": "▁",
+      "start_ms": 0.0,
+      "end_ms": 40.0,
+      "confidence": 0.7523
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 120.0,
+      "end_ms": 240.0,
+      "confidence": 0.879
+    },
+    {
+      "token": "i",
+      "start_ms": 240.0,
+      "end_ms": 280.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 360.0,
+      "end_ms": 400.0,
+      "confidence": 0.9963
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "l",
+      "start_ms": 560.0,
+      "end_ms": 600.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "i",
+      "start_ms": 600.0,
+      "end_ms": 680.0,
+      "confidence": 0.8066
+    },
+    {
+      "token": "ɛ̃",
+      "start_ms": 720.0,
+      "end_ms": 760.0,
+      "confidence": 0.9394
+    },
+    {
+      "token": "n",
+      "start_ms": 760.0,
+      "end_ms": 800.0,
+      "confidence": 0.9955
+    },
+    {
+      "token": "d",
+      "start_ms": 840.0,
+      "end_ms": 920.0,
+      "confidence": 0.9559
+    },
+    {
+      "token": "ʒ",
+      "start_ms": 920.0,
+      "end_ms": 960.0,
+      "confidence": 0.9727
+    },
+    {
+      "token": "ɔ",
+      "start_ms": 960.0,
+      "end_ms": 1000.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1000.0,
+      "end_ms": 1080.0,
+      "confidence": 0.8873
+    },
+    {
+      "token": "s",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.799
+    },
+    {
+      "token": "s",
+      "start_ms": 1200.0,
+      "end_ms": 1280.0,
+      "confidence": 0.8622
+    },
+    {
+      "token": "p",
+      "start_ms": 1280.0,
+      "end_ms": 1320.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "i",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "k",
+      "start_ms": 1400.0,
+      "end_ms": 1440.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.6324
+    },
+    {
+      "token": "ŋ",
+      "start_ms": 1520.0,
+      "end_ms": 1560.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "p",
+      "start_ms": 1640.0,
+      "end_ms": 1680.0,
+      "confidence": 0.8953
+    },
+    {
+      "token": "o",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9982
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 1720.0,
+      "end_ms": 1800.0,
+      "confidence": 0.9662
+    },
+    {
+      "token": "θ",
+      "start_ms": 1800.0,
+      "end_ms": 1840.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 2000.0,
+      "end_ms": 2040.0,
+      "confidence": 0.6596
+    },
+    {
+      "token": "ŋ",
+      "start_ms": 2040.0,
+      "end_ms": 2080.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "ɡ",
+      "start_ms": 2080.0,
+      "end_ms": 2160.0,
+      "confidence": 0.7536
+    },
+    {
+      "token": "l",
+      "start_ms": 2160.0,
+      "end_ms": 2240.0,
+      "confidence": 0.7689
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 2320.0,
+      "end_ms": 2400.0,
+      "confidence": 0.8837
+    },
+    {
+      "token": "ə",
+      "start_ms": 2600.0,
+      "end_ms": 2640.0,
+      "confidence": 0.9951
+    },
+    {
+      "token": "n",
+      "start_ms": 2680.0,
+      "end_ms": 2720.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "d",
+      "start_ms": 2720.0,
+      "end_ms": 2800.0,
+      "confidence": 0.7487
+    },
+    {
+      "token": "ə",
+      "start_ms": 2840.0,
+      "end_ms": 2880.0,
+      "confidence": 0.988
+    },
+    {
+      "token": "l",
+      "start_ms": 2960.0,
+      "end_ms": 3000.0,
+      "confidence": 0.9993
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 3000.0,
+      "end_ms": 3040.0,
+      "confidence": 0.9995
+    },
+    {
+      "token": "t",
+      "start_ms": 3080.0,
+      "end_ms": 3120.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "ə",
+      "start_ms": 3120.0,
+      "end_ms": 3160.0,
+      "confidence": 0.9996
+    },
+    {
+      "token": "l",
+      "start_ms": 3160.0,
+      "end_ms": 3200.0,
+      "confidence": 0.9987
+    },
+    {
+      "token": "f",
+      "start_ms": 3280.0,
+      "end_ms": 3320.0,
+      "confidence": 0.9999
+    },
+    {
+      "token": "ɹ",
+      "start_ms": 3320.0,
+      "end_ms": 3400.0,
+      "confidence": 0.9845
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 3400.0,
+      "end_ms": 3440.0,
+      "confidence": 0.6958
+    },
+    {
+      "token": "n",
+      "start_ms": 3480.0,
+      "end_ms": 3520.0,
+      "confidence": 0.9988
+    },
+    {
+      "token": "t",
+      "start_ms": 3520.0,
+      "end_ms": 3560.0,
+      "confidence": 0.9958
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 3560.0,
+      "end_ms": 3600.0,
+      "confidence": 0.9992
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl_long"
+}

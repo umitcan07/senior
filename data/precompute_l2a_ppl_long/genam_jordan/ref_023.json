@@ -1,0 +1,293 @@
+{
+  "author": "genam_jordan",
+  "dialect": "genam",
+  "id": "ref_023",
+  "text": "Do you want to come over this weekend and help me paint the kitchen?",
+  "ipa_transcription": "d u j u w ɑ̃ n t ə k ʌ m o ʊ v ə˞ ð ɪ s w i k ə n d ə n d h ɛ l p m i p e ɪ n t ð ə kʰ ɪ t ʃ ə n",
+  "phone_timings": [
+    {
+      "token": "d",
+      "start_ms": 80.0,
+      "end_ms": 160.0,
+      "confidence": 0.7761
+    },
+    {
+      "token": "u",
+      "start_ms": 160.0,
+      "end_ms": 200.0,
+      "confidence": 0.99
+    },
+    {
+      "token": "j",
+      "start_ms": 200.0,
+      "end_ms": 280.0,
+      "confidence": 0.9574
+    },
+    {
+      "token": "u",
+      "start_ms": 280.0,
+      "end_ms": 320.0,
+      "confidence": 0.9885
+    },
+    {
+      "token": "w",
+      "start_ms": 320.0,
+      "end_ms": 360.0,
+      "confidence": 0.9927
+    },
+    {
+      "token": "ɑ̃",
+      "start_ms": 360.0,
+      "end_ms": 440.0,
+      "confidence": 0.601
+    },
+    {
+      "token": "n",
+      "start_ms": 440.0,
+      "end_ms": 480.0,
+      "confidence": 0.7775
+    },
+    {
+      "token": "t",
+      "start_ms": 480.0,
+      "end_ms": 520.0,
+      "confidence": 0.7906
+    },
+    {
+      "token": "ə",
+      "start_ms": 520.0,
+      "end_ms": 560.0,
+      "confidence": 0.503
+    },
+    {
+      "token": "k",
+      "start_ms": 600.0,
+      "end_ms": 640.0,
+      "confidence": 0.8689
+    },
+    {
+      "token": "ʌ",
+      "start_ms": 640.0,
+      "end_ms": 680.0,
+      "confidence": 0.999
+    },
+    {
+      "token": "m",
+      "start_ms": 680.0,
+      "end_ms": 720.0,
+      "confidence": 0.9985
+    },
+    {
+      "token": "o",
+      "start_ms": 800.0,
+      "end_ms": 840.0,
+      "confidence": 0.9994
+    },
+    {
+      "token": "ʊ",
+      "start_ms": 840.0,
+      "end_ms": 880.0,
+      "confidence": 0.9971
+    },
+    {
+      "token": "v",
+      "start_ms": 880.0,
+      "end_ms": 920.0,
+      "confidence": 0.998
+    },
+    {
+      "token": "ə˞",
+      "start_ms": 920.0,
+      "end_ms": 1000.0,
+      "confidence": 0.755
+    },
+    {
+      "token": "ð",
+      "start_ms": 1040.0,
+      "end_ms": 1080.0,
+      "confidence": 0.9976
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 1080.0,
+      "end_ms": 1120.0,
+      "confidence": 0.9905
+    },
+    {
+      "token": "s",
+      "start_ms": 1160.0,
+      "end_ms": 1200.0,
+      "confidence": 0.9991
+    },
+    {
+      "token": "w",
+      "start_ms": 1240.0,
+      "end_ms": 1320.0,
+      "confidence": 0.9694
+    },
+    {
+      "token": "i",
+      "start_ms": 1320.0,
+      "end_ms": 1360.0,
+      "confidence": 0.9963
+    },
+    {
+      "token": "k",
+      "start_ms": 1400.0,
+      "end_ms": 1440.0,
+      "confidence": 0.9954
+    },
+    {
+      "token": "ə",
+      "start_ms": 1480.0,
+      "end_ms": 1520.0,
+      "confidence": 0.6022
+    },
+    {
+      "token": "n",
+      "start_ms": 1560.0,
+      "end_ms": 1600.0,
+      "confidence": 0.9936
+    },
+    {
+      "token": "d",
+      "start_ms": 1600.0,
+      "end_ms": 1640.0,
+      "confidence": 0.9858
+    },
+    {
+      "token": "ə",
+      "start_ms": 1680.0,
+      "end_ms": 1720.0,
+      "confidence": 0.9916
+    },
+    {
+      "token": "n",
+      "start_ms": 1720.0,
+      "end_ms": 1760.0,
+      "confidence": 0.9984
+    },
+    {
+      "token": "d",
+      "start_ms": 1760.0,
+      "end_ms": 1800.0,
+      "confidence": 0.957
+    },
+    {
+      "token": "h",
+      "start_ms": 1800.0,
+      "end_ms": 1840.0,
+      "confidence": 0.9959
+    },
+    {
+      "token": "ɛ",
+      "start_ms": 1840.0,
+      "end_ms": 1880.0,
+      "confidence": 0.998
+    },
+    {
+      "token": "l",
+      "start_ms": 1880.0,
+      "end_ms": 1960.0,
+      "confidence": 0.962
+    },
+    {
+      "token": "p",
+      "start_ms": 1960.0,
+      "end_ms": 2000.0,
+      "confidence": 0.9753
+    },
+    {
+      "token": "m",
+      "start_ms": 2040.0,
+      "end_ms": 2080.0,
+      "confidence": 0.9972
+    },
+    {
+      "token": "i",
+      "start_ms": 2080.0,
+      "end_ms": 2120.0,
+      "confidence": 0.9943
+    },
+    {
+      "token": "p",
+      "start_ms": 2200.0,
+      "end_ms": 2240.0,
+      "confidence": 0.6894
+    },
+    {
+      "token": "e",
+      "start_ms": 2240.0,
+      "end_ms": 2280.0,
+      "confidence": 0.988
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2280.0,
+      "end_ms": 2320.0,
+      "confidence": 0.5933
+    },
+    {
+      "token": "n",
+      "start_ms": 2320.0,
+      "end_ms": 2400.0,
+      "confidence": 0.9267
+    },
+    {
+      "token": "t",
+      "start_ms": 2400.0,
+      "end_ms": 2440.0,
+      "confidence": 0.9565
+    },
+    {
+      "token": "ð",
+      "start_ms": 2440.0,
+      "end_ms": 2480.0,
+      "confidence": 0.9489
+    },
+    {
+      "token": "ə",
+      "start_ms": 2480.0,
+      "end_ms": 2520.0,
+      "confidence": 0.9497
+    },
+    {
+      "token": "kʰ",
+      "start_ms": 2560.0,
+      "end_ms": 2600.0,
+      "confidence": 0.5502
+    },
+    {
+      "token": "ɪ",
+      "start_ms": 2640.0,
+      "end_ms": 2680.0,
+      "confidence": 0.9963
+    },
+    {
+      "token": "t",
+      "start_ms": 2680.0,
+      "end_ms": 2760.0,
+      "confidence": 0.9933
+    },
+    {
+      "token": "ʃ",
+      "start_ms": 2760.0,
+      "end_ms": 2800.0,
+      "confidence": 0.9998
+    },
+    {
+      "token": "ə",
+      "start_ms": 2840.0,
+      "end_ms": 2880.0,
+      "confidence": 0.9989
+    },
+    {
+      "token": "n",
+      "start_ms": 2880.0,
+      "end_ms": 2920.0,
+      "confidence": 0.9989
+    }
+  ],
+  "model_tag": "espnet/powsm",
+  "model_version": "l2a_ppl_long"
+}
