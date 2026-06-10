@@ -277,20 +277,15 @@ class POWSMAligner:
             vocab=list(self.token_list),
         )
 
-    def forced_alignment(
-        self, audio: np.ndarray, canonical_ipa: list[str]
-    ) -> list[PhoneSegment]:
+    def _forced_segments(self, log_probs, enc_lens, ids: list[int]) -> list[PhoneSegment]:
+        """Forced-align spans from already-computed CTC log_probs (no extra encode)."""
         import torch
         import torchaudio.functional as AF
-
-        ids = self._tokenize_ipa(canonical_ipa)
-        _, enc_lens, log_probs = self._encode_audio(audio)
 
         targets = torch.tensor([ids], dtype=torch.int32, device=self.device)
         target_lengths = torch.tensor(
             [len(ids)], dtype=torch.int32, device=self.device
         )
-
         align_path, align_scores = AF.forced_align(
             log_probs.float(),
             targets,
@@ -298,15 +293,13 @@ class POWSMAligner:
             target_lengths,
             blank=self.blank_id,
         )
-
         spans = AF.merge_tokens(align_path[0], align_scores[0].exp())
 
         segments = []
         for s in spans:
             if s.token == self.blank_id:
                 continue
-            tok = self.token_list[s.token]
-            bare = tok.strip("/")
+            bare = self.token_list[s.token].strip("/")
             segments.append(
                 PhoneSegment(
                     token=bare,
@@ -315,8 +308,31 @@ class POWSMAligner:
                     confidence=round(float(s.score), 4),
                 )
             )
-
         return split_affricate_ligatures(segments)
+
+    def forced_alignment(
+        self, audio: np.ndarray, canonical_ipa: list[str]
+    ) -> list[PhoneSegment]:
+        ids = self._tokenize_ipa(canonical_ipa)
+        _, enc_lens, log_probs = self._encode_audio(audio)
+        return self._forced_segments(log_probs, enc_lens, ids)
+
+    def encode_and_forced_alignment(
+        self, audio: np.ndarray, canonical_ipa: list[str]
+    ) -> tuple[AlignerOutput, list[PhoneSegment]]:
+        """Single encoder pass shared by GOP (needs the AlignerOutput logprobs) and
+        forced alignment (needs the spans) — avoids encoding the same audio twice."""
+        ids = self._tokenize_ipa(canonical_ipa)
+        _, enc_lens, log_probs = self._encode_audio(audio)
+        n_frames = int(enc_lens[0])
+        out = AlignerOutput(
+            logprobs=log_probs[0, :n_frames].cpu().numpy(),
+            n_frames=n_frames,
+            frame_stride_ms=self.frame_sec * 1000,
+            blank_id=self.blank_id,
+            vocab=list(self.token_list),
+        )
+        return out, self._forced_segments(log_probs, enc_lens, ids)
 
     def free_alignment(self, audio: np.ndarray) -> list[PhoneSegment]:
         enc, enc_lens, log_probs = self._encode_audio(audio)
