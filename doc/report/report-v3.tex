@@ -69,6 +69,11 @@ Core functionality includes: (i) capturing and processing user speech recordings
 
 The system focuses on English with US accent (potentially including UK), with initial development targeting Turkish-native English speakers. Future milestones will leverage users' native language to better detect phonetic units. The application is designed to be accessible and pedagogically sound, emphasizing comprehensibility over accent elimination.
 
+\subsection{Relationship to the CMPE491 Prototype}
+\label{sec:v1-vs-v2}
+
+Nounce builds directly on a prototype developed for CMPE491. That first version established the end-to-end recording-to-feedback concept, but several of its components proved unreliable or pedagogically thin. The present work (CMPE492) reworks the system around two themes---\emph{reliability} and \emph{deviation-awareness}---and the improvements over the prototype are detailed in the relevant sections rather than enumerated here. In brief: forced alignment moves from the Montreal Forced Aligner to POWSM's own CTC alignment, giving a single consistent phone inventory and real frame-level timestamps (Chapter~6); synthesized text-to-speech reference audio is retired in favour of human native recordings in General American and Received Pronunciation; an audio-quality stage now detects no-speech, noisy, and wrong-sentence input and abstains rather than returning a misleading score; the phone-level difference and the learner-facing feedback are computed over articulatory feature vectors instead of exact-match string comparison, so they reflect \emph{how far} a produced phone is from the target; and the interface adds per-phone playback with synchronized highlighting and goodness-of-pronunciation colouring. Most significantly, where the prototype shipped without any formal evaluation, this version introduces dedicated validation sets, a cross-dataset fine-tuning study, and a human-judgment correlation analysis (Section~\ref{sec:finetuning-results}). The through-line is a shift from a transcribe-and-compare prototype to an evaluated assessment system that detects and explains pronunciation deviations.
+
 \section{Project Planning}
 \subsection{Project Time and Resource Estimation}
 The project is developed as a two-person team effort with the following resource allocation:
@@ -174,6 +179,16 @@ Connectionist Temporal Classification (CTC) \cite{graves2006connectionist} is wi
 
 The Montreal Forced Aligner (MFA) \cite{mcauliffe2017montreal} is an industry-standard tool for phoneme-level time alignment, supporting English out-of-the-box. Pronunciation assessment employs metrics such as Phoneme Error Rate (PER) and goodness of pronunciation (GOP) scores \cite{witt2000phone} to evaluate speech quality.
 
+\section{L2 Speech Corpora and the Annotation Gap}
+\label{sec:data-gap}
+
+A model that \emph{detects} mispronunciations must be trained on what the learner actually \emph{produced}, not on the dictionary form of the target word---otherwise it learns to normalize deviations away rather than surface them. This bias originates upstream, in how phonetic foundation models are built: they are trained on \emph{canonical} phonetic transcriptions, and POWSM \cite{powsm} in particular is trained on the IPAPack++ corpus, whose labels are canonical. As is typical of phonetic models, POWSM therefore emits dictionary-form phones by default---precisely the normalizing behaviour a deviation detector must overcome. % TODO: add a citation for IPAPack++ if a suitable reference is available.
+This requirement exposes a real gap in publicly available L2-English data. Most resources provide either canonical phoneme transcriptions or holistic proficiency/accuracy \emph{scores}; neither supplies the produced (perceived) phone sequence a deviation detector needs as a supervision target. L2-ARCTIC \cite{l2arctic} is the rare corpus that annotates both canonical (CPL) and perceived (PPL) phones on identical audio---the property our ablation in Section~\ref{sec:finetuning-method} exploits---but it covers Arabic, Hindi, Korean, Mandarin, Spanish, and Vietnamese first languages, with \emph{no Turkish-native speakers}. speechocean762 \cite{speechocean762} contributes expert phoneme-accuracy scores at scale, but again provides scores rather than a produced transcription and contains no Turkish data.
+
+To our knowledge, no public corpus offers perceived phonetic annotation of Turkish-native English speech. Our project's Turkish data originates from a rich and carefully constructed in-house corpus of Turkish-native English speech, kindly contributed by a collaborating linguist.\footnote{Turkish-native English speech corpus contributed by \"O\u{g}r.\ G\"or.\ Dr.\ Kardelen K\i l\i n\c{c}, Eski\c{s}ehir Technical University, School of Foreign Languages. We gratefully acknowledge this contribution.} Our \emph{first} fine-tuning adapter was trained directly on this corpus. It did not improve mispronunciation detection---not for any want of quality in the data, which is rich and linguistically valuable, but because the issue was one of \emph{fit}: its phonetic annotation follows a canonical, dictionary-oriented convention with a diphthong/glide notation that differs from POWSM's own perceived output convention. As our ablation later confirms (Section~\ref{sec:finetuning-method}), training a deviation detector on canonical-style labels reinforces normalization rather than teaching it to surface what the learner produced. This experience is precisely what motivated the annotation-convention focus of the present work.
+
+For the present version we therefore prepared a small set re-annotated with the phones actually produced, in the model's own convention: four Turkish-native speakers reading thirteen sentences (approximately 52 clips). The set is deliberately small---too small to train a model from scratch---so it is used in two complementary roles: mixed with L2-ARCTIC as in-domain fine-tuning data (the leave-one-speaker-out folds of Section~\ref{sec:finetuning-method}), and as the held-out validation set against which both the baseline and fine-tuned models are measured (Section~\ref{sec:finetuning-results}). This dual use lets a small, carefully annotated set do real work despite the absence of a large public Turkish-L2 resource.
+
 \section{Commercial Applications}
 
 Commercial pronunciation assessment platforms demonstrate practical applications of these technologies. ELSA Speak \cite{elsaspeak} provides real-time pronunciation feedback for English language learners with personalized AI coaching. Pronounce AI \cite{pronounce2024} offers instant speech feedback, pronunciation practice, and AI speaking partners for professionals and language learners, supporting both American and British English accents.
@@ -202,15 +217,14 @@ The production deployment follows a serverless, cloud-native architecture:
 
 \textbf{Database:} Neon serverless PostgreSQL provides the database layer with automatic scaling, point-in-time recovery, and branching capabilities for development and testing.
 
-\textbf{ML Services:} Machine learning inference is handled by RunPod serverless GPU endpoints, which provide on-demand GPU resources for model inference. Two separate endpoints are deployed:
+\textbf{ML Services:} Machine learning inference is handled by a single RunPod serverless GPU endpoint:
 \begin{itemize}
-    \item \textbf{Assessment Endpoint:} Handles pronunciation assessment with POWSM \cite{powsm} PR and G2P models, MFA alignment, and error detection
-    \item \textbf{IPA Generation Endpoint:} Generates IPA transcriptions for reference speeches using POWSM \cite{powsm} G2P model
+    \item \textbf{Assessment Endpoint:} Handles pronunciation assessment end to end with POWSM \cite{powsm}---CTC phone recognition and forced alignment, audio-quality abstention, feature-vector difference, and GOP scoring. (The prototype's separate G2P/IPA-generation endpoint and Montreal Forced Aligner were removed; see Section~\ref{sec:v1-vs-v2}.)
 \end{itemize}
 
-\textbf{Model Caching:} RunPod network volumes are used to cache large model files (POWSM \cite{powsm} models, MFA dictionaries and acoustic models), significantly reducing cold-start times. The maximum observed cold-start time is 30 seconds, while average task execution times are 3 seconds for Phone Recognition (PR) and 2 seconds for Grapheme-to-Phoneme (G2P) tasks.
+\textbf{Model Caching:} RunPod network volumes cache the POWSM \cite{powsm} model (and the fine-tuned adapter weights) to reduce cold-start time; subsequent requests reuse the cached model.
 
-\textbf{Reference Speech Generation:} ElevenLabs API is integrated for generating reference speech audio files. Currently, the system uses US English with two different speaker configurations to provide variety in target pronunciations.
+\textbf{Reference Speech:} Reference pronunciations are human native recordings in General American and Received Pronunciation, precomputed into phone sequences offline; the prototype's ElevenLabs text-to-speech generation was retired.
 
 \textbf{Deployment Automation:} GitHub Actions CI/CD pipelines handle building Docker images, running tests, linting, and automated deployment to Fly.io. The build process includes diagram generation from PlantUML source files, ensuring documentation stays synchronized with code changes.
 
@@ -242,7 +256,7 @@ We test this with a controlled, same-data, opposite-supervision ablation on the 
     \item \texttt{l2a\_ppl\_tr\_fold1--4} --- L2-ARCTIC PPL plus three of the four annotated Turkish speakers, in a Leave-One-Speaker-Out (LOSO) design, to measure speaker-independently whether a small amount of in-domain Turkish data helps.
 \end{itemize}
 
-Because dev loss is not comparable across different label distributions, models are compared only on held-out behaviour: phone error rate (PER) and substitution recall on a Turkish-native held-out set, deviation recall on L2-ARCTIC, and a native false-positive (drift) rate that a deployable adapter must not inflate. Each adapter was trained for 30 epochs and, after observing that dev loss had not plateaued, re-trained for 60 epochs (\texttt{l2a\_*\_long}); the longer schedule is what sharpens the result (Section~\ref{sec:finetuning-results}).
+Because dev loss is not comparable across different label distributions, models are compared only on held-out behaviour: phone error rate (PER) and substitution recall on a Turkish-native held-out set, deviation recall on L2-ARCTIC, and a native false-positive (drift) rate that a deployable adapter must not inflate. Each adapter was trained for 30 epochs and, after observing that dev loss had not plateaued, re-trained for 60 epochs (\texttt{l2a\_*\_long}); the longer schedule is what sharpens the result (Section~\ref{sec:finetuning-results}). All training and evaluation code, and the adapter artifacts, are available in the project repository \cite{github2024senior}.
 
 % TODO: A collaborator independently fine-tuned POWSM on L2-ARCTIC with a different
 % recipe. Once we have their artifacts/numbers, summarize their setup here and add a
@@ -520,7 +534,7 @@ The main application codebase is located in the \texttt{app/} directory \cite{gi
     \item Practice text selection with filtering by difficulty (beginner, intermediate, advanced) and category (daily, professional, academic, phonetic challenge, common phrase)
     \item Browser-based audio recording with real-time waveform visualization
     \item Audio upload functionality with format conversion
-    \item Pronunciation analysis results visualization with phoneme-level error highlighting
+    \item Pronunciation analysis results in a git-style diff viewer with goodness-of-pronunciation colour-coding, plus per-phone audio playback that highlights each phone as it is spoken
     \item Progress tracking and summary dashboard with statistics and error analysis
     \item Educational content pages for IPA and English phonology
 \end{itemize}
@@ -530,7 +544,7 @@ The main application codebase is located in the \texttt{app/} directory \cite{gi
 \textbf{Database:} The complete database schema is implemented using Drizzle ORM with Neon serverless PostgreSQL. All planned tables are operational, including:
 \begin{itemize}
     \item \texttt{practice\_texts} - Practice materials with difficulty and category classification
-    \item \texttt{authors} - Reference voice/author management with ElevenLabs integration
+    \item \texttt{authors} - Reference voice/author management (native General American and Received Pronunciation speakers)
     \item \texttt{reference\_speeches} - Target pronunciation audio files with IPA transcriptions
     \item \texttt{user\_recordings} - User-submitted audio recordings with metadata
     \item \texttt{audio\_quality\_metrics} - Quality assessment results (SNR, silence ratio, clipping ratio)
@@ -547,30 +561,28 @@ The main application codebase is located in the \texttt{app/} directory \cite{gi
 \begin{itemize}
     \item Practice text CRUD operations with bulk import capabilities
     \item Reference speech management with audio upload and IPA generation
-    \item Author/voice management with ElevenLabs API integration for TTS generation
-    \item IPA generation job monitoring and management
+    \item Author/voice management for native-speaker reference recordings
+    \item Reference phone precomputation monitoring and management
 \end{itemize}
 
-Reference speech generation currently supports US English with two different speaker configurations via ElevenLabs API, providing variety in target pronunciations for practice materials.
+Reference pronunciations are human native recordings in both General American and Received Pronunciation (commissioned voice talent), replacing the prototype's text-to-speech and letting learners choose a dialect to practise against.
 
 \subsection{Machine Learning Services}
 
 The machine learning pipeline is implemented as separate RunPod serverless endpoints in the \texttt{mod/} directory:
 
-\textbf{Assessment Endpoint:} The pronunciation assessment service (\texttt{mod/assessment/}) integrates POWSM \cite{powsm} models for phonetic transcription:
+\textbf{Assessment Endpoint:} The pronunciation assessment service (\texttt{mod/assessment/}) is built around POWSM \cite{powsm} and its CTC encoder, and replaces several prototype components:
 \begin{itemize}
-    \item Phone Recognition (PR): Extracts IPA phonemes from user audio using POWSM PR model (average execution time: 3 seconds)
-    \item Grapheme-to-Phoneme (G2P): Generates target IPA from text using POWSM G2P model with audio-guided transcription (average execution time: 2 seconds)
-    \item Edit Distance Calculation: Compares actual vs. target phonemes to identify substitution, insertion, and deletion errors
-    \item MFA Alignment: Integrates Montreal Forced Aligner for phone-level timestamp generation
-    \item Score Calculation: Computes pronunciation accuracy scores based on error rates
+    \item \textbf{Phone recognition:} POWSM CTC free alignment transcribes the IPA phones the learner actually produced, with real frame-level timestamps.
+    \item \textbf{Forced alignment:} the reference phone sequence is force-aligned to the audio, also via POWSM's CTC path. This replaces the prototype's Montreal Forced Aligner and gives a single, consistent phone inventory across recognition and alignment instead of two tools with different inventories.
+    \item \textbf{Audio-quality abstention:} a Silero voice-activity stage plus signal-quality checks (SNR, clipping) reject no-speech, noisy, or wrong-sentence recordings, returning an explained abstention rather than a misleading score.
+    \item \textbf{Feature-aware difference:} produced and target phones are compared with an articulatory feature-vector distance (PanPhon) rather than exact-match edit distance, so a near-miss (e.g.\ a voicing-only swap) is treated as closer than a gross substitution. The same feature distance drives both the difference visualization and the learner-facing feedback.
+    \item \textbf{Goodness-of-Pronunciation (GOP):} per-phone GOP and entropy are computed directly from the CTC posteriors, supporting confidence-aware, colour-coded feedback.
 \end{itemize}
 
-The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays. Maximum observed cold-start time is 30 seconds, with subsequent requests benefiting from cached models.
+Because the reference phones are precomputed and supplied with each request, the GPU worker is stateless (it never re-aligns the reference). The endpoint is deployed on RunPod serverless GPU infrastructure, utilizing network volumes for model caching to minimize cold-start delays.
 
-\textbf{IPA Generation Endpoint:} The IPA generation service (\texttt{mod/ipa\_generation/}) provides phonetic transcription for reference speeches, supporting both text-only and audio-guided G2P modes.
-
-Both endpoints are containerized with Docker and deployed on RunPod, utilizing GPU resources for efficient model inference. The services handle audio download, preprocessing, model inference, and result formatting.
+\textbf{Decommissioned G2P endpoint.} The prototype ran a separate Grapheme-to-Phoneme endpoint (\texttt{mod/ipa\_generation/}) to derive target IPA from text. This was removed in the present version: reference phones are computed once, offline, with the assessment model's own alignment, eliminating a second model load and a cross-model phone-inventory mismatch that had inflated error counts.
 
 \subsection{Signal Processing and Experiments}
 
@@ -578,8 +590,8 @@ Signal processing experiments and deep learning model evaluations are conducted 
 \begin{itemize}
     \item Audio preprocessing and quality assessment (SNR, silence detection, clipping detection)
     \item POWSM \cite{powsm} model evaluation and fine-tuning experiments
-    \item MFA alignment testing and TextGrid parsing
-    \item G2P accuracy evaluation and comparison
+    \item POWSM CTC forced-alignment evaluation (replacing the prototype's MFA/TextGrid pipeline)
+    \item Cross-dataset evaluation and comparison (L2-ARCTIC, speechocean762, and the in-house Turkish set)
     \item Visualization of phonetic features and alignment results
 \end{itemize}
 
