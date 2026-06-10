@@ -2,7 +2,7 @@
 
 set -e
 
-TEX_FILE="report-v2.tex"
+TEX_FILE="report-v3.tex"
 BASE_NAME="${TEX_FILE%.tex}"
 CLEAN_FILES=("*.aux" "*.log" "*.toc" "*.out" "*.bbl" "*.blg" "*.fdb_latexmk" "*.fls" "*.synctex.gz")
 RED='\033[0;31m'

@@ -95,8 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "powershell",
-            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$env:CLAUDE_PROJECT_DIR\\.claude\\hooks\\copy-env-on-session-start.ps1\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/copy-env-on-session-start.sh\"",
             "timeout": 15,
             "statusMessage": "Seeding app/.env in worktree..."
           }

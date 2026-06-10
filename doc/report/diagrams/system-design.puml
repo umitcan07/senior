@@ -1,35 +1,40 @@
 @startuml
 !theme plain
 skinparam componentStyle rectangle
+skinparam dpi 300
 
 package "Nounce Application" {
   component "Web Client\n(React Frontend\nTanStack Start)" as Client
-  
+
   component "Application Server\n(API Endpoints\nBusiness Logic\nTanStack Start Server)" as Server
-  
-  component "ML Processing\n(Phonetic Transcription\nForced Alignment\nPronunciation Assessment)" as GPU
-  
-  component "Database\n(PostgreSQL\nUser Data\nRecordings Metadata\nAnalysis Results)" as DB
-  
-  component "Object Storage\n(Cloudflare R2\nAudio Files\nAlignment Data)" as Storage
+
+  component "ML Worker\n(POWSM + LoRA adapter\nPhone Recognition\nCTC Forced Alignment\nVAD Abstention\nFeature Diff + GOP)" as GPU
+
+  component "Database\n(PostgreSQL\nUser Data\nReferences + Timings\nAnalysis Results)" as DB
+
+  component "Object Storage\n(Cloudflare R2\nUser + Reference Audio)" as Storage
 }
 
 ' Connections
 Client --> Server : HTTP/HTTPS
 Server --> DB : SQL Queries
 Server --> Storage : File Operations
-Server --> GPU : ML Job Queue
-GPU --> Storage : Read/Write Audio
+Server --> GPU : ML Job Queue (single endpoint)
+GPU --> Storage : Read Audio
 GPU --> DB : Store Results
 
 note right of GPU
+  Single stateless endpoint.
   Processes audio asynchronously
-  via job queue system
+  via the job queue. Phone
+  Recognition (PR) for every task.
 end note
 
 note right of Storage
-  Stores processed audio files
-  (16-bit, 16kHz, mono WAV)
+  16-bit, 16 kHz mono WAV.
+  Reference phones + timings are
+  precomputed offline and stored
+  in the database, not recomputed.
 end note
 
 @enduml

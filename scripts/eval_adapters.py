@@ -122,6 +122,11 @@ MODELS = [
     ("l2a_ppl_tr_fold2", "l2a_ppl_tr_fold2/best", "loso_fold2"),
     ("l2a_ppl_tr_fold3", "l2a_ppl_tr_fold3/best", "loso_fold3"),
     ("l2a_ppl_tr_fold4", "l2a_ppl_tr_fold4/best", "loso_fold4"),
+    # Full-L2-ARCTIC perceived-label run (all 6 L1s, 25ep, lang_sym <unk>;
+    # see sig/fine-tune/05_finetune_l2arctic). Scored here on OUR split/metrics
+    # (folded PER, deviation recall, native FPR) for a same-axis comparison with
+    # l2a_ppl / l2a_ppl_long. report-v3.tex §"Scaling ... to Full L2-ARCTIC".
+    ("l2a_ppl_full", "l2a_ppl_full/best", "all"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -776,7 +781,8 @@ def main() -> None:
     if not args.skip_l2arctic and ensure_l2arctic_manifests(ftune, str(l2a_root)):
         l2a_set = load_l2arctic_set(ftune, "dev")
     L2A_MODELS = {"base", "l2a_cpl", "l2a_ppl", "l2a_ppl_dora",
-                  "l2a_cpl_long", "l2a_ppl_long"}  # cpl-vs-ppl, not the TR folds
+                  "l2a_cpl_long", "l2a_ppl_long",
+                  "l2a_ppl_full"}  # cpl-vs-ppl + full-L2-ARCTIC run, not the TR folds
 
     print(f"[data] TR all={len(all_utts)} utts, LOSO folds={ {k: len(v) for k, v in fold_utts.items()} }, "
           f"canonical sentences={len(canon)}, native clips={len(native)}, "
@@ -815,10 +821,23 @@ def main() -> None:
         l2a_summ = None
         if l2a_set and name in L2A_MODELS:
             print(f"    [l2a] scoring {len(l2a_set)} L2-ARCTIC dev utts ...")
-            lrows, _lc, _lp, lrecall, lschwa = eval_model_on_set(aligner, l2a_set, None)
+            lrows, l2a_confusion, l2a_per_phone, lrecall, lschwa = eval_model_on_set(
+                aligner, l2a_set, None)
             for r in lrows:
                 r["model"] = name
             l2a_per_utt.extend(lrows)
+            # Per-phone error counts + confusion on the L2-ARCTIC dev set (truth =
+            # produced/PPL). Same shape as the TR dumps below; lets us build the
+            # base-vs-adapter per-phone table for the full-L2-ARCTIC arm.
+            write_csv(out / "raw" / f"l2a_per_phone_{name}.csv",
+                      [{"phone": p, "errors": v[0], "total": v[1],
+                        "error_rate": round(v[0] / v[1], 4) if v[1] else 0}
+                       for p, v in sorted(l2a_per_phone.items(), key=lambda kv: -kv[1][1])],
+                      ["phone", "errors", "total", "error_rate"])
+            write_csv(out / "raw" / f"l2a_confusion_{name}.csv",
+                      [{"ref": r, "hyp": h, "count": c}
+                       for (r, h), c in l2a_confusion.most_common()],
+                      ["ref", "hyp", "count"])
             lsr = recall_summary(lrecall)
             l2a_summ = {
                 "model": name,
