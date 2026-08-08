@@ -8,7 +8,7 @@
         "dev"
       ],
       "port": 3000,
-      "cwd": "C:\\Users\\faruq\\Desktop\\solo\\senior\\app"
+      "cwd": "app"
     },
     {
       "name": "corptes-site",
@@ -19,7 +19,7 @@
         "5290"
       ],
       "port": 5290,
-      "cwd": "C:\\Users\\faruq\\Desktop\\solo\\senior\\corpus\\site"
+      "cwd": "corpus/site"
     }
   ]
 }

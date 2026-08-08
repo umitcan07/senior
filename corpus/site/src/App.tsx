@@ -9,6 +9,7 @@ import { StressView } from "./components/StressView";
 import { Spinner } from "./components/ui";
 import { UtterancePanel } from "./components/UtterancePanel";
 import { loadManifest } from "./lib/api";
+import { readUrl, writeUrl } from "./lib/urlState";
 import type { AreaKey, Manifest } from "./lib/types";
 
 export interface Selection {
@@ -20,12 +21,9 @@ export interface Selection {
 export function App() {
 	const [manifest, setManifest] = useState<Manifest | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [view, setView] = useState<View>("explore");
-	const [sel, setSel] = useState<Selection>({
-		area: "consonants",
-		classKey: null,
-		phone: null,
-	});
+	// Seed view/selection from the URL so links deep into the corpus work.
+	const [view, setView] = useState<View>(() => readUrl().view);
+	const [sel, setSel] = useState<Selection>(() => readUrl().sel);
 	const [openUtterance, setOpenUtterance] = useState<{
 		id: string;
 		focusToken?: string;
@@ -33,6 +31,22 @@ export function App() {
 
 	useEffect(() => {
 		loadManifest().then(setManifest).catch((e) => setError(String(e)));
+	}, []);
+
+	// Mirror state into the hash (replaceState — no history spam), and follow
+	// the hash when the user navigates back/forward or pastes a link.
+	useEffect(() => {
+		writeUrl({ view, sel });
+	}, [view, sel]);
+
+	useEffect(() => {
+		const onHash = () => {
+			const s = readUrl();
+			setView(s.view);
+			setSel(s.sel);
+		};
+		window.addEventListener("hashchange", onHash);
+		return () => window.removeEventListener("hashchange", onHash);
 	}, []);
 
 	if (error) {
