@@ -1,0 +1,12 @@
+# Dependencies & build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Generated corpus data — produced by the site_build pipeline, not committed.
+# Rebuild with:  python -m corpus.scripts.site_build.build --out corpus/site/public
+public/data/
+public/clips/
+
+# Vite cache
+.vite/

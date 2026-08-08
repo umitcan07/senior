@@ -1,0 +1,30 @@
+{
+	"name": "corptes-explorer",
+	"private": true,
+	"type": "module",
+	"description": "Static explorer for the CORPTES Turkish-L1 English pronunciation corpus.",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"preview": "vite preview",
+		"data:link": "node scripts/link-data.mjs"
+	},
+	"dependencies": {
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3"
+	},
+	"devDependencies": {
+		"@tailwindcss/vite": "^4.0.6",
+		"@types/react": "^19.2.0",
+		"@types/react-dom": "^19.2.0",
+		"@vitejs/plugin-react": "^5.0.4",
+		"tailwindcss": "^4.0.6",
+		"typescript": "^5.7.2",
+		"vite": "^7.1.7"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	}
+}

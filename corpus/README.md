@@ -52,3 +52,20 @@ python corpus/scripts/analyze_corpus.py > corpus/reports/inventory.txt
 ## Processed outputs (future)
 
 Gate artifacts (`manifest_chunks.tsv`, ESPnet `wav.scp`, splits) should live under `corpus/processed/` — not committed until curated and small enough for review.
+
+## Public corpus explorer (feature-based website)
+
+The **CORPTES Explorer** turns this corpus into a public, filterable website —
+browse by phonetic feature (vowels / consonants / lexical stress / rhythm /
+intonation), read correct-vs-incorrect statistics, inspect any token in context
+with audio. Requested by Kardelen Hoca; hosted separately, linked from the
+department site. Not a fork of EXMARaLDA — we reuse only the `.exb`/`.coma`
+format and EXAKT's concepts.
+
+- **Pipeline:** `scripts/site_build/` (Python) — parses the drop and emits a
+  precomputed JSON tree. Tests: `python scripts/site_build/tests/test_pipeline.py`.
+- **Site:** `site/` (Vite + React) — static, no backend.
+- **Verify the drop first:** `python -m corpus.scripts.site_build.verify --raw "$CORPUS_RAW_DIR"`
+  answers the open questions (paired tiers? stress marks? metadata keys?).
+
+Full architecture + data contract: **[`doc/corpus_site.md`](../doc/corpus_site.md)**.
