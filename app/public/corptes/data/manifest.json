@@ -1,0 +1,1344 @@
+{
+  "build": {
+    "raw_dir": "C:\\Users\\faruq\\AppData\\Local\\Temp\\claude\\C--Users-faruq-Desktop-solo-senior\\a0fc7d5d-d53e-474f-9dfd-63c14a40d2fa\\scratchpad\\demo_raw",
+    "files": 48,
+    "utterances": 48,
+    "pitchBackend": "numpy-autocorr",
+    "clips": true,
+    "synthetic": true
+  },
+  "areas": [
+    "vowels",
+    "consonants",
+    "lexical-stress",
+    "rhythm",
+    "intonation"
+  ],
+  "filterTree": {
+    "consonants": [
+      {
+        "key": "contrast:missing-in-turkish",
+        "phones": [
+          "w",
+          "ð",
+          "ŋ",
+          "ɹ",
+          "θ"
+        ]
+      },
+      {
+        "key": "manner:affricate",
+        "phones": [
+          "dz",
+          "ts",
+          "ʤ",
+          "ʧ",
+          "ʰ"
+        ]
+      },
+      {
+        "key": "manner:approximant",
+        "phones": [
+          "j",
+          "w",
+          "ɹ"
+        ]
+      },
+      {
+        "key": "manner:fricative",
+        "phones": [
+          "f",
+          "h",
+          "s",
+          "v",
+          "x",
+          "z",
+          "ð",
+          "ɣ",
+          "ʃ",
+          "ʒ",
+          "θ"
+        ]
+      },
+      {
+        "key": "manner:lateral",
+        "phones": [
+          "l",
+          "ɫ"
+        ]
+      },
+      {
+        "key": "manner:nasal",
+        "phones": [
+          "m",
+          "n",
+          "ŋ"
+        ]
+      },
+      {
+        "key": "manner:plosive",
+        "phones": [
+          "b",
+          "c",
+          "d",
+          "g",
+          "k",
+          "p",
+          "t",
+          "ɟ",
+          "ɡ",
+          "ʔ"
+        ]
+      },
+      {
+        "key": "manner:tap",
+        "phones": [
+          "ɾ"
+        ]
+      },
+      {
+        "key": "manner:trill",
+        "phones": [
+          "r"
+        ]
+      },
+      {
+        "key": "place:alveolar",
+        "phones": [
+          "d",
+          "dz",
+          "l",
+          "n",
+          "r",
+          "s",
+          "t",
+          "ts",
+          "z",
+          "ɹ",
+          "ɾ",
+          "ʰ"
+        ]
+      },
+      {
+        "key": "place:bilabial",
+        "phones": [
+          "b",
+          "m",
+          "p"
+        ]
+      },
+      {
+        "key": "place:dental",
+        "phones": [
+          "ð",
+          "θ"
+        ]
+      },
+      {
+        "key": "place:glottal",
+        "phones": [
+          "h",
+          "ʔ"
+        ]
+      },
+      {
+        "key": "place:labial-velar",
+        "phones": [
+          "w"
+        ]
+      },
+      {
+        "key": "place:labiodental",
+        "phones": [
+          "f",
+          "v"
+        ]
+      },
+      {
+        "key": "place:palatal",
+        "phones": [
+          "c",
+          "j",
+          "ɟ"
+        ]
+      },
+      {
+        "key": "place:postalveolar",
+        "phones": [
+          "ʃ",
+          "ʒ",
+          "ʤ",
+          "ʧ"
+        ]
+      },
+      {
+        "key": "place:velar",
+        "phones": [
+          "g",
+          "k",
+          "x",
+          "ŋ",
+          "ɡ",
+          "ɣ",
+          "ɫ"
+        ]
+      },
+      {
+        "key": "voicing:voiced",
+        "phones": [
+          "b",
+          "d",
+          "dz",
+          "g",
+          "j",
+          "l",
+          "m",
+          "n",
+          "r",
+          "v",
+          "w",
+          "z",
+          "ð",
+          "ŋ",
+          "ɟ",
+          "ɡ",
+          "ɣ",
+          "ɫ",
+          "ɹ",
+          "ɾ",
+          "ʒ",
+          "ʤ"
+        ]
+      },
+      {
+        "key": "voicing:voiceless",
+        "phones": [
+          "c",
+          "f",
+          "h",
+          "k",
+          "p",
+          "s",
+          "t",
+          "ts",
+          "x",
+          "ʃ",
+          "ʔ",
+          "ʧ",
+          "ʰ",
+          "θ"
+        ]
+      }
+    ],
+    "vowels": [
+      {
+        "key": "backness:back",
+        "phones": [
+          "o",
+          "oʊ",
+          "u",
+          "ɑ",
+          "ɒ",
+          "ɔ",
+          "ɔɪ",
+          "ɯ",
+          "ʊ",
+          "ʊə",
+          "ʌ"
+        ]
+      },
+      {
+        "key": "backness:central",
+        "phones": [
+          "ə",
+          "ɚ",
+          "ɜ",
+          "ɝ"
+        ]
+      },
+      {
+        "key": "backness:front",
+        "phones": [
+          "a",
+          "aɪ",
+          "aʊ",
+          "e",
+          "eə",
+          "eɪ",
+          "i",
+          "y",
+          "æ",
+          "ø",
+          "ɛ",
+          "ɪ",
+          "ɪə"
+        ]
+      },
+      {
+        "key": "contrast:missing-in-turkish",
+        "phones": [
+          "æ",
+          "ə",
+          "ɚ",
+          "ɝ",
+          "ɪ",
+          "ʊ",
+          "ʌ"
+        ]
+      },
+      {
+        "key": "height:close",
+        "phones": [
+          "i",
+          "u",
+          "y",
+          "ɯ"
+        ]
+      },
+      {
+        "key": "height:close-mid",
+        "phones": [
+          "e",
+          "eɪ",
+          "o",
+          "oʊ",
+          "ø"
+        ]
+      },
+      {
+        "key": "height:mid",
+        "phones": [
+          "ə",
+          "ɚ"
+        ]
+      },
+      {
+        "key": "height:near-close",
+        "phones": [
+          "ɪ",
+          "ɪə",
+          "ʊ",
+          "ʊə"
+        ]
+      },
+      {
+        "key": "height:near-open",
+        "phones": [
+          "æ"
+        ]
+      },
+      {
+        "key": "height:open",
+        "phones": [
+          "a",
+          "aɪ",
+          "aʊ",
+          "ɑ",
+          "ɒ"
+        ]
+      },
+      {
+        "key": "height:open-mid",
+        "phones": [
+          "eə",
+          "ɔ",
+          "ɔɪ",
+          "ɛ",
+          "ɜ",
+          "ɝ",
+          "ʌ"
+        ]
+      },
+      {
+        "key": "manner:diphthong",
+        "phones": [
+          "aɪ",
+          "aʊ",
+          "eə",
+          "eɪ",
+          "oʊ",
+          "ɔɪ",
+          "ɪə",
+          "ʊə"
+        ]
+      },
+      {
+        "key": "rounding:rounded",
+        "phones": [
+          "o",
+          "oʊ",
+          "u",
+          "y",
+          "ø",
+          "ɒ",
+          "ɔ",
+          "ɔɪ",
+          "ʊ",
+          "ʊə"
+        ]
+      },
+      {
+        "key": "rounding:unrounded",
+        "phones": [
+          "a",
+          "aɪ",
+          "aʊ",
+          "e",
+          "eə",
+          "eɪ",
+          "i",
+          "æ",
+          "ɑ",
+          "ə",
+          "ɚ",
+          "ɛ",
+          "ɜ",
+          "ɝ",
+          "ɪ",
+          "ɪə",
+          "ɯ",
+          "ʌ"
+        ]
+      },
+      {
+        "key": "tenseness:lax",
+        "phones": [
+          "a",
+          "eə",
+          "æ",
+          "ɒ",
+          "ə",
+          "ɚ",
+          "ɛ",
+          "ɪ",
+          "ɪə",
+          "ʊ",
+          "ʊə",
+          "ʌ"
+        ]
+      },
+      {
+        "key": "tenseness:tense",
+        "phones": [
+          "aɪ",
+          "aʊ",
+          "e",
+          "eɪ",
+          "i",
+          "o",
+          "oʊ",
+          "u",
+          "y",
+          "ø",
+          "ɑ",
+          "ɔ",
+          "ɔɪ",
+          "ɜ",
+          "ɝ",
+          "ɯ"
+        ]
+      }
+    ]
+  },
+  "speakers": {
+    "S01": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "25",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "18"
+    },
+    "S02": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "22",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "15"
+    },
+    "S03": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "19",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "12"
+    },
+    "S04": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "24",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "17"
+    },
+    "S05": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "21",
+      "learner_level_CEFR_conversion": "C1",
+      "L2_study_years": "14"
+    },
+    "S06": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "18",
+      "learner_level_CEFR_conversion": "A2",
+      "L2_study_years": "11"
+    },
+    "S07": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "24",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "17"
+    },
+    "S08": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "21",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "14"
+    },
+    "S09": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "18",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "11"
+    },
+    "S10": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "23",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "16"
+    },
+    "S11": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "20",
+      "learner_level_CEFR_conversion": "C1",
+      "L2_study_years": "13"
+    },
+    "S12": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "25",
+      "learner_level_CEFR_conversion": "A2",
+      "L2_study_years": "18"
+    },
+    "S13": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "22",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "15"
+    },
+    "S14": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "20",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "13"
+    },
+    "S15": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "25",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "18"
+    },
+    "S16": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "22",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "15"
+    },
+    "S17": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "19",
+      "learner_level_CEFR_conversion": "C1",
+      "L2_study_years": "12"
+    },
+    "S18": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "24",
+      "learner_level_CEFR_conversion": "A2",
+      "L2_study_years": "17"
+    },
+    "S19": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "21",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "14"
+    },
+    "S20": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "18",
+      "learner_level_CEFR_conversion": "B1",
+      "L2_study_years": "11"
+    },
+    "S21": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "24",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "17"
+    },
+    "S22": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "21",
+      "learner_level_CEFR_conversion": "B2",
+      "L2_study_years": "14"
+    },
+    "S23": {
+      "sex": "m",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "18",
+      "learner_level_CEFR_conversion": "C1",
+      "L2_study_years": "11"
+    },
+    "S24": {
+      "sex": "f",
+      "l1": [
+        "tur"
+      ],
+      "l2": [
+        "eng"
+      ],
+      "age": "23",
+      "learner_level_CEFR_conversion": "A2",
+      "L2_study_years": "16"
+    }
+  },
+  "warnings": [],
+  "utterances": [
+    {
+      "id": "S01T1_000",
+      "spk": "S01",
+      "task": "T1",
+      "text": "this three weather water world thing young song red right very cat bad map ship sheep bit beat.",
+      "dur": 8.131
+    },
+    {
+      "id": "S01T2_000",
+      "spk": "S01",
+      "task": "T2",
+      "text": "water world thing young song red right very cat bad map ship sheep bit beat full fool about.",
+      "dur": 7.319
+    },
+    {
+      "id": "S02T1_000",
+      "spk": "S02",
+      "task": "T1",
+      "text": "three weather water world thing young song red right very cat bad map ship sheep bit beat full.",
+      "dur": 7.906
+    },
+    {
+      "id": "S02T2_000",
+      "spk": "S02",
+      "task": "T2",
+      "text": "world thing young song red right very cat bad map ship sheep bit beat full fool about sofa.",
+      "dur": 7.95
+    },
+    {
+      "id": "S03T1_000",
+      "spk": "S03",
+      "task": "T1",
+      "text": "weather water world thing young song red right very cat bad map ship sheep bit beat full fool.",
+      "dur": 8.154
+    },
+    {
+      "id": "S03T2_000",
+      "spk": "S03",
+      "task": "T2",
+      "text": "thing young song red right very cat bad map ship sheep bit beat full fool about sofa student.",
+      "dur": 8.249
+    },
+    {
+      "id": "S04T1_000",
+      "spk": "S04",
+      "task": "T1",
+      "text": "water world thing young song red right very cat bad map ship sheep bit beat full fool about.",
+      "dur": 8.073
+    },
+    {
+      "id": "S04T2_000",
+      "spk": "S04",
+      "task": "T2",
+      "text": "young song red right very cat bad map ship sheep bit beat full fool about sofa student street.",
+      "dur": 8.504
+    },
+    {
+      "id": "S05T1_000",
+      "spk": "S05",
+      "task": "T1",
+      "text": "world thing young song red right very cat bad map ship sheep bit beat full fool about sofa.",
+      "dur": 7.759
+    },
+    {
+      "id": "S05T2_000",
+      "spk": "S05",
+      "task": "T2",
+      "text": "song red right very cat bad map ship sheep bit beat full fool about sofa student street spring.",
+      "dur": 8.524
+    },
+    {
+      "id": "S06T1_000",
+      "spk": "S06",
+      "task": "T1",
+      "text": "thing young song red right very cat bad map ship sheep bit beat full fool about sofa student.",
+      "dur": 8.442
+    },
+    {
+      "id": "S06T2_000",
+      "spk": "S06",
+      "task": "T2",
+      "text": "red right very cat bad map ship sheep bit beat full fool about sofa student street spring school.",
+      "dur": 9.434
+    },
+    {
+      "id": "S07T1_000",
+      "spk": "S07",
+      "task": "T1",
+      "text": "young song red right very cat bad map ship sheep bit beat full fool about sofa student street.",
+      "dur": 8.808
+    },
+    {
+      "id": "S07T2_000",
+      "spk": "S07",
+      "task": "T2",
+      "text": "right very cat bad map ship sheep bit beat full fool about sofa student street spring school stop.",
+      "dur": 8.997
+    },
+    {
+      "id": "S08T1_000",
+      "spk": "S08",
+      "task": "T1",
+      "text": "song red right very cat bad map ship sheep bit beat full fool about sofa student street spring.",
+      "dur": 8.388
+    },
+    {
+      "id": "S08T2_000",
+      "spk": "S08",
+      "task": "T2",
+      "text": "very cat bad map ship sheep bit beat full fool about sofa student street spring school stop desk.",
+      "dur": 8.735
+    },
+    {
+      "id": "S09T1_000",
+      "spk": "S09",
+      "task": "T1",
+      "text": "red right very cat bad map ship sheep bit beat full fool about sofa student street spring school.",
+      "dur": 9.148
+    },
+    {
+      "id": "S09T2_000",
+      "spk": "S09",
+      "task": "T2",
+      "text": "cat bad map ship sheep bit beat full fool about sofa student street spring school stop desk job.",
+      "dur": 9.755
+    },
+    {
+      "id": "S10T1_000",
+      "spk": "S10",
+      "task": "T1",
+      "text": "right very cat bad map ship sheep bit beat full fool about sofa student street spring school stop.",
+      "dur": 9.198
+    },
+    {
+      "id": "S10T2_000",
+      "spk": "S10",
+      "task": "T2",
+      "text": "bad map ship sheep bit beat full fool about sofa student street spring school stop desk job bridge.",
+      "dur": 9.377
+    },
+    {
+      "id": "S11T1_000",
+      "spk": "S11",
+      "task": "T1",
+      "text": "very cat bad map ship sheep bit beat full fool about sofa student street spring school stop desk.",
+      "dur": 9.657
+    },
+    {
+      "id": "S11T2_000",
+      "spk": "S11",
+      "task": "T2",
+      "text": "map ship sheep bit beat full fool about sofa student street spring school stop desk job bridge church.",
+      "dur": 9.181
+    },
+    {
+      "id": "S12T1_000",
+      "spk": "S12",
+      "task": "T1",
+      "text": "cat bad map ship sheep bit beat full fool about sofa student street spring school stop desk job.",
+      "dur": 9.268
+    },
+    {
+      "id": "S12T2_000",
+      "spk": "S12",
+      "task": "T2",
+      "text": "ship sheep bit beat full fool about sofa student street spring school stop desk job bridge church measure.",
+      "dur": 8.961
+    },
+    {
+      "id": "S13T1_000",
+      "spk": "S13",
+      "task": "T1",
+      "text": "bad map ship sheep bit beat full fool about sofa student street spring school stop desk job bridge.",
+      "dur": 9.116
+    },
+    {
+      "id": "S13T2_000",
+      "spk": "S13",
+      "task": "T2",
+      "text": "sheep bit beat full fool about sofa student street spring school stop desk job bridge church measure vision.",
+      "dur": 9.404
+    },
+    {
+      "id": "S14T1_000",
+      "spk": "S14",
+      "task": "T1",
+      "text": "map ship sheep bit beat full fool about sofa student street spring school stop desk job bridge church.",
+      "dur": 9.17
+    },
+    {
+      "id": "S14T2_000",
+      "spk": "S14",
+      "task": "T2",
+      "text": "bit beat full fool about sofa student street spring school stop desk job bridge church measure vision garage.",
+      "dur": 10.104
+    },
+    {
+      "id": "S15T1_000",
+      "spk": "S15",
+      "task": "T1",
+      "text": "ship sheep bit beat full fool about sofa student street spring school stop desk job bridge church measure.",
+      "dur": 9.289
+    },
+    {
+      "id": "S15T2_000",
+      "spk": "S15",
+      "task": "T2",
+      "text": "beat full fool about sofa student street spring school stop desk job bridge church measure vision garage think.",
+      "dur": 10.017
+    },
+    {
+      "id": "S16T1_000",
+      "spk": "S16",
+      "task": "T1",
+      "text": "sheep bit beat full fool about sofa student street spring school stop desk job bridge church measure vision.",
+      "dur": 9.874
+    },
+    {
+      "id": "S16T2_000",
+      "spk": "S16",
+      "task": "T2",
+      "text": "full fool about sofa student street spring school stop desk job bridge church measure vision garage think this.",
+      "dur": 10.038
+    },
+    {
+      "id": "S17T1_000",
+      "spk": "S17",
+      "task": "T1",
+      "text": "bit beat full fool about sofa student street spring school stop desk job bridge church measure vision garage.",
+      "dur": 9.737
+    },
+    {
+      "id": "S17T2_000",
+      "spk": "S17",
+      "task": "T2",
+      "text": "fool about sofa student street spring school stop desk job bridge church measure vision garage think this three.",
+      "dur": 10.143
+    },
+    {
+      "id": "S18T1_000",
+      "spk": "S18",
+      "task": "T1",
+      "text": "beat full fool about sofa student street spring school stop desk job bridge church measure vision garage think.",
+      "dur": 10.264
+    },
+    {
+      "id": "S18T2_000",
+      "spk": "S18",
+      "task": "T2",
+      "text": "about sofa student street spring school stop desk job bridge church measure vision garage think this three weather.",
+      "dur": 10.435
+    },
+    {
+      "id": "S19T1_000",
+      "spk": "S19",
+      "task": "T1",
+      "text": "full fool about sofa student street spring school stop desk job bridge church measure vision garage think this.",
+      "dur": 9.993
+    },
+    {
+      "id": "S19T2_000",
+      "spk": "S19",
+      "task": "T2",
+      "text": "sofa student street spring school stop desk job bridge church measure vision garage think this three weather water.",
+      "dur": 10.521
+    },
+    {
+      "id": "S20T1_000",
+      "spk": "S20",
+      "task": "T1",
+      "text": "fool about sofa student street spring school stop desk job bridge church measure vision garage think this three.",
+      "dur": 10.383
+    },
+    {
+      "id": "S20T2_000",
+      "spk": "S20",
+      "task": "T2",
+      "text": "student street spring school stop desk job bridge church measure vision garage think this three weather water world.",
+      "dur": 9.927
+    },
+    {
+      "id": "S21T1_000",
+      "spk": "S21",
+      "task": "T1",
+      "text": "about sofa student street spring school stop desk job bridge church measure vision garage think this three weather.",
+      "dur": 10.192
+    },
+    {
+      "id": "S21T2_000",
+      "spk": "S21",
+      "task": "T2",
+      "text": "street spring school stop desk job bridge church measure vision garage think this three weather water world thing.",
+      "dur": 9.403
+    },
+    {
+      "id": "S22T1_000",
+      "spk": "S22",
+      "task": "T1",
+      "text": "sofa student street spring school stop desk job bridge church measure vision garage think this three weather water.",
+      "dur": 10.148
+    },
+    {
+      "id": "S22T2_000",
+      "spk": "S22",
+      "task": "T2",
+      "text": "spring school stop desk job bridge church measure vision garage think this three weather water world thing young.",
+      "dur": 8.844
+    },
+    {
+      "id": "S23T1_000",
+      "spk": "S23",
+      "task": "T1",
+      "text": "student street spring school stop desk job bridge church measure vision garage think this three weather water world.",
+      "dur": 9.91
+    },
+    {
+      "id": "S23T2_000",
+      "spk": "S23",
+      "task": "T2",
+      "text": "school stop desk job bridge church measure vision garage think this three weather water world thing young song.",
+      "dur": 9.372
+    },
+    {
+      "id": "S24T1_000",
+      "spk": "S24",
+      "task": "T1",
+      "text": "street spring school stop desk job bridge church measure vision garage think this three weather water world thing.",
+      "dur": 9.718
+    },
+    {
+      "id": "S24T2_000",
+      "spk": "S24",
+      "task": "T2",
+      "text": "stop desk job bridge church measure vision garage think this three weather water world thing young song red.",
+      "dur": 8.713
+    }
+  ],
+  "insertions": [
+    {
+      "phone": "ɯ",
+      "total": 83,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "t",
+      "total": 7,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "n",
+      "total": 6,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɛ",
+      "total": 5,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ə",
+      "total": 4,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "p",
+      "total": 4,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "s",
+      "total": 3,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ŋ",
+      "total": 3,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "f",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "l",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "aʊ",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "r",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɪ",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ʒ",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɚ",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɔ",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "k",
+      "total": 2,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "u",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ʤ",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɛr",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "b",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "i",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "d",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "m",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "v",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɝ",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "θ",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "j",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "a",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    },
+    {
+      "phone": "ɹ",
+      "total": 1,
+      "correct": 0,
+      "substitute": 0,
+      "delete": 0,
+      "accuracy": null,
+      "confusions": {}
+    }
+  ]
+}

@@ -8,7 +8,18 @@
         "dev"
       ],
       "port": 3000,
-      "cwd": "C:\\Users\\faruq\\Desktop\\college\\senior\\app"
+      "cwd": "app"
+    },
+    {
+      "name": "corptes-site",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev",
+        "--port",
+        "5290"
+      ],
+      "port": 5290,
+      "cwd": "corpus/site"
     }
   ]
 }
