@@ -78,14 +78,20 @@ export function UtterancePanel({
 								</p>
 							)}
 
-							<audio
-								ref={audioRef}
-								src={clipURL(utt.clip)}
-								controls
-								preload="none"
-								onTimeUpdate={(e) => setPlayhead(e.currentTarget.currentTime)}
-								className="w-full"
-							/>
+							{utt.audioAvailable === false ? (
+								<p className="rounded-[var(--radius-card)] border border-dashed border-[var(--color-rule)] p-3 text-[var(--color-ink-faint)] text-xs">
+									Audio is unavailable for this utterance; its corpus annotations remain available.
+								</p>
+							) : (
+								<audio
+									ref={audioRef}
+									src={clipURL(utt.clip)}
+									controls
+									preload="none"
+									onTimeUpdate={(e) => setPlayhead(e.currentTarget.currentTime)}
+									className="w-full"
+								/>
+							)}
 
 							<PhoneStrip utt={utt} onSeek={seek} focusToken={focusToken} />
 

@@ -43,7 +43,7 @@ export function loadStressStats(): Promise<StressStats> {
 
 /** Token shard for one target phone within an area folder. Empty on 404. */
 export async function loadPhoneTokens(
-	area: Area | "stress",
+	area: Area | "stress" | "linking" | "intonation",
 	phone: string,
 ): Promise<TokenRow[]> {
 	try {

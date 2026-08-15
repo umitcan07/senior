@@ -21,6 +21,7 @@ const AREAS: AreaKey[] = [
 	"vowels",
 	"consonants",
 	"lexical-stress",
+	"linking",
 	"rhythm",
 	"intonation",
 ];

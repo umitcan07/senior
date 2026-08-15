@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AboutView } from "./components/AboutView";
 import { FilterSidebar } from "./components/FilterSidebar";
 import { IntonationView } from "./components/IntonationView";
+import { LinkingView } from "./components/LinkingView";
 import { Masthead, type View } from "./components/Masthead";
 import { RhythmView } from "./components/RhythmView";
 import { SegmentalView } from "./components/SegmentalView";
@@ -100,6 +101,14 @@ export function App() {
 						)}
 						{sel.area === "lexical-stress" && (
 							<StressView
+								manifest={manifest}
+								onOpenUtterance={(id, t) =>
+									setOpenUtterance({ id, focusToken: t })
+								}
+							/>
+						)}
+						{sel.area === "linking" && (
+							<LinkingView
 								manifest={manifest}
 								onOpenUtterance={(id, t) =>
 									setOpenUtterance({ id, focusToken: t })

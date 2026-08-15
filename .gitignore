@@ -32,3 +32,5 @@ data/finetune/
 
 # Claude Code harness scratch
 .claude/scheduled_tasks.lock
+
+data/kardelen/

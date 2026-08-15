@@ -1,32 +1,36 @@
-# About this corpus
+# About CORPTES
 
-The sections marked with a callout are for the corpus compiler to write — the
-rest describes how this site derives what it shows and should stay accurate to
-the pipeline. Edit this file and rebuild; nothing else needs to change.
+CORPTES (Corpus Phonology of Turkish EFL Learners) is a phonologically
+annotated learner-speech corpus developed as part of the 2026 doctoral
+dissertation *An Analysis of L2 Learner Pronunciation and Intelligibility:
+Developing a Phonological Corpus of Turkish Learners of English (CORPTES)*.
+It supports research on English pronunciation by Turkish learners, especially
+the relationship between pronunciation and speech intelligibility.
 
-## What this corpus is
+## What the corpus contains
 
-> **To be written by Kardelen Kılınç.** What the corpus is for, what research
-> question it was built to answer, and what a visitor should expect to find in
-> it. A short paragraph or two is plenty.
+CORPTES contains recordings from 30 Turkish EFL learners in two complementary
+tasks: a controlled read-aloud task and elicited spontaneous speech. It combines
+audio, orthographic and phonological information, multilayer annotations and
+speaker information in the EXMARaLDA corpus environment.
 
-## How the recordings were collected
+The explorer reports vowels, consonants, lexical stress, linking, rhythm and
+intonation. Linking and rhythm are distinct: linking is a hand-annotated
+word-boundary judgment; rhythm is a set of durational measurements.
 
-> **To be written by Kardelen Kılınç.** The elicitation tasks (what the two
-> tasks were, what participants were asked to do), the recording setup, and when
-> and where the sessions took place.
+## Who can use CORPTES
 
-## Who the speakers are
+CORPTES is intended for researchers in second-language acquisition, L2
+phonology, learner and speech corpora, CAPT and speech technology; teachers,
+teacher educators, curriculum and materials developers; and Turkish learners
+who want to develop pronunciation awareness from authentic learner speech.
 
-> **To be written by Kardelen Kılınç.** Recruitment, proficiency range and how
-> it was established, and anything a reader needs in order to judge how far the
-> findings generalise. The speaker counts on this page are read from the corpus
-> itself, so they do not need repeating here.
+## CORPTES for self-study
 
-## How the transcriptions were made
-
-> **To be written by Kardelen Kılınç.** Who transcribed, against what
-> conventions, and whether any inter-annotator agreement was measured.
+Learners can explore common patterns in vowels, consonants, lexical stress,
+linking and intonation, compare productions in context, and use short clips
+where audio is available. CORPTES does not promote imitation of one native
+speaker model; its pedagogical focus is intelligible, effective communication.
 
 ---
 
@@ -58,27 +62,17 @@ The concordance is a working surface, not just a table:
 
 ## How correct and incorrect are decided
 
-A production counts as **correct only if it matches the reference phone
-exactly**. There is no tolerance table and no partial credit: `/θ/` realised as
-`/t/` is an error, and so is `/ɪ/` realised as `/i/`.
-
-The comparison is between two tiers of the corpus annotation — the learner's
-transcribed `phones` tier and the reference `REF-phones` tier — aligned with a
-Needleman–Wunsch edit-distance alignment. That alignment yields four outcomes
-per position: correct, substituted, omitted, and inserted.
-
-Two consequences worth stating plainly:
-
-- **These figures come from the corpus annotation, not from a speech model.**
-  Nothing on this site is a machine prediction of correctness.
-- **Stress and length mismatches are counted separately** from segmental errors.
-  A vowel can be the right vowel yet carry the wrong stress; that case is a
-  lexical-stress mismatch, not a vowel error. Such rows carry a ˢ or ˡ badge.
+Correct/incorrect figures are the corpus annotators’ own judgments in the
+`phoneAcc`, `Stress_accuracy`, `linkingAcc_accuracy` and
+`Intonation_accuracy` tiers. They are not machine predictions and this site
+does not infer substitutions, omissions or confusions that the corpus does not
+annotate.
 
 ## What is reported but not graded
 
-**Rhythm** and **intonation** are presented as measurements, with no
-correct/incorrect verdict attached.
+**Rhythm** is presented as a measurement, with no correct/incorrect verdict
+attached. Intonation may also include a corpus-native annotation judgment;
+the F0 contour remains supplementary evidence rather than an automatic grade.
 
 This is deliberate. An nPVI value or an F0 contour has no single right answer —
 a rising nucleus is information about how the utterance was produced, not an
@@ -101,11 +95,13 @@ inspection.
 
 ## Citing this corpus
 
-> **To be written by Kardelen Kılınç.** The citation you want users to give,
-> and a DOI or permanent link if there is one.
+Please acknowledge CORPTES and cite Kardelen Kılınç’s 2026 doctoral
+dissertation when using the corpus for research, publication or teaching.
+Contact the corpus compiler for the definitive citation format or access terms.
 
 ## Contact and licence
 
-> **To be written by Kardelen Kılınç.** Who to contact about the corpus, the
-> terms under which the data and audio may be reused, and the ethics approval
-> the recordings were collected under.
+For corpus access, use, collaboration or further information, contact Dr.
+Kardelen Kılınç, Eskişehir Technical University School of Foreign Languages:
+kardelenkilinc@eskisehir.edu.tr. Reuse of data and audio is subject to the
+corpus compiler’s conditions.

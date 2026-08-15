@@ -61,6 +61,7 @@ def verify(raw_dir: Path) -> int:
 
     total_files = 0
     paired_files = 0
+    native_judgment_files = 0
     single_tier_files: list[str] = []
     missing_wav: list[str] = []
     stress_hits = 0
@@ -105,7 +106,7 @@ def verify(raw_dir: Path) -> int:
                         oov[parsed.token] += 1
 
     print()
-    print("── Q1: paired tiers (correct/incorrect available) ─────────────")
+    print("── Q1: segmental judgment source ──────────────────────────────")
     print(f"  {paired_files}/{total_files} files have BOTH phones + REF-phones")
     if single_tier_files:
         print(f"  {len(single_tier_files)} single-tier (inventory-only):")
@@ -151,6 +152,8 @@ def verify(raw_dir: Path) -> int:
                 continue
             for t in tr.tiers(type="a"):
                 ann_categories[t.category] += 1
+            if any(t.category.lower() == "phoneacc" and t.events for t in tr.tier_list):
+                native_judgment_files += 1
             for sp in tr.speakers.values():
                 ud_keys.update(sp.ud.keys())
         if ann_categories:
@@ -161,13 +164,18 @@ def verify(raw_dir: Path) -> int:
             print(f"  speaker metadata keys seen: {sorted(ud_keys)}")
 
     print("\n" + "=" * 62)
-    if paired_files == 0 and total_files > 0:
-        print("BLOCKER: no file has both tiers — cannot compute correct/incorrect.")
+    if native_judgment_files:
+        print(f"  corpus-native phoneAcc judgments: {native_judgment_files} file(s)")
+    if paired_files == 0 and native_judgment_files == 0 and total_files > 0:
+        print("BLOCKER: no paired tiers or phoneAcc annotations — cannot compute correct/incorrect.")
         return 1
     if total_files == 0:
         print("BLOCKER: no TextGrid files found.")
         return 1
-    print(f"OK: {paired_files} file(s) usable for correct/incorrect. Ready to build.")
+    print(
+        f"OK: {native_judgment_files or paired_files} file(s) expose a segmental judgment source. "
+        "Ready to build."
+    )
     return 0
 
 

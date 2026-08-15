@@ -7,6 +7,7 @@ export type AreaKey =
 	| "vowels"
 	| "consonants"
 	| "lexical-stress"
+	| "linking"
 	| "rhythm"
 	| "intonation";
 
@@ -52,7 +53,8 @@ export interface PhoneStat {
 
 export interface Manifest {
 	build: {
-		raw_dir: string;
+		corpusId?: string;
+		raw_dir?: string;
 		files: number;
 		utterances: number;
 		pitchBackend: "parselmouth" | "numpy-autocorr" | "none";
@@ -87,6 +89,13 @@ export interface StressStats {
 	mismatch: number;
 	marksPresent: boolean;
 	byPhone: StressPhoneStat[];
+}
+
+export interface AnnotationStats {
+	area: "linking" | "intonation";
+	total: number;
+	correct: number;
+	incorrect: number;
 }
 
 export interface TokenRow {
@@ -133,6 +142,7 @@ export interface UtteranceDetail {
 	text: string | null;
 	dur: number;
 	clip: string;
+	audioAvailable?: boolean;
 	aligned: boolean;
 	tokens: (TokenRow & { st: number; sa: number })[];
 	rhythm: RhythmMetrics;

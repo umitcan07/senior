@@ -78,23 +78,25 @@ export const AREA_LABELS: Record<AreaKey, string> = {
 	vowels: "Vowels",
 	consonants: "Consonants",
 	"lexical-stress": "Lexical Stress",
+	linking: "Linking",
 	rhythm: "Rhythm",
 	intonation: "Intonation",
 };
 
 export const AREA_BLURBS: Record<AreaKey, string> = {
-	vowels: "Monophthongs and diphthongs, scored against the reference target.",
+	vowels: "Annotated vowel productions and corpus-native correctness judgments.",
 	consonants: "Manner, place and voicing — including the sounds Turkish lacks.",
 	"lexical-stress":
-		"Where primary and secondary stress land, versus the target.",
+		"Hand-annotated lexical-stress judgments from CORPTES.",
+	linking: "Hand-annotated word-boundary linking judgments in connected speech.",
 	rhythm:
 		"Durational measures (%V, nPVI, Varco) — reported, not graded.",
-	intonation: "Pitch contours over each utterance — reported, not graded.",
+	intonation: "Hand-annotated intonation judgments with pitch contours for inspection.",
 };
 
 export const ERROR_LABELS: Record<ErrorType, string> = {
 	correct: "Correct",
-	substitute: "Substituted",
+	substitute: "Incorrect",
 	delete: "Omitted",
 	insert: "Inserted",
 };

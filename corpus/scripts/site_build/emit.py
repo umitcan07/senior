@@ -26,6 +26,7 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 
 @dataclass
@@ -128,6 +129,7 @@ class SiteWriter:
         self._stress_by_phone: dict[str, list[int]] = {}
         self._stress_marks_seen = False
         self._stress_rows: list[dict[str, Any]] = []
+        self._annotations: dict[str, list[dict[str, Any]]] = {}
 
     def add_token(self, area: str, row: TokenRow) -> None:
         # Insertions have no target phone; bucket them under the actual phone in
@@ -196,12 +198,44 @@ class SiteWriter:
         )
         _write_json(self.data / "utterances" / f"{payload['id']}.json", payload)
 
+    def add_annotation(self, area: str, row: dict[str, Any]) -> None:
+        """Store a corpus-native hand judgement as a concordance row."""
+        self._annotations.setdefault(area, []).append(row)
+        if area == "lexical-stress":
+            self._stress_marks_seen = True
+            self._stress_total += 1
+            outcome = row["e"] == "correct"
+            if outcome:
+                self._stress_correct += 1
+            else:
+                self._stress_rows.append(row)
+
+    def write_annotation_stats(self, area: str) -> None:
+        rows = self._annotations.get(area, [])
+        correct = sum(1 for row in rows if row["e"] == "correct")
+        # The existing UI's ``substitute`` column is retained as a transport
+        # field for an incorrect hand judgement; no substitution is claimed.
+        payload = {
+            "area": area,
+            "total": len(rows),
+            "correct": correct,
+            "incorrect": len(rows) - correct,
+            "mismatch": len(rows) - correct,
+            "marksPresent": bool(rows),
+            "byPhone": [],
+        }
+        _write_json(self.data / "areas" / f"{area}.json", payload)
+        _write_json(self.data / "tokens" / area / "all.json", rows)
+
     def phone_stat(self, target: str) -> PhoneStat:
         return self._stats.setdefault(target, PhoneStat(target=target))
 
     def flush_shards(self) -> None:
         for (area, key), rows in self._shards.items():
-            _write_json(self.data / "tokens" / area / f"{key}.json", rows)
+            # Corpus labels may contain Windows-reserved characters (notably
+            # ``:`` in length notation). Match the browser's encodeURIComponent
+            # request path while keeping generated files portable.
+            _write_json(self.data / "tokens" / area / f"{quote(key, safe='')}.json", rows)
 
     def write_area_stats(self, area: str, phones: list[str]) -> None:
         stats = [

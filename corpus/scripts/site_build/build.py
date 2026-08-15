@@ -38,6 +38,7 @@ Design notes:
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -66,11 +67,11 @@ SYNTHETIC_MARKER = ".synthetic"
 
 # Per-task tier wiring (corpus/finetune_qc.md Gate 0/3).
 TASK_TIERS = {
-    "T1": {"phones": ("phones",), "ref": ("REF-phones", "phones"), "words": ("words",)},
+    "T1": {"phones": ("phones",), "ref": ("REF-phones",), "words": ("words", "REF-words", "REF_words", "REF")},
     "T2": {
-        "phones": ("phones", "REF-phones"),
+        "phones": ("phones",),
         "ref": ("REF-phones",),
-        "words": ("REF-words-matched", "REF-words", "words"),
+        "words": ("REF-words-matched", "REF-words", "words", "REF"),
     },
 }
 
@@ -203,7 +204,12 @@ def build(
     *,
     cut_clips: bool = False,
     limit: int | None = None,
+    clean: bool = True,
+    skip_pitch: bool = False,
 ) -> int:
+    if clean:
+        for child in (out_dir / "data", out_dir / "clips"):
+            shutil.rmtree(child, ignore_errors=True)
     writer = emit.SiteWriter(out_dir)
     all_warnings: list[str] = []
     speakers_meta: dict[str, dict] = {}
@@ -232,28 +238,34 @@ def build(
 
             # Speaker metadata from the sibling .exb, if present.
             exb_path = _find_exb(tg_path, raw_dir)
+            transcription = None
             if exb_path and speaker not in speakers_meta:
                 meta = _speaker_meta(exb_path, speaker)
                 if meta:
                     speakers_meta[speaker] = meta
+            if exb_path:
+                try:
+                    transcription = exb.parse_exb(exb_path)
+                except Exception as error:
+                    all_warnings.append(f"{exb_path.name}: parse failed ({error})")
 
             utterances, warnings = load_utterances(tg, speaker, tsk)
             all_warnings.extend(warnings)
 
             for utt in utterances:
                 n_utts += 1
-                _emit_utterance(writer, utt, wav_path, cut_clips)
+                _emit_utterance(writer, utt, wav_path, cut_clips, transcription, skip_pitch)
 
     manifest = {
         "build": {
-            "raw_dir": str(raw_dir),
+            "corpusId": "corptes-v1",
             "files": n_files,
             "utterances": n_utts,
-            "pitchBackend": intonation.backend(),
+            "pitchBackend": "none" if skip_pitch else intonation.backend(),
             "clips": cut_clips,
             "synthetic": (raw_dir / SYNTHETIC_MARKER).exists(),
         },
-        "areas": ["vowels", "consonants", "lexical-stress", "rhythm", "intonation"],
+        "areas": ["vowels", "consonants", "lexical-stress", "linking", "rhythm", "intonation"],
         "filterTree": inventory.filter_tree(),
         "speakers": speakers_meta,
         "warnings": all_warnings,
@@ -264,6 +276,8 @@ def build(
         phones = [p.token for p in inventory.INVENTORY.values() if p.area == area]
         writer.write_area_stats(area, phones)
     writer.write_stress_stats()
+    for area in ("linking", "intonation"):
+        writer.write_annotation_stats(area)
     writer.write_manifest(manifest)
 
     print(f"Built {n_utts} utterances from {n_files} files -> {out_dir}")
@@ -274,11 +288,71 @@ def build(
     return 0
 
 
+def _annotation_events(
+    transcription: exb.Transcription | None, category: str, t0: float, t1: float
+) -> list[tuple[float, float, str, str | None]]:
+    """Resolve EXB annotation events that overlap an utterance."""
+    if transcription is None:
+        return []
+    out: list[tuple[float, float, str, str | None]] = []
+    # ``event_times`` recomputes interpolation each call. A real transcription
+    # has thousands of timeline items, so resolve it once per utterance.
+    timeline = transcription.anchored_timeline()
+    for tier in transcription.tiers(category=category):
+        for event in tier.events:
+            start = timeline.get(event.start)
+            end = timeline.get(event.end)
+            if start is None or end is None:
+                continue
+            if min(t1, end) <= max(t0, start):
+                continue
+            outcome = event.text.strip().lower()
+            if outcome not in ("correct", "incorrect"):
+                continue
+            out.append((start, end, outcome, tier.display_name))
+    return out
+
+
+def _matching_judgment(
+    events: list[tuple[float, float, str, str | None]], t0: float, t1: float
+) -> str | None:
+    mid = (t0 + t1) / 2
+    matches = [event for event in events if event[0] <= mid <= event[1]]
+    if not matches:
+        return None
+    return matches[0][2]
+
+
 def _emit_utterance(
-    writer: emit.SiteWriter, utt: Utterance, wav_path: Path, cut_clips: bool
+    writer: emit.SiteWriter,
+    utt: Utterance,
+    wav_path: Path,
+    cut_clips: bool,
+    transcription: exb.Transcription | None = None,
+    skip_pitch: bool = False,
 ) -> None:
+    native_phone_acc = _annotation_events(transcription, "phoneAcc", utt.t0, utt.t1)
     have_both = bool(utt.ref_phones and utt.act_phones)
-    if have_both:
+    if native_phone_acc:
+        # CORPTES records the production tier and an independent hand judgement;
+        # do not fabricate a reference tier or infer substitutions.
+        present = utt.act_phones or utt.ref_phones
+        tokens = []
+        for i, iv in enumerate(present):
+            judgment = _matching_judgment(native_phone_acc, iv.t0, iv.t1)
+            if judgment is None:
+                continue
+            tokens.append(
+                align.Token(
+                    index=i,
+                    error="correct" if judgment == "correct" else "substitute",
+                    target=inventory.parse_phone(iv.text).token,
+                    actual=inventory.parse_phone(iv.text).token,
+                    t0=iv.t0,
+                    t1=iv.t1,
+                )
+            )
+    elif have_both:
         tokens = align.align_intervals(utt.ref_phones, utt.act_phones, utt.words)
     else:
         # Inventory-only: emit the phones present (as "correct") so the token is
@@ -300,7 +374,7 @@ def _emit_utterance(
     rhythm_metrics = rhythm.compute_rhythm(utt.act_phones or utt.ref_phones)
 
     contour = None
-    if intonation.available() and wav_path.exists():
+    if not skip_pitch and intonation.available() and wav_path.exists():
         contour = intonation.extract_contour(wav_path, utt.t0, utt.t1)
 
     clip_rel = f"clips/{utt.id}.wav"
@@ -343,7 +417,7 @@ def _emit_utterance(
             left_context=left_ctx,
             right_context=right_ctx,
         )
-        if have_both:
+        if have_both or native_phone_acc:
             writer.add_token(area if area != "other" else "consonants", row)
             # Feed lexical stress: only vowels can bear stress, and a slot is
             # evidence only where a stress mark was actually present.
@@ -364,6 +438,29 @@ def _emit_utterance(
             }
         )
 
+    # These are corpus-native hand judgements, not acoustic-model decisions.
+    for area, category in (
+        ("lexical-stress", "Stress_accuracy"),
+        ("linking", "linkingAcc_accuracy"),
+        ("intonation", "Intonation_accuracy"),
+    ):
+        for idx, event in enumerate(_annotation_events(transcription, category, utt.t0, utt.t1)):
+            t0, t1, outcome, label = event
+            writer.add_annotation(
+                area,
+                {
+                    "id": f"{utt.id}_{area}_{idx:03d}",
+                    "u": utt.id,
+                    "spk": utt.speaker,
+                    "tgt": label,
+                    "act": label,
+                    "e": "correct" if outcome == "correct" else "substitute",
+                    "t0": round(t0 - utt.t0, 3),
+                    "t1": round(t1 - utt.t0, 3),
+                    "w": label,
+                },
+            )
+
     writer.add_utterance(
         {
             "id": utt.id,
@@ -372,7 +469,8 @@ def _emit_utterance(
             "text": utt.text,
             "dur": round(utt.t1 - utt.t0, 3),
             "clip": clip_rel,
-            "aligned": have_both,
+            "audioAvailable": cut_clips and wav_path.exists(),
+            "aligned": have_both or bool(native_phone_acc),
             "tokens": token_payload,
             "rhythm": rhythm_metrics.as_dict(),
             "pitch": contour.as_dict() if contour else None,
@@ -416,6 +514,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--clips", action="store_true", help="cut clips (needs ffmpeg)")
     parser.add_argument("--limit", type=int, default=None, help="max files (debug)")
+    parser.add_argument("--no-clean", action="store_true", help="preserve old generated artifacts")
+    parser.add_argument("--skip-pitch", action="store_true", help="skip slow F0 extraction")
     args = parser.parse_args(argv)
 
     if args.raw is None:
@@ -432,7 +532,10 @@ def main(argv: list[str] | None = None) -> int:
         print("Set CORPUS_RAW_DIR or pass --raw.", file=sys.stderr)
         return 1
 
-    return build(raw, args.out, cut_clips=args.clips, limit=args.limit)
+    return build(
+        raw, args.out, cut_clips=args.clips, limit=args.limit,
+        clean=not args.no_clean, skip_pitch=args.skip_pitch,
+    )
 
 
 if __name__ == "__main__":

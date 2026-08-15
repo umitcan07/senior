@@ -98,6 +98,12 @@ def _parse_long(text: str, path: Path) -> TextGrid:
                 intervals.append(Interval(t, t, _unquote(m.group(2))))
             kind = "point"
 
+        # A few CORPTES exports contain an empty shell tier followed by the
+        # populated tier under the same name (notably S1T1 linking). Preserve
+        # the useful intervals rather than silently replacing them.
+        existing = tiers.get(name)
+        if existing is not None:
+            intervals = existing.intervals + intervals
         tiers[name] = Tier(name=name, kind=kind, intervals=intervals)
 
     return TextGrid(path=path, xmin=xmin, xmax=xmax, tiers=tiers)
@@ -141,6 +147,9 @@ def _parse_short(text: str, path: Path) -> TextGrid:
                 intervals.append(Interval(t, t, label))
                 i += 2
             kind = "point"
+        existing = tiers.get(name)
+        if existing is not None:
+            intervals = existing.intervals + intervals
         tiers[name] = Tier(name=name, kind=kind, intervals=intervals)
 
     return TextGrid(path=path, xmin=xmin, xmax=xmax, tiers=tiers)
@@ -163,7 +172,13 @@ def _looks_numeric(line: str) -> bool:
 
 def read_textgrid(path: Path) -> TextGrid:
     """Parse a TextGrid, auto-detecting long vs short text format."""
-    text = path.read_text(encoding="utf-8", errors="replace")
+    raw = path.read_bytes()
+    # The real drop includes UTF-16 TextGrids (S27T1). BOM-aware decoding is
+    # required; UTF-8 replacement would make the long-format detector fail.
+    if raw.startswith((b"\xff\xfe", b"\xfe\xff")):
+        text = raw.decode("utf-16")
+    else:
+        text = raw.decode("utf-8-sig", errors="replace")
     # PRAAT writes a BOM on some platforms.
     text = text.lstrip("﻿")
     if "xmin = " in text or "xmin=" in text:

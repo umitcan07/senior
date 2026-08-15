@@ -15,6 +15,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
+from urllib.parse import quote
 
 _HERE = Path(__file__).resolve()
 sys.path.insert(0, str(_HERE.parents[2]))  # corpus/scripts
@@ -137,7 +138,7 @@ def test_full_build_emits_artifacts():
 
     # θ shard exists and records the substitution to t.
     theta = json.loads(
-        (out / "data" / "tokens" / "consonants" / "θ.json").read_text(encoding="utf-8")
+        (out / "data" / "tokens" / "consonants" / f"{quote('θ', safe='')}.json").read_text(encoding="utf-8")
     )
     assert any(row["act"] == "t" and row["e"] == "substitute" for row in theta)
 
