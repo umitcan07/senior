@@ -20,7 +20,6 @@ export function PhoneDetail({
 	stat: PhoneStat;
 	speakers: Record<string, SpeakerMeta>;
 	onOpenUtterance: (id: string, focusToken?: string) => void;
-	onPickConfusion: (phone: string) => void;
 }) {
 	const [tokens, setTokens] = useState<TokenRow[] | null>(null);
 
@@ -29,8 +28,7 @@ export function PhoneDetail({
 		loadPhoneTokens(area, stat.phone).then(setTokens);
 	}, [area, stat.phone]);
 
-	const confusions = Object.entries(stat.confusions).sort((a, b) => b[1] - a[1]);
-	const incorrect = stat.substitute + stat.delete;
+	const incorrect = stat.incorrect;
 
 	return (
 		<div className="rise">
@@ -42,7 +40,7 @@ export function PhoneDetail({
 					<IPA phone={stat.phone} className="font-display text-5xl" />
 				</div>
 				<div className="min-w-0 flex-1">
-					<Eyebrow>Target phone</Eyebrow>
+					<Eyebrow>Annotated phone</Eyebrow>
 					<h2 className="font-display text-4xl leading-tight">
 						<IPA phone={stat.phone} />
 					</h2>
@@ -54,10 +52,10 @@ export function PhoneDetail({
 						/>
 						<StatTile label="Tokens" value={stat.total.toLocaleString()} />
 						<StatTile
-							label="Substituted"
-							value={stat.substitute.toLocaleString()}
+							label="Correct"
+							value={stat.correct.toLocaleString()}
 						/>
-						<StatTile label="Omitted" value={stat.delete.toLocaleString()} />
+						<StatTile label="Incorrect" value={incorrect.toLocaleString()} />
 					</div>
 					<div className="mt-4 max-w-xl">
 						<div className="mb-1.5 flex items-center justify-between">
@@ -65,45 +63,13 @@ export function PhoneDetail({
 						</div>
 						<AccuracyBar
 							correct={stat.correct}
-							substitute={stat.substitute}
-							del={stat.delete}
+							incorrect={incorrect}
 							height={12}
 						/>
 					</div>
 				</div>
 			</div>
 
-			{confusions.length > 0 && (
-				<section className="mb-7">
-					<Eyebrow>
-						Realised as — {incorrect.toLocaleString()} incorrect productions
-					</Eyebrow>
-					<div className="mt-2.5 flex flex-wrap gap-2">
-						{confusions.map(([actual, count]) => {
-							const share = incorrect ? count / incorrect : 0;
-							return (
-								<div
-									key={actual}
-									className="flex items-center gap-2 rounded-[2px] border border-[var(--color-rule)] bg-[var(--color-paper-deep)]/50 py-1 pr-2.5 pl-2"
-								>
-									<IPA phone={stat.phone} className="text-sm opacity-50" />
-									<span className="text-[var(--color-ink-faint)] text-xs">→</span>
-									<IPA
-										phone={actual}
-										className="font-display text-lg text-[var(--color-incorrect)]"
-									/>
-									<span className="tnum text-[var(--color-ink-soft)] text-xs">
-										{count.toLocaleString()}{" "}
-										<span className="text-[var(--color-ink-faint)]">
-											({pct(share)})
-										</span>
-									</span>
-								</div>
-							);
-						})}
-					</div>
-				</section>
-			)}
 
 			<section>
 				<div className="mb-2.5 flex items-baseline justify-between">
@@ -126,11 +92,7 @@ export function PhoneDetail({
 				)}
 			</section>
 			<p className="mt-6 max-w-xl text-[var(--color-ink-faint)] text-xs leading-relaxed">
-				Correctness is strict identity against the reference transcription: a
-				production counts as correct only if it matches the target phone
-				exactly. Stress and length mismatches are marked separately, with the
-				<span className="mx-1 font-mono">ˢ</span> and
-				<span className="mx-1 font-mono">ˡ</span> badges.
+				Correctness is the corpus annotators’ judgment for each production.
 			</p>
 		</div>
 	);

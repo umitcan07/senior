@@ -136,26 +136,23 @@ def test_full_build_emits_artifacts():
     assert "S01" in manifest["speakers"]
     assert manifest["speakers"]["S01"]["age"] == "21"
 
-    # θ shard exists and records the substitution to t.
-    theta = json.loads(
-        (out / "data" / "tokens" / "consonants" / f"{quote('θ', safe='')}.json").read_text(encoding="utf-8")
+    # Public artifacts expose a production phone with a binary judgment.
+    t_rows = json.loads(
+        (out / "data" / "tokens" / "consonants" / f"{quote('t', safe='')}.json").read_text(encoding="utf-8")
     )
-    assert any(row["act"] == "t" and row["e"] == "substitute" for row in theta)
+    assert any(row["ph"] == "t" and row["e"] == "incorrect" for row in t_rows)
 
-    # Area stats: θ accuracy is 0 (1 substitution, 0 correct).
+    # Area stats expose Correct/Incorrect, never a fabricated confusion.
     cons = json.loads((out / "data" / "areas" / "consonants.json").read_text(encoding="utf-8"))
-    theta_stat = next(p for p in cons["phones"] if p["phone"] == "θ")
-    assert theta_stat["substitute"] == 1
-    assert theta_stat["accuracy"] == 0.0
-
-    # Insertion bucketed separately, not in target-phone denominators.
-    assert any(ins["phone"] == "ɯ" for ins in manifest["insertions"])
+    t_stat = next(p for p in cons["phones"] if p["phone"] == "t")
+    assert t_stat["incorrect"] >= 1
+    assert "confusions" not in t_stat
 
     # Per-utterance detail carries tokens + rhythm.
     utt = json.loads(
         (out / "data" / "utterances" / "S01T1_000.json").read_text(encoding="utf-8")
     )
-    assert utt["aligned"] is True
+    assert utt["judged"] is True
     assert utt["rhythm"]["percentV"] is not None
     assert len(utt["tokens"]) == 4
 

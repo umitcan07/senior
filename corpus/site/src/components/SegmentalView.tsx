@@ -51,7 +51,6 @@ export function SegmentalView({
 				stat={stat ?? emptyStat(sel.phone)}
 				speakers={manifest.speakers}
 				onOpenUtterance={onOpenUtterance}
-				onPickConfusion={() => {}}
 			/>
 		);
 	}
@@ -63,13 +62,12 @@ export function SegmentalView({
 	const totals = rows.reduce(
 		(acc, r) => {
 			acc.correct += r.correct;
-			acc.substitute += r.substitute;
-			acc.delete += r.delete;
+			acc.incorrect += r.incorrect;
 			return acc;
 		},
-		{ correct: 0, substitute: 0, delete: 0 },
+		{ correct: 0, incorrect: 0 },
 	);
-	const totalTokens = totals.correct + totals.substitute + totals.delete;
+	const totalTokens = totals.correct + totals.incorrect;
 	const overallAcc = totalTokens ? totals.correct / totalTokens : null;
 
 	return (
@@ -122,9 +120,6 @@ function PhoneCard({
 	stat: PhoneStat;
 	onClick: () => void;
 }) {
-	const topConfusion = Object.entries(stat.confusions).sort(
-		(a, b) => b[1] - a[1],
-	)[0];
 	return (
 		<button
 			type="button"
@@ -137,12 +132,6 @@ function PhoneCard({
 						phone={stat.phone}
 						className="font-display text-2xl transition-colors group-hover:text-[var(--color-accent)]"
 					/>
-					{topConfusion && (
-						<span className="text-[var(--color-ink-faint)] text-xs">
-							→ often{" "}
-							<IPA phone={topConfusion[0]} className="text-sm" />
-						</span>
-					)}
 				</div>
 				<div className="tnum text-right">
 					<span className="font-display text-lg">{pct(stat.accuracy)}</span>
@@ -151,8 +140,7 @@ function PhoneCard({
 			<div className="mt-2 flex items-center gap-2">
 				<AccuracyBar
 					correct={stat.correct}
-					substitute={stat.substitute}
-					del={stat.delete}
+					incorrect={stat.incorrect}
 				/>
 				<span className="tnum shrink-0 text-[var(--color-ink-faint)] text-xs">
 					{stat.total.toLocaleString()}
@@ -165,9 +153,7 @@ function PhoneCard({
 function EmptyState() {
 	return (
 		<div className="rounded-[var(--radius-card)] border border-[var(--color-rule)] border-dashed p-8 text-center text-[var(--color-ink-faint)] text-sm">
-			No tokens in this selection. This can happen for a phone that appears in
-			the reference but was never realised, or where only one tier was
-			annotated.
+			No annotated tokens in this selection.
 		</div>
 	);
 }
@@ -177,9 +163,7 @@ function emptyStat(phone: string): PhoneStat {
 		phone,
 		total: 0,
 		correct: 0,
-		substitute: 0,
-		delete: 0,
+		incorrect: 0,
 		accuracy: null,
-		confusions: {},
 	};
 }

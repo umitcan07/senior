@@ -4,7 +4,20 @@
     "files": 60,
     "utterances": 2552,
     "pitchBackend": "none",
-    "clips": false,
+    "clips": true,
+    "clipFormat": "mp3",
+    "sourceAudioFiles": 52,
+    "clipsPublished": 1901,
+    "missingSourceAudio": [
+      "S14T2",
+      "S16T2",
+      "S17T2",
+      "S18T2",
+      "S20T2",
+      "S29T2",
+      "S7T2",
+      "S8T2"
+    ],
     "synthetic": false
   },
   "areas": [
@@ -18520,6 +18533,5 @@
       "text": "[hes] i think her size may be large [hes] dog and pig he they are laughing",
       "dur": 16.325
     }
-  ],
-  "insertions": []
+  ]
 }

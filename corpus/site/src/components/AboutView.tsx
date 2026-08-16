@@ -2,12 +2,6 @@ import aboutMd from "@/content/about.md?raw";
 import { Markdown } from "@/lib/markdown";
 import type { Manifest } from "@/lib/types";
 
-const PITCH_BACKEND_LABELS: Record<Manifest["build"]["pitchBackend"], string> = {
-	parselmouth: "Praat (Parselmouth)",
-	"numpy-autocorr": "autocorrelation fallback",
-	none: "not extracted",
-};
-
 export function AboutView({ manifest }: { manifest: Manifest }) {
 	const { build, speakers, warnings } = manifest;
 	const nSpeakers = Object.keys(speakers).length;
@@ -34,10 +28,19 @@ export function AboutView({ manifest }: { manifest: Manifest }) {
 						label="Utterances"
 						value={build.utterances.toLocaleString()}
 					/>
-					<Fact label="Audio clips" value={build.clips ? "published" : "none"} />
 					<Fact
-						label="Pitch extraction"
-						value={PITCH_BACKEND_LABELS[build.pitchBackend]}
+						label="Audio clips"
+						value={
+							build.clipsPublished
+								? `${build.clipsPublished.toLocaleString()} published`
+								: build.clips
+									? "published"
+									: "not included"
+						}
+					/>
+					<Fact
+						label="Missing source audio"
+						value={(build.missingSourceAudio?.length ?? 0).toLocaleString()}
 					/>
 					<Fact
 						label="Build warnings"
@@ -45,7 +48,7 @@ export function AboutView({ manifest }: { manifest: Manifest }) {
 					/>
 				</dl>
 
-				{warnings.length > 0 && (
+				{warnings.length > 0 && !warnings.every((w) => w.includes("only one phone tier")) && (
 					<details className="mt-4 rounded-[var(--radius-card)] border border-[var(--color-rule)] p-3">
 						<summary className="cursor-pointer font-mono text-[var(--color-ink-soft)] text-xs">
 							{warnings.length} warning{warnings.length === 1 ? "" : "s"} from

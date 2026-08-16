@@ -1,7 +1,7 @@
 // Mirrors the JSON contract emitted by corpus/scripts/site_build/emit.py.
 // Keys are terse on purpose — the shards are large and served static.
 
-export type ErrorType = "correct" | "substitute" | "delete" | "insert";
+export type Outcome = "correct" | "incorrect";
 export type Area = "vowels" | "consonants";
 export type AreaKey =
 	| "vowels"
@@ -37,18 +37,12 @@ export interface UtteranceIndexEntry {
 	dur: number | null;
 }
 
-export interface PhoneConfusion {
-	[actual: string]: number;
-}
-
 export interface PhoneStat {
 	phone: string;
 	total: number;
 	correct: number;
-	substitute: number;
-	delete: number;
+	incorrect: number;
 	accuracy: number | null;
-	confusions: PhoneConfusion;
 }
 
 export interface Manifest {
@@ -59,6 +53,10 @@ export interface Manifest {
 		utterances: number;
 		pitchBackend: "parselmouth" | "numpy-autocorr" | "none";
 		clips: boolean;
+		clipFormat?: "mp3";
+		sourceAudioFiles?: number;
+		clipsPublished?: number;
+		missingSourceAudio?: string[];
 		/** True when built from demo_corpus.py — every figure is fabricated. */
 		synthetic?: boolean;
 	};
@@ -67,7 +65,6 @@ export interface Manifest {
 	speakers: Record<string, SpeakerMeta>;
 	warnings: string[];
 	utterances: UtteranceIndexEntry[];
-	insertions: PhoneStat[];
 }
 
 export interface AreaStats {
@@ -79,14 +76,14 @@ export interface StressPhoneStat {
 	phone: string;
 	total: number;
 	correct: number;
-	mismatch: number;
+	incorrect: number;
 }
 
 export interface StressStats {
 	area: "lexical-stress";
 	total: number;
 	correct: number;
-	mismatch: number;
+	incorrect: number;
 	marksPresent: boolean;
 	byPhone: StressPhoneStat[];
 }
@@ -102,9 +99,8 @@ export interface TokenRow {
 	id: string;
 	u: string; // utterance id
 	spk: string; // speaker
-	tgt: string | null; // target phone
-	act: string | null; // actual phone
-	e: ErrorType;
+	ph?: string | null; // annotated phone or event label
+	e: Outcome;
 	t0: number; // relative to clip start
 	t1: number;
 	se?: boolean; // stress error
@@ -141,9 +137,9 @@ export interface UtteranceDetail {
 	task: string | null;
 	text: string | null;
 	dur: number;
-	clip: string;
+	clip: string | null;
 	audioAvailable?: boolean;
-	aligned: boolean;
+	judged: boolean;
 	tokens: (TokenRow & { st: number; sa: number })[];
 	rhythm: RhythmMetrics;
 	pitch: PitchContourData | null;

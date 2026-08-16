@@ -25,7 +25,7 @@ export function StressView({
 		<div className="rise">
 			<Header
 				title="Lexical Stress"
-				blurb="Where primary and secondary stress land, compared against the reference. A vowel can be segmentally correct yet stressed wrongly — those cases are counted here, not among the vowel errors."
+				blurb="Corpus-native lexical-stress judgments, kept separate from segmental correctness."
 			/>
 
 			{!stats ? (
@@ -38,8 +38,8 @@ export function StressView({
 						<StatTile label="Stress-bearing" value={stats.total.toLocaleString()} />
 						<StatTile label="Correct" value={stats.correct.toLocaleString()} />
 						<StatTile
-							label="Mismatched"
-							value={stats.mismatch.toLocaleString()}
+							label="Incorrect"
+							value={stats.incorrect.toLocaleString()}
 							accent
 						/>
 						<StatTile
@@ -63,8 +63,7 @@ export function StressView({
 										<div className="flex-1">
 											<AccuracyBar
 												correct={p.correct}
-												substitute={p.mismatch}
-												del={0}
+							incorrect={p.incorrect}
 											/>
 										</div>
 										<span className="tnum w-10 text-right font-display text-sm">
@@ -79,7 +78,7 @@ export function StressView({
 					</section>
 
 					<section>
-						<Eyebrow>Stress mismatches in context</Eyebrow>
+						<Eyebrow>Stress judgments in context</Eyebrow>
 						<div className="mt-2.5">
 							{tokens === null ? (
 								<Spinner />
@@ -107,8 +106,8 @@ function NoStress({ marks }: { marks: boolean }) {
 			</p>
 			<p className="mt-2 max-w-md mx-auto text-[var(--color-ink-faint)] text-xs">
 				{marks
-					? "Stress marks are present but no stress-bearing pairs were aligned."
-					: "The phone tiers carry no ˈ/ˌ marks, so stress cannot be scored from the annotation. This area needs hand-labelled stress to populate."}
+					? "Stress annotation is present but has no events in this build."
+					: "No corpus stress-accuracy annotations are available in this build."}
 			</p>
 		</div>
 	);
@@ -119,7 +118,7 @@ function emptyStress(): StressStats {
 		area: "lexical-stress",
 		total: 0,
 		correct: 0,
-		mismatch: 0,
+		incorrect: 0,
 		marksPresent: false,
 		byPhone: [],
 	};

@@ -8,17 +8,16 @@ import { type Column, downloadCsv, slugForFile, toCsv } from "@/lib/csv";
 import { ERROR_LABELS } from "@/lib/labels";
 import {
 	cefrOf,
-	type ErrorType,
+	type Outcome as Judgment,
 	type SpeakerMeta,
 	type TokenRow,
 } from "@/lib/types";
 import { errorColor, IPA } from "./ui";
 
-type FilterMode = "all" | "incorrect" | ErrorType;
+type FilterMode = "all" | Judgment;
 type SortKey =
 	| "left"
-	| "target"
-	| "realised"
+	| "phone"
 	| "right"
 	| "word"
 	| "speaker"
@@ -28,10 +27,8 @@ type Sort = { key: SortKey; dir: "asc" | "desc" } | null;
 
 const MODES: { key: FilterMode; label: string }[] = [
 	{ key: "all", label: "All" },
-	{ key: "incorrect", label: "Incorrect only" },
+	{ key: "incorrect", label: "Incorrect" },
 	{ key: "correct", label: "Correct" },
-	{ key: "substitute", label: "Substituted" },
-	{ key: "delete", label: "Omitted" },
 ];
 
 const PAGE = 60;
@@ -45,7 +42,7 @@ const ANY = "__any__";
  * anchors could never match.
  */
 function searchFields(t: TokenRow): string[] {
-	return [t.tgt, t.act, t.w, t.spk, t.lc, t.rc].filter(
+	return [t.ph, t.w, t.spk, t.lc, t.rc].filter(
 		(v): v is string => typeof v === "string" && v !== "",
 	);
 }
@@ -69,10 +66,8 @@ function sortValue(t: TokenRow, key: SortKey): string | number {
 			return outward(t.lc, true);
 		case "right":
 			return outward(t.rc, false);
-		case "target":
-			return t.tgt ?? "";
-		case "realised":
-			return t.act ?? "";
+		case "phone":
+			return t.ph ?? "";
 		case "word":
 			return t.w ?? "";
 		case "speaker":
@@ -150,8 +145,7 @@ export function TokenConcordance({
 
 	const filtered = useMemo(() => {
 		const rows = tokens.filter((t) => {
-			if (mode === "incorrect" && t.e === "correct") return false;
-			if (mode !== "all" && mode !== "incorrect" && t.e !== mode) return false;
+			if (mode !== "all" && t.e !== mode) return false;
 			if (sex !== ANY && speakers[t.spk]?.sex !== sex) return false;
 			if (cefr !== ANY && cefrOf(speakers[t.spk]) !== cefr) return false;
 			if (matcher && !matcher(searchFields(t))) return false;
@@ -196,8 +190,7 @@ export function TokenConcordance({
 	function exportCsv() {
 		const columns: Column<TokenRow>[] = [
 			{ header: "left_context", value: (t) => t.lc ?? "" },
-			{ header: "target", value: (t) => t.tgt ?? "" },
-			{ header: "realised", value: (t) => t.act ?? "" },
+			{ header: "phone", value: (t) => t.ph ?? "" },
 			{ header: "right_context", value: (t) => t.rc ?? "" },
 			{ header: "outcome", value: (t) => ERROR_LABELS[t.e] },
 			{ header: "word", value: (t) => t.w ?? "" },
@@ -220,7 +213,7 @@ export function TokenConcordance({
 	if (tokens.length === 0) {
 		return (
 			<div className="rounded-[var(--radius-card)] border border-[var(--color-rule)] border-dashed p-6 text-center text-[var(--color-ink-faint)] text-sm">
-				No aligned tokens for this phone.
+				No annotated tokens for this selection.
 			</div>
 		);
 	}
@@ -319,11 +312,8 @@ export function TokenConcordance({
 							>
 								Left
 							</Th>
-							<Th sortKey="target" sort={sort} onSort={toggleSort}>
-								Target
-							</Th>
-							<Th sortKey="realised" sort={sort} onSort={toggleSort}>
-								Realised
+							<Th sortKey="phone" sort={sort} onSort={toggleSort}>
+								Phone / site
 							</Th>
 							<Th sortKey="right" sort={sort} onSort={toggleSort}>
 								Right
@@ -356,14 +346,11 @@ export function TokenConcordance({
 									</span>
 								</Td>
 								<Td>
-									<IPA phone={t.tgt} className="text-base" />
-								</Td>
-								<Td>
 									<span className="flex items-center gap-1">
 										<IPA
-											phone={t.act}
+											phone={t.ph ?? null}
 											className="text-base"
-											slash={t.act !== null}
+											slash={t.ph !== null}
 										/>
 										{t.se && <Badge title="Stress mismatch">ˢ</Badge>}
 										{t.le && <Badge title="Length mismatch">ˡ</Badge>}
@@ -543,7 +530,7 @@ function Badge({
 	);
 }
 
-function Outcome({ e }: { e: ErrorType }) {
+function Outcome({ e }: { e: Judgment }) {
 	return (
 		<span className="flex items-center gap-1.5">
 			<span

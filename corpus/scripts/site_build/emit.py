@@ -36,9 +36,8 @@ class TokenRow:
     id: str
     utterance: str
     speaker: str
-    target: str | None
-    actual: str | None
-    error: str  # correct | substitute | delete | insert
+    phone: str | None
+    outcome: str  # correct | incorrect
     t0: float
     t1: float
     stress_error: bool = False
@@ -53,9 +52,8 @@ class TokenRow:
             "id": self.id,
             "u": self.utterance,
             "spk": self.speaker,
-            "tgt": self.target,
-            "act": self.actual,
-            "e": self.error,
+            "ph": self.phone,
+            "e": self.outcome,
             "t0": round(self.t0, 3),
             "t1": round(self.t1, 3),
         }
@@ -77,14 +75,7 @@ class PhoneStat:
     target: str
     total: int = 0
     correct: int = 0
-    substitute: int = 0
-    delete: int = 0
-    # Substitution confusions: what the target was replaced with, counted.
-    confusions: dict[str, int] = field(default_factory=dict)
-
-    @property
-    def incorrect(self) -> int:
-        return self.substitute + self.delete
+    incorrect: int = 0
 
     @property
     def accuracy(self) -> float | None:
@@ -96,12 +87,8 @@ class PhoneStat:
             "phone": self.target,
             "total": self.total,
             "correct": self.correct,
-            "substitute": self.substitute,
-            "delete": self.delete,
+            "incorrect": self.incorrect,
             "accuracy": round(self.accuracy, 4) if self.accuracy is not None else None,
-            "confusions": dict(
-                sorted(self.confusions.items(), key=lambda kv: -kv[1])
-            ),
         }
 
 
@@ -121,7 +108,6 @@ class SiteWriter:
         self._shards: dict[tuple[str, str], list[dict[str, Any]]] = {}
         # target phone -> stat
         self._stats: dict[str, PhoneStat] = {}
-        self._insertions: dict[str, PhoneStat] = {}
         self._utterances: list[dict[str, Any]] = []
         # Lexical stress: totals + per-stressed-vowel {phone: [correct, mismatch]}
         self._stress_total = 0
@@ -132,27 +118,13 @@ class SiteWriter:
         self._annotations: dict[str, list[dict[str, Any]]] = {}
 
     def add_token(self, area: str, row: TokenRow) -> None:
-        # Insertions have no target phone; bucket them under the actual phone in
-        # a parallel "added" table so they are inspectable without polluting the
-        # target-phone accuracy denominators.
-        if row.error == "insert":
-            key = row.actual or "∅"
-            stat = self._insertions.setdefault(key, PhoneStat(target=key))
-            stat.total += 1
-            self._shards.setdefault((area, f"ins_{key}"), []).append(row.as_dict())
-            return
-
-        key = row.target or "∅"
+        key = row.phone or "∅"
         stat = self._stats.setdefault(key, PhoneStat(target=key))
         stat.total += 1
-        if row.error == "correct":
+        if row.outcome == "correct":
             stat.correct += 1
-        elif row.error == "substitute":
-            stat.substitute += 1
-            if row.actual:
-                stat.confusions[row.actual] = stat.confusions.get(row.actual, 0) + 1
-        elif row.error == "delete":
-            stat.delete += 1
+        else:
+            stat.incorrect += 1
         self._shards.setdefault((area, key), []).append(row.as_dict())
 
     def add_stress(
@@ -245,7 +217,7 @@ class SiteWriter:
 
     def write_stress_stats(self) -> None:
         by_phone = [
-            {"phone": p, "total": c + m, "correct": c, "mismatch": m}
+            {"phone": p, "total": c + m, "correct": c, "incorrect": m}
             for p, (c, m) in sorted(
                 self._stress_by_phone.items(), key=lambda kv: -(kv[1][0] + kv[1][1])
             )
@@ -256,7 +228,7 @@ class SiteWriter:
                 "area": "lexical-stress",
                 "total": self._stress_total,
                 "correct": self._stress_correct,
-                "mismatch": self._stress_total - self._stress_correct,
+                "incorrect": self._stress_total - self._stress_correct,
                 "marksPresent": self._stress_marks_seen,
                 "byPhone": by_phone,
             },
@@ -266,9 +238,6 @@ class SiteWriter:
     def write_manifest(self, manifest: dict[str, Any]) -> None:
         manifest = dict(manifest)
         manifest["utterances"] = sorted(self._utterances, key=lambda u: u["id"])
-        manifest["insertions"] = [
-            s.as_dict() for s in sorted(self._insertions.values(), key=lambda s: -s.total)
-        ]
         _write_json(self.data / "manifest.json", manifest, indent=2)
 
     @property

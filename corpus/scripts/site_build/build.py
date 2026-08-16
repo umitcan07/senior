@@ -47,10 +47,10 @@ from pathlib import Path
 # Support both `python -m corpus.scripts.site_build.build` and a direct-path run.
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from site_build import align, emit, exb, intonation, inventory, rhythm, textgrid
+    from site_build import align, clips, emit, exb, intonation, inventory, rhythm, textgrid
     from site_build.textgrid import Interval, TextGrid
 else:
-    from . import align, emit, exb, intonation, inventory, rhythm, textgrid
+    from . import align, clips, emit, exb, intonation, inventory, rhythm, textgrid
     from .textgrid import Interval, TextGrid
 
 
@@ -177,27 +177,6 @@ def load_utterances(tg: TextGrid, speaker: str, task: str) -> tuple[list[Utteran
     return utterances, warnings
 
 
-def cut_clip(wav: Path, out: Path, t0: float, t1: float, pad: float = 0.15) -> bool:
-    """Cut [t0-pad, t1+pad] of wav to out via ffmpeg. Returns success."""
-    out.parent.mkdir(parents=True, exist_ok=True)
-    start = max(0.0, t0 - pad)
-    dur = (t1 - t0) + 2 * pad
-    try:
-        subprocess.run(
-            [
-                "ffmpeg", "-y", "-loglevel", "error",
-                "-i", str(wav),
-                "-ss", f"{start:.3f}", "-t", f"{dur:.3f}",
-                "-ar", "16000", "-ac", "1",
-                str(out),
-            ],
-            check=True,
-        )
-        return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return False
-
-
 def build(
     raw_dir: Path,
     out_dir: Path,
@@ -215,6 +194,8 @@ def build(
     speakers_meta: dict[str, dict] = {}
     n_files = 0
     n_utts = 0
+    source_audio_files = 0
+    missing_source_audio: list[str] = []
 
     task_folders = [
         ("T1", raw_dir / "TASK1 audio&textgrids"),
@@ -233,6 +214,10 @@ def build(
             speaker, tsk = speaker_task(tg_path.stem)
             tsk = task  # folder is authoritative over filename
             wav_path = tg_path.with_suffix(".wav")
+            if wav_path.exists():
+                source_audio_files += 1
+            else:
+                missing_source_audio.append(tg_path.stem)
 
             tg = textgrid.read_textgrid(tg_path)
 
@@ -252,9 +237,23 @@ def build(
             utterances, warnings = load_utterances(tg, speaker, tsk)
             all_warnings.extend(warnings)
 
+            published_clips: set[str] = set()
+            if cut_clips and wav_path.is_file():
+                published_clips = clips.cut_recording(
+                    wav_path,
+                    [clips.Clip(utt.id, utt.t0, utt.t1) for utt in utterances],
+                    out_dir / "clips",
+                )
             for utt in utterances:
                 n_utts += 1
-                _emit_utterance(writer, utt, wav_path, cut_clips, transcription, skip_pitch)
+                _emit_utterance(
+                    writer,
+                    utt,
+                    wav_path,
+                    utt.id in published_clips,
+                    transcription,
+                    skip_pitch,
+                )
 
     manifest = {
         "build": {
@@ -263,6 +262,10 @@ def build(
             "utterances": n_utts,
             "pitchBackend": "none" if skip_pitch else intonation.backend(),
             "clips": cut_clips,
+            "clipFormat": "mp3" if cut_clips else None,
+            "sourceAudioFiles": source_audio_files,
+            "clipsPublished": len(list((out_dir / "clips").glob("*.mp3"))),
+            "missingSourceAudio": missing_source_audio,
             "synthetic": (raw_dir / SYNTHETIC_MARKER).exists(),
         },
         "areas": ["vowels", "consonants", "lexical-stress", "linking", "rhythm", "intonation"],
@@ -327,7 +330,7 @@ def _emit_utterance(
     writer: emit.SiteWriter,
     utt: Utterance,
     wav_path: Path,
-    cut_clips: bool,
+    clip_available: bool,
     transcription: exb.Transcription | None = None,
     skip_pitch: bool = False,
 ) -> None:
@@ -377,9 +380,7 @@ def _emit_utterance(
     if not skip_pitch and intonation.available() and wav_path.exists():
         contour = intonation.extract_contour(wav_path, utt.t0, utt.t1)
 
-    clip_rel = f"clips/{utt.id}.wav"
-    if cut_clips and wav_path.exists():
-        cut_clip(wav_path, writer.data.parent / clip_rel, utt.t0, utt.t1)
+    clip_rel = f"clips/{utt.id}.mp3"
 
     # KWIC context: the phones the speaker actually produced either side of each
     # token. Deletions contribute nothing, since nothing was audible there.
@@ -396,7 +397,8 @@ def _emit_utterance(
     token_payload = []
     for i, tok in enumerate(tokens):
         gid = f"{utt.id}_{tok.index:03d}"
-        area = inventory.parse_phone(tok.target or tok.actual or "").area
+        phone = tok.actual or tok.target
+        area = inventory.parse_phone(phone or "").area
         # Resolve the containing word for the concordance's Word column.
         word = None
         if tok.word_index is not None and 0 <= tok.word_index < len(utt.words):
@@ -406,9 +408,8 @@ def _emit_utterance(
             id=gid,
             utterance=utt.id,
             speaker=utt.speaker,
-            target=tok.target,
-            actual=tok.actual,
-            error=tok.error,
+            phone=phone,
+            outcome="correct" if tok.error == "correct" else "incorrect",
             t0=tok.t0 - utt.t0,  # relative to clip start
             t1=tok.t1 - utt.t0,
             stress_error=tok.stress_error,
@@ -424,7 +425,7 @@ def _emit_utterance(
             if area == "vowels":
                 defined = bool(tok.target_stress or tok.actual_stress)
                 writer.add_stress(
-                    tok.target,
+                    phone,
                     defined=defined,
                     mismatch=tok.stress_error,
                     marks_seen=defined,
@@ -452,9 +453,8 @@ def _emit_utterance(
                     "id": f"{utt.id}_{area}_{idx:03d}",
                     "u": utt.id,
                     "spk": utt.speaker,
-                    "tgt": label,
-                    "act": label,
-                    "e": "correct" if outcome == "correct" else "substitute",
+                    "ph": label,
+                    "e": "correct" if outcome == "correct" else "incorrect",
                     "t0": round(t0 - utt.t0, 3),
                     "t1": round(t1 - utt.t0, 3),
                     "w": label,
@@ -469,8 +469,8 @@ def _emit_utterance(
             "text": utt.text,
             "dur": round(utt.t1 - utt.t0, 3),
             "clip": clip_rel,
-            "audioAvailable": cut_clips and wav_path.exists(),
-            "aligned": have_both or bool(native_phone_acc),
+            "audioAvailable": clip_available,
+            "judged": have_both or bool(native_phone_acc),
             "tokens": token_payload,
             "rhythm": rhythm_metrics.as_dict(),
             "pitch": contour.as_dict() if contour else None,

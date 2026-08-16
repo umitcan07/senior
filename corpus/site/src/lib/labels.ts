@@ -1,6 +1,6 @@
 // Human-readable labels for filter-tree keys and areas, plus small formatters.
 
-import type { AreaKey, ErrorType } from "./types";
+import type { AreaKey, Outcome } from "./types";
 
 const CLASS_LABELS: Record<string, string> = {
 	// manner
@@ -94,11 +94,9 @@ export const AREA_BLURBS: Record<AreaKey, string> = {
 	intonation: "Hand-annotated intonation judgments with pitch contours for inspection.",
 };
 
-export const ERROR_LABELS: Record<ErrorType, string> = {
+export const ERROR_LABELS: Record<Outcome, string> = {
 	correct: "Correct",
-	substitute: "Incorrect",
-	delete: "Omitted",
-	insert: "Inserted",
+	incorrect: "Incorrect",
 };
 
 export function pct(x: number | null, digits = 0): string {

@@ -1,7 +1,7 @@
 // Shared visual primitives for the specimen-sheet aesthetic.
 
 import type { ReactNode } from "react";
-import type { ErrorType } from "@/lib/types";
+import type { Outcome } from "@/lib/types";
 
 /** An IPA glyph in Doulos SIL, optionally slashed. */
 export function IPA({
@@ -17,48 +17,37 @@ export function IPA({
 	return <span className={`ipa ${className}`}>{text}</span>;
 }
 
-const ERROR_COLOR: Record<ErrorType, string> = {
+const ERROR_COLOR: Record<Outcome, string> = {
 	correct: "var(--color-correct)",
-	substitute: "var(--color-incorrect)",
-	delete: "var(--color-incorrect)",
-	insert: "var(--color-insert)",
+	incorrect: "var(--color-incorrect)",
 };
 
-export function errorColor(e: ErrorType): string {
+export function errorColor(e: Outcome): string {
 	return ERROR_COLOR[e];
 }
 
 /** A horizontal correct/incorrect proportion bar with a hairline frame. */
 export function AccuracyBar({
 	correct,
-	substitute,
-	del,
+	incorrect,
 	height = 8,
 }: {
 	correct: number;
-	substitute: number;
-	del: number;
+	incorrect: number;
 	height?: number;
 }) {
-	const total = correct + substitute + del || 1;
+	const total = correct + incorrect || 1;
 	const seg = (n: number) => `${(n / total) * 100}%`;
 	return (
 		<div
 			className="flex w-full overflow-hidden rounded-[2px] ring-1 ring-[var(--color-rule)]"
 			style={{ height }}
 			role="img"
-			aria-label={`${correct} correct, ${substitute} substituted, ${del} omitted`}
+			aria-label={`${correct} correct, ${incorrect} incorrect`}
 		>
 			<div style={{ width: seg(correct), background: "var(--color-correct)" }} />
 			<div
-				style={{ width: seg(substitute), background: "var(--color-incorrect)" }}
-			/>
-			<div
-				style={{
-					width: seg(del),
-					background: "var(--color-incorrect)",
-					opacity: 0.5,
-				}}
+				style={{ width: seg(incorrect), background: "var(--color-incorrect)" }}
 			/>
 		</div>
 	);
@@ -116,9 +105,7 @@ export function Card({
 export function Legend() {
 	const items: [string, string, number][] = [
 		["Correct", "var(--color-correct)", 1],
-		["Substituted", "var(--color-incorrect)", 1],
-		["Omitted", "var(--color-incorrect)", 0.5],
-		["Inserted", "var(--color-insert)", 1],
+		["Incorrect", "var(--color-incorrect)", 1],
 	];
 	return (
 		<div className="flex flex-wrap items-center gap-x-4 gap-y-1">

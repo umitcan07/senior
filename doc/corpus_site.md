@@ -1,8 +1,8 @@
 # CORPTES corpus explorer — architecture & data contract
 
 Public, static website that lets a user browse the Turkish-L1 English corpus by
-**phonetic feature**: pick one of five areas (vowels, consonants, lexical stress,
-rhythm, intonation), filter by articulatory class or a single phone, read
+**phonetic feature**: pick one of five annotated features (vowels, consonants,
+lexical stress, linking, intonation), or separate rhythm measurements, filter by articulatory class or a single phone, read
 correct/incorrect statistics, and inspect any token in context with audio.
 
 This is the deliverable Kardelen Kılınç (Eskişehir Technical University) asked
@@ -25,9 +25,9 @@ way: do not copy code from that repo into this one.
 
 | Decision | Choice | Why |
 |---|---|---|
-| Source of correct/incorrect | Align learner `phones` tier vs `REF-phones` tier | Reflects the **corpus annotation**, not model output — scientifically defensible |
-| Error definition | **Strict identity** on the phone token | Matches how EXAKT counting works; no tolerance table to defend |
-| Rhythm & intonation | Presented as **measurements**, not correct/incorrect | An F0 contour or nPVI has no "right answer"; grading it would be wrong |
+| Source of correct/incorrect | Corpus-native hand annotation | Reflects the corpus annotators’ judgment, not an inferred model decision |
+| Error definition | **Correct / incorrect** | The public export does not invent substitution or omission categories |
+| Rhythm | Presented as **measurements**, not correct/incorrect | An nPVI value has no single right answer |
 | Audio | **Short clips only** (utterance-level), never full recordings | Interview audio may carry PII; clips bound the exposure |
 | Architecture | **Static site, no DB/server/auth** | Corpus is frozen; every aggregate is precomputed once |
 | Clip unit | **Utterance** (~≤18 s), token seeks via `currentTime` | 300k phones ≠ 300k files; one clip serves every token in it, and is the unit intonation needs anyway |
@@ -38,10 +38,11 @@ way: do not copy code from that repo into this one.
 
 | Area | Needs audio? | Source |
 |---|---|---|
-| Vowels / Consonants | no | `phones` ↔ `REF-phones` alignment |
-| Lexical stress | no | ˈ/ˌ marks on aligned vowels (only where present) |
+| Vowels / Consonants | no | corpus-native `phoneAcc` |
+| Lexical stress | no | corpus-native `Stress_accuracy` |
+| Linking | no | corpus-native `linkingAcc_accuracy` |
 | Rhythm | no | segment durations → %V, nPVI, Varco, ΔC |
-| Intonation | **yes** | F0 via Parselmouth, else a numpy autocorrelation fallback |
+| Intonation | no | corpus-native `Intonation_accuracy` |
 
 If a phone tier is missing (a file with only one of `phones`/`REF-phones`), that
 file becomes **inventory-only** — its phones are listed but contribute no
@@ -55,7 +56,7 @@ raw drop (.exb + .TextGrid + .wav)
    ├─ textgrid.py   parse PRAAT tiers (intervals + times)
    ├─ exb.py        parse EXMARaLDA (speaker metadata, annotation tiers)
    ├─ inventory.py  IPA → articulatory classes (the filter tree)
-   ├─ align.py      Needleman-Wunsch phones vs REF-phones → per-token errors
+   ├─ align.py      fallback only for synthetic/test material
    ├─ rhythm.py     durational metrics per utterance
    ├─ intonation.py F0 contour per utterance (optional backend)
    └─ emit.py       write the JSON artifact tree
@@ -87,17 +88,17 @@ Everything lives under `corpus/site/public/data/` (git-ignored; regenerated):
 
 ```
 data/
-  manifest.json                build meta, speakers, filter tree, utterance index, insertions
-  areas/vowels.json            per-phone {total, correct, substitute, delete, accuracy, confusions}
+  manifest.json                build meta, speakers, filter tree, utterance index, audio coverage
+  areas/vowels.json            per-phone {total, correct, incorrect, accuracy}
   areas/consonants.json
-  areas/lexical-stress.json    {total, correct, mismatch, marksPresent, byPhone[]}
-  tokens/<area>/<phone>.json   token shard: every realisation of one target phone
+  areas/lexical-stress.json    {total, correct, incorrect, marksPresent, byPhone[]}
+  tokens/<area>/<phone>.json   token shard: every annotated phone/site
   tokens/stress/mismatch.json  stress-mismatch tokens for the stress concordance
-  utterances/<uid>.json        aligned tokens + rhythm + pitch + clip path
-clips/<uid>.wav                short per-utterance audio (if --clips)
+  utterances/<uid>.json        annotated tokens + rhythm + optional clip path
+clips/<uid>.mp3                short per-utterance audio (if --clips)
 ```
 
-Token row keys are terse (shards are large): `id, u, spk, tgt, act, e, t0, t1,
+Token row keys are terse (shards are large): `id, u, spk, ph, e, t0, t1,
 se?, le?, w?, lc?, rc?`. See `corpus/site/src/lib/types.ts` for the typed mirror.
 
 `lc`/`rc` are the KWIC context — up to `KWIC_WINDOW` phones the speaker actually
@@ -105,7 +106,7 @@ se?, le?, w?, lc?, rc?`. See `corpus/site/src/lib/types.ts` for the typed mirror
 precomputed in `build.py` rather than derived in the browser: deriving them would
 mean fetching the whole utterance JSON for every visible row.
 
-Sharding per target phone keeps every fetch small: the "/b/ only" drill loads
+Sharding per annotated phone keeps every fetch small: the "/b/ only" drill loads
 one file, not the whole 300k-token table.
 
 ### Synthetic-data flag

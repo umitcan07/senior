@@ -83,9 +83,9 @@ export function UtterancePanel({
 									Audio is unavailable for this utterance; its corpus annotations remain available.
 								</p>
 							) : (
-								<audio
+							<audio
 									ref={audioRef}
-									src={clipURL(utt.clip)}
+								src={clipURL(utt.clip ?? "")}
 									controls
 									preload="none"
 									onTimeUpdate={(e) => setPlayhead(e.currentTarget.currentTime)}
@@ -118,11 +118,10 @@ export function UtterancePanel({
 								</div>
 							</section>
 
-							{!utt.aligned && (
+							{!utt.judged && (
 								<p className="rounded-[var(--radius-card)] border border-[var(--color-insert)]/40 bg-[var(--color-insert-wash)]/50 p-3 text-[var(--color-ink-soft)] text-xs">
-									Only one phone tier was annotated for this recording, so no
-									correct/incorrect judgement is shown — the phones below are the
-									transcription as-is.
+									This recording has no corpus-native correctness judgment; its
+									annotated phones are shown as transcribed.
 								</p>
 							)}
 						</div>
@@ -144,7 +143,7 @@ function PhoneStrip({
 }) {
 	return (
 		<section>
-			<Eyebrow>Aligned phones — click to hear</Eyebrow>
+			<Eyebrow>Annotated phones — click to hear</Eyebrow>
 			<div className="mt-2 flex flex-wrap gap-1">
 				{utt.tokens.map((t) => {
 					const focused = t.id === focusToken;
@@ -153,7 +152,7 @@ function PhoneStrip({
 							key={t.id}
 							type="button"
 							onClick={() => onSeek(t.t0)}
-							title={`${t.tgt ?? "∅"} → ${t.act ?? "∅"} · ${t.t0.toFixed(2)}s`}
+							title={`${t.ph ?? "∅"} · ${t.t0.toFixed(2)}s`}
 							className={`group relative rounded-[2px] border px-1.5 py-1 transition-colors ${
 								focused
 									? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
@@ -164,13 +163,8 @@ function PhoneStrip({
 								className="ipa block text-lg leading-none"
 								style={{ color: errorColor(t.e) }}
 							>
-								{t.act ?? "∅"}
+								{t.ph ?? "∅"}
 							</span>
-							{t.e === "substitute" && (
-								<span className="ipa mt-0.5 block text-[var(--color-ink-faint)] text-xs leading-none line-through">
-									{t.tgt}
-								</span>
-							)}
 							<span
 								className="mt-1 block h-0.5 w-full rounded"
 								style={{ background: errorColor(t.e), opacity: 0.5 }}
