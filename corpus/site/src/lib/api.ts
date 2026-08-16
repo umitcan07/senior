@@ -13,6 +13,10 @@ import type {
 
 // Relative base so the site works under any hosting subpath.
 const DATA = `${import.meta.env.BASE_URL}data`.replace(/\/+/g, "/");
+// Static hosts and CDNs commonly cache stable JSON paths long after a corpus
+// rebuild. Bump this with every published data tree so a new JS bundle never
+// mixes its schema with an older manifest, shard, or audio clip.
+const DATA_REVISION = "20260816-corptes-native-v1";
 
 const cache = new Map<string, Promise<unknown>>();
 
@@ -20,7 +24,7 @@ function getJSON<T>(path: string): Promise<T> {
 	if (!cache.has(path)) {
 		cache.set(
 			path,
-			fetch(path).then((r) => {
+			fetch(`${path}?v=${DATA_REVISION}`).then((r) => {
 				if (!r.ok) throw new Error(`${r.status} ${path}`);
 				return r.json();
 			}),
@@ -60,5 +64,5 @@ export function loadUtterance(id: string): Promise<UtteranceDetail> {
 }
 
 export function clipURL(clip: string): string {
-	return `${DATA}/../${clip}`.replace(/\/+/g, "/");
+	return `${DATA}/../${clip}`.replace(/\/+/g, "/") + `?v=${DATA_REVISION}`;
 }
