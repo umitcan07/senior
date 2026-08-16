@@ -1,0 +1,988 @@
+- generic [ref=e3]:
+  - banner [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: Turkish-L1 · English-L2 · Phonetic Corpus
+        - heading "CORPTES Explorer" [level=1] [ref=e10]
+        - paragraph [ref=e11]: A phonetic-feature view of how Turkish-native speakers pronounce English — browse by sound, read the error statistics, inspect any token in context.
+        - navigation [ref=e12]:
+          - button "Explore" [ref=e13]
+          - button "About" [ref=e14]
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - definition [ref=e17]: "30"
+          - term [ref=e18]: Speakers
+        - generic [ref=e19]:
+          - definition [ref=e20]: 2,552
+          - term [ref=e21]: Utterances
+        - generic [ref=e22]:
+          - definition [ref=e23]: "60"
+          - term [ref=e24]: Recordings
+  - generic [ref=e25]:
+    - complementary [ref=e26]:
+      - navigation [ref=e27]:
+        - generic [ref=e28]: Pronunciation Areas
+        - list [ref=e29]:
+          - listitem [ref=e30]:
+            - button "Vowels" [ref=e31]
+          - listitem [ref=e33]:
+            - button "Consonants" [ref=e365]
+          - listitem [ref=e37]:
+            - button "Lexical Stress" [ref=e38]
+          - listitem [ref=e40]:
+            - button "Linking" [ref=e41]
+          - listitem [ref=e43]:
+            - button "Rhythm" [ref=e44]
+          - listitem [ref=e46]:
+            - button "Intonation ●" [ref=e366]:
+              - generic [ref=e48]: Intonation
+              - generic [ref=e367]: ●
+    - main [ref=e183]:
+      - generic [ref=e368]:
+        - generic [ref=e369]:
+          - generic [ref=e370]: Suprasegmental
+          - heading "Intonation" [level=2] [ref=e371]
+          - paragraph [ref=e372]: Corpus-native intonation judgments. Pitch contours are not required for this explorer build.
+        - generic [ref=e375]:
+          - generic [ref=e376]:
+            - generic [ref=e377]: Sites
+            - generic [ref=e378]: "327"
+          - generic [ref=e379]:
+            - generic [ref=e380]: Correct
+            - generic [ref=e381]: "164"
+          - generic [ref=e382]:
+            - generic [ref=e383]: Match rate
+            - generic [ref=e384]: 50%
+        - generic [ref=e385]:
+          - generic [ref=e386]:
+            - generic [ref=e387]:
+              - button "All" [ref=e388]
+              - button "Incorrect" [ref=e389]
+              - button "Correct" [ref=e390]
+            - button "↓ CSV" [ref=e391]
+          - generic [ref=e392]:
+            - searchbox "Search the concordance" [ref=e393]
+            - button ".*" [ref=e394]
+          - table [ref=e396]:
+            - rowgroup [ref=e397]:
+              - row [ref=e398]:
+                - columnheader [ref=e399]:
+                  - button "Left" [ref=e400]:
+                    - text: Left
+                    - generic [ref=e401]: ↑
+                - columnheader [ref=e402]:
+                  - button "Phone / site" [ref=e403]:
+                    - text: Phone / site
+                    - generic [ref=e404]: ↑
+                - columnheader [ref=e405]:
+                  - button "Right" [ref=e406]:
+                    - text: Right
+                    - generic [ref=e407]: ↑
+                - columnheader [ref=e408]:
+                  - button "Word" [ref=e409]:
+                    - text: Word
+                    - generic [ref=e410]: ↑
+                - columnheader [ref=e411]:
+                  - button "Speaker" [ref=e412]:
+                    - text: Speaker
+                    - generic [ref=e413]: ↑
+                - columnheader [ref=e414]:
+                  - button "Outcome" [ref=e415]:
+                    - text: Outcome
+                    - generic [ref=e416]: ↑
+                - columnheader [ref=e417]:
+                  - button "Time" [ref=e418]:
+                    - text: Time
+                    - generic [ref=e419]: ↑
+                - columnheader "Note" [ref=e420]
+            - rowgroup [ref=e421]:
+              - row [ref=e422] [cursor=pointer]:
+                - cell [ref=e423]
+                - cell /intonation [Intonation_accuracy]/ [ref=e424]
+                - cell [ref=e427]
+                - cell "intonation [Intonation_accuracy]" [ref=e428]
+                - cell "S10 m" [ref=e429]:
+                  - generic [ref=e430]:
+                    - generic [ref=e431]: S10
+                    - generic [ref=e432]: m
+                - cell "Incorrect" [ref=e433]
+                - cell "16.92s" [ref=e437]
+                - cell [ref=e439]:
+                  - textbox "Note for token S10T1_002_intonation_000" [ref=e440]:
+                    - /placeholder: …
+              - row [ref=e441] [cursor=pointer]:
+                - cell [ref=e442]
+                - cell /intonation [Intonation_accuracy]/ [ref=e443]
+                - cell [ref=e446]
+                - cell "intonation [Intonation_accuracy]" [ref=e447]
+                - cell "S10 m" [ref=e448]:
+                  - generic [ref=e449]:
+                    - generic [ref=e450]: S10
+                    - generic [ref=e451]: m
+                - cell "Incorrect" [ref=e452]
+                - cell "2.88s" [ref=e456]
+                - cell [ref=e458]:
+                  - textbox "Note for token S10T1_003_intonation_000" [ref=e459]:
+                    - /placeholder: …
+              - row [ref=e460] [cursor=pointer]:
+                - cell [ref=e461]
+                - cell /intonation [Intonation_accuracy]/ [ref=e462]
+                - cell [ref=e465]
+                - cell "intonation [Intonation_accuracy]" [ref=e466]
+                - cell "S10 m" [ref=e467]:
+                  - generic [ref=e468]:
+                    - generic [ref=e469]: S10
+                    - generic [ref=e470]: m
+                - cell "Incorrect" [ref=e471]
+                - cell "10.82s" [ref=e475]
+                - cell [ref=e477]:
+                  - textbox "Note for token S10T1_003_intonation_001" [ref=e478]:
+                    - /placeholder: …
+              - row [ref=e479] [cursor=pointer]:
+                - cell [ref=e480]
+                - cell /intonation [Intonation_accuracy]/ [ref=e481]
+                - cell [ref=e484]
+                - cell "intonation [Intonation_accuracy]" [ref=e485]
+                - cell "S10 m" [ref=e486]:
+                  - generic [ref=e487]:
+                    - generic [ref=e488]: S10
+                    - generic [ref=e489]: m
+                - cell "Incorrect" [ref=e490]
+                - cell "10.98s" [ref=e494]
+                - cell [ref=e496]:
+                  - textbox "Note for token S10T1_007_intonation_000" [ref=e497]:
+                    - /placeholder: …
+              - row [ref=e498] [cursor=pointer]:
+                - cell [ref=e499]
+                - cell /intonation [Intonation_accuracy]/ [ref=e500]
+                - cell [ref=e503]
+                - cell "intonation [Intonation_accuracy]" [ref=e504]
+                - cell "S11 m" [ref=e505]:
+                  - generic [ref=e506]:
+                    - generic [ref=e507]: S11
+                    - generic [ref=e508]: m
+                - cell "Correct" [ref=e509]
+                - cell "16.43s" [ref=e513]
+                - cell [ref=e515]:
+                  - textbox "Note for token S11T1_002_intonation_000" [ref=e516]:
+                    - /placeholder: …
+              - row [ref=e517] [cursor=pointer]:
+                - cell [ref=e518]
+                - cell /intonation [Intonation_accuracy]/ [ref=e519]
+                - cell [ref=e522]
+                - cell "intonation [Intonation_accuracy]" [ref=e523]
+                - cell "S11 m" [ref=e524]:
+                  - generic [ref=e525]:
+                    - generic [ref=e526]: S11
+                    - generic [ref=e527]: m
+                - cell "Correct" [ref=e528]
+                - cell "1.67s" [ref=e532]
+                - cell [ref=e534]:
+                  - textbox "Note for token S11T1_003_intonation_000" [ref=e535]:
+                    - /placeholder: …
+              - row [ref=e536] [cursor=pointer]:
+                - cell [ref=e537]
+                - cell /intonation [Intonation_accuracy]/ [ref=e538]
+                - cell [ref=e541]
+                - cell "intonation [Intonation_accuracy]" [ref=e542]
+                - cell "S11 m" [ref=e543]:
+                  - generic [ref=e544]:
+                    - generic [ref=e545]: S11
+                    - generic [ref=e546]: m
+                - cell "Incorrect" [ref=e547]
+                - cell "8.42s" [ref=e551]
+                - cell [ref=e553]:
+                  - textbox "Note for token S11T1_003_intonation_001" [ref=e554]:
+                    - /placeholder: …
+              - row [ref=e555] [cursor=pointer]:
+                - cell [ref=e556]
+                - cell /intonation [Intonation_accuracy]/ [ref=e557]
+                - cell [ref=e560]
+                - cell "intonation [Intonation_accuracy]" [ref=e561]
+                - cell "S11 m" [ref=e562]:
+                  - generic [ref=e563]:
+                    - generic [ref=e564]: S11
+                    - generic [ref=e565]: m
+                - cell "Incorrect" [ref=e566]
+                - cell "4.48s" [ref=e570]
+                - cell [ref=e572]:
+                  - textbox "Note for token S11T1_007_intonation_000" [ref=e573]:
+                    - /placeholder: …
+              - row [ref=e574] [cursor=pointer]:
+                - cell [ref=e575]
+                - cell /intonation [Intonation_accuracy]/ [ref=e576]
+                - cell [ref=e579]
+                - cell "intonation [Intonation_accuracy]" [ref=e580]
+                - cell "S11 m" [ref=e581]:
+                  - generic [ref=e582]:
+                    - generic [ref=e583]: S11
+                    - generic [ref=e584]: m
+                - cell "Incorrect" [ref=e585]
+                - cell "9.25s" [ref=e589]
+                - cell [ref=e591]:
+                  - textbox "Note for token S11T1_007_intonation_001" [ref=e592]:
+                    - /placeholder: …
+              - row [ref=e593] [cursor=pointer]:
+                - cell [ref=e594]
+                - cell /intonation [Intonation_accuracy]/ [ref=e595]
+                - cell [ref=e598]
+                - cell "intonation [Intonation_accuracy]" [ref=e599]
+                - cell "S11 m" [ref=e600]:
+                  - generic [ref=e601]:
+                    - generic [ref=e602]: S11
+                    - generic [ref=e603]: m
+                - cell "Incorrect" [ref=e604]
+                - cell "13.59s" [ref=e608]
+                - cell [ref=e610]:
+                  - textbox "Note for token S11T1_007_intonation_002" [ref=e611]:
+                    - /placeholder: …
+              - row [ref=e612] [cursor=pointer]:
+                - cell [ref=e613]
+                - cell /intonation [Intonation_accuracy]/ [ref=e614]
+                - cell [ref=e617]
+                - cell "intonation [Intonation_accuracy]" [ref=e618]
+                - cell "S12 m" [ref=e619]:
+                  - generic [ref=e620]:
+                    - generic [ref=e621]: S12
+                    - generic [ref=e622]: m
+                - cell "Incorrect" [ref=e623]
+                - cell "7.71s" [ref=e627]
+                - cell [ref=e629]:
+                  - textbox "Note for token S12T1_002_intonation_000" [ref=e630]:
+                    - /placeholder: …
+              - row [ref=e631] [cursor=pointer]:
+                - cell [ref=e632]
+                - cell /intonation [Intonation_accuracy]/ [ref=e633]
+                - cell [ref=e636]
+                - cell "intonation [Intonation_accuracy]" [ref=e637]
+                - cell "S12 m" [ref=e638]:
+                  - generic [ref=e639]:
+                    - generic [ref=e640]: S12
+                    - generic [ref=e641]: m
+                - cell "Correct" [ref=e642]
+                - cell "11.03s" [ref=e646]
+                - cell [ref=e648]:
+                  - textbox "Note for token S12T1_002_intonation_001" [ref=e649]:
+                    - /placeholder: …
+              - row [ref=e650] [cursor=pointer]:
+                - cell [ref=e651]
+                - cell /intonation [Intonation_accuracy]/ [ref=e652]
+                - cell [ref=e655]
+                - cell "intonation [Intonation_accuracy]" [ref=e656]
+                - cell "S12 m" [ref=e657]:
+                  - generic [ref=e658]:
+                    - generic [ref=e659]: S12
+                    - generic [ref=e660]: m
+                - cell "Correct" [ref=e661]
+                - cell "17.09s" [ref=e665]
+                - cell [ref=e667]:
+                  - textbox "Note for token S12T1_002_intonation_002" [ref=e668]:
+                    - /placeholder: …
+              - row [ref=e669] [cursor=pointer]:
+                - cell [ref=e670]
+                - cell /intonation [Intonation_accuracy]/ [ref=e671]
+                - cell [ref=e674]
+                - cell "intonation [Intonation_accuracy]" [ref=e675]
+                - cell "S12 m" [ref=e676]:
+                  - generic [ref=e677]:
+                    - generic [ref=e678]: S12
+                    - generic [ref=e679]: m
+                - cell "Correct" [ref=e680]
+                - cell "-0.69s" [ref=e684]
+                - cell [ref=e686]:
+                  - textbox "Note for token S12T1_003_intonation_000" [ref=e687]:
+                    - /placeholder: …
+              - row [ref=e688] [cursor=pointer]:
+                - cell [ref=e689]
+                - cell /intonation [Intonation_accuracy]/ [ref=e690]
+                - cell [ref=e693]
+                - cell "intonation [Intonation_accuracy]" [ref=e694]
+                - cell "S12 m" [ref=e695]:
+                  - generic [ref=e696]:
+                    - generic [ref=e697]: S12
+                    - generic [ref=e698]: m
+                - cell "Incorrect" [ref=e699]
+                - cell "4.24s" [ref=e703]
+                - cell [ref=e705]:
+                  - textbox "Note for token S12T1_006_intonation_000" [ref=e706]:
+                    - /placeholder: …
+              - row [ref=e707] [cursor=pointer]:
+                - cell [ref=e708]
+                - cell /intonation [Intonation_accuracy]/ [ref=e709]
+                - cell [ref=e712]
+                - cell "intonation [Intonation_accuracy]" [ref=e713]
+                - cell "S12 m" [ref=e714]:
+                  - generic [ref=e715]:
+                    - generic [ref=e716]: S12
+                    - generic [ref=e717]: m
+                - cell "Correct" [ref=e718]
+                - cell "6.62s" [ref=e722]
+                - cell [ref=e724]:
+                  - textbox "Note for token S12T1_006_intonation_001" [ref=e725]:
+                    - /placeholder: …
+              - row [ref=e726] [cursor=pointer]:
+                - cell [ref=e727]
+                - cell /intonation [Intonation_accuracy]/ [ref=e728]
+                - cell [ref=e731]
+                - cell "intonation [Intonation_accuracy]" [ref=e732]
+                - cell "S12 m" [ref=e733]:
+                  - generic [ref=e734]:
+                    - generic [ref=e735]: S12
+                    - generic [ref=e736]: m
+                - cell "Correct" [ref=e737]
+                - cell "9.60s" [ref=e741]
+                - cell [ref=e743]:
+                  - textbox "Note for token S12T1_006_intonation_002" [ref=e744]:
+                    - /placeholder: …
+              - row [ref=e745] [cursor=pointer]:
+                - cell [ref=e746]
+                - cell /intonation [Intonation_accuracy]/ [ref=e747]
+                - cell [ref=e750]
+                - cell "intonation [Intonation_accuracy]" [ref=e751]
+                - cell "S13 m" [ref=e752]:
+                  - generic [ref=e753]:
+                    - generic [ref=e754]: S13
+                    - generic [ref=e755]: m
+                - cell "Correct" [ref=e756]
+                - cell "0.62s" [ref=e760]
+                - cell [ref=e762]:
+                  - textbox "Note for token S13T1_002_intonation_000" [ref=e763]:
+                    - /placeholder: …
+              - row [ref=e764] [cursor=pointer]:
+                - cell [ref=e765]
+                - cell /intonation [Intonation_accuracy]/ [ref=e766]
+                - cell [ref=e769]
+                - cell "intonation [Intonation_accuracy]" [ref=e770]
+                - cell "S13 m" [ref=e771]:
+                  - generic [ref=e772]:
+                    - generic [ref=e773]: S13
+                    - generic [ref=e774]: m
+                - cell "Correct" [ref=e775]
+                - cell "3.63s" [ref=e779]
+                - cell [ref=e781]:
+                  - textbox "Note for token S13T1_002_intonation_001" [ref=e782]:
+                    - /placeholder: …
+              - row [ref=e783] [cursor=pointer]:
+                - cell [ref=e784]
+                - cell /intonation [Intonation_accuracy]/ [ref=e785]
+                - cell [ref=e788]
+                - cell "intonation [Intonation_accuracy]" [ref=e789]
+                - cell "S13 m" [ref=e790]:
+                  - generic [ref=e791]:
+                    - generic [ref=e792]: S13
+                    - generic [ref=e793]: m
+                - cell "Correct" [ref=e794]
+                - cell "9.09s" [ref=e798]
+                - cell [ref=e800]:
+                  - textbox "Note for token S13T1_002_intonation_002" [ref=e801]:
+                    - /placeholder: …
+              - row [ref=e802] [cursor=pointer]:
+                - cell [ref=e803]
+                - cell /intonation [Intonation_accuracy]/ [ref=e804]
+                - cell [ref=e807]
+                - cell "intonation [Intonation_accuracy]" [ref=e808]
+                - cell "S13 m" [ref=e809]:
+                  - generic [ref=e810]:
+                    - generic [ref=e811]: S13
+                    - generic [ref=e812]: m
+                - cell "Incorrect" [ref=e813]
+                - cell "-0.46s" [ref=e817]
+                - cell [ref=e819]:
+                  - textbox "Note for token S13T1_005_intonation_000" [ref=e820]:
+                    - /placeholder: …
+              - row [ref=e821] [cursor=pointer]:
+                - cell [ref=e822]
+                - cell /intonation [Intonation_accuracy]/ [ref=e823]
+                - cell [ref=e826]
+                - cell "intonation [Intonation_accuracy]" [ref=e827]
+                - cell "S14 m" [ref=e828]:
+                  - generic [ref=e829]:
+                    - generic [ref=e830]: S14
+                    - generic [ref=e831]: m
+                - cell "Incorrect" [ref=e832]
+                - cell "4.29s" [ref=e836]
+                - cell [ref=e838]:
+                  - textbox "Note for token S14T1_002_intonation_000" [ref=e839]:
+                    - /placeholder: …
+              - row [ref=e840] [cursor=pointer]:
+                - cell [ref=e841]
+                - cell /intonation [Intonation_accuracy]/ [ref=e842]
+                - cell [ref=e845]
+                - cell "intonation [Intonation_accuracy]" [ref=e846]
+                - cell "S14 m" [ref=e847]:
+                  - generic [ref=e848]:
+                    - generic [ref=e849]: S14
+                    - generic [ref=e850]: m
+                - cell "Correct" [ref=e851]
+                - cell "7.50s" [ref=e855]
+                - cell [ref=e857]:
+                  - textbox "Note for token S14T1_002_intonation_001" [ref=e858]:
+                    - /placeholder: …
+              - row [ref=e859] [cursor=pointer]:
+                - cell [ref=e860]
+                - cell /intonation [Intonation_accuracy]/ [ref=e861]
+                - cell [ref=e864]
+                - cell "intonation [Intonation_accuracy]" [ref=e865]
+                - cell "S14 m" [ref=e866]:
+                  - generic [ref=e867]:
+                    - generic [ref=e868]: S14
+                    - generic [ref=e869]: m
+                - cell "Incorrect" [ref=e870]
+                - cell "13.18s" [ref=e874]
+                - cell [ref=e876]:
+                  - textbox "Note for token S14T1_002_intonation_002" [ref=e877]:
+                    - /placeholder: …
+              - row [ref=e878] [cursor=pointer]:
+                - cell [ref=e879]
+                - cell /intonation [Intonation_accuracy]/ [ref=e880]
+                - cell [ref=e883]
+                - cell "intonation [Intonation_accuracy]" [ref=e884]
+                - cell "S14 m" [ref=e885]:
+                  - generic [ref=e886]:
+                    - generic [ref=e887]: S14
+                    - generic [ref=e888]: m
+                - cell "Correct" [ref=e889]
+                - cell "6.74s" [ref=e893]
+                - cell [ref=e895]:
+                  - textbox "Note for token S14T1_005_intonation_000" [ref=e896]:
+                    - /placeholder: …
+              - row [ref=e897] [cursor=pointer]:
+                - cell [ref=e898]
+                - cell /intonation [Intonation_accuracy]/ [ref=e899]
+                - cell [ref=e902]
+                - cell "intonation [Intonation_accuracy]" [ref=e903]
+                - cell "S14 m" [ref=e904]:
+                  - generic [ref=e905]:
+                    - generic [ref=e906]: S14
+                    - generic [ref=e907]: m
+                - cell "Correct" [ref=e908]
+                - cell "9.61s" [ref=e912]
+                - cell [ref=e914]:
+                  - textbox "Note for token S14T1_005_intonation_001" [ref=e915]:
+                    - /placeholder: …
+              - row [ref=e916] [cursor=pointer]:
+                - cell [ref=e917]
+                - cell /intonation [Intonation_accuracy]/ [ref=e918]
+                - cell [ref=e921]
+                - cell "intonation [Intonation_accuracy]" [ref=e922]
+                - cell "S14 m" [ref=e923]:
+                  - generic [ref=e924]:
+                    - generic [ref=e925]: S14
+                    - generic [ref=e926]: m
+                - cell "Correct" [ref=e927]
+                - cell "12.26s" [ref=e931]
+                - cell [ref=e933]:
+                  - textbox "Note for token S14T1_005_intonation_002" [ref=e934]:
+                    - /placeholder: …
+              - row [ref=e935] [cursor=pointer]:
+                - cell [ref=e936]
+                - cell /intonation [Intonation_accuracy]/ [ref=e937]
+                - cell [ref=e940]
+                - cell "intonation [Intonation_accuracy]" [ref=e941]
+                - cell "S15 m" [ref=e942]:
+                  - generic [ref=e943]:
+                    - generic [ref=e944]: S15
+                    - generic [ref=e945]: m
+                - cell "Incorrect" [ref=e946]
+                - cell "15.37s" [ref=e950]
+                - cell [ref=e952]:
+                  - textbox "Note for token S15T1_002_intonation_000" [ref=e953]:
+                    - /placeholder: …
+              - row [ref=e954] [cursor=pointer]:
+                - cell [ref=e955]
+                - cell /intonation [Intonation_accuracy]/ [ref=e956]
+                - cell [ref=e959]
+                - cell "intonation [Intonation_accuracy]" [ref=e960]
+                - cell "S15 m" [ref=e961]:
+                  - generic [ref=e962]:
+                    - generic [ref=e963]: S15
+                    - generic [ref=e964]: m
+                - cell "Correct" [ref=e965]
+                - cell "0.54s" [ref=e969]
+                - cell [ref=e971]:
+                  - textbox "Note for token S15T1_003_intonation_000" [ref=e972]:
+                    - /placeholder: …
+              - row [ref=e973] [cursor=pointer]:
+                - cell [ref=e974]
+                - cell /intonation [Intonation_accuracy]/ [ref=e975]
+                - cell [ref=e978]
+                - cell "intonation [Intonation_accuracy]" [ref=e979]
+                - cell "S15 m" [ref=e980]:
+                  - generic [ref=e981]:
+                    - generic [ref=e982]: S15
+                    - generic [ref=e983]: m
+                - cell "Correct" [ref=e984]
+                - cell "7.70s" [ref=e988]
+                - cell [ref=e990]:
+                  - textbox "Note for token S15T1_003_intonation_001" [ref=e991]:
+                    - /placeholder: …
+              - row [ref=e992] [cursor=pointer]:
+                - cell [ref=e993]
+                - cell /intonation [Intonation_accuracy]/ [ref=e994]
+                - cell [ref=e997]
+                - cell "intonation [Intonation_accuracy]" [ref=e998]
+                - cell "S15 m" [ref=e999]:
+                  - generic [ref=e1000]:
+                    - generic [ref=e1001]: S15
+                    - generic [ref=e1002]: m
+                - cell "Incorrect" [ref=e1003]
+                - cell "10.78s" [ref=e1007]
+                - cell [ref=e1009]:
+                  - textbox "Note for token S15T1_007_intonation_000" [ref=e1010]:
+                    - /placeholder: …
+              - row [ref=e1011] [cursor=pointer]:
+                - cell [ref=e1012]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1013]
+                - cell [ref=e1016]
+                - cell "intonation [Intonation_accuracy]" [ref=e1017]
+                - cell "S15 m" [ref=e1018]:
+                  - generic [ref=e1019]:
+                    - generic [ref=e1020]: S15
+                    - generic [ref=e1021]: m
+                - cell "Correct" [ref=e1022]
+                - cell "14.65s" [ref=e1026]
+                - cell [ref=e1028]:
+                  - textbox "Note for token S15T1_007_intonation_001" [ref=e1029]:
+                    - /placeholder: …
+              - row [ref=e1030] [cursor=pointer]:
+                - cell [ref=e1031]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1032]
+                - cell [ref=e1035]
+                - cell "intonation [Intonation_accuracy]" [ref=e1036]
+                - cell "S16 m" [ref=e1037]:
+                  - generic [ref=e1038]:
+                    - generic [ref=e1039]: S16
+                    - generic [ref=e1040]: m
+                - cell "Incorrect" [ref=e1041]
+                - cell "10.13s" [ref=e1045]
+                - cell [ref=e1047]:
+                  - textbox "Note for token S16T1_002_intonation_000" [ref=e1048]:
+                    - /placeholder: …
+              - row [ref=e1049] [cursor=pointer]:
+                - cell [ref=e1050]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1051]
+                - cell [ref=e1054]
+                - cell "intonation [Intonation_accuracy]" [ref=e1055]
+                - cell "S16 m" [ref=e1056]:
+                  - generic [ref=e1057]:
+                    - generic [ref=e1058]: S16
+                    - generic [ref=e1059]: m
+                - cell "Correct" [ref=e1060]
+                - cell "14.77s" [ref=e1064]
+                - cell [ref=e1066]:
+                  - textbox "Note for token S16T1_002_intonation_001" [ref=e1067]:
+                    - /placeholder: …
+              - row [ref=e1068] [cursor=pointer]:
+                - cell [ref=e1069]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1070]
+                - cell [ref=e1073]
+                - cell "intonation [Intonation_accuracy]" [ref=e1074]
+                - cell "S16 m" [ref=e1075]:
+                  - generic [ref=e1076]:
+                    - generic [ref=e1077]: S16
+                    - generic [ref=e1078]: m
+                - cell "Incorrect" [ref=e1079]
+                - cell "4.00s" [ref=e1083]
+                - cell [ref=e1085]:
+                  - textbox "Note for token S16T1_003_intonation_000" [ref=e1086]:
+                    - /placeholder: …
+              - row [ref=e1087] [cursor=pointer]:
+                - cell [ref=e1088]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1089]
+                - cell [ref=e1092]
+                - cell "intonation [Intonation_accuracy]" [ref=e1093]
+                - cell "S16 m" [ref=e1094]:
+                  - generic [ref=e1095]:
+                    - generic [ref=e1096]: S16
+                    - generic [ref=e1097]: m
+                - cell "Incorrect" [ref=e1098]
+                - cell "0.84s" [ref=e1102]
+                - cell [ref=e1104]:
+                  - textbox "Note for token S16T1_006_intonation_000" [ref=e1105]:
+                    - /placeholder: …
+              - row [ref=e1106] [cursor=pointer]:
+                - cell [ref=e1107]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1108]
+                - cell [ref=e1111]
+                - cell "intonation [Intonation_accuracy]" [ref=e1112]
+                - cell "S16 m" [ref=e1113]:
+                  - generic [ref=e1114]:
+                    - generic [ref=e1115]: S16
+                    - generic [ref=e1116]: m
+                - cell "Incorrect" [ref=e1117]
+                - cell "4.14s" [ref=e1121]
+                - cell [ref=e1123]:
+                  - textbox "Note for token S16T1_006_intonation_001" [ref=e1124]:
+                    - /placeholder: …
+              - row [ref=e1125] [cursor=pointer]:
+                - cell [ref=e1126]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1127]
+                - cell [ref=e1130]
+                - cell "intonation [Intonation_accuracy]" [ref=e1131]
+                - cell "S16 m" [ref=e1132]:
+                  - generic [ref=e1133]:
+                    - generic [ref=e1134]: S16
+                    - generic [ref=e1135]: m
+                - cell "Correct" [ref=e1136]
+                - cell "8.42s" [ref=e1140]
+                - cell [ref=e1142]:
+                  - textbox "Note for token S16T1_006_intonation_002" [ref=e1143]:
+                    - /placeholder: …
+              - row [ref=e1144] [cursor=pointer]:
+                - cell [ref=e1145]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1146]
+                - cell [ref=e1149]
+                - cell "intonation [Intonation_accuracy]" [ref=e1150]
+                - cell "S17 m" [ref=e1151]:
+                  - generic [ref=e1152]:
+                    - generic [ref=e1153]: S17
+                    - generic [ref=e1154]: m
+                - cell "Correct" [ref=e1155]
+                - cell "13.55s" [ref=e1159]
+                - cell [ref=e1161]:
+                  - textbox "Note for token S17T1_002_intonation_000" [ref=e1162]:
+                    - /placeholder: …
+              - row [ref=e1163] [cursor=pointer]:
+                - cell [ref=e1164]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1165]
+                - cell [ref=e1168]
+                - cell "intonation [Intonation_accuracy]" [ref=e1169]
+                - cell "S17 m" [ref=e1170]:
+                  - generic [ref=e1171]:
+                    - generic [ref=e1172]: S17
+                    - generic [ref=e1173]: m
+                - cell "Incorrect" [ref=e1174]
+                - cell "1.77s" [ref=e1178]
+                - cell [ref=e1180]:
+                  - textbox "Note for token S17T1_003_intonation_000" [ref=e1181]:
+                    - /placeholder: …
+              - row [ref=e1182] [cursor=pointer]:
+                - cell [ref=e1183]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1184]
+                - cell [ref=e1187]
+                - cell "intonation [Intonation_accuracy]" [ref=e1188]
+                - cell "S17 m" [ref=e1189]:
+                  - generic [ref=e1190]:
+                    - generic [ref=e1191]: S17
+                    - generic [ref=e1192]: m
+                - cell "Incorrect" [ref=e1193]
+                - cell "10.87s" [ref=e1197]
+                - cell [ref=e1199]:
+                  - textbox "Note for token S17T1_003_intonation_001" [ref=e1200]:
+                    - /placeholder: …
+              - row [ref=e1201] [cursor=pointer]:
+                - cell [ref=e1202]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1203]
+                - cell [ref=e1206]
+                - cell "intonation [Intonation_accuracy]" [ref=e1207]
+                - cell "S17 m" [ref=e1208]:
+                  - generic [ref=e1209]:
+                    - generic [ref=e1210]: S17
+                    - generic [ref=e1211]: m
+                - cell "Incorrect" [ref=e1212]
+                - cell "3.61s" [ref=e1216]
+                - cell [ref=e1218]:
+                  - textbox "Note for token S17T1_007_intonation_000" [ref=e1219]:
+                    - /placeholder: …
+              - row [ref=e1220] [cursor=pointer]:
+                - cell [ref=e1221]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1222]
+                - cell [ref=e1225]
+                - cell "intonation [Intonation_accuracy]" [ref=e1226]
+                - cell "S17 m" [ref=e1227]:
+                  - generic [ref=e1228]:
+                    - generic [ref=e1229]: S17
+                    - generic [ref=e1230]: m
+                - cell "Incorrect" [ref=e1231]
+                - cell "7.90s" [ref=e1235]
+                - cell [ref=e1237]:
+                  - textbox "Note for token S17T1_007_intonation_001" [ref=e1238]:
+                    - /placeholder: …
+              - row [ref=e1239] [cursor=pointer]:
+                - cell [ref=e1240]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1241]
+                - cell [ref=e1244]
+                - cell "intonation [Intonation_accuracy]" [ref=e1245]
+                - cell "S18 m" [ref=e1246]:
+                  - generic [ref=e1247]:
+                    - generic [ref=e1248]: S18
+                    - generic [ref=e1249]: m
+                - cell "Correct" [ref=e1250]
+                - cell "7.31s" [ref=e1254]
+                - cell [ref=e1256]:
+                  - textbox "Note for token S18T1_002_intonation_000" [ref=e1257]:
+                    - /placeholder: …
+              - row [ref=e1258] [cursor=pointer]:
+                - cell [ref=e1259]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1260]
+                - cell [ref=e1263]
+                - cell "intonation [Intonation_accuracy]" [ref=e1264]
+                - cell "S18 m" [ref=e1265]:
+                  - generic [ref=e1266]:
+                    - generic [ref=e1267]: S18
+                    - generic [ref=e1268]: m
+                - cell "Incorrect" [ref=e1269]
+                - cell "11.26s" [ref=e1273]
+                - cell [ref=e1275]:
+                  - textbox "Note for token S18T1_002_intonation_001" [ref=e1276]:
+                    - /placeholder: …
+              - row [ref=e1277] [cursor=pointer]:
+                - cell [ref=e1278]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1279]
+                - cell [ref=e1282]
+                - cell "intonation [Intonation_accuracy]" [ref=e1283]
+                - cell "S18 m" [ref=e1284]:
+                  - generic [ref=e1285]:
+                    - generic [ref=e1286]: S18
+                    - generic [ref=e1287]: m
+                - cell "Incorrect" [ref=e1288]
+                - cell "17.59s" [ref=e1292]
+                - cell [ref=e1294]:
+                  - textbox "Note for token S18T1_002_intonation_002" [ref=e1295]:
+                    - /placeholder: …
+              - row [ref=e1296] [cursor=pointer]:
+                - cell [ref=e1297]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1298]
+                - cell [ref=e1301]
+                - cell "intonation [Intonation_accuracy]" [ref=e1302]
+                - cell "S18 m" [ref=e1303]:
+                  - generic [ref=e1304]:
+                    - generic [ref=e1305]: S18
+                    - generic [ref=e1306]: m
+                - cell "Incorrect" [ref=e1307]
+                - cell "-0.40s" [ref=e1311]
+                - cell [ref=e1313]:
+                  - textbox "Note for token S18T1_003_intonation_000" [ref=e1314]:
+                    - /placeholder: …
+              - row [ref=e1315] [cursor=pointer]:
+                - cell [ref=e1316]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1317]
+                - cell [ref=e1320]
+                - cell "intonation [Intonation_accuracy]" [ref=e1321]
+                - cell "S18 m" [ref=e1322]:
+                  - generic [ref=e1323]:
+                    - generic [ref=e1324]: S18
+                    - generic [ref=e1325]: m
+                - cell "Correct" [ref=e1326]
+                - cell "4.11s" [ref=e1330]
+                - cell [ref=e1332]:
+                  - textbox "Note for token S18T1_006_intonation_000" [ref=e1333]:
+                    - /placeholder: …
+              - row [ref=e1334] [cursor=pointer]:
+                - cell [ref=e1335]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1336]
+                - cell [ref=e1339]
+                - cell "intonation [Intonation_accuracy]" [ref=e1340]
+                - cell "S18 m" [ref=e1341]:
+                  - generic [ref=e1342]:
+                    - generic [ref=e1343]: S18
+                    - generic [ref=e1344]: m
+                - cell "Correct" [ref=e1345]
+                - cell "7.19s" [ref=e1349]
+                - cell [ref=e1351]:
+                  - textbox "Note for token S18T1_006_intonation_001" [ref=e1352]:
+                    - /placeholder: …
+              - row [ref=e1353] [cursor=pointer]:
+                - cell [ref=e1354]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1355]
+                - cell [ref=e1358]
+                - cell "intonation [Intonation_accuracy]" [ref=e1359]
+                - cell "S18 m" [ref=e1360]:
+                  - generic [ref=e1361]:
+                    - generic [ref=e1362]: S18
+                    - generic [ref=e1363]: m
+                - cell "Incorrect" [ref=e1364]
+                - cell "10.99s" [ref=e1368]
+                - cell [ref=e1370]:
+                  - textbox "Note for token S18T1_006_intonation_002" [ref=e1371]:
+                    - /placeholder: …
+              - row [ref=e1372] [cursor=pointer]:
+                - cell [ref=e1373]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1374]
+                - cell [ref=e1377]
+                - cell "intonation [Intonation_accuracy]" [ref=e1378]
+                - cell "S19 m" [ref=e1379]:
+                  - generic [ref=e1380]:
+                    - generic [ref=e1381]: S19
+                    - generic [ref=e1382]: m
+                - cell "Incorrect" [ref=e1383]
+                - cell "6.07s" [ref=e1387]
+                - cell [ref=e1389]:
+                  - textbox "Note for token S19T1_002_intonation_000" [ref=e1390]:
+                    - /placeholder: …
+              - row [ref=e1391] [cursor=pointer]:
+                - cell [ref=e1392]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1393]
+                - cell [ref=e1396]
+                - cell "intonation [Intonation_accuracy]" [ref=e1397]
+                - cell "S19 m" [ref=e1398]:
+                  - generic [ref=e1399]:
+                    - generic [ref=e1400]: S19
+                    - generic [ref=e1401]: m
+                - cell "Incorrect" [ref=e1402]
+                - cell "8.90s" [ref=e1406]
+                - cell [ref=e1408]:
+                  - textbox "Note for token S19T1_002_intonation_001" [ref=e1409]:
+                    - /placeholder: …
+              - row [ref=e1410] [cursor=pointer]:
+                - cell [ref=e1411]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1412]
+                - cell [ref=e1415]
+                - cell "intonation [Intonation_accuracy]" [ref=e1416]
+                - cell "S19 m" [ref=e1417]:
+                  - generic [ref=e1418]:
+                    - generic [ref=e1419]: S19
+                    - generic [ref=e1420]: m
+                - cell "Correct" [ref=e1421]
+                - cell "14.70s" [ref=e1425]
+                - cell [ref=e1427]:
+                  - textbox "Note for token S19T1_002_intonation_002" [ref=e1428]:
+                    - /placeholder: …
+              - row [ref=e1429] [cursor=pointer]:
+                - cell [ref=e1430]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1431]
+                - cell [ref=e1434]
+                - cell "intonation [Intonation_accuracy]" [ref=e1435]
+                - cell "S19 m" [ref=e1436]:
+                  - generic [ref=e1437]:
+                    - generic [ref=e1438]: S19
+                    - generic [ref=e1439]: m
+                - cell "Incorrect" [ref=e1440]
+                - cell "13.98s" [ref=e1444]
+                - cell [ref=e1446]:
+                  - textbox "Note for token S19T1_005_intonation_000" [ref=e1447]:
+                    - /placeholder: …
+              - row [ref=e1448] [cursor=pointer]:
+                - cell [ref=e1449]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1450]
+                - cell [ref=e1453]
+                - cell "intonation [Intonation_accuracy]" [ref=e1454]
+                - cell "S19 m" [ref=e1455]:
+                  - generic [ref=e1456]:
+                    - generic [ref=e1457]: S19
+                    - generic [ref=e1458]: m
+                - cell "Correct" [ref=e1459]
+                - cell "17.67s" [ref=e1463]
+                - cell [ref=e1465]:
+                  - textbox "Note for token S19T1_005_intonation_001" [ref=e1466]:
+                    - /placeholder: …
+              - row [ref=e1467] [cursor=pointer]:
+                - cell [ref=e1468]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1469]
+                - cell [ref=e1472]
+                - cell "intonation [Intonation_accuracy]" [ref=e1473]
+                - cell "S19 m" [ref=e1474]:
+                  - generic [ref=e1475]:
+                    - generic [ref=e1476]: S19
+                    - generic [ref=e1477]: m
+                - cell "Correct" [ref=e1478]
+                - cell "-0.17s" [ref=e1482]
+                - cell [ref=e1484]:
+                  - textbox "Note for token S19T1_006_intonation_000" [ref=e1485]:
+                    - /placeholder: …
+              - row [ref=e1486] [cursor=pointer]:
+                - cell [ref=e1487]
+                - cell /intonation [Intonation_accuracy]/ [ref=e1488]
+                - cell [ref=e1491]
+                - cell "intonation [Intonation_accuracy]" [ref=e1492]
+                - cell "S19 m" [ref=e1493]:
+                  - generic [ref=e1494]:
+                    - generic [ref=e1495]: S19
+                    - generic [ref=e1496]: m
+                - cell "Incorrect" [ref=e1497]
+                - cell "4.03s" [ref=e1501]
+                - cell [ref=e1503]:
+                  - textbox "Note for token S19T1_006_intonation_001" [ref=e1504]:
+                    - /placeholder: …
+              - row [ref=e1505] [cursor=pointer]:
+                - cell [ref=e1506]
+                - cell /inton_RAW [Intonation_accuracy]/ [ref=e1507]
+                - cell [ref=e1510]
+                - cell "inton_RAW [Intonation_accuracy]" [ref=e1511]
+                - cell "S1 m" [ref=e1512]:
+                  - generic [ref=e1513]:
+                    - generic [ref=e1514]: S1
+                    - generic [ref=e1515]: m
+                - cell "Incorrect" [ref=e1516]
+                - cell "4.61s" [ref=e1520]
+                - cell [ref=e1522]:
+                  - textbox "Note for token S1T1_002_intonation_000" [ref=e1523]:
+                    - /placeholder: …
+              - row [ref=e1524] [cursor=pointer]:
+                - cell [ref=e1525]
+                - cell /inton_RAW [Intonation_accuracy]/ [ref=e1526]
+                - cell [ref=e1529]
+                - cell "inton_RAW [Intonation_accuracy]" [ref=e1530]
+                - cell "S1 m" [ref=e1531]:
+                  - generic [ref=e1532]:
+                    - generic [ref=e1533]: S1
+                    - generic [ref=e1534]: m
+                - cell "Correct" [ref=e1535]
+                - cell "8.04s" [ref=e1539]
+                - cell [ref=e1541]:
+                  - textbox "Note for token S1T1_002_intonation_001" [ref=e1542]:
+                    - /placeholder: …
+              - row [ref=e1543] [cursor=pointer]:
+                - cell [ref=e1544]
+                - cell /inton_RAW [Intonation_accuracy]/ [ref=e1545]
+                - cell [ref=e1548]
+                - cell "inton_RAW [Intonation_accuracy]" [ref=e1549]
+                - cell "S1 m" [ref=e1550]:
+                  - generic [ref=e1551]:
+                    - generic [ref=e1552]: S1
+                    - generic [ref=e1553]: m
+                - cell "Incorrect" [ref=e1554]
+                - cell "15.73s" [ref=e1558]
+                - cell [ref=e1560]:
+                  - textbox "Note for token S1T1_002_intonation_002" [ref=e1561]:
+                    - /placeholder: …
+          - generic [ref=e1562]:
+            - generic [ref=e1563]: Showing 60 of 327
+            - button "Load more" [ref=e1564]
+  - generic [ref=e1565]:
+    - button "Close" [ref=e1566]
+    - generic [ref=e1567]:
+      - generic [ref=e1568]:
+        - generic [ref=e1569]:
+          - generic [ref=e1570]: Utterance · S10T1_002
+          - heading "S10·read-aloud·male" [level=3] [ref=e1571]:
+            - generic [ref=e1572]: S10
+            - generic [ref=e1573]: ·read-aloud
+            - generic [ref=e1574]: ·male
+        - button "Esc ✕" [ref=e1575]
+      - generic [ref=e1577]:
+        - paragraph [ref=e1578]: “all rushed from their homes full of concern for his safety and two of his cousins even stayed with him for a short while once one of them ask where is the wolf”
+        - generic [ref=e1580]:
+          - generic [ref=e1581]: Annotated phones — click to hear
+          - generic [ref=e1582]:
+            - button "ɒ" [ref=e1583]
+            - button "ɐ" [ref=e1586]
+            - button "ɝ" [ref=e1589]
+            - button "eɪ" [ref=e1592]
+            - button "ʉ" [ref=e1595]
+            - button "t" [ref=e1598]
+            - button "ɒ" [ref=e1601]
+            - button "v" [ref=e1604]
+            - button "v" [ref=e1607]
+        - generic [ref=e1610]: No pitch contour for this utterance. Contours are extracted with Parselmouth at build time; if it wasn’t installed, this area is empty while every other measure still works.
+        - generic [ref=e1611]:
+          - generic [ref=e1612]: Rhythm metrics
+          - generic [ref=e1614]:
+            - generic [ref=e1615]:
+              - generic [ref=e1616]: "%V"
+              - generic [ref=e1617]: 36.0%
+            - generic [ref=e1618]:
+              - generic [ref=e1619]: nPVI-V
+              - generic [ref=e1620]: "56.7"
+            - generic [ref=e1621]:
+              - generic [ref=e1622]: VarcoV
+              - generic [ref=e1623]: "45.1"
+            - generic [ref=e1624]:
+              - generic [ref=e1625]: VarcoC
+              - generic [ref=e1626]: "88.1"
+            - generic [ref=e1627]:
+              - generic [ref=e1628]: ΔC
+              - generic [ref=e1629]: 197.5ms
+            - generic [ref=e1630]:
+              - generic [ref=e1631]: rPVI-C
+              - generic [ref=e1632]: 179.3ms

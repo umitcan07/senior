@@ -455,8 +455,11 @@ def _emit_utterance(
                     "spk": utt.speaker,
                     "ph": label,
                     "e": "correct" if outcome == "correct" else "incorrect",
-                    "t0": round(t0 - utt.t0, 3),
-                    "t1": round(t1 - utt.t0, 3),
+                    # A judgement can overlap an utterance boundary. The clip
+                    # starts at that boundary (plus harmless pre-roll), so
+                    # never publish a negative seek position.
+                    "t0": round(max(0.0, t0 - utt.t0), 3),
+                    "t1": round(max(0.0, t1 - utt.t0), 3),
                     "w": label,
                 },
             )

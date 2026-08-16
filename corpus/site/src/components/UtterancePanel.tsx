@@ -107,9 +107,7 @@ export function UtterancePanel({
 										<PitchPlot pitch={utt.pitch} playhead={playhead} />
 									</div>
 								</section>
-							) : (
-								<NoPitch />
-							)}
+							) : null}
 
 							<section>
 								<Eyebrow>Rhythm metrics</Eyebrow>
@@ -210,16 +208,6 @@ function SpeakerLine({
 				</span>
 			))}
 		</h3>
-	);
-}
-
-function NoPitch() {
-	return (
-		<section className="rounded-[var(--radius-card)] border border-[var(--color-rule)] border-dashed p-3 text-[var(--color-ink-faint)] text-xs">
-			No pitch contour for this utterance. Contours are extracted with
-			Parselmouth at build time; if it wasn’t installed, this area is empty
-			while every other measure still works.
-		</section>
 	);
 }
 
