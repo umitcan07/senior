@@ -7,7 +7,7 @@
     "clips": true,
     "clipFormat": "mp3",
     "sourceAudioFiles": 52,
-    "clipsPublished": 1901,
+    "clipsPublished": 2209,
     "missingSourceAudio": [
       "S14T2",
       "S16T2",
@@ -18,7 +18,8 @@
       "S7T2",
       "S8T2"
     ],
-    "synthetic": false
+    "synthetic": false,
+    "referenceIpaAvailable": false
   },
   "areas": [
     "vowels",
@@ -673,14 +674,14 @@
       "id": "S10T1_000",
       "spk": "S10",
       "task": "T1",
-      "text": "there was once a poor shepherd boy who used to watch these flocks in the fields next to a dark forest near the foot of mountain foot of a mountain one hot afternoon he tr tow up a good plan to get",
+      "text": "there was once a poor shepherd boy who used to watch these flocks in the fields next to a dark forest near the foot of mountain foot of a mountain one hot afternoon he tr thought up a good plan to get",
       "dur": 17.94
     },
     {
       "id": "S10T1_001",
       "spk": "S10",
       "task": "T1",
-      "text": "some company for himself and also have a f have a little fun raising his first [bracketed] in rain he run down to the village shooting wolf wolf as soon as they heard him the villagers [uh]",
+      "text": "some company for himself and also have a f have a little fun raising his fist [bracketed] in the air he ran down to the village shooting wolf wolf as soon as they heard him the villagers [uh]",
       "dur": 18.0
     },
     {
@@ -694,7 +695,7 @@
       "id": "S10T1_003",
       "spk": "S10",
       "task": "T1",
-      "text": "another one also ask have you really seen a wolf they didn't he didn't answer and his cousin repeat the question was there a wolf or not they got very angry",
+      "text": "another one also ask have you really seen a wolf they didn't he didn't answer and his cousin repeated the question was there a wolf or not they got very angry",
       "dur": 17.67
     },
     {
@@ -715,14 +716,14 @@
       "id": "S10T1_006",
       "spk": "S10",
       "task": "T1",
-      "text": "out from forest and began to train the sheep racing down to village to the boy of course cried cried out even louder than before unfortunately as all the villagers",
+      "text": "out from forest and began to threaten the sheep raising down to village to the boy of course cried cried out even louder than before unfortunately as all the villagers",
       "dur": 17.8
     },
     {
       "id": "S10T1_007",
       "spk": "S10",
       "task": "T1",
-      "text": "were com vincented that he was trying to fool them a tr third time they told him you're fooling us again aren't you go f go",
+      "text": "were convinced that he was trying to fool them a tr third time they told him you're fooling us again aren't you go f go",
       "dur": 14.2
     },
     {
@@ -1233,7 +1234,7 @@
       "id": "S11T1_001",
       "spk": "S11",
       "task": "T1",
-      "text": "company for himself and also have a little fun rising his [uh] f fist in the air he run down o to the village shouting wolf wolf as soon as they heard him the v villagers",
+      "text": "company for himself and also have a little fun raising his [uh] f fist in the air he run down o to the village shouting wolf wolf as soon as they heard him the v villagers",
       "dur": 17.68
     },
     {
@@ -1261,14 +1262,14 @@
       "id": "S11T1_005",
       "spk": "S11",
       "task": "T1",
-      "text": "from its usual diet of chicken and ducks duck so o o overcoming its fear of being shot it [uh] actually did come out from the forest and began to train the sh sheep",
+      "text": "from its usual diet of chicken and duck duck so o o overcoming its fear of being shot it [uh] actually did come out from the forest and began to threaten the sh sheep",
       "dur": 17.47
     },
     {
       "id": "S11T1_006",
       "spk": "S11",
       "task": "T1",
-      "text": "racing down the village [uh] the boy of course c cried out even louder than before unfortunately as v as all the villagers were conv convic that he was trying to f",
+      "text": "racing down the village [uh] the boy of course c cried out even louder than before unfortunately as v as all the villagers were conv convinced that he was trying to f",
       "dur": 17.81
     },
     {
@@ -1989,14 +1990,14 @@
       "id": "S12T1_001",
       "spk": "S12",
       "task": "T1",
-      "text": "have little fun reasoning his fist in the air he ran down to the village shotting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concern for his safety and",
+      "text": "have little fun raising spn fist in the air he ran down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concern for his safety and",
       "dur": 17.89
     },
     {
       "id": "S12T1_002",
       "spk": "S12",
       "task": "T1",
-      "text": "two of his cousin and even stayed with him for a short while one of them asked where is the wolf another one also asked have you really seen a wolf he didn't answer and he couldn't repeat the question was there a",
+      "text": "two of his cousin and even stayed with him for a short while one of them asked where is the wolf another one also asked have you really seen a wolf he didn't answer and he couldn't repeated the question was there a",
       "dur": 17.78
     },
     {
@@ -2010,14 +2011,14 @@
       "id": "S12T1_004",
       "spk": "S12",
       "task": "T1",
-      "text": "a wolf that had just escaped escaped from the zoo was looking for a change chance from its usual need of chicken and duck so overcoming its fear of being shot it's actually it's actually did",
+      "text": "a wolf that had just spn spn escaped from the zoo was looking for a change chance from its usual diet of chicken and duck so overcoming its fear of being shot it's actually it's actually did",
       "dur": 17.7
     },
     {
       "id": "S12T1_005",
       "spk": "S12",
       "task": "T1",
-      "text": "come out from the forest and began to threaten the ship racing down to the village the boy of [uh] course creeped out even louder than before unfortunately as all the villagers were confident that",
+      "text": "come out from the forest and began to threaten the sheep racing down to the village the boy of [uh] course cried out even louder than before unfortunately as all the villagers were convinced that",
       "dur": 17.74
     },
     {
@@ -2633,7 +2634,7 @@
       "id": "S13T1_000",
       "spk": "S13",
       "task": "T1",
-      "text": "there was once poor separate boy who used to watch his flocks in the field next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun raising his",
+      "text": "there was once poor shepherd boy who used to watch his flocks in the field next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun raising his",
       "dur": 17.98
     },
     {
@@ -2654,7 +2655,7 @@
       "id": "S13T1_003",
       "spk": "S13",
       "task": "T1",
-      "text": "tried exactly exactly the same trick again and once more he was successful however not long after a wolf that had just escaped from the zoo was looking for a change for from its usual diet of chicken and and back so",
+      "text": "tried exactly exactly the same trick again and once more he was successful however not long after a wolf that had just escaped from the zoo was looking for a change for from its usual diet of chicken and and duck so",
       "dur": 17.78
     },
     {
@@ -3102,7 +3103,7 @@
       "id": "S14T1_001",
       "spk": "S14",
       "task": "T1",
-      "text": "little fun raising his fists in the air he ran down to village shooting wolf wolf as soon as they heard him the villagers all rushed rushed from their homes full of concern for his safety and 2 of his cousins even",
+      "text": "little fun raising his fist in the air he ran down to village shooting wolf wolf as soon as they heard him the villagers all rushed rushed from their homes full of concern for his safety and two of his cousins even",
       "dur": 17.77
     },
     {
@@ -3130,7 +3131,7 @@
       "id": "S14T1_005",
       "spk": "S14",
       "task": "T1",
-      "text": "as all the villagers were convinced that he was trying to fool them a 3rd time they told him you are fooling us again aren't you go away and don't bother us again and so the wolf had a",
+      "text": "as all the villagers were convinced that he was trying to fool them a third time they told him you are fooling us again aren't you go away and don't bother us again and so the wolf had a",
       "dur": 13.06
     },
     {
@@ -3718,7 +3719,7 @@
       "id": "S15T1_000",
       "spk": "S15",
       "task": "T1",
-      "text": "there was a [uh] once a pure shapered boy who used to watch his flock in the field next to a dark forest near the foot of the mountain [uh] one hot afternoon he thought up a good plan to",
+      "text": "there was a [uh] once a poor shepherd boy who used to watch his flock in the field next to a dark forest near the foot of the mountain [uh] one hot afternoon he thought up a good plan to",
       "dur": 17.83
     },
     {
@@ -3732,7 +3733,7 @@
       "id": "S15T1_002",
       "spk": "S15",
       "task": "T1",
-      "text": "[uh] the villagers all rushed from their homes full of concern for his safety and two of these cousins even stayed with him for a short while one of them asked [uh] where is the wolf another one also",
+      "text": "[uh] the villagers all rushed from their homes full of concern for his safety and two of his cousins even stayed with him for a short while one of them asked [uh] where is the wolf another one also",
       "dur": 17.9
     },
     {
@@ -3760,14 +3761,14 @@
       "id": "S15T1_006",
       "spk": "S15",
       "task": "T1",
-      "text": "[uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh]villagers were",
+      "text": "[uh] [uh] to threaten [uh] the sheep raising down to village boy of course cried out even louder than before unfortunately as [uh] [uh] all the [uh] villagers were",
       "dur": 17.95
     },
     {
       "id": "S15T1_007",
       "spk": "S15",
       "task": "T1",
-      "text": "conv convinced that he was trying to fool them a third time they told him you are fooling us again aren't me go away and don't bother us again and so the wolf had a feast",
+      "text": "convinced convinced that he was tried to fool them a third time they told him you are fooling us again aren't me go away and don't bother us again and so the wolf had a feast",
       "dur": 16.28
     },
     {
@@ -4894,14 +4895,14 @@
       "id": "S17T1_000",
       "spk": "S17",
       "task": "T1",
-      "text": "there was once a poor shepherd boy who used to watch his flock in the fields next to a forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself",
+      "text": "there was once a poor shepherd boy who used to watch his flock in the fields next to dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself",
       "dur": 17.72
     },
     {
       "id": "S17T1_001",
       "spk": "S17",
       "task": "T1",
-      "text": "and also have a little fun racing his fist in the air he run down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their",
+      "text": "and also have a little fun raising his fist in the air he ran down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their",
       "dur": 17.45
     },
     {
@@ -4915,7 +4916,7 @@
       "id": "S17T1_003",
       "spk": "S17",
       "task": "T1",
-      "text": "asked have you really seen a wolf he didn't answer and his cousin replied the question was there wolf or not they got very angry with him and this gave the boy",
+      "text": "asked have you really seen a wolf he didn't answer and his cousin repeated the question was there wolf or not they got very angry with him and this gave the boy",
       "dur": 17.99
     },
     {
@@ -5552,7 +5553,7 @@
       "id": "S18T1_001",
       "spk": "S18",
       "task": "T1",
-      "text": "raising his fist in the air he run down to the village shoutingwolf wolf as soon as they heard him the villagers all rushed rushed from their homes full of cancer for his safety and 2 of",
+      "text": "raising his fist in the air he ran down to the village shoutingwolf wolf as soon as they heard him the villagers all rushed rushed from their homes full of concern for his safety and two of",
       "dur": 17.84
     },
     {
@@ -5580,14 +5581,14 @@
       "id": "S18T1_005",
       "spk": "S18",
       "task": "T1",
-      "text": "forest and began to tear out the sheep racing down to the village the boy of course cried out even louder than before unfortunately as all the villagers were conv convinced that he was",
+      "text": "forest and began to threaten the sheep racing down to the village the boy of course cried out even louder than before unfortunately as all the villagers were conv convinced that he was",
       "dur": 17.77
     },
     {
       "id": "S18T1_006",
       "spk": "S18",
       "task": "T1",
-      "text": "trying to fool them a 3rd time they told him you are fooling us again aren't you go away and don't bother us again and so the wolf had a",
+      "text": "trying to fool them a third time they told him you are fooling us again aren't you go away and don't bother us again and so the wolf had a",
       "dur": 12.08
     },
     {
@@ -6210,14 +6211,14 @@
       "id": "S19T1_000",
       "spk": "S19",
       "task": "T1",
-      "text": "there was once a poor shepherd boy who used to watch his flocks in the fields next to a dark forest near the float of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun",
+      "text": "there was once a poor shepherd boy who used to watch his flocks in the fields next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun",
       "dur": 17.89
     },
     {
       "id": "S19T1_001",
       "spk": "S19",
       "task": "T1",
-      "text": "raising his 1st in the air he ran down to the village shooting wolf wolves as soon as they heard him the villagers all rushed from their homes full of concern for his safety and two of his",
+      "text": "raising his fist in the air he ran down to the village shouting wolf wolves as soon as they heard him the villagers all rushed from their homes full of concern for his safety and two of his",
       "dur": 17.38
     },
     {
@@ -6238,14 +6239,14 @@
       "id": "S19T1_004",
       "spk": "S19",
       "task": "T1",
-      "text": "zoo was looking for a change from its usual diets of chicken and duck so ourcomic [bracketed] it's fear of being shot it actually did come out from the forest and began to dread the sheep racing down to the village",
+      "text": "zoo was looking for a change from its usual diet of chicken and duck so overcoming [bracketed] it's fear of being shot it actually did come out from the forest and began to threaten the sheep racing down to the village",
       "dur": 17.74
     },
     {
       "id": "S19T1_005",
       "spk": "S19",
       "task": "T1",
-      "text": "the boy of course cried out even louder than before unfortunately as all the villagers [uh] were convinced that he was trying to fool them a 3rd time told him you are fooling us again aren't you go",
+      "text": "the boy of course cried out even louder than before unfortunately as all the villagers [uh] were convinced that he was trying to fool them a third time they told him you are fooling us again aren't you go",
       "dur": 17.84
     },
     {
@@ -6784,14 +6785,14 @@
       "id": "S1T1_000",
       "spk": "S1",
       "task": "T1",
-      "text": "there was once a poor shipyard boy who used to watch his flocks in the fields next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun",
+      "text": "there was once a poor shepherd boy who used to watch his flocks in the fields next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun",
       "dur": 17.49
     },
     {
       "id": "S1T1_001",
       "spk": "S1",
       "task": "T1",
-      "text": "rising his fist in the air he ran down to the village shooting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concern for his safety and 2 of his cousins",
+      "text": "rising his fist in the air he ran down to the village shooting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concern for his safety and two of his cousins",
       "dur": 17.85
     },
     {
@@ -6812,14 +6813,14 @@
       "id": "S1T1_004",
       "spk": "S1",
       "task": "T1",
-      "text": "from the zoo was looking for a change from its h usual diet of chicken and dog so overcoming its fe fear of being shot it actually did come out from the forest and began to threaten the sheep raising down to the village the boy",
+      "text": "from the zoo was looking for a change from its h usual diet of chicken and duck so overcoming its fe fear of being shot it actually did come out from the forest and began to threaten the sheep raising down to the village the boy",
       "dur": 17.98
     },
     {
       "id": "S1T1_005",
       "spk": "S1",
       "task": "T1",
-      "text": "of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying to fool fool them 3rd time they told him you are fooling us again are not you go away and do bother us again and so",
+      "text": "of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying to fool fool them third time they told him you are fooling us again are not you go away and do bother us again and so",
       "dur": 17.98
     },
     {
@@ -7435,28 +7436,28 @@
       "id": "S20T1_001",
       "spk": "S20",
       "task": "T1",
-      "text": "in air he ran down the village shutting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concerns for his safety and 2 of of his cousins even stayed with him for a short while one of",
+      "text": "in air he ran down the village shouting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concerns for his safety and two of of his cousins even stayed with him for a short while one of",
       "dur": 17.96
     },
     {
       "id": "S20T1_002",
       "spk": "S20",
       "task": "T1",
-      "text": "them asked where is the wolf another one also asked how you really see a wolf he didn't answer and his cousin repeated the question was that a wolf or not they got [uh] very angry with him and this gave the boy so much pleasure that a few days later he tried the",
+      "text": "them asked where is the wolf another one also asked how you really seen a wolf he didn't answer and his cousin repeated the question was that a wolf or not they got [uh] very angry with him and this gave the boy so much pleasure that a few days later he tried the",
       "dur": 17.87
     },
     {
       "id": "S20T1_003",
       "spk": "S20",
       "task": "T1",
-      "text": "exact little same thing again and one more he once more he was successful however not long after a wolf that had just escaped from the zoo was looking for change from its usual d diet for chicken and duck so overcoming its fear",
+      "text": "exactly same trick again and one more he once more he was successful however not long after a wolf that had just escaped from the zoo was looking for change from its usual d diet for chicken and duck so overcoming its fear",
       "dur": 17.79
     },
     {
       "id": "S20T1_004",
       "spk": "S20",
       "task": "T1",
-      "text": "of being shot shot it actually did come out from forests and beg began to threaten to sleep racing down the village the boy of course cried out even louder than before unfortunately as the villagers were confident they that he was trained to fool them",
+      "text": "of being shot shot it actually did come out from forests and beg began to threaten to sleep racing down the village the boy of course cried out even louder than before unfortunately as the villagers were convinced they that he was trained to fool them",
       "dur": 17.7
     },
     {
@@ -8002,7 +8003,7 @@
       "id": "S21T1_004",
       "spk": "S21",
       "task": "T1",
-      "text": "chan change from its usual diet of chicken and duck so overcoming its fear of being shot it actually did come out from the forest and began to treat some sheep raising down the village the boy of course cried out even louder than before",
+      "text": "chan change from its usual diet of chicken and duck so overcoming its fear of being shot it actually did come out from the forest and began to threaten sheep raising down the village the boy of course cried out even louder than before",
       "dur": 17.95
     },
     {
@@ -8688,7 +8689,7 @@
       "id": "S22T1_001",
       "spk": "S22",
       "task": "T1",
-      "text": "himself and also have little fun raising his horse in the air he ran down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their hams",
+      "text": "himself and also have little fun raising his fist in the air he ran down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their hams",
       "dur": 16.57
     },
     {
@@ -9367,21 +9368,21 @@
       "id": "S23T1_000",
       "spk": "S23",
       "task": "T1",
-      "text": "there was once poor shep shepherd boy who used to watch his his flocks in the fields fields next to a dark forest near the foot of a m mountain one hot afternoon he tore up a good plan to get some company for himself",
+      "text": "there was once poor shep shepherd boy who used to watch his his flocks in the fields fields next to a dark forest near the foot of a m mountain one hot afternoon he thought up a good plan to get some company for himself",
       "dur": 17.64
     },
     {
       "id": "S23T1_001",
       "spk": "S23",
       "task": "T1",
-      "text": "and also have a little fun raising his f fist in the air he ran do down he ran to the village shooting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concern",
+      "text": "and also have a little fun raising his f fist in the air he ran do down he ran down to the village shooting wolf wolf as soon as they heard him the villagers all rushed from their homes full of concern",
       "dur": 17.87
     },
     {
       "id": "S23T1_002",
       "spk": "S23",
       "task": "T1",
-      "text": "concern for his safety and 2 of his cousins even stayed with him for a short while one of them asked asked where is the wolf another one also asked have you really seen a wolf he didn't answer",
+      "text": "concern for his safety and two of his cousins even stayed with him for a short while one of them asked asked where is the wolf another one also asked have you really seen a wolf he didn't answer",
       "dur": 17.84
     },
     {
@@ -9871,7 +9872,7 @@
       "id": "S24T1_005",
       "spk": "S24",
       "task": "T1",
-      "text": "out even louder than before unfortunately as all the villagers were convinced that he was trying to fool them a 3rd time they told him you are fooling us again are not you go and don't bother us again and so",
+      "text": "out even louder than before unfortunately as all the villagers were convinced that he was trying to fool them a third time they told him you are fooling us again are not you go away and don't bother us again and so",
       "dur": 17.78
     },
     {
@@ -10445,14 +10446,14 @@
       "id": "S25T1_000",
       "spk": "S25",
       "task": "T1",
-      "text": "there was once a poor shepherd who w [uh] boy who used to watch his flocks in the fields next to a dark forest near the [bracketed] foot of a mountain one hot [uh] afternoon he tough up a good plan to get",
+      "text": "there was once a poor shepherd who w [uh] boy who used to watch his flocks in the fields next to a dark forest near the [bracketed] foot of a mountain one hot [uh] afternoon he though up a good plan to get",
       "dur": 17.94
     },
     {
       "id": "S25T1_001",
       "spk": "S25",
       "task": "T1",
-      "text": "some company for himself and also have a little fun [uh] raising his [bracketed] fist in the air he run down to the village shooting wolf wolf as soon as they heard him the villagers all rushed",
+      "text": "some company for himself and also have a little fun [uh] raising his [bracketed] fist in the air he ran down to the village shooting wolf wolf as soon as they heard him the villagers all rushed",
       "dur": 17.33
     },
     {
@@ -10480,14 +10481,14 @@
       "id": "S25T1_005",
       "spk": "S25",
       "task": "T1",
-      "text": "zoo was looking for a chance from its usual diet of chicken and duck so overcoming its fear of being shot it actually did come out from the forest and began to threaten the sheep",
+      "text": "zoo was looking for a change from its usual diet of chicken and duck so overcoming its fear of being shot it actually did come out from the forest and began to threaten the sheep",
       "dur": 16.94
     },
     {
       "id": "S25T1_006",
       "spk": "S25",
       "task": "T1",
-      "text": "racing down to of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying to fool them a third time they told",
+      "text": "racing down to the village the boy of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying to fool them a third time they told",
       "dur": 17.74
     },
     {
@@ -10914,14 +10915,14 @@
       "id": "S26T1_000",
       "spk": "S26",
       "task": "T1",
-      "text": "there was once poor shepherd boy who used to watch these flocks in the fields next to a dark dark forest near the mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun raising his fist in the air he ran down",
+      "text": "there was once a poor shepherd boy who used to watch these flocks in the fields next to a dark dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have a little fun raising his fist in the air he ran down",
       "dur": 17.68
     },
     {
       "id": "S26T1_001",
       "spk": "S26",
       "task": "T1",
-      "text": "to the village shutting wolf wolf as soon as they heard him the village the ha all rushed for him their homes full of concern for his safety and 2 of his cousins even stayed with him for a short while one of them asked where is the",
+      "text": "to the village shutting wolf wolf as soon as they heard him the village the they all rushed for him their homes full of concern for his safety and two of his cousins even stayed with him for a short while one of them asked where is the",
       "dur": 17.78
     },
     {
@@ -10942,14 +10943,14 @@
       "id": "S26T1_004",
       "spk": "S26",
       "task": "T1",
-      "text": "usual diet of chicken and duck so overcoming its fear of being shot it actually did come out come out from the forest and [uh] began to the ship racing r r r r r",
+      "text": "usual diet of chicken and duck so overcoming its fear of being shot it actually did come out come out from the forest and [uh] began to threaten the ship racing r down r r to the village the boy of",
       "dur": 17.49
     },
     {
       "id": "S26T1_005",
       "spk": "S26",
       "task": "T1",
-      "text": "r r r r r r r r told you're fooling us again aren't go and don't bother again and so the wolf r",
+      "text": "that he was trying to fool them a third time r they told him you're fooling us again aren't you go away and don't bother us again and so the wolf had a feast r",
       "dur": 12.08
     },
     {
@@ -11572,42 +11573,42 @@
       "id": "S27T1_001",
       "spk": "S27",
       "task": "T1",
-      "text": "himself and also have a little fun raising his fist in the air he run down to the village shouting wolf wolf as soon as they heard him the villagers are rushed",
+      "text": "himself and also have a little fun raising his fist in the air he ran down to the village shouting wolf wolf as soon as they heard him the villagers are rushed",
       "dur": 17.94
     },
     {
       "id": "S27T1_002",
       "spk": "S27",
       "task": "T1",
-      "text": "from their homes full of corn corn for his safety and 2 of his cousins even stayed with him for a short while one of them asked where is the wolf other one also asked",
+      "text": "from their homes full of corn concern for his safety and two of his cousins even stayed with him for a short while one of them asked where is the wolf another one also asked",
       "dur": 17.25
     },
     {
       "id": "S27T1_003",
       "spk": "S27",
       "task": "T1",
-      "text": "how have you really seen a wolf he didn't answer and his cousin repeated the question was there a wolf or not they got very angry with him and this gave the boy so much pleasure that",
+      "text": "spn have you really seen a wolf he didn't answer and his cousin repeated the question was there a wolf or not they got very angry with him and this gave the boy so much pleasure that",
       "dur": 17.36
     },
     {
       "id": "S27T1_004",
       "spk": "S27",
       "task": "T1",
-      "text": "a few days later he tried exactly the same trick again and once more he was successful however not long after a wolf that had just escaped from the zoo was looking for a change from its usually dead office",
+      "text": "a few days later he tried exactly the same trick again and once more he was successful however not long after a wolf that had just escaped from the zoo was looking for a change from its usual diet of",
       "dur": 17.8
     },
     {
       "id": "S27T1_005",
       "spk": "S27",
       "task": "T1",
-      "text": "at return the sheep raising down to the village the boy of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying",
+      "text": "to threaten the sheep raising down to the village the boy of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying",
       "dur": 17.78
     },
     {
       "id": "S27T1_006",
       "spk": "S27",
       "task": "T1",
-      "text": "to fool them at right time they told you're fooling us again aren't you go away and don't bow to us again and so the wolf had a feast",
+      "text": "to fool them a third time they told you're fooling us again aren't you go away and don't bother us again and so the wolf had a feast",
       "dur": 12.57
     },
     {
@@ -12111,14 +12112,14 @@
       "id": "S28T1_000",
       "spk": "S28",
       "task": "T1",
-      "text": "there was once a poor shepherd boy who used to watch his flock in the fields next to a forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself",
+      "text": "there was once a poor shepherd boy who used to watch his flock in the fields next to dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself",
       "dur": 17.72
     },
     {
       "id": "S28T1_001",
       "spk": "S28",
       "task": "T1",
-      "text": "and also have a little fun racing his fist in the air he run down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their",
+      "text": "and also have a little fun raising his fist in the air he ran down to the village shouting wolf wolf as soon as they heard him the villagers all rushed from their",
       "dur": 17.45
     },
     {
@@ -12132,7 +12133,7 @@
       "id": "S28T1_003",
       "spk": "S28",
       "task": "T1",
-      "text": "asked have you really seen a wolf he didn't answer and his cousin replied the question was there wolf or not they got very angry with him and this gave the boy",
+      "text": "asked have you really seen a wolf he didn't answer and his cousin repeated the question was there wolf or not they got very angry with him and this gave the boy",
       "dur": 17.99
     },
     {
@@ -12713,14 +12714,14 @@
       "id": "S29T1_000",
       "spk": "S29",
       "task": "T1",
-      "text": "there was once a poor sheepherd boy who used to watch his p flocks in the fields next to a dark forest near the foot of a mountain one hap afternoon he thought up a plan to get some company for himself and also have a lit have a little fun",
+      "text": "there was once a poor shepherd boy who used to watch his p flocks in the fields next to a dark forest near the foot of a mountain one hot afternoon he thought up a plan to get some company for himself and also have a lit have a little fun",
       "dur": 16.96
     },
     {
       "id": "S29T1_001",
       "spk": "S29",
       "task": "T1",
-      "text": "raising his fist in the air he ran down to village shouting wolf wolf as soon as they heard him the villagers overrushed from their homes full of concern for his safety and 2 of his cousins even",
+      "text": "raising his fist in the air he ran down to village shouting wolf wolf as soon as they heard him the villagers overrushed from their homes full of concern for his safety and two of his cousins even",
       "dur": 17.98
     },
     {
@@ -12741,14 +12742,14 @@
       "id": "S29T1_004",
       "spk": "S29",
       "task": "T1",
-      "text": "again and once more he was successful however not long after a wolf that had just escaped know i zoo don't know don't know i don't know",
+      "text": "again and once more he was successful however not long after a wolf that had just escaped know i zoo was looking for a change from its usual i diet of chicken and duck",
       "dur": 16.85
     },
     {
       "id": "S29T1_005",
       "spk": "S29",
       "task": "T1",
-      "text": "i don't know i don't i know don't know know know don't to threaten the sheep know racing don't know village don't don't know don't out i even than before unfortunately all the",
+      "text": "overcoming its fear of being shot its actually did know come out from the forest and began to threaten the sheep know racing don't know village don't don't cried out i even than before unfortunately all the",
       "dur": 17.66
     },
     {
@@ -14267,14 +14268,14 @@
       "id": "S30T1_000",
       "spk": "S30",
       "task": "T1",
-      "text": "there was a once a poor shepherd's boy who used to watch his flocks in the fields next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan",
+      "text": "there was a once a poor shepherd boy who used to watch his flocks in the fields next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan",
       "dur": 17.89
     },
     {
       "id": "S30T1_001",
       "spk": "S30",
       "task": "T1",
-      "text": "[bracketed] to get some company for himself and also have a little fun raising his fist in the air he run down to village shotting wolf wolf as soon as they heard him the villagers",
+      "text": "[bracketed] to get some company for himself and also have a little fun raising his fist in the air he ran down to village shotting wolf wolf as soon as they heard him the villagers",
       "dur": 17.34
     },
     {
@@ -14288,7 +14289,7 @@
       "id": "S30T1_003",
       "spk": "S30",
       "task": "T1",
-      "text": "another [uh] one also asked have you real seen a wolf he didn't answer and his cousin repeat the question was there a w wolf or not they got very angry with him and this gave the boy so much pleasure",
+      "text": "another [uh] one also asked have you real seen a wolf he didn't answer and his cousin repeated the question was there a w wolf or not they got very angry with him and this gave the boy so much pleasure",
       "dur": 18.0
     },
     {
@@ -14309,7 +14310,7 @@
       "id": "S30T1_006",
       "spk": "S30",
       "task": "T1",
-      "text": "village the boy of course cried all the even louder than before unfortunately as all the villagers [uh] here concealing that w he was trying to fool them a third time",
+      "text": "village the boy of course cried all the even louder than before unfortunately as all the villagers [uh] here convinced that w he was trying to fool them a third time",
       "dur": 17.29
     },
     {
@@ -15968,21 +15969,21 @@
       "id": "S5T1_000",
       "spk": "S5",
       "task": "T1",
-      "text": "there was once a poor separate boy who used to watch his flax in the field next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun",
+      "text": "there was once a poor shepherd boy who used to watch his flax in the field next to a dark forest near the foot of a mountain one hot afternoon he thought up a good plan to get some company for himself and also have little fun",
       "dur": 17.21
     },
     {
       "id": "S5T1_001",
       "spk": "S5",
       "task": "T1",
-      "text": "raising his fist in the air he ran down to the village shooting wolf wolf as soon as they heard him the villagers are all [uh] all you [uh] raised from their homes full of concern for his safety and two of his cousin cousin even",
+      "text": "raising his fist in the air he ran down to the village shooting wolf wolf as soon as they heard him the villagers are all [uh] all you [uh] rushed from their homes full of concern for his safety and two of his cousin cousin even",
       "dur": 17.74
     },
     {
       "id": "S5T1_002",
       "spk": "S5",
       "task": "T1",
-      "text": "stayed with him for a short while one of them asked where is the wolf another one also asked have you really seen a wolf he didn't answer and his cousin repeated the question was there a wolf the",
+      "text": "stayed with him for a short while one of them asked where is the wolf another one also asked have you really seen a wolf he didn't answer and his cousin repeated the question was there a wolf or not they got very angry with him and this gave the",
       "dur": 17.96
     },
     {
@@ -15996,7 +15997,7 @@
       "id": "S5T1_004",
       "spk": "S5",
       "task": "T1",
-      "text": "of chicken and duck so overcoming its fear of being sought it actually did come out from the forest and began to tread on the sheep racing down to the village boy of [uh] course [uh] cried out even louder than before",
+      "text": "of chicken and duck so overcoming its fear of being shot it actually did come out from the forest and began to threaten the sheep racing down to the village boy of [uh] course [uh] cried out even louder than before",
       "dur": 17.2
     },
     {
@@ -16374,14 +16375,14 @@
       "id": "S6T1_001",
       "spk": "S6",
       "task": "T1",
-      "text": "also have a lit have a little fun raising his f raising his first first in the air he run down to the village shutting wolf wolf as soon as they heard him [uh] the villagers all ro the villagers",
+      "text": "also have a lit have a little fun raising his f raising his first first in the air he ran down to the village shutting wolf wolf as soon as they heard him [uh] the villagers all ro the villagers",
       "dur": 17.97
     },
     {
       "id": "S6T1_002",
       "spk": "S6",
       "task": "T1",
-      "text": "all all rushed from their homes full of concern concern full of concern for his safety and two of his cousin even stayed with him for a short while one of them asked where is the wolf other other one also asked",
+      "text": "all all rushed from their homes full of concern concern full of concern for his safety and two of his cousin even stayed with him for a short while one of them asked where is the wolf other another one also asked",
       "dur": 17.18
     },
     {
@@ -16395,14 +16396,14 @@
       "id": "S6T1_004",
       "spk": "S6",
       "task": "T1",
-      "text": "trick again and once more he was successful however not long after a wolf that had just escaped from the zoo was looking for a chance from its usual diet of chicken and duck so overcom",
+      "text": "trick again and once more he was successful however not long after a wolf that had just escaped from the zoo was looking for a change from its usual diet of chicken and duck so overcom",
       "dur": 17.0
     },
     {
       "id": "S6T1_005",
       "spk": "S6",
       "task": "T1",
-      "text": "overcoming its fear of being shot it actually did come out from the forest and began to traten the sheep raising raising down the wi to the village [uh] -huh raising down to the village [uh] the boy of course cried out",
+      "text": "overcoming its fear of being shot it actually did come out from the forest and began to threaten the sheep raising raising down the wi to the village [uh] -huh raising down to the village [uh] the boy of course cried out",
       "dur": 17.87
     },
     {
@@ -16948,7 +16949,7 @@
       "id": "S7T1_002",
       "spk": "S7",
       "task": "T1",
-      "text": "for a short while one of them asked where is the wolf another one also also asked have you really seen a wolf he didn't answer it and his cousin repeats repeats the questions was there wolf or not they got",
+      "text": "for a short while one of them asked where is the wolf another one also also asked have you really seen a wolf he didn't answer it and his cousin repeated repeats the questions was there wolf or not they got",
       "dur": 17.8
     },
     {
@@ -16962,14 +16963,14 @@
       "id": "S7T1_004",
       "spk": "S7",
       "task": "T1",
-      "text": "shot being shot it actually did come out from the forest and began to try to sleep the sheep racing down the village the boy of course cried out even louder than before unfortunately as all the villagers were",
+      "text": "shot being shot it actually did come out from the forest and began to threaten sleep the sheep racing down the village the boy of course cried out even louder than before unfortunately as all the villagers were",
       "dur": 17.75
     },
     {
       "id": "S7T1_005",
       "spk": "S7",
       "task": "T1",
-      "text": "were confident that he was trying to fool them a third time they told him you are fooling us again aren't you go away and don't bother us again and so the wolf had a feast",
+      "text": "were convinced that he was trying to fool them a third time they told him you are fooling us again aren't you go away and don't bother us again and so the wolf had a feast",
       "dur": 14.73
     },
     {
@@ -18054,7 +18055,7 @@
       "id": "S9T1_002",
       "spk": "S9",
       "task": "T1",
-      "text": "[uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] [uh] where is the wolf another [uh] another one also asked have you really seen a wolf he didn't [uh] answer and his cousin repeated the question was there a wolf or",
+      "text": "even stayed with him for a [uh] short while one of them asked where is the wolf another [uh] another one also asked have you really seen a wolf he didn't [uh] answer and his cousin repeated the question was there a wolf or",
       "dur": 17.909
     },
     {
@@ -18075,7 +18076,7 @@
       "id": "S9T1_005",
       "spk": "S9",
       "task": "T1",
-      "text": "from the forest and began to trait into ship racing down to village i to the boy of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying to to",
+      "text": "from the forest and began to threaten ship racing down to village i to the boy of course cried out even louder than before unfortunately as all the villagers were convinced that he was trying to to",
       "dur": 17.66
     },
     {

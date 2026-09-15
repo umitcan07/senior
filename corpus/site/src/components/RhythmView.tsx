@@ -1,3 +1,4 @@
+import { useTask } from "./TaskFilter";
 import { useEffect, useMemo, useState } from "react";
 import { loadUtterance } from "@/lib/api";
 import { num } from "@/lib/labels";
@@ -51,7 +52,7 @@ export function RhythmStrip({ r }: { r: RhythmMetrics }) {
 
 export function RhythmView({ manifest }: { manifest: Manifest }) {
 	const [details, setDetails] = useState<UtteranceDetail[] | null>(null);
-	const [task, setTask] = useState<"all" | "T1" | "T2">("all");
+	const task = useTask();
 
 	// Sample utterances to keep the fetch bounded — rhythm needs enough of a span
 	// to be meaningful, so we prefer longer utterances.
@@ -75,7 +76,8 @@ export function RhythmView({ manifest }: { manifest: Manifest }) {
 			for (const m of METRICS) {
 				const v = d.rhythm[m.key] as number | null;
 				if (v !== null && v !== undefined && !Number.isNaN(v)) {
-					(acc[m.key] ??= []).push(v);
+					acc[m.key] ??= [];
+					acc[m.key].push(v);
 				}
 			}
 		}
@@ -88,23 +90,6 @@ export function RhythmView({ manifest }: { manifest: Manifest }) {
 				title="Rhythm"
 				blurb="Durational measures of speech rhythm, computed from segment boundaries. These are measurements — there is no correct/incorrect verdict on a rhythm score, only the corpus distribution beside a reference band."
 			/>
-
-			<div className="mb-5 flex gap-1">
-				{(["all", "T1", "T2"] as const).map((t) => (
-					<button
-						key={t}
-						type="button"
-						onClick={() => setTask(t)}
-						className={`rounded-[2px] px-2.5 py-1 font-mono text-xs transition-colors ${
-							task === t
-								? "bg-[var(--color-ink)] text-[var(--color-paper)]"
-								: "text-[var(--color-ink-faint)] hover:bg-[var(--color-paper-deep)]"
-						}`}
-					>
-						{t === "all" ? "All" : t === "T1" ? "Read-aloud" : "Interview"}
-					</button>
-				))}
-			</div>
 
 			{!agg ? (
 				<Spinner label="Computing rhythm distribution…" />
@@ -166,9 +151,13 @@ function Histogram({ values }: { values: number[] }) {
 		<div className="mt-3 flex h-10 items-end gap-[2px]" aria-hidden>
 			{counts.map((c, i) => (
 				<div
+					// biome-ignore lint/suspicious/noArrayIndexKey: fixed histogram bins never reorder.
 					key={i}
 					className="flex-1 rounded-[1px] bg-[var(--color-correct)]"
-					style={{ height: `${(c / peak) * 100}%`, opacity: 0.35 + (c / peak) * 0.5 }}
+					style={{
+						height: `${(c / peak) * 100}%`,
+						opacity: 0.35 + (c / peak) * 0.5,
+					}}
 				/>
 			))}
 		</div>
@@ -180,9 +169,7 @@ export function Header({ title, blurb }: { title: string; blurb: string }) {
 		<div className="mb-5 border-[var(--color-rule)] border-b pb-4">
 			<Eyebrow>Suprasegmental</Eyebrow>
 			<h2 className="mt-0.5 font-display text-3xl">{title}</h2>
-			<p className="mt-1 max-w-2xl text-[var(--color-ink-soft)] text-sm">
-				{blurb}
-			</p>
+			<p className="mt-1 max-w-2xl text-[var(--color-ink-soft)] text-sm">{blurb}</p>
 		</div>
 	);
 }

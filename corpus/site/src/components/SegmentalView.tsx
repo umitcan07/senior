@@ -1,8 +1,10 @@
+import { useTask } from "./TaskFilter";
 import { useEffect, useMemo, useState } from "react";
 import type { Selection } from "@/App";
-import { loadAreaStats } from "@/lib/api";
+import { loadAreaStats, loadPhoneTokens } from "@/lib/api";
 import { AREA_BLURBS, AREA_LABELS, classLabel, pct } from "@/lib/labels";
-import type { Area, AreaStats, Manifest, PhoneStat } from "@/lib/types";
+import type { Area, AreaStats, Manifest, PhoneStat, TokenRow } from "@/lib/types";
+import { TokenConcordance } from "./TokenConcordance";
 import { PhoneDetail } from "./PhoneDetail";
 import { AccuracyBar, Eyebrow, IPA, Legend, Spinner } from "./ui";
 
@@ -15,19 +17,20 @@ export function SegmentalView({
 	manifest: Manifest;
 	sel: Selection;
 	onSelect: (s: Selection) => void;
-	onOpenUtterance: (id: string, focusToken?: string) => void;
+	onOpenUtterance: (id: string, focusToken?: TokenRow) => void;
 }) {
+	const task = useTask();
 	const area = sel.area as Area;
 	const [stats, setStats] = useState<AreaStats | null>(null);
 
 	useEffect(() => {
 		setStats(null);
-		loadAreaStats(area).then(setStats);
-	}, [area]);
+		loadAreaStats(area, task).then(setStats);
+	}, [area, task]);
 
 	// Which phones are in scope given the filter.
 	const scopePhones = useMemo(() => {
-		if (sel.phone) return [sel.phone];
+		if (sel.phones.length) return sel.phones;
 		if (sel.classKey) {
 			const cls = manifest.filterTree[area].find((c) => c.key === sel.classKey);
 			return cls?.phones ?? [];
@@ -43,21 +46,24 @@ export function SegmentalView({
 		.sort((a, b) => b.total - a.total);
 
 	// Single-phone view -> full detail.
-	if (sel.phone) {
-		const stat = stats.phones.find((p) => p.phone === sel.phone);
+	if (sel.phones.length === 1) {
+		const stat = stats.phones.find((p) => p.phone === sel.phones[0]);
 		return (
 			<PhoneDetail
 				area={area}
-				stat={stat ?? emptyStat(sel.phone)}
+				stat={stat ?? emptyStat(sel.phones[0])}
 				speakers={manifest.speakers}
 				onOpenUtterance={onOpenUtterance}
 			/>
 		);
 	}
 
-	const heading = sel.classKey
-		? classLabel(sel.classKey)
-		: `All ${AREA_LABELS[area].toLowerCase()}`;
+	const heading =
+		sel.phones.length > 1
+			? sel.phones.map((p) => `/${p}/`).join(" · ")
+			: sel.classKey
+				? classLabel(sel.classKey)
+				: `All ${AREA_LABELS[area].toLowerCase()}`;
 
 	const totals = rows.reduce(
 		(acc, r) => {
@@ -103,23 +109,71 @@ export function SegmentalView({
 							key={stat.phone}
 							stat={stat}
 							onClick={() =>
-								onSelect({ area, classKey: null, phone: stat.phone })
+								onSelect({
+									area,
+									classKey: null,
+									phones: [stat.phone],
+								})
 							}
 						/>
 					))}
 				</div>
 			)}
+			{sel.phones.length > 1 && (
+				<SelectedTokens
+					key={sel.phones.join(",")}
+					area={area}
+					phones={sel.phones}
+					manifest={manifest}
+					onOpen={onOpenUtterance}
+				/>
+			)}
 		</div>
 	);
 }
 
-function PhoneCard({
-	stat,
-	onClick,
+function SelectedTokens({
+	area,
+	phones,
+	manifest,
+	onOpen,
 }: {
-	stat: PhoneStat;
-	onClick: () => void;
+	area: Area;
+	phones: string[];
+	manifest: Manifest;
+	onOpen: (id: string, token?: TokenRow) => void;
 }) {
+	const task = useTask();
+	const [tokens, setTokens] = useState<TokenRow[] | null>(null);
+	useEffect(() => {
+		let active = true;
+		Promise.all(phones.map((phone) => loadPhoneTokens(area, phone, task))).then((rows) => {
+			if (active) setTokens(rows.flat());
+		});
+		return () => {
+			active = false;
+		};
+	}, [area, phones, task]);
+	return (
+		<section className="mt-7">
+			<Eyebrow>Selected phones — all matching tokens</Eyebrow>
+			<div className="mt-3">
+				{tokens ? (
+					<TokenConcordance
+						tokens={tokens}
+						speakers={manifest.speakers}
+						onOpen={onOpen}
+						exportName={`${area}-${phones.join("-")}`}
+					/>
+				) : (
+					<Spinner label="Loading selected phones…" />
+				)}
+			</div>
+		</section>
+	);
+}
+
+function PhoneCard({ stat, onClick }: { stat: PhoneStat; onClick: () => void }) {
 	return (
 		<button
 			type="button"
@@ -138,10 +192,7 @@ function PhoneCard({
 				</div>
 			</div>
 			<div className="mt-2 flex items-center gap-2">
-				<AccuracyBar
-					correct={stat.correct}
-					incorrect={stat.incorrect}
-				/>
+				<AccuracyBar correct={stat.correct} incorrect={stat.incorrect} />
 				<span className="tnum shrink-0 text-[var(--color-ink-faint)] text-xs">
 					{stat.total.toLocaleString()}
 				</span>

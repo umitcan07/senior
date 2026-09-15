@@ -33,30 +33,37 @@ export interface UrlState {
 
 const DEFAULT: UrlState = {
 	view: "explore",
-	sel: { area: "consonants", classKey: null, phone: null },
+	sel: { area: "consonants", classKey: null, phones: [] },
 };
 
 export function parseHash(hash: string): UrlState {
-	const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+	let parts: string[];
+	try {
+		parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+	} catch {
+		return DEFAULT;
+	}
 	if (parts.length === 0) return DEFAULT;
 
 	if (parts[0] === "about") return { ...DEFAULT, view: "about" };
 
-	const area = decodeURIComponent(parts[0] ?? "");
+	const area = parts[0] ?? "";
 	if (!AREAS.includes(area as AreaKey)) return DEFAULT;
 
-	const sel: Selection = { area: area as AreaKey, classKey: null, phone: null };
+	const sel: Selection = { area: area as AreaKey, classKey: null, phones: [] };
 	const kind = parts[1];
-	const value = parts[2] ? decodeURIComponent(parts[2]) : null;
+	const value = parts[2] ?? null;
 	if (kind === "class" && value) sel.classKey = value;
-	if (kind === "phone" && value) sel.phone = value;
+	if (kind === "phone" && value) sel.phones = [value];
+	if (kind === "phones") sel.phones = [...new Set(parts.slice(2))];
 	return { view: "explore", sel };
 }
 
 export function toHash(state: UrlState): string {
 	if (state.view === "about") return "#/about";
-	const { area, classKey, phone } = state.sel;
-	if (phone) return `#/${area}/phone/${encodeURIComponent(phone)}`;
+	const { area, classKey, phones } = state.sel;
+	if (phones.length === 1) return `#/${area}/phone/${encodeURIComponent(phones[0])}`;
+	if (phones.length > 1) return `#/${area}/phones/${phones.map(encodeURIComponent).join("/")}`;
 	if (classKey) return `#/${area}/class/${encodeURIComponent(classKey)}`;
 	return `#/${area}`;
 }

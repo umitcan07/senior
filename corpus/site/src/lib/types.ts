@@ -106,6 +106,10 @@ export interface TokenRow {
 	se?: boolean; // stress error
 	le?: boolean; // length error
 	w?: string; // word
+	area?: AreaKey;
+	tone?: string | null;
+	sentenceType?: string | null;
+	referenceIpa?: string[]; // verified dictionary forms only; absent until supplied
 	lc?: string; // KWIC left context — realised phones before this one
 	rc?: string; // KWIC right context
 }
@@ -140,6 +144,8 @@ export interface UtteranceDetail {
 	clip: string | null;
 	audioAvailable?: boolean;
 	judged: boolean;
+	area?: AreaKey | null;
+	annotations?: TokenRow[];
 	tokens: (TokenRow & { st: number; sa: number })[];
 	rhythm: RhythmMetrics;
 	pitch: PitchContourData | null;

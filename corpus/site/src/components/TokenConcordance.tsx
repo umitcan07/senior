@@ -1,28 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-	clearAnnotations,
-	loadAnnotations,
-	setAnnotation,
-} from "@/lib/annotations";
+import { clearAnnotations, loadAnnotations, setAnnotation } from "@/lib/annotations";
 import { type Column, downloadCsv, slugForFile, toCsv } from "@/lib/csv";
 import { ERROR_LABELS } from "@/lib/labels";
-import {
-	cefrOf,
-	type Outcome as Judgment,
-	type SpeakerMeta,
-	type TokenRow,
-} from "@/lib/types";
+import { cefrOf, type Outcome as Judgment, type SpeakerMeta, type TokenRow } from "@/lib/types";
 import { errorColor, IPA } from "./ui";
 
 type FilterMode = "all" | Judgment;
-type SortKey =
-	| "left"
-	| "phone"
-	| "right"
-	| "word"
-	| "speaker"
-	| "outcome"
-	| "time";
+type SortKey = "tone" | "phone" | "sentenceType" | "word" | "speaker" | "outcome" | "time";
 type Sort = { key: SortKey; dir: "asc" | "desc" } | null;
 
 const MODES: { key: FilterMode; label: string }[] = [
@@ -42,30 +26,17 @@ const ANY = "__any__";
  * anchors could never match.
  */
 function searchFields(t: TokenRow): string[] {
-	return [t.ph, t.w, t.spk, t.lc, t.rc].filter(
+	return [t.ph, t.w, t.spk, t.tone, t.sentenceType].filter(
 		(v): v is string => typeof v === "string" && v !== "",
 	);
 }
 
-/** Concordance convention: context sorts outward from the hit, not left-to-right.
- *
- * Sorting the left context by its raw string would group by the phone furthest
- * from the target, which tells you nothing. Reversing it first (EXAKT's
- * "word-wise reversed" sort) groups by the immediately preceding phone, which is
- * how conditioning environments become visible.
- */
-function outward(context: string | undefined, reverse: boolean): string {
-	if (!context) return "";
-	const phones = context.split(" ");
-	return (reverse ? phones.reverse() : phones).join(" ");
-}
-
 function sortValue(t: TokenRow, key: SortKey): string | number {
 	switch (key) {
-		case "left":
-			return outward(t.lc, true);
-		case "right":
-			return outward(t.rc, false);
+		case "tone":
+			return t.tone ?? "Not annotated";
+		case "sentenceType":
+			return t.sentenceType ?? "Not annotated";
 		case "phone":
 			return t.ph ?? "";
 		case "word":
@@ -84,13 +55,25 @@ export function TokenConcordance({
 	speakers,
 	onOpen,
 	exportName = "tokens",
+	kind = "segmental",
 }: {
 	tokens: TokenRow[];
 	speakers: Record<string, SpeakerMeta>;
-	onOpen: (id: string, focusToken?: string) => void;
+	onOpen: (id: string, focusToken?: TokenRow) => void;
 	/** Stem for the exported CSV filename, e.g. the phone being drilled. */
 	exportName?: string;
+	kind?: "segmental" | "lexical-stress" | "linking" | "intonation";
 }) {
+	const [tone, setTone] = useState(ANY);
+	const [sentenceType, setSentenceType] = useState(ANY);
+	const tones = [...new Set(tokens.map((t) => t.tone ?? "Not annotated"))].sort();
+	const sentenceTypes = [
+		...new Set(
+			tokens
+				.filter((t) => tone === ANY || (t.tone ?? "Not annotated") === tone)
+				.map((t) => t.sentenceType ?? "Not annotated"),
+		),
+	].sort();
 	const [mode, setMode] = useState<FilterMode>("all");
 	const [sex, setSex] = useState<string>(ANY);
 	const [cefr, setCefr] = useState<string>(ANY);
@@ -145,6 +128,9 @@ export function TokenConcordance({
 
 	const filtered = useMemo(() => {
 		const rows = tokens.filter((t) => {
+			if (tone !== ANY && (t.tone ?? "Not annotated") !== tone) return false;
+			if (sentenceType !== ANY && (t.sentenceType ?? "Not annotated") !== sentenceType)
+				return false;
 			if (mode !== "all" && t.e !== mode) return false;
 			if (sex !== ANY && speakers[t.spk]?.sex !== sex) return false;
 			if (cefr !== ANY && cefrOf(speakers[t.spk]) !== cefr) return false;
@@ -162,7 +148,7 @@ export function TokenConcordance({
 			}
 			return String(va).localeCompare(String(vb)) * sign;
 		});
-	}, [tokens, speakers, mode, sex, cefr, matcher, sort]);
+	}, [tokens, speakers, mode, sex, cefr, matcher, sort, tone, sentenceType]);
 
 	const shown = filtered.slice(0, limit);
 	const narrowed = filtered.length !== tokens.length;
@@ -189,11 +175,29 @@ export function TokenConcordance({
 
 	function exportCsv() {
 		const columns: Column<TokenRow>[] = [
-			{ header: "left_context", value: (t) => t.lc ?? "" },
-			{ header: "phone", value: (t) => t.ph ?? "" },
-			{ header: "right_context", value: (t) => t.rc ?? "" },
+			...(kind === "segmental"
+				? [{ header: "phone", value: (t: TokenRow) => t.ph ?? "" }]
+				: []),
+			...(kind === "intonation"
+				? [
+						{
+							header: "intonation",
+							value: (t: TokenRow) => t.tone ?? "Not annotated",
+						},
+						{
+							header: "sentence_type",
+							value: (t: TokenRow) => t.sentenceType ?? "Not annotated",
+						},
+					]
+				: []),
 			{ header: "outcome", value: (t) => ERROR_LABELS[t.e] },
-			{ header: "word", value: (t) => t.w ?? "" },
+			{
+				header:
+					kind === "linking" || kind === "intonation"
+						? "target_utterance"
+						: "word",
+				value: (t) => t.w ?? "",
+			},
 			{ header: "speaker", value: (t) => t.spk },
 			{ header: "sex", value: (t) => speakers[t.spk]?.sex ?? "" },
 			{ header: "cefr", value: (t) => cefrOf(speakers[t.spk]) ?? "" },
@@ -204,10 +208,7 @@ export function TokenConcordance({
 			{ header: "start_s", value: (t) => t.t0.toFixed(3) },
 			{ header: "end_s", value: (t) => t.t1.toFixed(3) },
 		];
-		downloadCsv(
-			`corptes-${slugForFile(exportName)}.csv`,
-			toCsv(filtered, columns),
-		);
+		downloadCsv(`corptes-${slugForFile(exportName)}.csv`, toCsv(filtered, columns));
 	}
 
 	if (tokens.length === 0) {
@@ -266,12 +267,32 @@ export function TokenConcordance({
 				</button>
 			</div>
 
+			{kind === "intonation" && (
+				<div className="mb-3 flex flex-wrap gap-4">
+					<Select
+						label="Intonation"
+						value={tone}
+						options={tones}
+						onChange={(v) => {
+							reset(setTone)(v);
+							setSentenceType(ANY);
+						}}
+					/>
+					<Select
+						label="Sentence type"
+						value={sentenceType}
+						options={sentenceTypes}
+						onChange={reset(setSentenceType)}
+					/>
+				</div>
+			)}
+
 			<div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1.5">
 				<input
 					type="search"
 					value={query}
 					onChange={(e) => reset(setQuery)(e.target.value)}
-					placeholder="Search word, phone, context or speaker…"
+					placeholder="Search target, phone, annotation or speaker…"
 					aria-label="Search the concordance"
 					aria-invalid={regexError}
 					className={`min-w-56 flex-1 rounded-[2px] border bg-[var(--color-paper)] px-2 py-1 font-body text-sm transition-colors placeholder:text-[var(--color-ink-faint)] ${
@@ -304,22 +325,33 @@ export function TokenConcordance({
 				<table className="w-full border-collapse text-sm">
 					<thead>
 						<tr className="border-[var(--color-rule)] border-b bg-[var(--color-paper-deep)]/60 text-left">
-							<Th
-								sortKey="left"
-								sort={sort}
-								onSort={toggleSort}
-								className="text-right"
-							>
-								Left
-							</Th>
-							<Th sortKey="phone" sort={sort} onSort={toggleSort}>
-								Phone / site
-							</Th>
-							<Th sortKey="right" sort={sort} onSort={toggleSort}>
-								Right
-							</Th>
+							{kind === "segmental" && (
+								<Th sortKey="phone" sort={sort} onSort={toggleSort}>
+									Phone
+								</Th>
+							)}
+							{kind === "intonation" && (
+								<>
+									<Th
+										sortKey="tone"
+										sort={sort}
+										onSort={toggleSort}
+									>
+										Intonation
+									</Th>
+									<Th
+										sortKey="sentenceType"
+										sort={sort}
+										onSort={toggleSort}
+									>
+										Sentence type
+									</Th>
+								</>
+							)}
 							<Th sortKey="word" sort={sort} onSort={toggleSort}>
-								Word
+								{kind === "linking" || kind === "intonation"
+									? "Target utterance"
+									: "Word"}
 							</Th>
 							<Th sortKey="speaker" sort={sort} onSort={toggleSort}>
 								Speaker
@@ -327,7 +359,12 @@ export function TokenConcordance({
 							<Th sortKey="outcome" sort={sort} onSort={toggleSort}>
 								Outcome
 							</Th>
-							<Th sortKey="time" sort={sort} onSort={toggleSort} className="text-right">
+							<Th
+								sortKey="time"
+								sort={sort}
+								onSort={toggleSort}
+								className="text-right"
+							>
 								Time
 							</Th>
 							<Th>Note</Th>
@@ -337,37 +374,56 @@ export function TokenConcordance({
 						{shown.map((t) => (
 							<tr
 								key={t.id}
-								onClick={() => onOpen(t.u, t.id)}
+								onClick={() => onOpen(t.u, t)}
 								className="cursor-pointer border-[var(--color-rule)] border-b last:border-0 hover:bg-[var(--color-paper-deep)]/50"
 							>
-								<Td className="text-right">
-									<span className="ipa whitespace-nowrap text-[var(--color-ink-faint)] text-xs">
-										{t.lc ?? ""}
-									</span>
+								{kind === "segmental" && (
+									<Td>
+										<span className="flex items-center gap-1">
+											<IPA
+												phone={t.ph ?? null}
+												className="text-base"
+												slash={t.ph !== null}
+											/>
+											{t.se && (
+												<Badge title="Stress mismatch">
+													ˢ
+												</Badge>
+											)}
+											{t.le && (
+												<Badge title="Length mismatch">
+													ˡ
+												</Badge>
+											)}
+										</span>
+									</Td>
+								)}
+								{kind === "intonation" && (
+									<>
+										<Td>{t.tone ?? "Not annotated"}</Td>
+										<Td>
+											{t.sentenceType ??
+												"Not annotated"}
+										</Td>
+									</>
+								)}
+								<Td>
+									<button
+										type="button"
+										onClick={(event) => {
+											event.stopPropagation();
+											onOpen(t.u, t);
+										}}
+										className="text-left font-body text-[var(--color-ink-soft)] underline decoration-[var(--color-rule)] underline-offset-4 hover:text-[var(--color-accent)]"
+									>
+										{t.w || "Not annotated"}
+									</button>
 								</Td>
 								<Td>
-									<span className="flex items-center gap-1">
-										<IPA
-											phone={t.ph ?? null}
-											className="text-base"
-											slash={t.ph !== null}
-										/>
-										{t.se && <Badge title="Stress mismatch">ˢ</Badge>}
-										{t.le && <Badge title="Length mismatch">ˡ</Badge>}
-									</span>
-								</Td>
-								<Td>
-									<span className="ipa whitespace-nowrap text-[var(--color-ink-faint)] text-xs">
-										{t.rc ?? ""}
-									</span>
-								</Td>
-								<Td>
-									<span className="font-body text-[var(--color-ink-soft)]">
-										{t.w ?? "—"}
-									</span>
-								</Td>
-								<Td>
-									<SpeakerCell id={t.spk} meta={speakers[t.spk]} />
+									<SpeakerCell
+										id={t.spk}
+										meta={speakers[t.spk]}
+									/>
 								</Td>
 								<Td>
 									<Outcome e={t.e} />
@@ -381,7 +437,9 @@ export function TokenConcordance({
 									<input
 										type="text"
 										value={notes[t.id] ?? ""}
-										onChange={(e) => onNote(t.id, e.target.value)}
+										onChange={(e) =>
+											onNote(t.id, e.target.value)
+										}
 										onClick={(e) => e.stopPropagation()}
 										onKeyDown={(e) => e.stopPropagation()}
 										placeholder="…"
@@ -421,8 +479,8 @@ export function TokenConcordance({
 			{noteCount > 0 && (
 				<p className="mt-3 flex flex-wrap items-center gap-x-2 text-[var(--color-ink-faint)] text-xs">
 					<span>
-						{noteCount.toLocaleString()} note{noteCount === 1 ? "" : "s"} saved
-						in this browser only — export the CSV to keep them.
+						{noteCount.toLocaleString()} note{noteCount === 1 ? "" : "s"}{" "}
+						saved in this browser only — export the CSV to keep them.
 					</span>
 					<button
 						type="button"
@@ -503,23 +561,11 @@ function Th({
 	);
 }
 
-function Td({
-	children,
-	className = "",
-}: {
-	children: React.ReactNode;
-	className?: string;
-}) {
+function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
 	return <td className={`px-3 py-2 align-middle ${className}`}>{children}</td>;
 }
 
-function Badge({
-	children,
-	title,
-}: {
-	children: React.ReactNode;
-	title: string;
-}) {
+function Badge({ children, title }: { children: React.ReactNode; title: string }) {
 	return (
 		<span
 			title={title}

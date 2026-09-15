@@ -38,6 +38,7 @@ Design notes:
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -47,10 +48,10 @@ from pathlib import Path
 # Support both `python -m corpus.scripts.site_build.build` and a direct-path run.
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from site_build import align, clips, emit, exb, intonation, inventory, rhythm, textgrid
+    from site_build import align, clips, emit, exb, intonation, inventory, rhythm, textgrid, reference_ipa
     from site_build.textgrid import Interval, TextGrid
 else:
-    from . import align, clips, emit, exb, intonation, inventory, rhythm, textgrid
+    from . import align, clips, emit, exb, intonation, inventory, rhythm, textgrid, reference_ipa
     from .textgrid import Interval, TextGrid
 
 
@@ -67,7 +68,7 @@ SYNTHETIC_MARKER = ".synthetic"
 
 # Per-task tier wiring (corpus/finetune_qc.md Gate 0/3).
 TASK_TIERS = {
-    "T1": {"phones": ("phones",), "ref": ("REF-phones",), "words": ("words", "REF-words", "REF_words", "REF")},
+    "T1": {"phones": ("phones",), "ref": ("REF-phones",), "words": ("words-REF", "REF-words", "REF_words", "words", "REF")},
     "T2": {
         "phones": ("phones",),
         "ref": ("REF-phones",),
@@ -158,8 +159,12 @@ def load_utterances(tg: TextGrid, speaker: str, task: str) -> tuple[list[Utteran
             f"(ref={len(ref_iv)}, act={len(act_iv)}) — inventory only, no correct/incorrect"
         )
 
+    # Keep existing chunk boundaries/IDs (and browser-local phone notes) stable
+    # while reading corrected target text from the reference tier.
+    chunk_tier = tg.tier("words") if task == "T1" else word_tier
+    chunk_tier = chunk_tier or word_tier
     utterances: list[Utterance] = []
-    for i, (t0, t1, text) in enumerate(chunk_utterances(word_tier.labelled())):
+    for i, (t0, t1, _) in enumerate(chunk_utterances(chunk_tier.labelled())):
         uid = f"{speaker}{task}_{i:03d}"
         utterances.append(
             Utterance(
@@ -168,7 +173,7 @@ def load_utterances(tg: TextGrid, speaker: str, task: str) -> tuple[list[Utteran
                 task=task,
                 t0=t0,
                 t1=t1,
-                text=text,
+                text=target_words(word_tier.labelled(), t0, t1),
                 ref_phones=_slice(ref_iv, t0, t1) if ref_iv else [],
                 act_phones=_slice(act_iv, t0, t1) if act_iv else [],
                 words=_slice(word_tier.labelled(), t0, t1),
@@ -185,11 +190,13 @@ def build(
     limit: int | None = None,
     clean: bool = True,
     skip_pitch: bool = False,
+    reference_ipa_path: Path | None = None,
 ) -> int:
+    reference_forms = reference_ipa.load(reference_ipa_path) if reference_ipa_path else {}
     if clean:
         for child in (out_dir / "data", out_dir / "clips"):
             shutil.rmtree(child, ignore_errors=True)
-    writer = emit.SiteWriter(out_dir)
+    writer = emit.SiteWriter(out_dir, reference_forms)
     all_warnings: list[str] = []
     speakers_meta: dict[str, dict] = {}
     n_files = 0
@@ -236,13 +243,21 @@ def build(
 
             utterances, warnings = load_utterances(tg, speaker, tsk)
             all_warnings.extend(warnings)
+            annotations, annotation_windows = recording_annotations(tg, transcription, utterances, speaker, tsk)
+            for rows in annotations.values():
+                for row in rows:
+                    writer.add_annotation(row["area"], row)
+            for _, row in annotation_windows:
+                writer.add_annotation(row["area"], row)
 
             published_clips: set[str] = set()
             if cut_clips and wav_path.is_file():
                 published_clips = clips.cut_recording(
                     wav_path,
-                    [clips.Clip(utt.id, utt.t0, utt.t1) for utt in utterances],
+                    [clips.Clip(utt.id, utt.t0, utt.t1) for utt in utterances]
+                    + [clips.Clip(utt.id, utt.t0, utt.t1) for utt, _ in annotation_windows],
                     out_dir / "clips",
+                    pad=0.0,
                 )
             for utt in utterances:
                 n_utts += 1
@@ -253,6 +268,12 @@ def build(
                     utt.id in published_clips,
                     transcription,
                     skip_pitch,
+                    annotations=annotations.get(utt.id, []),
+                )
+            for utt, row in annotation_windows:
+                _emit_utterance(
+                    writer, utt, wav_path, utt.id in published_clips,
+                    transcription, skip_pitch, annotations=[row], detail_only=True,
                 )
 
     manifest = {
@@ -267,6 +288,7 @@ def build(
             "clipsPublished": len(list((out_dir / "clips").glob("*.mp3"))),
             "missingSourceAudio": missing_source_audio,
             "synthetic": (raw_dir / SYNTHETIC_MARKER).exists(),
+            "referenceIpaAvailable": bool(reference_forms),
         },
         "areas": ["vowels", "consonants", "lexical-stress", "linking", "rhythm", "intonation"],
         "filterTree": inventory.filter_tree(),
@@ -326,6 +348,83 @@ def _matching_judgment(
     return matches[0][2]
 
 
+def target_words(words: list[Interval], t0: float, t1: float) -> str:
+    """Read the target tier at annotation times, including partially covered words."""
+    return " ".join(w.text.strip() for w in words if min(w.t1, t1) - max(w.t0, t0) > 1e-6)
+
+
+def containing_word(words: list[Interval], t0: float, t1: float) -> str:
+    """A phone belongs to the word with the greatest temporal overlap."""
+    candidates = [w for w in words if min(w.t1, t1) - max(w.t0, t0) > 1e-6]
+    if not candidates:
+        return ""
+    return max(candidates, key=lambda w: min(w.t1, t1) - max(w.t0, t0)).text.strip().rstrip(".?!")
+
+
+def intonation_labels(label: str) -> tuple[str | None, str | None]:
+    """Normalize the corpus's long and abbreviated labels, without inferring types."""
+    parts = re.split(r"\s*--\s*|_", label.strip(), maxsplit=1)
+    contour = re.sub(r"[\s&]+", "", parts[0]).lower()
+    contour = {"falling": "Falling", "rising": "Rising", "riseandfall": "Rise & Fall"}.get(contour)
+    kind = parts[1].strip() if len(parts) > 1 else None
+    kind = {
+        "yesnoquestion": "Yes/No Question", "yesno": "Yes/No Question",
+        "whquestion": "Wh Question", "wh": "Wh Question",
+        "statement": "Statement", "stat": "Statement",
+        "closedchoice": "Closed Choice", "closedc": "Closed Choice", "c": "Closed Choice",
+        "listing": "Listing", "l": "Listing",
+    }.get((kind or "").lower(), kind)
+    return contour, kind
+
+
+def recording_annotations(
+    tg: TextGrid, transcription: exb.Transcription | None,
+    utterances: list[Utterance], speaker: str, task: str,
+) -> tuple[dict[str, list[dict]], list[tuple[Utterance, dict]]]:
+    """Emit each source event once. Intonation gets its own exact sentence window."""
+    grouped: dict[str, list[dict]] = {}
+    windows: list[tuple[Utterance, dict]] = []
+    if transcription is None or not utterances:
+        return grouped, windows
+    wiring = TASK_TIERS[task]
+    words = tg.tier(*wiring["words"]).labelled()
+    ref = tg.tier(*wiring["ref"])
+    act = tg.tier(*wiring["phones"])
+    timeline = transcription.anchored_timeline()
+    types = [
+        (timeline[e.start], timeline[e.end], e.text)
+        for tier in transcription.tiers(category="Intonation_types") for e in tier.events
+        if e.start in timeline and e.end in timeline
+    ]
+    for area, category in (
+        ("lexical-stress", "Stress_accuracy"),
+        ("linking", "linkingAcc_accuracy"),
+        ("intonation", "Intonation_accuracy"),
+    ):
+        for idx, (t0, t1, outcome, label) in enumerate(_annotation_events(transcription, category, 0, float("inf"))):
+            uid = f"{speaker}{task}_{area}_{idx:03d}"
+            target = target_words(words, t0, t1)
+            row = {"id": uid, "spk": speaker, "ph": label, "e": outcome, "w": target, "area": area}
+            owner = max(utterances, key=lambda u: min(u.t1, t1) - max(u.t0, t0))
+            if area == "intonation" or min(owner.t1, t1) <= max(owner.t0, t0):
+                matching = [event for event in types if abs(event[0] - t0) < 0.001 and abs(event[1] - t1) < 0.001]
+                tone, kind = intonation_labels(matching[0][2]) if matching else (None, None)
+                row.update(u=uid, t0=0.0, t1=round(t1 - t0, 3))
+                if area == "intonation":
+                    row.update(tone=tone, sentenceType=kind)
+                window = Utterance(
+                    uid, speaker, task, t0, t1, target,
+                    _slice(ref.labelled(), t0, t1) if ref else [],
+                    _slice(act.labelled(), t0, t1) if act else [],
+                    _slice(words, t0, t1),
+                )
+                windows.append((window, row))
+            else:
+                row.update(u=owner.id, t0=round(max(0, t0 - owner.t0), 3), t1=round(min(owner.t1, t1) - owner.t0, 3))
+                grouped.setdefault(owner.id, []).append(row)
+    return grouped, windows
+
+
 def _emit_utterance(
     writer: emit.SiteWriter,
     utt: Utterance,
@@ -333,6 +432,9 @@ def _emit_utterance(
     clip_available: bool,
     transcription: exb.Transcription | None = None,
     skip_pitch: bool = False,
+    *,
+    annotations: list[dict] | None = None,
+    detail_only: bool = False,
 ) -> None:
     native_phone_acc = _annotation_events(transcription, "phoneAcc", utt.t0, utt.t1)
     have_both = bool(utt.ref_phones and utt.act_phones)
@@ -400,9 +502,7 @@ def _emit_utterance(
         phone = tok.actual or tok.target
         area = inventory.parse_phone(phone or "").area
         # Resolve the containing word for the concordance's Word column.
-        word = None
-        if tok.word_index is not None and 0 <= tok.word_index < len(utt.words):
-            word = utt.words[tok.word_index].text.rstrip(".?!")
+        word = containing_word(utt.words, tok.t0, tok.t1)
         left_ctx, right_ctx = _context(i)
         row = emit.TokenRow(
             id=gid,
@@ -410,19 +510,19 @@ def _emit_utterance(
             speaker=utt.speaker,
             phone=phone,
             outcome="correct" if tok.error == "correct" else "incorrect",
-            t0=tok.t0 - utt.t0,  # relative to clip start
-            t1=tok.t1 - utt.t0,
+            t0=max(0.0, tok.t0 - utt.t0),  # relative to the unpadded clip start
+            t1=min(utt.t1, tok.t1) - utt.t0,
             stress_error=tok.stress_error,
             length_error=tok.length_error,
             word=word,
             left_context=left_ctx,
             right_context=right_ctx,
         )
-        if have_both or native_phone_acc:
+        if not detail_only and (have_both or native_phone_acc):
             writer.add_token(area if area != "other" else "consonants", row)
             # Feed lexical stress: only vowels can bear stress, and a slot is
             # evidence only where a stress mark was actually present.
-            if area == "vowels":
+            if area == "vowels" and not native_phone_acc:
                 defined = bool(tok.target_stress or tok.actual_stress)
                 writer.add_stress(
                     phone,
@@ -439,31 +539,6 @@ def _emit_utterance(
             }
         )
 
-    # These are corpus-native hand judgements, not acoustic-model decisions.
-    for area, category in (
-        ("lexical-stress", "Stress_accuracy"),
-        ("linking", "linkingAcc_accuracy"),
-        ("intonation", "Intonation_accuracy"),
-    ):
-        for idx, event in enumerate(_annotation_events(transcription, category, utt.t0, utt.t1)):
-            t0, t1, outcome, label = event
-            writer.add_annotation(
-                area,
-                {
-                    "id": f"{utt.id}_{area}_{idx:03d}",
-                    "u": utt.id,
-                    "spk": utt.speaker,
-                    "ph": label,
-                    "e": "correct" if outcome == "correct" else "incorrect",
-                    # A judgement can overlap an utterance boundary. The clip
-                    # starts at that boundary (plus harmless pre-roll), so
-                    # never publish a negative seek position.
-                    "t0": round(max(0.0, t0 - utt.t0), 3),
-                    "t1": round(max(0.0, t1 - utt.t0), 3),
-                    "w": label,
-                },
-            )
-
     writer.add_utterance(
         {
             "id": utt.id,
@@ -477,7 +552,10 @@ def _emit_utterance(
             "tokens": token_payload,
             "rhythm": rhythm_metrics.as_dict(),
             "pitch": contour.as_dict() if contour else None,
-        }
+            "annotations": annotations or [],
+            "area": annotations[0]["area"] if detail_only and annotations else None,
+        },
+        index=not detail_only,
     )
 
 
@@ -519,6 +597,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, default=None, help="max files (debug)")
     parser.add_argument("--no-clean", action="store_true", help="preserve old generated artifacts")
     parser.add_argument("--skip-pitch", action="store_true", help="skip slow F0 extraction")
+    parser.add_argument("--reference-ipa", type=Path, help="verified corpus dictionary export: JSON word -> IPA variant list")
     args = parser.parse_args(argv)
 
     if args.raw is None:
@@ -538,6 +617,7 @@ def main(argv: list[str] | None = None) -> int:
     return build(
         raw, args.out, cut_clips=args.clips, limit=args.limit,
         clean=not args.no_clean, skip_pitch=args.skip_pitch,
+        reference_ipa_path=args.reference_ipa,
     )
 
 

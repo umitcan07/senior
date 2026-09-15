@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
+from .reference_ipa import enrich
 
 
 @dataclass
@@ -101,8 +102,9 @@ def _write_json(path: Path, payload: Any, *, indent: int | None = None) -> None:
 class SiteWriter:
     """Accumulates rows/stats during the build, then flushes the artifact tree."""
 
-    def __init__(self, out_dir: Path) -> None:
+    def __init__(self, out_dir: Path, reference_forms: dict[str, list[str]] | None = None) -> None:
         self.out = out_dir
+        self.reference_forms = reference_forms or {}
         self.data = out_dir / "data"
         # target phone -> shard rows
         self._shards: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -115,6 +117,7 @@ class SiteWriter:
         self._stress_by_phone: dict[str, list[int]] = {}
         self._stress_marks_seen = False
         self._stress_rows: list[dict[str, Any]] = []
+        self._stress_all_rows: list[dict[str, Any]] = []
         self._annotations: dict[str, list[dict[str, Any]]] = {}
 
     def add_token(self, area: str, row: TokenRow) -> None:
@@ -125,7 +128,7 @@ class SiteWriter:
             stat.correct += 1
         else:
             stat.incorrect += 1
-        self._shards.setdefault((area, key), []).append(row.as_dict())
+        self._shards.setdefault((area, key), []).append(enrich(row.as_dict(), self.reference_forms))
 
     def add_stress(
         self,
@@ -150,28 +153,42 @@ class SiteWriter:
         key = target_phone or "∅"
         bucket = self._stress_by_phone.setdefault(key, [0, 0])
         self._stress_total += 1
+        stress_row = {
+            **row.as_dict(),
+            "e": "incorrect" if mismatch else "correct",
+            "area": "lexical-stress",
+        } if row is not None else None
+        if stress_row is not None:
+            stress_row = enrich(stress_row, self.reference_forms)
+            self._stress_all_rows.append(stress_row)
         if mismatch:
             bucket[1] += 1
-            if row is not None:
-                self._stress_rows.append(row.as_dict())
+            if stress_row is not None:
+                self._stress_rows.append(stress_row)
         else:
             self._stress_correct += 1
             bucket[0] += 1
 
-    def add_utterance(self, payload: dict[str, Any]) -> None:
-        self._utterances.append(
-            {
-                "id": payload["id"],
-                "spk": payload["spk"],
-                "task": payload.get("task"),
-                "text": payload.get("text"),
-                "dur": payload.get("dur"),
-            }
-        )
+    def add_utterance(self, payload: dict[str, Any], *, index: bool = True) -> None:
+        payload = {**payload}
+        for key in ("tokens", "annotations"):
+            if key in payload:
+                payload[key] = [enrich(row, self.reference_forms) for row in payload[key]]
+        if index:
+            self._utterances.append(
+                {
+                    "id": payload["id"],
+                    "spk": payload["spk"],
+                    "task": payload.get("task"),
+                    "text": payload.get("text"),
+                    "dur": payload.get("dur"),
+                }
+            )
         _write_json(self.data / "utterances" / f"{payload['id']}.json", payload)
 
     def add_annotation(self, area: str, row: dict[str, Any]) -> None:
         """Store a corpus-native hand judgement as a concordance row."""
+        row = enrich(row, self.reference_forms)
         self._annotations.setdefault(area, []).append(row)
         if area == "lexical-stress":
             self._stress_marks_seen = True
@@ -234,6 +251,10 @@ class SiteWriter:
             },
         )
         _write_json(self.data / "tokens" / "stress" / "mismatch.json", self._stress_rows)
+        _write_json(
+            self.data / "tokens" / "stress" / "all.json",
+            self._stress_all_rows + self._annotations.get("lexical-stress", []),
+        )
 
     def write_manifest(self, manifest: dict[str, Any]) -> None:
         manifest = dict(manifest)

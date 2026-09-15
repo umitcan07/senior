@@ -1,3 +1,5 @@
+import { TaskContext, TaskSelector } from "./components/TaskFilter";
+import type { TaskFilter } from "./lib/taskFilter";
 import { useEffect, useState } from "react";
 import { AboutView } from "./components/AboutView";
 import { FilterSidebar } from "./components/FilterSidebar";
@@ -11,15 +13,16 @@ import { Spinner } from "./components/ui";
 import { UtterancePanel } from "./components/UtterancePanel";
 import { loadManifest } from "./lib/api";
 import { readUrl, writeUrl } from "./lib/urlState";
-import type { AreaKey, Manifest } from "./lib/types";
+import type { AreaKey, Manifest, TokenRow } from "./lib/types";
 
 export interface Selection {
 	area: AreaKey;
 	classKey: string | null; // articulatory class filter (segmental areas)
-	phone: string | null; // single-phone filter (segmental areas)
+	phones: string[]; // selected phones; empty means no phone filter
 }
 
 export function App() {
+	const [task, setTask] = useState<TaskFilter>("all");
 	const [manifest, setManifest] = useState<Manifest | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	// Seed view/selection from the URL so links deep into the corpus work.
@@ -27,11 +30,13 @@ export function App() {
 	const [sel, setSel] = useState<Selection>(() => readUrl().sel);
 	const [openUtterance, setOpenUtterance] = useState<{
 		id: string;
-		focusToken?: string;
+		focusToken?: TokenRow;
 	} | null>(null);
 
 	useEffect(() => {
-		loadManifest().then(setManifest).catch((e) => setError(String(e)));
+		loadManifest()
+			.then(setManifest)
+			.catch((e) => setError(String(e)));
 	}, []);
 
 	// Mirror state into the hash (replaceState — no history spam), and follow
@@ -56,8 +61,8 @@ export function App() {
 				<h1 className="mb-3 font-display text-2xl">Corpus data not found</h1>
 				<p className="text-[var(--color-ink-soft)]">
 					Could not load{" "}
-					<code className="font-mono text-sm">data/manifest.json</code>. Build it
-					first:
+					<code className="font-mono text-sm">data/manifest.json</code>. Build
+					it first:
 				</p>
 				<pre className="mt-3 overflow-x-auto rounded border border-[var(--color-rule)] bg-[var(--color-paper-deep)] p-3 font-mono text-xs">
 					python -m corpus.scripts.site_build.build --out corpus/site/public
@@ -88,40 +93,67 @@ export function App() {
 				<div className="mx-auto flex max-w-[1400px] flex-col gap-0 lg:flex-row">
 					<FilterSidebar manifest={manifest} sel={sel} onSelect={setSel} />
 					<main className="min-w-0 flex-1 px-5 py-6 lg:px-8">
-						{isSegmental && (
-							<SegmentalView
-								key={sel.area}
-								manifest={manifest}
-								sel={sel}
-								onSelect={setSel}
-								onOpenUtterance={(id, focusToken) =>
-									setOpenUtterance({ id, focusToken })
-								}
-							/>
-						)}
-						{sel.area === "lexical-stress" && (
-							<StressView
-								manifest={manifest}
-								onOpenUtterance={(id, t) =>
-									setOpenUtterance({ id, focusToken: t })
-								}
-							/>
-						)}
-						{sel.area === "linking" && (
-							<LinkingView
-								manifest={manifest}
-								onOpenUtterance={(id, t) =>
-									setOpenUtterance({ id, focusToken: t })
-								}
-							/>
-						)}
-						{sel.area === "rhythm" && <RhythmView manifest={manifest} />}
-						{sel.area === "intonation" && (
-							<IntonationView
-								manifest={manifest}
-								onOpenUtterance={(id) => setOpenUtterance({ id })}
-							/>
-						)}
+						<TaskSelector
+							task={task}
+							onChange={(value) => {
+								setTask(value);
+								setOpenUtterance(null);
+							}}
+						/>
+						<TaskContext.Provider value={task}>
+							<div key={task}>
+								{isSegmental && (
+									<SegmentalView
+										key={sel.area}
+										manifest={manifest}
+										sel={sel}
+										onSelect={setSel}
+										onOpenUtterance={(id, focusToken) =>
+											setOpenUtterance({
+												id,
+												focusToken,
+											})
+										}
+									/>
+								)}
+								{sel.area === "lexical-stress" && (
+									<StressView
+										manifest={manifest}
+										onOpenUtterance={(id, t) =>
+											setOpenUtterance({
+												id,
+												focusToken: t,
+											})
+										}
+									/>
+								)}
+								{sel.area === "linking" && (
+									<LinkingView
+										manifest={manifest}
+										onOpenUtterance={(id, t) =>
+											setOpenUtterance({
+												id,
+												focusToken: t,
+											})
+										}
+									/>
+								)}
+								{sel.area === "rhythm" && (
+									<RhythmView manifest={manifest} />
+								)}
+								{sel.area === "intonation" && (
+									<IntonationView
+										manifest={manifest}
+										onOpenUtterance={(id, focusToken) =>
+											setOpenUtterance({
+												id,
+												focusToken,
+											})
+										}
+									/>
+								)}
+							</div>
+						</TaskContext.Provider>
 					</main>
 				</div>
 			)}

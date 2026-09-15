@@ -1,3 +1,4 @@
+import { useTask } from "./TaskFilter";
 import { useEffect, useState } from "react";
 import { loadPhoneTokens, loadStressStats } from "@/lib/api";
 import { pct } from "@/lib/labels";
@@ -11,15 +12,18 @@ export function StressView({
 	onOpenUtterance,
 }: {
 	manifest: Manifest;
-	onOpenUtterance: (id: string, focusToken?: string) => void;
+	onOpenUtterance: (id: string, focusToken?: TokenRow) => void;
 }) {
+	const task = useTask();
 	const [stats, setStats] = useState<StressStats | null>(null);
 	const [tokens, setTokens] = useState<TokenRow[] | null>(null);
 
 	useEffect(() => {
-		loadStressStats().then(setStats).catch(() => setStats(emptyStress()));
-		loadPhoneTokens("stress", "mismatch").then(setTokens);
-	}, []);
+		loadStressStats(task)
+			.then(setStats)
+			.catch(() => setStats(emptyStress()));
+		loadPhoneTokens("stress", "all", task).then(setTokens);
+	}, [task]);
 
 	return (
 		<div className="rise">
@@ -35,8 +39,14 @@ export function StressView({
 			) : (
 				<>
 					<div className="mb-6 grid max-w-2xl grid-cols-2 gap-5 sm:grid-cols-4">
-						<StatTile label="Stress-bearing" value={stats.total.toLocaleString()} />
-						<StatTile label="Correct" value={stats.correct.toLocaleString()} />
+						<StatTile
+							label="Stress-bearing"
+							value={stats.total.toLocaleString()}
+						/>
+						<StatTile
+							label="Correct"
+							value={stats.correct.toLocaleString()}
+						/>
 						<StatTile
 							label="Incorrect"
 							value={stats.incorrect.toLocaleString()}
@@ -44,38 +54,52 @@ export function StressView({
 						/>
 						<StatTile
 							label="Match rate"
-							value={pct(stats.total ? stats.correct / stats.total : null)}
+							value={pct(
+								stats.total ? stats.correct / stats.total : null,
+							)}
 						/>
 					</div>
 
-					<section className="mb-7">
-						<Eyebrow>By stressed vowel</Eyebrow>
-						<div className="mt-2.5 grid grid-cols-1 gap-x-6 sm:grid-cols-2 xl:grid-cols-3">
-							{stats.byPhone
-								.filter((p) => p.total > 0)
-								.sort((a, b) => b.total - a.total)
-								.map((p) => (
-									<div
-										key={p.phone}
-										className="flex items-center gap-3 border-[var(--color-rule)] border-b py-2.5"
-									>
-										<IPA phone={p.phone} className="w-12 font-display text-xl" />
-										<div className="flex-1">
-											<AccuracyBar
-												correct={p.correct}
-							incorrect={p.incorrect}
+					{stats.byPhone.length > 0 && (
+						<section className="mb-7">
+							<Eyebrow>By stressed vowel</Eyebrow>
+							<div className="mt-2.5 grid grid-cols-1 gap-x-6 sm:grid-cols-2 xl:grid-cols-3">
+								{stats.byPhone
+									.filter((p) => p.total > 0)
+									.sort((a, b) => b.total - a.total)
+									.map((p) => (
+										<div
+											key={p.phone}
+											className="flex items-center gap-3 border-[var(--color-rule)] border-b py-2.5"
+										>
+											<IPA
+												phone={p.phone}
+												className="w-12 font-display text-xl"
 											/>
+											<div className="flex-1">
+												<AccuracyBar
+													correct={p.correct}
+													incorrect={
+														p.incorrect
+													}
+												/>
+											</div>
+											<span className="tnum w-10 text-right font-display text-sm">
+												{pct(
+													p.total
+														? p.correct /
+																p.total
+														: null,
+												)}
+											</span>
+											<span className="tnum w-10 text-right text-[var(--color-ink-faint)] text-xs">
+												{p.total}
+											</span>
 										</div>
-										<span className="tnum w-10 text-right font-display text-sm">
-											{pct(p.total ? p.correct / p.total : null)}
-										</span>
-										<span className="tnum w-10 text-right text-[var(--color-ink-faint)] text-xs">
-											{p.total}
-										</span>
-									</div>
-								))}
-						</div>
-					</section>
+									))}
+							</div>
+						</section>
+					)}
 
 					<section>
 						<Eyebrow>Stress judgments in context</Eyebrow>
@@ -88,6 +112,7 @@ export function StressView({
 									speakers={manifest.speakers}
 									onOpen={onOpenUtterance}
 									exportName="lexical-stress"
+									kind="lexical-stress"
 								/>
 							)}
 						</div>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { clipURL, loadUtterance } from "@/lib/api";
 import { num } from "@/lib/labels";
-import type { SpeakerMeta, UtteranceDetail } from "@/lib/types";
+import type { SpeakerMeta, TokenRow, UtteranceDetail } from "@/lib/types";
 import { PitchPlot } from "./PitchPlot";
 import { RhythmStrip } from "./RhythmView";
 import { errorColor, Eyebrow, Spinner } from "./ui";
@@ -13,7 +13,7 @@ export function UtterancePanel({
 	onClose,
 }: {
 	id: string;
-	focusToken?: string;
+	focusToken?: TokenRow;
 	speakers: Record<string, SpeakerMeta>;
 	onClose: () => void;
 }) {
@@ -25,7 +25,17 @@ export function UtterancePanel({
 	useEffect(() => {
 		setUtt(null);
 		setErr(null);
-		loadUtterance(id).then(setUtt).catch((e) => setErr(String(e)));
+		let active = true;
+		loadUtterance(id)
+			.then((data) => {
+				if (active) setUtt(data);
+			})
+			.catch((e) => {
+				if (active) setErr(String(e));
+			});
+		return () => {
+			active = false;
+		};
 	}, [id]);
 
 	// Escape closes.
@@ -35,6 +45,8 @@ export function UtterancePanel({
 		return () => window.removeEventListener("keydown", onKey);
 	}, [onClose]);
 
+	const focused = focusToken ?? utt?.annotations?.[0];
+	const isIntonation = utt?.area === "intonation";
 	const seek = (t0: number) => {
 		const a = audioRef.current;
 		if (!a) return;
@@ -53,9 +65,15 @@ export function UtterancePanel({
 			<div className="relative flex h-full w-full max-w-xl flex-col overflow-y-auto border-[var(--color-rule-strong)] border-l bg-[var(--color-paper)] shadow-2xl">
 				<div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-[var(--color-rule)] border-b bg-[var(--color-paper)]/90 px-6 py-4 backdrop-blur">
 					<div>
-						<Eyebrow>Utterance · {id}</Eyebrow>
+						<Eyebrow>
+							{isIntonation ? "Target utterance" : "Utterance"} · {id}
+						</Eyebrow>
 						{utt && (
-							<SpeakerLine id={utt.spk} meta={speakers[utt.spk]} task={utt.task} />
+							<SpeakerLine
+								id={utt.spk}
+								meta={speakers[utt.spk]}
+								task={utt.task}
+							/>
 						)}
 					</div>
 					<button
@@ -73,53 +91,152 @@ export function UtterancePanel({
 					{utt && (
 						<div className="rise space-y-6">
 							{utt.text && (
-								<p className="font-body text-[var(--color-ink)] text-lg italic leading-snug">
+								<p
+									id="utterance-transcript"
+									className="font-body text-[var(--color-ink)] text-lg italic leading-snug"
+								>
 									“{utt.text}”
 								</p>
 							)}
 
+							{focused && (
+								<section className="border-y border-[var(--color-rule)] py-3">
+									<Eyebrow>
+										{isIntonation ||
+										focused.area === "linking"
+											? "Target utterance"
+											: "Target word"}
+									</Eyebrow>
+									{!isIntonation && (
+										<p className="mt-1 font-display text-xl">
+											{focused.w || "Not annotated"}
+										</p>
+									)}
+									{isIntonation && (
+										<p className="mt-1 text-sm">
+											{focused.tone ?? "Not annotated"}{" "}
+											·{" "}
+											{focused.sentenceType ??
+												"Sentence type not annotated"}
+										</p>
+									)}
+									<p
+										className="mt-1 text-sm"
+										style={{ color: errorColor(focused.e) }}
+									>
+										{focused.e === "correct"
+											? "Correct"
+											: "Incorrect"}
+									</p>
+									{focused.e === "incorrect" &&
+										!isIntonation &&
+										focused.area !== "linking" && (
+											<div className="mt-3">
+												<Eyebrow>
+													Reference
+													pronunciation (IPA)
+												</Eyebrow>
+												{focused.referenceIpa
+													?.length ? (
+													<p className="ipa mt-1 text-lg">
+														{focused.referenceIpa
+															.map(
+																(
+																	ipa,
+																) =>
+																	`/${ipa}/`,
+															)
+															.join(
+																" · ",
+															)}
+													</p>
+												) : (
+													<p className="mt-1 text-xs text-[var(--color-ink-faint)]">
+														Reference IPA is
+														not yet
+														available for
+														this word.
+													</p>
+												)}
+											</div>
+										)}
+								</section>
+							)}
+
 							{utt.audioAvailable === false ? (
 								<p className="rounded-[var(--radius-card)] border border-dashed border-[var(--color-rule)] p-3 text-[var(--color-ink-faint)] text-xs">
-									Audio is unavailable for this utterance; its corpus annotations remain available.
+									Audio is unavailable for this utterance; its
+									corpus annotations remain available.
 								</p>
 							) : (
-							<audio
+								// biome-ignore lint/a11y/useMediaCaption: The annotated transcript is displayed above this audio-only player.
+								<audio
+									key={id}
+									aria-label="Target recording"
+									aria-describedby={
+										utt.text
+											? "utterance-transcript"
+											: undefined
+									}
 									ref={audioRef}
-								src={clipURL(utt.clip ?? "")}
+									src={clipURL(utt.clip ?? "")}
 									controls
-									preload="none"
-									onTimeUpdate={(e) => setPlayhead(e.currentTarget.currentTime)}
+									preload="metadata"
+									onLoadedMetadata={(event) => {
+										event.currentTarget.currentTime =
+											Math.min(
+												focused?.t0 ?? 0,
+												event.currentTarget
+													.duration,
+											);
+									}}
+									onTimeUpdate={(e) =>
+										setPlayhead(e.currentTarget.currentTime)
+									}
 									className="w-full"
 								/>
 							)}
 
-							<PhoneStrip utt={utt} onSeek={seek} focusToken={focusToken} />
+							<PhoneStrip
+								utt={utt}
+								onSeek={seek}
+								focusToken={focused}
+							/>
 
 							{utt.pitch ? (
 								<section>
 									<div className="mb-1.5 flex items-baseline justify-between">
-										<Eyebrow>Intonation · F0 contour</Eyebrow>
+										<Eyebrow>
+											Intonation · F0 contour
+										</Eyebrow>
 										<span className="tnum font-mono text-[var(--color-ink-faint)] text-xs">
-											{num(utt.pitch.min)}–{num(utt.pitch.max)} Hz
+											{num(utt.pitch.min)}–
+											{num(utt.pitch.max)} Hz
 										</span>
 									</div>
 									<div className="rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-deep)]/30 p-2">
-										<PitchPlot pitch={utt.pitch} playhead={playhead} />
+										<PitchPlot
+											pitch={utt.pitch}
+											playhead={playhead}
+										/>
 									</div>
 								</section>
 							) : null}
 
-							<section>
-								<Eyebrow>Rhythm metrics</Eyebrow>
-								<div className="mt-2">
-									<RhythmStrip r={utt.rhythm} />
-								</div>
-							</section>
+							{!isIntonation && (
+								<section>
+									<Eyebrow>Rhythm metrics</Eyebrow>
+									<div className="mt-2">
+										<RhythmStrip r={utt.rhythm} />
+									</div>
+								</section>
+							)}
 
 							{!utt.judged && (
 								<p className="rounded-[var(--radius-card)] border border-[var(--color-insert)]/40 bg-[var(--color-insert-wash)]/50 p-3 text-[var(--color-ink-soft)] text-xs">
-									This recording has no corpus-native correctness judgment; its
-									annotated phones are shown as transcribed.
+									This recording has no corpus-native
+									correctness judgment; its annotated phones are
+									shown as transcribed.
 								</p>
 							)}
 						</div>
@@ -137,20 +254,24 @@ function PhoneStrip({
 }: {
 	utt: UtteranceDetail;
 	onSeek: (t: number) => void;
-	focusToken?: string;
+	focusToken?: TokenRow;
 }) {
 	return (
 		<section>
 			<Eyebrow>Annotated phones — click to hear</Eyebrow>
 			<div className="mt-2 flex flex-wrap gap-1">
 				{utt.tokens.map((t) => {
-					const focused = t.id === focusToken;
+					const focused =
+						t.id === focusToken?.id ||
+						(Boolean(focusToken?.area) &&
+							t.t0 < (focusToken?.t1 ?? 0) &&
+							t.t1 > (focusToken?.t0 ?? 0));
 					return (
 						<button
 							key={t.id}
 							type="button"
 							onClick={() => onSeek(t.t0)}
-							title={`${t.ph ?? "∅"} · ${t.t0.toFixed(2)}s`}
+							title={`${t.w ?? ""} · ${t.ph ?? "∅"} · ${t.t0.toFixed(2)}s`}
 							className={`group relative rounded-[2px] border px-1.5 py-1 transition-colors ${
 								focused
 									? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
@@ -165,7 +286,10 @@ function PhoneStrip({
 							</span>
 							<span
 								className="mt-1 block h-0.5 w-full rounded"
-								style={{ background: errorColor(t.e), opacity: 0.5 }}
+								style={{
+									background: errorColor(t.e),
+									opacity: 0.5,
+								}}
 							/>
 						</button>
 					);
@@ -175,24 +299,15 @@ function PhoneStrip({
 	);
 }
 
-function SpeakerLine({
-	id,
-	meta,
-	task,
-}: {
-	id: string;
-	meta?: SpeakerMeta;
-	task: string | null;
-}) {
+function SpeakerLine({ id, meta, task }: { id: string; meta?: SpeakerMeta; task: string | null }) {
 	const parts: string[] = [id];
 	if (task) parts.push(task === "T1" ? "read-aloud" : "interview");
 	if (meta?.sex && meta.sex !== "u")
 		parts.push(meta.sex === "f" ? "female" : meta.sex === "m" ? "male" : meta.sex);
-	const cefr = meta?.["learner_level_CEFR_conversion"];
+	const cefr = meta?.learner_level_CEFR_conversion;
 	if (typeof cefr === "string") parts.push(cefr);
-	const age = meta?.["age"];
-	if (typeof age === "string" || typeof age === "number")
-		parts.push(`age ${age}`);
+	const age = meta?.age;
+	if (typeof age === "string" || typeof age === "number") parts.push(`age ${age}`);
 	return (
 		<h3 className="mt-0.5 font-display text-xl">
 			{parts.map((p, i) => (
@@ -201,7 +316,11 @@ function SpeakerLine({
 						<span className="mx-1.5 text-[var(--color-ink-faint)]">·</span>
 					)}
 					<span
-						className={i === 0 ? "font-mono text-lg" : "text-[var(--color-ink-soft)] text-base"}
+						className={
+							i === 0
+								? "font-mono text-lg"
+								: "text-[var(--color-ink-soft)] text-base"
+						}
 					>
 						{p}
 					</span>

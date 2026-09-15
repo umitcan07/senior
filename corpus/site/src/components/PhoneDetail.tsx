@@ -1,12 +1,8 @@
+import { useTask } from "./TaskFilter";
 import { useEffect, useState } from "react";
 import { loadPhoneTokens } from "@/lib/api";
 import { pct } from "@/lib/labels";
-import type {
-	Area,
-	PhoneStat,
-	SpeakerMeta,
-	TokenRow,
-} from "@/lib/types";
+import type { Area, PhoneStat, SpeakerMeta, TokenRow } from "@/lib/types";
 import { TokenConcordance } from "./TokenConcordance";
 import { AccuracyBar, Eyebrow, IPA, Legend, Spinner, StatTile } from "./ui";
 
@@ -19,14 +15,15 @@ export function PhoneDetail({
 	area: Area;
 	stat: PhoneStat;
 	speakers: Record<string, SpeakerMeta>;
-	onOpenUtterance: (id: string, focusToken?: string) => void;
+	onOpenUtterance: (id: string, focusToken?: TokenRow) => void;
 }) {
+	const task = useTask();
 	const [tokens, setTokens] = useState<TokenRow[] | null>(null);
 
 	useEffect(() => {
 		setTokens(null);
-		loadPhoneTokens(area, stat.phone).then(setTokens);
-	}, [area, stat.phone]);
+		loadPhoneTokens(area, stat.phone, task).then(setTokens);
+	}, [area, stat.phone, task]);
 
 	const incorrect = stat.incorrect;
 
@@ -55,7 +52,10 @@ export function PhoneDetail({
 							label="Correct"
 							value={stat.correct.toLocaleString()}
 						/>
-						<StatTile label="Incorrect" value={incorrect.toLocaleString()} />
+						<StatTile
+							label="Incorrect"
+							value={incorrect.toLocaleString()}
+						/>
 					</div>
 					<div className="mt-4 max-w-xl">
 						<div className="mb-1.5 flex items-center justify-between">
@@ -69,7 +69,6 @@ export function PhoneDetail({
 					</div>
 				</div>
 			</div>
-
 
 			<section>
 				<div className="mb-2.5 flex items-baseline justify-between">

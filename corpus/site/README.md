@@ -54,7 +54,7 @@ src/
     Masthead, FilterSidebar          header + tabs + 5 areas + filter tree
     AboutView                        renders content/about.md + live build facts
     SegmentalView, PhoneDetail       vowels/consonants grid + drill-down
-    TokenConcordance                 KWIC table: search, sort, filters, notes, CSV
+    TokenConcordance                 target table: search, sort, filters, notes, CSV
     UtterancePanel                   clip player + aligned phones + pitch + rhythm
     RhythmView, IntonationView, StressView, PitchPlot
 ```
@@ -64,3 +64,7 @@ src/
 The **About** tab is `src/content/about.md`. Sections quoted with `>` are
 placeholders for the corpus compiler to replace. Edit the file, rebuild, deploy —
 that is the whole flow.
+
+For the available local corpus drop, target-word rules, and publishing the bundle
+to `app/public/corptes/`, see the September 2026 section in
+[`doc/corpus_site.md`](../../doc/corpus_site.md).
