@@ -1,3 +1,4 @@
+import { sentenceTypeLabel } from "@/lib/sentenceTypes";
 import { ReferencePronunciation } from "./ReferencePronunciation";
 import { useEffect, useRef, useState } from "react";
 import { clipURL, loadUtterance } from "@/lib/api";
@@ -117,8 +118,7 @@ export function UtterancePanel({
 										<p className="mt-1 text-sm">
 											{focused.tone ?? "Not annotated"}{" "}
 											·{" "}
-											{focused.sentenceType ??
-												"Sentence type not annotated"}
+											{sentenceTypeLabel(focused)}
 										</p>
 									)}
 									<p

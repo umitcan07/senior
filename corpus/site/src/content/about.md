@@ -61,8 +61,11 @@ The concordance is a working surface, not just a table:
 
 **Lexical Stress** lists the target word; **Linking** lists the target phrase.
 **Intonation** can be filtered by pattern (Falling, Rising, Rise & Fall) and
-sentence type (such as Yes/No Question or Wh Question). A missing source label
-is shown as “Not annotated”.
+sentence type (such as Yes/No Question or Wh Question). For 171 read-aloud records missing a source sentence-type label, an editorial
+classification based on the six reading-text targets is marked “(suggested)”
+in the list, filters, detail panel and CSV. This includes hesitant or truncated
+versions of those targets. Suggestions are not corpus annotations and do not
+change tone or correctness labels. Other missing labels remain “Not annotated”.
 
 ## How correct and incorrect are decided
 

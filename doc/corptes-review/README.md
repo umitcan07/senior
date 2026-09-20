@@ -1,5 +1,17 @@
 # CORPTES: remaining source data
 
+## Editorial sentence-type suggestions
+
+User authorized text-based suggestions for the 171 read-aloud events with no
+source sentence type. The interface now displays these as `(suggested)` in
+tables, filters, details and CSV. Source JSON, intonation patterns and judgments
+remain unchanged. The six target classes are Wh Question, Yes/No Question,
+Alternative Question, Tag Question, Statement and Imperative. Exact observed
+text variants (including truncated targets) are mapped in `sentenceTypes.ts`;
+unrecognized text and interview records are never guessed. The CSV below remains
+an inventory of missing **source** labels, not missing display suggestions.
+
+
 ## Public dictionary reference now available
 
 At the user's request, the site now supplies a general American English reference

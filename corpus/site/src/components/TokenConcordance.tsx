@@ -1,3 +1,4 @@
+import { sentenceTypeLabel } from "@/lib/sentenceTypes";
 import { useEffect, useMemo, useState } from "react";
 import { clearAnnotations, loadAnnotations, setAnnotation } from "@/lib/annotations";
 import { type Column, downloadCsv, slugForFile, toCsv } from "@/lib/csv";
@@ -26,7 +27,7 @@ const ANY = "__any__";
  * anchors could never match.
  */
 function searchFields(t: TokenRow): string[] {
-	return [t.ph, t.w, t.spk, t.tone, t.sentenceType].filter(
+	return [t.ph, t.w, t.spk, t.tone, sentenceTypeLabel(t)].filter(
 		(v): v is string => typeof v === "string" && v !== "",
 	);
 }
@@ -36,7 +37,7 @@ function sortValue(t: TokenRow, key: SortKey): string | number {
 		case "tone":
 			return t.tone ?? "Not annotated";
 		case "sentenceType":
-			return t.sentenceType ?? "Not annotated";
+			return sentenceTypeLabel(t);
 		case "phone":
 			return t.ph ?? "";
 		case "word":
@@ -71,7 +72,7 @@ export function TokenConcordance({
 		...new Set(
 			tokens
 				.filter((t) => tone === ANY || (t.tone ?? "Not annotated") === tone)
-				.map((t) => t.sentenceType ?? "Not annotated"),
+				.map((t) => sentenceTypeLabel(t)),
 		),
 	].sort();
 	const [mode, setMode] = useState<FilterMode>("all");
@@ -129,7 +130,7 @@ export function TokenConcordance({
 	const filtered = useMemo(() => {
 		const rows = tokens.filter((t) => {
 			if (tone !== ANY && (t.tone ?? "Not annotated") !== tone) return false;
-			if (sentenceType !== ANY && (t.sentenceType ?? "Not annotated") !== sentenceType)
+			if (sentenceType !== ANY && (sentenceTypeLabel(t)) !== sentenceType)
 				return false;
 			if (mode !== "all" && t.e !== mode) return false;
 			if (sex !== ANY && speakers[t.spk]?.sex !== sex) return false;
@@ -186,7 +187,7 @@ export function TokenConcordance({
 						},
 						{
 							header: "sentence_type",
-							value: (t: TokenRow) => t.sentenceType ?? "Not annotated",
+							value: (t: TokenRow) => sentenceTypeLabel(t),
 						},
 					]
 				: []),
@@ -286,6 +287,12 @@ export function TokenConcordance({
 					/>
 				</div>
 			)}
+
+            {kind === "intonation" && (
+                <p className="mb-3 text-xs text-[var(--color-ink-faint)]">
+                    Suggested types are based on read-aloud target sentences, not source annotations.
+                </p>
+            )}
 
 			<div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1.5">
 				<input
@@ -402,8 +409,7 @@ export function TokenConcordance({
 									<>
 										<Td>{t.tone ?? "Not annotated"}</Td>
 										<Td>
-											{t.sentenceType ??
-												"Not annotated"}
+											{sentenceTypeLabel(t)}
 										</Td>
 									</>
 								)}
