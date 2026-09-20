@@ -1,3 +1,4 @@
+import { ReferencePronunciation } from "./ReferencePronunciation";
 import { useEffect, useRef, useState } from "react";
 import { clipURL, loadUtterance } from "@/lib/api";
 import { num } from "@/lib/labels";
@@ -131,34 +132,12 @@ export function UtterancePanel({
 									{focused.e === "incorrect" &&
 										!isIntonation &&
 										focused.area !== "linking" && (
-											<div className="mt-3">
-												<Eyebrow>
-													Reference
-													pronunciation (IPA)
-												</Eyebrow>
-												{focused.referenceIpa
-													?.length ? (
-													<p className="ipa mt-1 text-lg">
-														{focused.referenceIpa
-															.map(
-																(
-																	ipa,
-																) =>
-																	`/${ipa}/`,
-															)
-															.join(
-																" · ",
-															)}
-													</p>
-												) : (
-													<p className="mt-1 text-xs text-[var(--color-ink-faint)]">
-														Reference IPA is
-														not yet
-														available for
-														this word.
-													</p>
-												)}
-											</div>
+											<ReferencePronunciation
+												word={focused.w}
+												verified={
+													focused.referenceIpa
+												}
+											/>
 										)}
 								</section>
 							)}

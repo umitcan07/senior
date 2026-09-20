@@ -1,0 +1,1916 @@
+{
+  "source": {
+    "name": "English (US) ARPA dictionary",
+    "version": "3.0.0",
+    "dialect": "General American English",
+    "author": "Montreal Forced Aligner; Gorman, Howell and Wagner",
+    "url": "https://mfa-models.readthedocs.io/en/latest/dictionary/English/English%20(US)%20ARPA%20dictionary%20v3_0_0.html",
+    "download": "https://github.com/MontrealCorpusTools/mfa-models/releases/download/dictionary-english_us_arpa-v3.0.0/english_us_arpa.dict",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "adaptation": "ARPABET converted to broad IPA; vowel stress shown separately. Not the corpus annotator's reference.",
+    "sha256": "e8c6c7b036ae2b7c78d2768b8dc6b1f9359175b842956d00b48c53c9c332e6b0"
+  },
+  "entries": {
+    "a": [
+      {
+        "ipa": "ə",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "eɪ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "actually": [
+      {
+        "ipa": "ækʃəli",
+        "stress": [
+          "primary",
+          "unstressed",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "æktʃli",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "æktʃuəli",
+        "stress": [
+          "primary",
+          "secondary",
+          "unstressed",
+          "unstressed"
+        ]
+      }
+    ],
+    "afternoon": [
+      {
+        "ipa": "æftɚnun",
+        "stress": [
+          "secondary",
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "again": [
+      {
+        "ipa": "əɡɛn",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      },
+      {
+        "ipa": "əɡeɪn",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "age": [
+      {
+        "ipa": "eɪdʒ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "ages": [
+      {
+        "ipa": "eɪdʒəz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "eɪdʒɪz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "all": [
+      {
+        "ipa": "ɑl",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "ɔl",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "also": [
+      {
+        "ipa": "ɑlsoʊ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɔlsoʊ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "anger": [
+      {
+        "ipa": "æŋɡɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "angry": [
+      {
+        "ipa": "æŋɡɹi",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "another": [
+      {
+        "ipa": "ənʌðɚ",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "answer": [
+      {
+        "ipa": "ænsɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "away": [
+      {
+        "ipa": "əweɪ",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "bag": [
+      {
+        "ipa": "bæɡ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "balloon": [
+      {
+        "ipa": "bəlun",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "balloons": [
+      {
+        "ipa": "bəlunz",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "band": [
+      {
+        "ipa": "bænd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "ipa": "bændz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "basketball": [
+      {
+        "ipa": "bæskətbɔl",
+        "stress": [
+          "primary",
+          "unstressed",
+          "secondary"
+        ]
+      },
+      {
+        "ipa": "bæskətbɑl",
+        "stress": [
+          "primary",
+          "unstressed",
+          "secondary"
+        ]
+      }
+    ],
+    "bed": [
+      {
+        "ipa": "bɛd",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "bɛ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "before": [
+      {
+        "ipa": "bɪfɔɹ",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      },
+      {
+        "ipa": "bifɔɹ",
+        "stress": [
+          "secondary",
+          "primary"
+        ]
+      }
+    ],
+    "began": [
+      {
+        "ipa": "bɪɡæn",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      },
+      {
+        "ipa": "biɡæn",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "birthday": [
+      {
+        "ipa": "bɝθdeɪ",
+        "stress": [
+          "primary",
+          "secondary"
+        ]
+      }
+    ],
+    "black": [
+      {
+        "ipa": "blæk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "bother": [
+      {
+        "ipa": "bɑðɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "cake": [
+      {
+        "ipa": "keɪk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "cakes": [
+      {
+        "ipa": "keɪks",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "car": [
+      {
+        "ipa": "kɑɹ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "cars": [
+      {
+        "ipa": "kɑɹz",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "kɑz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "chance": [
+      {
+        "ipa": "tʃæns",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "change": [
+      {
+        "ipa": "tʃeɪndʒ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "cinema": [
+      {
+        "ipa": "sɪnəmə",
+        "stress": [
+          "primary",
+          "unstressed",
+          "unstressed"
+        ]
+      }
+    ],
+    "club": [
+      {
+        "ipa": "klʌb",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "coffee": [
+      {
+        "ipa": "kɔfi",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "kɑfi",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "company": [
+      {
+        "ipa": "kʌmpəni",
+        "stress": [
+          "primary",
+          "unstressed",
+          "unstressed"
+        ]
+      }
+    ],
+    "concern": [
+      {
+        "ipa": "kənsɝn",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "concerns": [
+      {
+        "ipa": "kənsɝnz",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "convinced": [
+      {
+        "ipa": "kənvɪnst",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "cook": [
+      {
+        "ipa": "kʊk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "cooked": [
+      {
+        "ipa": "kʊkt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "cooking": [
+      {
+        "ipa": "kʊkɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "corners": [
+      {
+        "ipa": "kɔɹnɚz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "cried": [
+      {
+        "ipa": "kɹaɪ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "kɹaɪd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "dark": [
+      {
+        "ipa": "dɑɹk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "days": [
+      {
+        "ipa": "deɪz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "dog": [
+      {
+        "ipa": "dɔɡ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "dɑɡ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "drink": [
+      {
+        "ipa": "dɹɪŋk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "drinking": [
+      {
+        "ipa": "dɹɪŋkɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "drinks": [
+      {
+        "ipa": "dɹɪŋks",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "duck": [
+      {
+        "ipa": "dʌk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "ducks": [
+      {
+        "ipa": "dʌks",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "escaped": [
+      {
+        "ipa": "ɪskeɪpt",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "exactly": [
+      {
+        "ipa": "ɪɡzæktli",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "father": [
+      {
+        "ipa": "fɑðɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "father's": [
+      {
+        "ipa": "fɑðɚz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "feast": [
+      {
+        "ipa": "fist",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "first": [
+      {
+        "ipa": "fɝst",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "firstly": [
+      {
+        "ipa": "fɝstli",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "fist": [
+      {
+        "ipa": "fɪst",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "fists": [
+      {
+        "ipa": "fɪsts",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "fool": [
+      {
+        "ipa": "ful",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "foot": [
+      {
+        "ipa": "fʊ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "fʊt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "forest": [
+      {
+        "ipa": "fɔɹəst",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "fɔɹɪst",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "forests": [
+      {
+        "ipa": "fɔɹəsts",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "four": [
+      {
+        "ipa": "fɔɹ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "full": [
+      {
+        "ipa": "fʊl",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "fun": [
+      {
+        "ipa": "fʌn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "garden": [
+      {
+        "ipa": "ɡɑɹdən",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "gave": [
+      {
+        "ipa": "ɡeɪv",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "girl": [
+      {
+        "ipa": "ɡɝl",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "girls": [
+      {
+        "ipa": "ɡɝlz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "go": [
+      {
+        "ipa": "ɡoʊ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "good": [
+      {
+        "ipa": "ɡɪd",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɡɪ",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɡʊ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "ɡʊd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "had": [
+      {
+        "ipa": "hæ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "hæd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "half": [
+      {
+        "ipa": "hæf",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "hand": [
+      {
+        "ipa": "hænd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "handbag": [
+      {
+        "ipa": "hændbæɡ",
+        "stress": [
+          "primary",
+          "secondary"
+        ]
+      }
+    ],
+    "hands": [
+      {
+        "ipa": "hænz",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "hændz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "have": [
+      {
+        "ipa": "hæv",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "heard": [
+      {
+        "ipa": "hɝ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "hɝd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "himself": [
+      {
+        "ipa": "hɪmsɛlf",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "his": [
+      {
+        "ipa": "hɪz",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "hɪz",
+        "stress": [
+          "unstressed"
+        ]
+      }
+    ],
+    "hot": [
+      {
+        "ipa": "hɑ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "hɑt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "however": [
+      {
+        "ipa": "haʊɛvɚ",
+        "stress": [
+          "secondary",
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "husband": [
+      {
+        "ipa": "hʌzbənd",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "in": [
+      {
+        "ipa": "ɪn",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɪn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "job": [
+      {
+        "ipa": "dʒɑb",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "dʒoʊb",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "large": [
+      {
+        "ipa": "lɑɹdʒ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "little": [
+      {
+        "ipa": "lɪtəl",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "long": [
+      {
+        "ipa": "lɔŋ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "looking": [
+      {
+        "ipa": "lʊkɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "louder": [
+      {
+        "ipa": "laʊdɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "man": [
+      {
+        "ipa": "mæn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "more": [
+      {
+        "ipa": "mɔɹ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "mountain": [
+      {
+        "ipa": "maʊntən",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "movie": [
+      {
+        "ipa": "muvi",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "movies": [
+      {
+        "ipa": "muviz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "much": [
+      {
+        "ipa": "mʌtʃ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "nightclub": [
+      {
+        "ipa": "naɪtklʌb",
+        "stress": [
+          "primary",
+          "secondary"
+        ]
+      }
+    ],
+    "of": [
+      {
+        "ipa": "ʌv",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "əv",
+        "stress": [
+          "unstressed"
+        ]
+      }
+    ],
+    "once": [
+      {
+        "ipa": "wʌns",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "party": [
+      {
+        "ipa": "pɑɹti",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "people": [
+      {
+        "ipa": "pipəl",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "people's": [
+      {
+        "ipa": "pipəlz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "peoples": [
+      {
+        "ipa": "pipəlz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "pet": [
+      {
+        "ipa": "pɛt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "pig": [
+      {
+        "ipa": "pɪɡ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "plan": [
+      {
+        "ipa": "plæn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "plane": [
+      {
+        "ipa": "pleɪn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "pleasure": [
+      {
+        "ipa": "plɛʒɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "pool": [
+      {
+        "ipa": "pul",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "popcorn": [
+      {
+        "ipa": "pɑpkɔɹn",
+        "stress": [
+          "primary",
+          "secondary"
+        ]
+      }
+    ],
+    "pub": [
+      {
+        "ipa": "pʌb",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "question": [
+      {
+        "ipa": "kwɛstʃən",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "kwɛʃən",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "ipa": "kwɛstʃənz",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "raising": [
+      {
+        "ipa": "ɹeɪzɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "ran": [
+      {
+        "ipa": "ɹæn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "red": [
+      {
+        "ipa": "ɹɛ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "ɹɛd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "repaired": [
+      {
+        "ipa": "ɹipɛɹd",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      },
+      {
+        "ipa": "ɹɪpɛɹd",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "repeated": [
+      {
+        "ipa": "ɹipitə",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɹipitɪd",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɹɪpitɪd",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɹipitɪ",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɹipitəd",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ɹɪpitɪ",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "repressed": [
+      {
+        "ipa": "ɹipɹɛst",
+        "stress": [
+          "unstressed",
+          "primary"
+        ]
+      }
+    ],
+    "rinsing": [
+      {
+        "ipa": "ɹɪnsɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "run": [
+      {
+        "ipa": "ɹʌn",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "rushed": [
+      {
+        "ipa": "ɹʌʃt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "sad": [
+      {
+        "ipa": "sæd",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "sæ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "safety": [
+      {
+        "ipa": "seɪfti",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "same": [
+      {
+        "ipa": "seɪm",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "sea": [
+      {
+        "ipa": "si",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "seas": [
+      {
+        "ipa": "siz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "seen": [
+      {
+        "ipa": "sin",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "sheep": [
+      {
+        "ipa": "ʃip",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "shepherd": [
+      {
+        "ipa": "ʃɛpɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ʃɛpɚd",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "ship": [
+      {
+        "ipa": "ʃɪp",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "shoe": [
+      {
+        "ipa": "ʃu",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "shoes": [
+      {
+        "ipa": "ʃuz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "short": [
+      {
+        "ipa": "ʃɔɹt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "shot": [
+      {
+        "ipa": "ʃɑ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "ʃɑt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "sit": [
+      {
+        "ipa": "sɪ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "sɪt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "sitting": [
+      {
+        "ipa": "sɪtɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "skirt": [
+      {
+        "ipa": "skɝt",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "skɝ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "skirts": [
+      {
+        "ipa": "skɝts",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "sleep": [
+      {
+        "ipa": "slip",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "stayed": [
+      {
+        "ipa": "steɪd",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "steɪ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "successful": [
+      {
+        "ipa": "səksɛsfəl",
+        "stress": [
+          "unstressed",
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "sunny": [
+      {
+        "ipa": "sʌni",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "swim": [
+      {
+        "ipa": "swɪm",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "swimming": [
+      {
+        "ipa": "swɪmɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "taught": [
+      {
+        "ipa": "tɔ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "tɔt",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "tɑ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "tɑt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "teeth": [
+      {
+        "ipa": "tiθ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "the": [
+      {
+        "ipa": "ðə",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ði",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ðʌ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "there": [
+      {
+        "ipa": "ðɛɹ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "there's": [
+      {
+        "ipa": "ðɛɹz",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "they": [
+      {
+        "ipa": "ðeɪ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "third": [
+      {
+        "ipa": "θɝd",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "θɝ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "this": [
+      {
+        "ipa": "ðɪs",
+        "stress": [
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "ðɪs",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "though": [
+      {
+        "ipa": "ðoʊ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "thought": [
+      {
+        "ipa": "θɔ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "θɑ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "θɔt",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "θɑt",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "threaten": [
+      {
+        "ipa": "θɹɛtən",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "three": [
+      {
+        "ipa": "θɹi",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "took": [
+      {
+        "ipa": "tʊk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "towed": [
+      {
+        "ipa": "toʊd",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "treat": [
+      {
+        "ipa": "tɹi",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "tɹit",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "trick": [
+      {
+        "ipa": "tɹɪk",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "tried": [
+      {
+        "ipa": "tɹaɪd",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "tɹaɪ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "turtle": [
+      {
+        "ipa": "tɝtəl",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "two": [
+      {
+        "ipa": "tu",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "up": [
+      {
+        "ipa": "ʌp",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "vegetable": [
+      {
+        "ipa": "vɛdʒtəbəl",
+        "stress": [
+          "primary",
+          "unstressed",
+          "unstressed"
+        ]
+      }
+    ],
+    "vegetables": [
+      {
+        "ipa": "vɛdʒtəbəlz",
+        "stress": [
+          "primary",
+          "unstressed",
+          "unstressed"
+        ]
+      }
+    ],
+    "very": [
+      {
+        "ipa": "vɛɹi",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "village": [
+      {
+        "ipa": "vɪlədʒ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      },
+      {
+        "ipa": "vɪlɪdʒ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "watch": [
+      {
+        "ipa": "wɑtʃ",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "wɔtʃ",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "watching": [
+      {
+        "ipa": "wɑtʃɪŋ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "weather": [
+      {
+        "ipa": "wɛðɚ",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "while": [
+      {
+        "ipa": "waɪl",
+        "stress": [
+          "primary"
+        ]
+      },
+      {
+        "ipa": "hwaɪl",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "who": [
+      {
+        "ipa": "hu",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "wolf": [
+      {
+        "ipa": "wʊlf",
+        "stress": [
+          "primary"
+        ]
+      }
+    ],
+    "woman": [
+      {
+        "ipa": "wʊmən",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "woman'": [
+      {
+        "ipa": "woʊmæn",
+        "stress": [
+          "primary",
+          "unstressed"
+        ]
+      }
+    ],
+    "zoo": [
+      {
+        "ipa": "zu",
+        "stress": [
+          "primary"
+        ]
+      }
+    ]
+  },
+  "unmatched": [
+    "2",
+    "3rd",
+    "large-"
+  ]
+}

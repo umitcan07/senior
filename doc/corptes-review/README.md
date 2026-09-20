@@ -1,5 +1,17 @@
 # CORPTES: remaining source data
 
+## Public dictionary reference now available
+
+At the user's request, the site now supplies a general American English reference
+from MFA's English (US) ARPA dictionary v3.0.0, converted to IPA with vowel stress
+shown separately. All 509 incorrect stress tokens, 548/550 incorrect vowel tokens,
+and 768/774 incorrect consonant tokens are covered. Unmatched forms are `2`, `3rd`
+and `large-`. The exact compiler dictionary is optional for replacing this public
+reference, not a blocker to displaying reference pronunciations.
+`missing-reference-ipa.csv` is the historical pre-dictionary inventory, not the
+current missing-reference list. The missing sentence types and audio below remain
+unresolved. See `doc/corpus_site.md` for source and regeneration steps.
+
 The interface changes are implemented. The following values cannot be recovered
 from the supplied corpus files and must come from the corpus compiler.
 

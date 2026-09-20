@@ -100,8 +100,17 @@ for its utterance sample. Reloading the page starts with All.
 - Audio is published as short utterance-level clips, never as whole recordings;
   a small number of recordings have no source audio and are clearly marked.
 
-- Dictionary reference IPA is not yet available. The corpus’s transcribed
-  phones are not used as a substitute for a verified reference pronunciation.
+- Incorrect vowel, consonant and stress records show general American English
+  dictionary reference pronunciations where the target word is covered. These
+  come from the English (US) ARPA dictionary v3.0.0, converted to broad IPA;
+  primary, secondary and unstressed vowel labels are shown separately in order.
+  No syllable boundaries are inferred. Variants are alternatives, not separate
+  correctness judgments. This is a public dictionary reference, not a claim about
+  the dictionary used by the corpus compiler, and does not alter corpus labels.
+  Source: Montreal Forced Aligner; Gorman, Howell and Wagner (2011),
+  [English (US) ARPA dictionary v3.0.0](https://mfa-models.readthedocs.io/en/latest/dictionary/English/English%20(US)%20ARPA%20dictionary%20v3_0_0.html),
+  adapted under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+  Unmatched word forms remain unavailable rather than being guessed.
 - Some intonation annotations specify the pattern but omit the sentence type;
   the explorer preserves this distinction rather than guessing the missing label.
 

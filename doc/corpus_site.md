@@ -232,3 +232,36 @@ Dedicated annotation IDs and ordinary utterance IDs share the exporter’s
 `{speaker}{task}_` recording prefix; `taskFilter.ts` resolves it using explicit
 manifest task metadata. Regression tests verify that this lookup matches every
 detail file, including intonation windows, and that T1 + T2 preserves all tokens.
+
+
+### Public dictionary reference IPA (September 2026)
+
+Supersedes the earlier deferred-IPA status: user authorized a public reference
+instead of waiting for the exact compiler dictionary. The panel now falls back to
+`corpus/site/src/data/reference-pronunciations.json`, a generated subset of the
+English (US) ARPA dictionary v3.0.0. Explicit `TokenRow.referenceIpa` still takes
+precedence if the corpus compiler supplies verified forms later. Manifest
+`referenceIpaAvailable` continues to describe that optional corpus-specific import;
+it does not describe the bundled public dictionary fallback.
+
+Source: Montreal Forced Aligner; Gorman, Howell and Wagner (2011),
+https://github.com/MontrealCorpusTools/mfa-models/releases/tag/dictionary-english_us_arpa-v3.0.0
+License: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ .
+Adaptations: corpus subset; ARPABET converted to broad IPA; primary/secondary/zero
+vowel stress preserved separately. No guessed syllable boundaries or stress
+insertion into IPA strings. Corpus correctness labels and recordings are unchanged.
+
+The IPA-native MFA dictionary has no lexical stress marks; the ARPA variant was
+chosen so stress information can also be displayed. All listed variants remain
+available, without claiming that one is the corpus annotator's correct answer.
+The source checksum is pinned in `public_dictionary.py` and included in the JSON.
+The full dictionaries are cached under ignored `corpus/processed/reference-dictionaries/`.
+Regenerate from the official `english_us_arpa.dict` release asset:
+
+```sh
+python -m corpus.scripts.site_build.public_dictionary --dictionary corpus/processed/reference-dictionaries/arpa.dict --data app/public/corptes/data --out corpus/site/src/data/reference-pronunciations.json
+pnpm --dir corpus/site build
+```
+
+Coverage: 180 normalized word forms. Incorrect-token coverage: vowels 548/550,
+consonants 768/774, stress 509/509. Unmatched `2`, `3rd`, `large-` remain explicit.

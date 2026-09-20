@@ -20,7 +20,7 @@ from urllib.parse import quote
 _HERE = Path(__file__).resolve()
 sys.path.insert(0, str(_HERE.parents[2]))  # corpus/scripts
 
-from site_build import align, build, emit, exb, inventory, rhythm, textgrid, reference_ipa  # noqa: E402
+from site_build import align, build, emit, exb, inventory, rhythm, textgrid, reference_ipa, public_dictionary  # noqa: E402
 from site_build.tests import fixtures  # noqa: E402
 
 
@@ -281,6 +281,21 @@ def test_invalid_dictionary_does_not_delete_existing_output():
     else:
         raise AssertionError("ARPABET must not be published as IPA")
     assert marker.read_text() == "existing"
+
+
+def test_public_dictionary_conversion_preserves_vowel_stress():
+    assert public_dictionary.convert("B ER1 TH D EY2".split()) == {
+        "ipa": "bɝθdeɪ", "stress": ["primary", "secondary"]}
+    assert public_dictionary.convert("F AO1 R AH0 S T".split()) == {
+        "ipa": "fɔɹəst", "stress": ["primary", "unstressed"]}
+    assert public_dictionary.convert("AH1 ER0".split()) == {
+        "ipa": "ʌɚ", "stress": ["primary", "unstressed"]}
+    try:
+        public_dictionary.convert(["UNKNOWN"])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Unknown phones must not silently become IPA")
 
 
 def _run_all():
